@@ -1,17 +1,23 @@
 /* LernDax – Service Worker: App läuft auch offline.
- * Bei jeder neuen Version VERSION erhöhen, dann holen sich alle Geräte die neuen Dateien. */
-const VERSION = 'lerndax-v3';
+ * Eigene Dateien: immer zuerst frisch vom Server, der Speicher ist nur der Offline-Ersatz.
+ * So kommen Änderungen sofort an. Bei neuer Version VERSION erhöhen. */
+const VERSION = 'lerndax-v4';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js',
   './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js',
   './mathe/erklaerungen/klasse5.js', './mathe/erklaerungen/entdecken.js',
-  './icons/dachs.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon.png',
+  './icons/dachs.svg', './icons/icon-192-v4.png', './icons/icon-512-v4.png',
+  './icons/apple-touch-icon-v4.png', './icons/favicon-v4.png',
 ];
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION)
+    .then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys()
+    .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+    .then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', (e) => {
   const req = e.request;
@@ -20,10 +26,19 @@ self.addEventListener('fetch', (e) => {
   const own = url.origin === location.origin;
   const cdn = /fonts\.(googleapis|gstatic)\.com$|cdn\.jsdelivr\.net$/.test(url.hostname);
   if (!own && !cdn) return; // Datenbank-Anfragen nie zwischenspeichern
-  // Erst Cache (schnell, offline), im Hintergrund aktualisieren
+  if (own) {
+    // Netz zuerst (ohne veralteten Browser-Cache), offline aus dem Speicher
+    e.respondWith(fetch(req, { cache: 'no-cache' })
+      .then((res) => { if (res && res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); } return res; })
+      .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('./index.html'))));
+    return;
+  }
+  // Schriften & Bibliotheken: Speicher zuerst (ändern sich nicht)
   e.respondWith(caches.open(VERSION).then(async (c) => {
-    const hit = await c.match(req, { ignoreSearch: own });
-    const net = fetch(req).then((res) => { if (res && (res.ok || res.type === 'opaque')) c.put(req, res.clone()); return res; }).catch(() => hit);
-    return hit || net;
+    const hit = await c.match(req);
+    if (hit) return hit;
+    const res = await fetch(req);
+    if (res && (res.ok || res.type === 'opaque')) c.put(req, res.clone());
+    return res;
   }));
 });
