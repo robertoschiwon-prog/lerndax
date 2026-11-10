@@ -117,9 +117,9 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
-- **5 Lernbereiche, 24 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
+- **5 Lernbereiche, 25 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
   - LB 1 Natürliche Zahlen: Runden · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen ·
-    Schriftlich dividieren · Teilbarkeit & Teiler · Primzahlen & Primfaktoren · Einfache Gleichungen
+    Schriftlich dividieren · Teiler & Vielfache · Primzahlen & Primfaktoren · Einfache Gleichungen · **Textaufgaben**
   - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern ·
     Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Zahlen vergleichen · Arithmetisches Mittel
   - LB 3 Geometrie: Koordinatensystem · Winkelarten · Winkel an Geraden
@@ -152,7 +152,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - **Teilbarkeit & Teiler** (seit 10.11.): passende Regel zur Aufgabe (Quersumme, letzte Ziffer,
     letzte zwei Ziffern, durch 6 = durch 2 und 3) bzw. Teiler-Paare
   Technik: Der Generator gibt `ex: { mode, … }` mit; die Erklärung bekommt das als `ctx` mit
-  `pre` (ähnliches Beispiel) oder `post` (genau die Aufgabe).
+  `pre` (ähnliches Beispiel) oder `post` (genau die Aufgabe). Mit `ex.via: '<Themen-ID>'` nutzt
+  eine Aufgabe die Erklärung eines anderen Themas (so bei den Textaufgaben).
 - **Entdecken (14 Staunen-Momente, dunkle „Bühne“):** Ich kann Gedanken lesen! · Der Trick
   des kleinen Gauß · Ungerade Zahlen bauen Quadrate · Unendlich viele Brüche ergeben 1 ·
   Das Sieb des Eratosthenes · Reis auf dem Schachbrett · Das Galton-Brett · Das Pascalsche
@@ -237,7 +238,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v14`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v15`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -381,7 +382,12 @@ Infos zur ersten Arbeit:
       „Mach die Probe: Stimmt das?“
 - [x] **Teilermengen** (`lerndax-v9`) im Thema „Teilbarkeit & Teiler“: Anzahl der Teiler,
       „Welche Zahl ist kein Teiler?“
-- [ ] Mit Bruno testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler
+- [x] **Vielfache** (im Thema „Teiler & Vielfache“) und neues Thema **„Textaufgaben“** (`lerndax-v15`):
+      Verteilen mit Rest, Rechnung zum Text aufstellen (Punkt vor Strich, Klammer), Gruppen bilden
+      (Teiler), Verdoppeln und Würfel (Potenzen), gleichmäßig verteilen (Teilbarkeit); jede
+      Textaufgabe öffnet die passende Animation. Auf der Trainingsseite als Block „Querbeet:
+      Textaufgaben“ (S. 45–47). Vorsorglich ergänzt, Abgleich mit dem Buch steht noch aus.
+- [ ] Mit Bruno testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler & Vielfache, Textaufgaben
 - [ ] Trainingsseite mit Bruno testen
 - [x] Auftrag an das Familienkalender-Projekt übergeben (10.11.2026, 19:50, mit Robertos OK;
       Chat „LernDax Übungs-Knopf und Tabellen“ im Projekt Familienkalender): Knopf „📚 Jetzt üben“,
@@ -469,6 +475,8 @@ Infos zur ersten Arbeit:
 - Entscheidungen Roberto: keine Geschwister; Bruno übt an Papas iPhone, am Computer und Tablet;
   Ziel eine Runde pro Tag; Trainingsseite bleibt nach der Arbeit stehen; Idee „später öffentlich“.
 - **Tagesziel** eingebaut und mit synchronisiert (Version `lerndax-v14`).
+- **Vielfache** und neues Thema **Textaufgaben** (Querbeet zu den Arbeitsthemen), auch auf der
+  Trainingsseite (Version `lerndax-v15`).
 - **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
   mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
   (Version `lerndax-v8`). Aufgabenarten:

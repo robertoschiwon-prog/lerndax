@@ -566,6 +566,138 @@
     };
   }
 
+  // Vielfache
+  function vielfache() {
+    const d = R(3, 12), v = R(1, 3);
+    const V = (k) => d * k;
+    const list = `V<sub>${d}</sub> = {${[1, 2, 3, 4, 5, 6].map(V).join(', ')}, …}`;
+    if (v === 1) {
+      const k = R(4, 10);
+      return {
+        prompt: `Was ist das <b>${k}. Vielfache</b> von <b>${d}</b>?`,
+        fields: [{ answer: d * k }],
+        hint: `Die Vielfachen von ${d} sind ${d}, ${2 * d}, ${3 * d}, … Das ${k}. ist ${k} · ${d}.`,
+        solution: `${list}<br>Das ${k}. Vielfache ist ${k} · ${d} = <b>${d * k}</b>`,
+      };
+    }
+    if (v === 2) {
+      const g = R(3, 9) * 10 + R(0, 9), ans = (Math.floor(g / d) + 1) * d;
+      return {
+        prompt: `Welches ist das <b>kleinste Vielfache</b> von <b>${d}</b>, das <b>größer als ${g}</b> ist?`,
+        fields: [{ answer: ans }],
+        hint: `Wie oft passt ${d} in ${g}? Dann einmal mehr.`,
+        solution: `${g} : ${d} = ${Math.floor(g / d)} Rest ${g % d}, also ist ${Math.floor(g / d)} · ${d} = ${Math.floor(g / d) * d} noch zu klein.<br>${Math.floor(g / d) + 1} · ${d} = <b>${ans}</b>`,
+      };
+    }
+    const right = d * R(5, 12);
+    const wrong = shuffle([...new Set([right + R(1, d - 1), right - R(1, d - 1), right + d + R(1, d - 1)])].filter((x) => x % d !== 0)).slice(0, 3);
+    const opts = shuffle([right, ...wrong]);
+    return {
+      prompt: `Welche Zahl ist ein <b>Vielfaches von ${d}</b>?`,
+      choices: opts.map(String),
+      correct: opts.indexOf(right),
+      hint: `Ein Vielfaches von ${d} lässt sich ohne Rest durch ${d} teilen.`,
+      solution: `${right} = ${right / d} · ${d} → <b>${right}</b> ist ein Vielfaches von ${d}.${wrong.length ? `<br><small>Die anderen haben beim Teilen durch ${d} einen Rest.</small>` : ''}`,
+    };
+  }
+
+  // Textaufgaben quer durch Lernbereich 1 (Querbeet vor der Arbeit)
+  function textaufgaben() {
+    const v = R(1, 6);
+    if (v === 1) {
+      // Verteilen mit Rest
+      const ctx = pick([
+        ['Kronkorken', 'sammelt die Klasse', 'in einen Beutel', 'Beutel', 'Kronkorken'],
+        ['Fotos', 'hat Bruno', 'auf eine Albumseite', 'Albumseiten', 'Foto'],
+        ['Murmeln', 'hat die Schule für das Sportfest', 'in ein Säckchen', 'Säckchen', 'Murmel'],
+        ['Kastanien', 'sammelt die 5d', 'in einen Korb', 'Körbe', 'Kastanie'],
+      ]);
+      const d = R(3, 9), n = R(150, 2000), q = Math.floor(n / d), r = n % d;
+      return {
+        prompt: `${fmt(n)} ${ctx[0]} ${ctx[1]}. Immer <b>${d}</b> kommen ${ctx[2]}. Wie viele <b>${ctx[3]}</b> werden voll, und wie viele ${ctx[0]} bleiben übrig?`,
+        fields: [{ answer: q, label: `volle ${ctx[3]}` }, { answer: r, label: 'übrig' }],
+        hint: `Rechne ${fmt(n)} : ${d}. Der Rest ist das, was übrig bleibt.`,
+        solution: `${fmt(n)} : ${d} = ${fmt(q)} Rest ${r}<br>→ <b>${fmt(q)}</b> ${ctx[3]} voll, <b>${r}</b> ${r === 1 ? ctx[4] + ' bleibt' : ctx[0] + ' bleiben'} übrig.`,
+        ex: { mode: 'div', n, d, via: 'k5-division' },
+        answerText: `${fmt(q)} voll, ${r} übrig`,
+      };
+    }
+    if (v === 2) {
+      // Rechnung aufstellen: Punkt vor Strich
+      const k = pick([['Hefte', 'Heft'], ['Brezeln', 'Brezel'], ['Sticker-Packungen', 'Packung'], ['Kugeln Eis', 'Kugel']]);
+      const a = R(2, 6), p = R(2, 4), x = pick([['einen Stift', R(2, 5)], ['ein Getränk', R(2, 3)], ['einen Block', R(3, 6)]]);
+      const sum = a * p + x[1];
+      const pay = Math.ceil(sum / 10) * 10 + (sum % 10 === 0 ? 10 : 0);
+      if (Math.random() < 0.5)
+        return {
+          prompt: `Bruno kauft <b>${a} ${k[0]}</b> zu je <b>${p} €</b> und dazu <b>${x[0]}</b> für <b>${x[1]} €</b>. Wie viel muss er bezahlen?`,
+          fields: [{ answer: sum, suffix: '€' }],
+          hint: 'Schreib zuerst eine Rechnung auf. Denk an Punkt vor Strich.',
+          solution: `Rechnung: <b>${a} · ${p} + ${x[1]}</b><br>Punkt vor Strich: ${a} · ${p} = ${a * p}, dann ${a * p} + ${x[1]} = <b>${sum} €</b>`,
+          ex: { mode: 'tree', e: `${a} · ${p} + ${x[1]}`, via: 'k5-vorrang' },
+        };
+      return {
+        prompt: `Bruno kauft <b>${a} ${k[0]}</b> zu je <b>${p} €</b> und <b>${x[0]}</b> für <b>${x[1]} €</b>. Er bezahlt mit <b>${pay} €</b>. Wie viel Geld bekommt er zurück?`,
+        fields: [{ answer: pay - sum, suffix: '€' }],
+        hint: 'Rechne erst aus, was alles zusammen kostet. Achtung: Klammer!',
+        solution: `Rechnung: <b>${pay} − (${a} · ${p} + ${x[1]})</b><br>Klammer zuerst: ${a} · ${p} + ${x[1]} = ${sum}, dann ${pay} − ${sum} = <b>${pay - sum} €</b>`,
+        ex: { mode: 'tree', e: `${pay} − (${a} · ${p} + ${x[1]})`, via: 'k5-vorrang' },
+      };
+    }
+    if (v === 3) {
+      // Gruppen bilden: Teiler
+      const n = pick([12, 18, 20, 24, 28, 30, 32, 36]);
+      const T = []; for (let i = 1; i <= n; i++) if (n % i === 0) T.push(i);
+      const inner = T.filter((t) => t > 1 && t < n);
+      return {
+        prompt: `<b>${n} Kinder</b> sollen in <b>gleich große</b> Gruppen eingeteilt werden. Jede Gruppe soll mindestens 2 Kinder haben, und es soll mehr als eine Gruppe geben. Wie viele <b>verschiedene Gruppengrößen</b> sind möglich?`,
+        fields: [{ answer: inner.length }],
+        hint: `Gesucht sind die Teiler von ${n}, ohne 1 und ohne ${n}.`,
+        solution: `T<sub>${n}</sub> = {${T.join(', ')}}. Ohne 1 und ${n} bleiben ${inner.join(', ')} → <b>${inner.length}</b> Möglichkeiten.`,
+        ex: { mode: 'teiler', n, via: 'k5-teilbar' },
+      };
+    }
+    if (v === 4) {
+      // Potenzen: Verdoppeln
+      const k = R(4, 9);
+      const c = pick([
+        [`Eine Seerose verdoppelt jeden Tag ihre Blätter. Am Anfang hat sie <b>1 Blatt</b>. Wie viele Blätter hat sie nach <b>${k} Tagen</b>?`, 'Blätter'],
+        [`Ein Gerücht: Jede Stunde erzählt jeder, der es kennt, es einer weiteren Person. Am Anfang kennt es <b>1 Person</b>. Wie viele kennen es nach <b>${k} Stunden</b>?`, 'Personen'],
+        [`Ein Blatt Papier wird <b>${k}-mal</b> in der Mitte gefaltet. Wie viele Lagen liegen dann übereinander?`, 'Lagen'],
+      ]);
+      return {
+        prompt: c[0],
+        fields: [{ answer: 2 ** k, suffix: c[1] }],
+        hint: `Jedes Mal verdoppeln: 1, 2, 4, 8, … Das ist 2 hoch ${k}.`,
+        solution: `${k}-mal verdoppeln = 2<sup>${k}</sup> = ${Array(k).fill(2).join(' · ')} = <b>${2 ** k}</b> ${c[1]}`,
+        ex: { mode: 'pow', b: 2, e: k, via: 'k5-potenz' },
+      };
+    }
+    if (v === 5) {
+      // Würfel aus kleinen Würfeln
+      const k = R(2, 6);
+      return {
+        prompt: `Ein großer Würfel wird aus kleinen Würfeln gebaut: <b>${k}</b> lang, <b>${k}</b> breit, <b>${k}</b> hoch. Wie viele kleine Würfel braucht man?`,
+        fields: [{ answer: k ** 3 }],
+        hint: `Eine Schicht hat ${k} · ${k} Würfel, und es gibt ${k} Schichten.`,
+        solution: `${k} · ${k} · ${k} = ${k}<sup>3</sup> = <b>${k ** 3}</b> kleine Würfel`,
+        ex: { mode: 'pow', b: k, e: 3, via: 'k5-potenz' },
+      };
+    }
+    // v === 6: gleichmäßig verteilen ohne Rest? (Teilbarkeit + Division)
+    const d = pick([3, 4, 6, 9]);
+    const ok = Math.random() < 0.5;
+    let n = d * R(20, 180); if (!ok) n += R(1, d - 1);
+    return {
+      prompt: `Beim Schulfest gibt es <b>${fmt(n)} Lose</b>. Sie sollen <b>gleichmäßig</b> auf <b>${d} Stände</b> verteilt werden, ohne dass eins übrig bleibt. Geht das?`,
+      choices: ['Ja', 'Nein'],
+      correct: ok ? 0 : 1,
+      hint: `Prüfe mit der Teilbarkeitsregel für ${d}.`,
+      solution: `${fmt(n)} : ${d} = ${ok ? fmt(n / d) : `${fmt(Math.floor(n / d))} Rest ${n % d}`} → <b>${ok ? 'Ja' : 'Nein'}</b>${ok ? `, jeder Stand bekommt ${fmt(n / d)} Lose.` : `, es blieben ${n % d} übrig.`}`,
+      ex: { mode: 'teil', n, d, via: 'k5-teilbar' },
+    };
+  }
+
   // Teilermengen
   const divisors = (n) => { const t = []; for (let i = 1; i <= n; i++) if (n % i === 0) t.push(i); return t; };
   function teiler() {
@@ -604,7 +736,9 @@
     10: 'Eine Zahl ist durch 10 teilbar, wenn ihre letzte Ziffer 0 ist.',
   };
   function teilbarkeit() {
-    if (Math.random() < 0.3) return teiler();
+    const roll = Math.random();
+    if (roll < 0.25) return teiler();
+    if (roll < 0.45) return vielfache();
     const d = pick([2, 3, 4, 5, 6, 9, 10, 3, 4, 6]);
     const yes = Math.random() < 0.5;
     let n = d * R(Math.ceil(100 / d), Math.floor(99999 / d));
@@ -1189,9 +1323,10 @@
           { id: 'k5-vorteil', title: 'Geschickt rechnen', icon: '⚡', gen: vorteilhaft },
           { id: 'k5-potenz', title: 'Potenzen', icon: 'x²', gen: potenzen },
           { id: 'k5-division', title: 'Schriftlich dividieren', icon: '÷', gen: division },
-          { id: 'k5-teilbar', title: 'Teilbarkeit & Teiler', icon: '∣', gen: teilbarkeit },
+          { id: 'k5-teilbar', title: 'Teiler & Vielfache', icon: '∣', gen: teilbarkeit },
           { id: 'k5-prim', title: 'Primzahlen & Primfaktoren', icon: 'P', gen: primzahlen },
           { id: 'k5-gleichung', title: 'Einfache Gleichungen', icon: 'x', gen: gleichungen },
+          { id: 'k5-text', title: 'Textaufgaben', icon: '?', gen: textaufgaben },
         ],
       },
       {

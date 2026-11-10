@@ -515,6 +515,8 @@ body.noscroll{overflow:hidden}
   const grade = () => M.grades[5];
   const allTopics = () => grade().lbs.flatMap((lb) => lb.topics.map((t) => Object.assign({ lb }, t)));
   const findTopic = (id) => allTopics().find((t) => t.id === id);
+  // Welche Erklärung gehört zu einer Aufgabe? Normalerweise die des Themas; Textaufgaben nennen sie in ex.via.
+  const exId = (topic, task) => (task && task.ex && task.ex.via && EXP[task.ex.via] ? task.ex.via : topic.id);
   const TR = (() => {
     let id = '';
     try { id = new URLSearchParams(location.search).get('t') || ''; } catch (e) {}
@@ -788,7 +790,7 @@ body.noscroll{overflow:hidden}
         <div id="fb"></div>
         <div class="acts" id="acts">
           <button class="btn" id="hintB">💡 Tipp</button>
-          ${EXP[topic.id] ? `<button class="btn" data-explain="${topic.id}" data-when="pre">▶ Erklärung</button>` : ''}
+          ${EXP[exId(topic, task)] ? `<button class="btn" data-explain="${exId(topic, task)}" data-when="pre">▶ Erklärung</button>` : ''}
           ${task.choices ? '' : '<button class="btn pri" id="checkB">Prüfen</button>'}
         </div>
       </div>`;
@@ -847,7 +849,7 @@ body.noscroll{overflow:hidden}
       finish(score);
       if (t.choices) markChoices(choiceIdx);
       const msg = c.attempt === 1 ? U.pick(['Richtig! 🎉', 'Stark! 💪', 'Genau so! ✨', 'Volltreffer! 🎯', 'Super gemacht! 🌟']) : 'Jetzt passt’s! 👍';
-      fb.innerHTML = `<div class="fb ok"><h3>${msg}</h3>${note ? `<div>${note}</div>` : ''}<div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${t.ex && EXP[c.topic.id] ? `<button class="btn exinline" data-explain="${c.topic.id}" data-when="post">▶ Lösung als Animation</button>` : ''}</div>`;
+      fb.innerHTML = `<div class="fb ok"><h3>${msg}</h3>${note ? `<div>${note}</div>` : ''}<div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${t.ex && EXP[exId(c.topic, t)] ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ Lösung als Animation</button>` : ''}</div>`;
     } else if (c.attempt === 1 && !fewChoices) {
       c.attempt = 2;
       if (t.choices) { const b = document.querySelector(`[data-choice="${choiceIdx}"]`); b.classList.add('w'); b.disabled = true; }
@@ -859,7 +861,7 @@ body.noscroll{overflow:hidden}
     } else {
       finish(0);
       if (t.choices) markChoices(choiceIdx);
-      fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[c.topic.id] ? `<button class="btn exinline" data-explain="${c.topic.id}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
+      fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[exId(c.topic, t)] ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
     }
     document.getElementById('acts').innerHTML = `<button class="btn pri wide" id="nextB">${R.idx + 1 < R.seq.length ? 'Weiter →' : 'Fertig →'}</button>`;
     document.getElementById('nextB').focus();

@@ -26,6 +26,7 @@ window.LERNDAX_TRAININGS = {
       { titel: 'Potenzen', buch: 'S. 30–31', themen: ['k5-potenz'] },
       { titel: 'Teilbarkeit und Primzahlen', buch: 'S. 33–37', themen: ['k5-teilbar', 'k5-prim'] },
       { titel: 'Schriftliches Dividieren', buch: 'S. 40', themen: ['k5-division'] },
+      { titel: 'Querbeet: Textaufgaben', buch: 'S. 45–47', themen: ['k5-text'] },
     ],
     buch: [
       { text: 'Querbeet-Aufgaben zu allen Themen', seiten: 'S. 45–47' },
