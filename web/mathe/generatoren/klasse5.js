@@ -141,7 +141,17 @@
   // ---------- Vorrangregeln ----------
   // Klammer zuerst · Potenz vor Punkt · Punkt vor Strich · sonst von links nach rechts
   const VR_HINT = 'Reihenfolge: <b>Klammer</b> zuerst, dann <b>Hochzahl</b>, dann <b>Punkt</b> (· und :), zuletzt <b>Strich</b> (+ und −). Sonst von links nach rechts.';
+  // Gibt jeder Vorrang-Aufgabe den Rechenausdruck für den Rechenbaum mit (ex.e, ² als Zeichen).
   function vorrang() {
+    const t = vorrang0();
+    const plain = (h) => h.replace(/<sup>2<\/sup>/g, '²').replace(/<[^>]+>/g, '');
+    let e = null;
+    if (/^Welche Rechnung/.test(t.prompt)) e = plain(t.choices[t.correct]);
+    else { const m = t.prompt.match(/<b>(.*?)<\/b>/); if (m) e = plain(m[1]); }
+    if (e) t.ex = { mode: 'tree', e };
+    return t;
+  }
+  function vorrang0() {
     const v = R(1, 11);
     if (v === 1) {
       const a = R(2, 60), b = R(2, 9), c = R(2, 12), p = b * c;
@@ -252,8 +262,8 @@
       };
     }
     if (v === 10) {
-      // Was rechnest du zuerst?
-      const a = R(2, 20), b = R(2, 9), c = R(2, 9), d = R(2, 9);
+      // Was rechnest du zuerst? (a groß genug, damit kein Zwischenergebnis negativ wird)
+      const a = R(12, 40), b = R(2, 9), c = R(2, 9), d = R(2, 9);
       const forms = [
         { e: `${a} + ${b} · ${c} − ${d}`, ch: [`${a} + ${b}`, `${b} · ${c}`, `${c} − ${d}`], k: 1, why: 'Punkt vor Strich.' },
         { e: `${a} · (${b} + ${c}) − ${d}`, ch: [`${a} · ${b}`, `${b} + ${c}`, `${c} − ${d}`], k: 1, why: 'Klammer zuerst.' },
@@ -273,7 +283,7 @@
     // v === 11: Wo gehört die Klammer hin?
     const a = R(2, 9), b = R(2, 9), c = R(2, 9);
     const withB = (a + b) * c, noB = a + b * c;
-    if (withB === noB) return vorrang();
+    if (withB === noB) return vorrang0();
     const wantB = Math.random() < 0.5;
     const target = wantB ? withB : noB;
     return {
@@ -385,6 +395,7 @@
       const n = R(11, 20);
       return {
         prompt: `Berechne: <b>${n}${sup(2)}</b>`,
+        ex: { mode: 'quad', n },
         fields: [{ answer: n * n }],
         hint: `${n}${sup(2)} bedeutet ${n} · ${n}.`,
         solution: `${n} · ${n} = <b>${n * n}</b>`,
@@ -394,6 +405,7 @@
       const n = R(11, 20);
       return {
         prompt: `Welche natürliche Zahl ergibt quadriert <b>${n * n}</b>?`,
+        ex: { mode: 'quad', n },
         fields: [{ answer: n }],
         hint: 'Probiere Zahlen zwischen 10 und 20. Schau auf die letzte Ziffer!',
         solution: `${n} · ${n} = ${n * n}, also <b>${n}</b>`,
@@ -404,12 +416,14 @@
       if (v === 3)
         return {
           prompt: `Schreibe als Zahl: <b>10${sup(k)}</b>`,
+          ex: { mode: 'zehn', k },
           fields: [{ answer: 10 ** k }],
           hint: 'Der Exponent sagt dir, wie viele Nullen hinter der 1 stehen.',
           solution: `10${sup(k)} = 1 mit ${k} Nullen = <b>${fmt(10 ** k)}</b>`,
         };
       return {
         prompt: `Schreibe als Zehnerpotenz: <b>${fmt(10 ** k)}</b>`,
+        ex: { mode: 'zehn', k },
         fields: [{ answer: k, prefix: '10 hoch' }],
         hint: 'Zähle die Nullen.',
         solution: `${fmt(10 ** k)} hat ${k} Nullen → <b>10${sup(k)}</b>`,
@@ -423,6 +437,7 @@
       const [b, e] = pick(POW);
       return {
         prompt: `Berechne: <b>${b}${sup(e)}</b>`,
+        ex: { mode: 'pow', b, e },
         fields: [{ answer: b ** e }],
         hint: `Die Basis ${b} wird <b>${e}-mal</b> mit sich selbst malgenommen. Nicht ${b} · ${e}!`,
         solution: `${b}${sup(e)} = ${e > 1 ? prod(b, e) + ' = ' : ''}<b>${fmt(b ** e)}</b>${e === 1 ? ' (hoch 1: die Zahl selbst)' : b === 1 ? ' (1 mal 1 bleibt immer 1)' : ''}`,
@@ -432,6 +447,7 @@
       const [b, e] = pick(POW.filter(([b, e]) => b > 1 && e > 1));
       return {
         prompt: `Schreibe als Potenz: <b>${prod(b, e)}</b>`,
+        ex: { mode: 'pow', b, e },
         fields: [{ answer: b, label: 'Basis' }, { answer: e, label: 'Exponent' }],
         hint: 'Die Basis ist die Zahl, die malgenommen wird. Der Exponent zählt, wie oft sie vorkommt.',
         solution: `Die ${b} kommt <b>${e}-mal</b> vor → <b>${b}${sup(e)}</b> (Basis ${b}, Exponent ${e})`,
@@ -444,6 +460,7 @@
       const opts = shuffle([b ** e, b * e, e ** b <= 2000 ? e ** b : b + e]);
       return {
         prompt: `Was ist <b>${b}${sup(e)}</b>?`,
+        ex: { mode: 'pow', b, e },
         choices: opts.map(fmt),
         correct: opts.indexOf(b ** e),
         hint: `Hochzahl heißt: ${b} so oft malnehmen, wie der Exponent sagt.`,
@@ -471,12 +488,14 @@
       return Math.random() < 0.5
         ? {
           prompt: `Berechne: <b>${a} · 10${sup(k)}</b>`,
+          ex: { mode: 'zehn', k, a },
           fields: [{ answer: a * 10 ** k }],
           hint: `10${sup(k)} ist eine 1 mit ${k} Nullen.`,
           solution: `${a} · ${fmt(10 ** k)} = <b>${fmt(a * 10 ** k)}</b>`,
         }
         : {
           prompt: `Schreibe mit einer Zehnerpotenz: <b>${fmt(a * 10 ** k)}</b>`,
+          ex: { mode: 'zehn', k, a },
           fields: [{ answer: k, prefix: `${a} · 10 hoch` }],
           hint: 'Zähle die Nullen hinter der ersten Ziffer.',
           solution: `${fmt(a * 10 ** k)} = ${a} · ${fmt(10 ** k)} = <b>${a} · 10${sup(k)}</b>`,
@@ -486,6 +505,7 @@
     const [b, e] = pick(POW.filter(([b, e]) => b > 1 && e >= 3));
     return {
       prompt: `Welche Zahl hoch ${e} ergibt <b>${fmt(b ** e)}</b>?`,
+      ex: { mode: 'pow', b, e },
       fields: [{ answer: b, suffix: `<sup>${e}</sup> = ${fmt(b ** e)}` }],
       hint: 'Probiere kleine Zahlen: 2, 3, 4, 5 …',
       solution: `${prod(b, e)} = ${fmt(b ** e)} → <b>${b}</b>`,
@@ -498,6 +518,7 @@
       const d = R(2, 9), n = R(100, 999), q = Math.floor(n / d), r = n % d;
       return {
         prompt: `Dividiere schriftlich: <b>${n} : ${d}</b>`,
+        ex: { mode: 'div', n, d },
         fields: [{ answer: q, label: 'Ergebnis' }, { answer: r, label: 'Rest' }],
         hint: 'Teile Stelle für Stelle von links. Bleibt am Ende nichts übrig, ist der Rest 0.',
         solution: `${n} : ${d} = <b>${q} Rest ${r}</b><br>Probe: ${d} · ${q} + ${r} = ${d * q} + ${r} = ${n} ✓`,
@@ -512,6 +533,7 @@
       const n = d * q;
       return {
         prompt: `Dividiere schriftlich: <b>${fmt(n)} : ${d}</b>`,
+        ex: { mode: 'div', n, d },
         fields: [{ answer: q, label: 'Ergebnis' }],
         hint: `Teile Stelle für Stelle von links. Passt ${d} in eine Stelle nicht hinein, schreibst du eine <b>0</b> ins Ergebnis!`,
         solution: `${fmt(n)} : ${d} = <b>${fmt(q)}</b><br>Probe: ${d} · ${fmt(q)} = ${fmt(n)} ✓`,
@@ -521,6 +543,7 @@
       const d = R(3, 9), n = R(1000, 9999), q = Math.floor(n / d), r = n % d;
       return {
         prompt: `Dividiere schriftlich: <b>${fmt(n)} : ${d}</b>`,
+        ex: { mode: 'div', n, d },
         fields: [{ answer: q, label: 'Ergebnis' }, { answer: r, label: 'Rest' }],
         hint: 'Teile Stelle für Stelle von links. Der Rest muss kleiner sein als die Zahl, durch die du teilst.',
         solution: `${fmt(n)} : ${d} = <b>${fmt(q)} Rest ${r}</b><br>Probe: ${d} · ${fmt(q)} + ${r} = ${fmt(d * q)} + ${r} = ${fmt(n)} ✓`,
@@ -535,6 +558,7 @@
     const back = d * shownQ + r;
     return {
       prompt: `Mach die Probe: Stimmt <b>${shown}</b>?`,
+      ex: { mode: 'div', n, d },
       choices: ['Stimmt', 'Stimmt nicht'],
       correct: ok ? 0 : 1,
       hint: `Probe: Ergebnis mal ${d}${r ? ', plus Rest' : ''}. Kommt ${fmt(n)} heraus?`,
@@ -551,6 +575,7 @@
     if (Math.random() < 0.5)
       return {
         prompt: `Wie viele Teiler hat <b>${n}</b>?`,
+        ex: { mode: 'teiler', n },
         fields: [{ answer: T.length, suffix: 'Teiler' }],
         hint: 'Suche Teiler-Paare: 1 · ' + n + ', 2 · …, und vergiss die 1 und die Zahl selbst nicht.',
         solution: `${list} → <b>${T.length} Teiler</b>`,
@@ -561,6 +586,7 @@
     const opts = shuffle([wrong, ...shuffle(T.filter((t) => t > 1 && t < n)).slice(0, 3)]);
     return {
       prompt: `Welche Zahl ist <b>kein</b> Teiler von <b>${n}</b>?`,
+      ex: { mode: 'teiler', n },
       choices: opts.map(String),
       correct: opts.indexOf(wrong),
       hint: 'Prüfe für jede Zahl: Geht die Division ohne Rest auf?',
@@ -591,6 +617,7 @@
     else why = `Die letzte Ziffer ist ${n % 10}.`;
     return {
       prompt: `Ist <b>${fmt(n)}</b> durch <b>${d}</b> teilbar?`,
+      ex: { mode: 'teil', n, d },
       choices: ['Ja', 'Nein'],
       correct: ok ? 0 : 1,
       hint: TEILER_REGELN[d],

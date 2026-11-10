@@ -88,9 +88,10 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 
 **Mathe (Mathelix)**
 - [x] Klasse 5: alle 5 Lernbereiche, 24 Themen, Tipps und Lösungswege
-- [x] 20 Erklär-Animationen, Pause und Langsam-Modus, Lösung nach dem Antworten (Primzahlen)
+- [x] 21 Erklär-Animationen, Pause und Langsam-Modus
+- [x] Beispiel vorher / Lösung als Animation nachher: Primzahlen, Vorrangregeln, Potenzen, Division, Teilbarkeit
 - [x] Entdecken: 14 visuelle Beweise und Staunen-Momente
-- [ ] Lösung-als-Animation auf weitere Themen übertragen
+- [ ] Lösung-als-Animation auf die übrigen Themen übertragen
 - [ ] Reihenfolge mit dem Schulbuch abgleichen
 - [ ] Klasse 6, danach Klasse 4 und die übrigen Klassen
 

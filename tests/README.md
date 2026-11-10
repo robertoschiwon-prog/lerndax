@@ -12,6 +12,7 @@ Voraussetzung: Python 3 mit `pip install playwright` und `playwright install chr
 | `python3 tests/ui2.py` | Alle 24 Themen durchspielen und richtig beantworten (384 Aufgaben müssen als richtig erkannt werden) |
 | `python3 tests/ex.py` | Alle Erklär-Animationen abspielen (Schnelldurchlauf) |
 | `python3 tests/pause.py` | Pause- und Langsam-Modus im Erklär-Player |
+| `python3 tests/ex_aufgabe.py` | Erklärungen passend zur Aufgabe (Vorrangregeln, Potenzen, Division, Teilbarkeit): „Erklärung“ vorher mit ähnlichem Beispiel, „Lösung als Animation“ nachher mit genau der Aufgabe |
 | `python3 tests/prim.py` | Primzahlen: Beispiel vor der Aufgabe, Lösung als Animation danach |
 | `python3 tests/pack2.py` | Entdecken-Bereich: alle Staunen-Momente laufen durch |
 | `python3 tests/two.py` | Zwei Animationen nacheinander (kein Überlappen) |

@@ -115,8 +115,10 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **20 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
-  Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Teilen mit Rest ·
+- **21 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
+  Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Dividieren: Bonbons in Tüten und
+  schriftlich Stelle für Stelle · Teilbarkeit: Regeln und Teiler (Quersumme, Endziffern, durch 6,
+  Teiler-Paare) ·
   Primzahlen · Potenzen: wie oft malnehmen? (Basis/Exponent, 2ⁿ verdoppeln, Zehnerpotenzen,
   a¹ und 1ⁿ, Quadratzahlen) · Anteile berechnen · Erweitern & Kürzen ·
   Die Hundertertafel · Mal 10 (das Komma bleibt, die Ziffern wandern) · Der Mittelwert macht
@@ -125,8 +127,20 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   Sprüngen · Zoom ins Maßband · Was ist π? Das abrollende Rad.
 - **Erklär-Player:** Abspielen, **Pause**, **Langsam-Modus**, „Nochmal“; viele Animationen
   haben Regler oder Auswahl-Chips zum Selbst-Ausprobieren.
-- **Beispiel vorher / Lösung als Animation nachher:** umgesetzt für **Primzahlen**
-  (Rechteck-Legen) und **Primfaktorzerlegung** (Faktorbaum). Vorlage für weitere Themen.
+- **Beispiel vorher / Lösung als Animation nachher:** „▶ Erklärung“ vor dem Antworten zeigt ein
+  **ähnliches Beispiel** (andere Zahlen, verrät nichts), „▶ Lösung als Animation“ nach dem Antworten
+  zeigt **genau die Aufgabe**. Umgesetzt für:
+  - **Primzahlen** (Rechteck-Legen) und **Primfaktorzerlegung** (Faktorbaum)
+  - **Vorrangregeln** (seit 10.11.): Rechenbaum aus Brunos Rechnung, auch mit Klammern und ²;
+    am Ende bleibt der Rechenweg als nummerierte Liste stehen
+  - **Potenzen** (seit 10.11.): Basis/Exponent mit den Zahlen der Aufgabe (inkl. „nicht b · e“),
+    Zehnerpotenzen mit markierter Zeile (auch a · 10ⁿ), Quadratzahlen bis zur Zahl der Aufgabe
+  - **Schriftliches Dividieren** (seit 10.11.): Stelle für Stelle wie im Heft, mit Nullen im
+    Ergebnis, Rest und Probe
+  - **Teilbarkeit & Teiler** (seit 10.11.): passende Regel zur Aufgabe (Quersumme, letzte Ziffer,
+    letzte zwei Ziffern, durch 6 = durch 2 und 3) bzw. Teiler-Paare
+  Technik: Der Generator gibt `ex: { mode, … }` mit; die Erklärung bekommt das als `ctx` mit
+  `pre` (ähnliches Beispiel) oder `post` (genau die Aufgabe).
 - **Entdecken (14 Staunen-Momente, dunkle „Bühne“):** Ich kann Gedanken lesen! · Der Trick
   des kleinen Gauß · Ungerade Zahlen bauen Quadrate · Unendlich viele Brüche ergeben 1 ·
   Das Sieb des Eratosthenes · Reis auf dem Schachbrett · Das Galton-Brett · Das Pascalsche
@@ -210,7 +224,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v11`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v12`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -371,7 +385,9 @@ Infos zur ersten Arbeit:
 - [x] Testrunde 1 mit Bruno (10.11.2026)
 - [x] Schulbücher und nächste Arbeit geklärt (siehe Abschnitt 1)
 - [ ] Reihenfolge der Themen mit dem Schulbuch abgleichen
-- [ ] „Lösung als Animation“ (wie bei Primzahlen) auf weitere Themen übertragen
+- [x] „Lösung als Animation“ für die Arbeitsthemen (Vorrangregeln, Potenzen, Division, Teilbarkeit)
+- [ ] „Lösung als Animation“ auf die übrigen Themen übertragen (einfach: Runden, Anteile, Mittelwert,
+      Koordinaten; nicht sinnvoll bei reinen Auswahlfragen wie „Welches Gesetz?“)
 - [ ] Hinweis zu den `lerndax_`-Tabellen in der `status.md` des Familienkalenders (Roberto)
 - [ ] Prüfen, ob der LernDax-Link im Familienkalender eingebaut ist
 
@@ -415,6 +431,10 @@ Infos zur ersten Arbeit:
   (Version `lerndax-v10`).
 - Erklärung „Potenzen“ neu aufgebaut: erst Basis/Exponent, Verdoppeln, Zehnerpotenzen, Sonderfälle,
   Quadratzahlen zum Schluss (Version `lerndax-v11`).
+- **Erklärungen passend zur Aufgabe** für Vorrangregeln, Potenzen, Division (neue Animation
+  „schriftlich Stelle für Stelle“) und Teilbarkeit (neue Animation); neuer Test
+  `tests/ex_aufgabe.py`. Fehler behoben: „Was rechnest du zuerst?“ konnte Rechnungen mit negativem
+  Zwischenergebnis erzeugen (z. B. 2 − 4 + 3 · 4). Version `lerndax-v12`.
 - **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
   mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
   (Version `lerndax-v8`). Aufgabenarten:

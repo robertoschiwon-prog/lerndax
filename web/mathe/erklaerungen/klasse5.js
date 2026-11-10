@@ -113,53 +113,307 @@
   });
 
   // =====================================================
-  // Division mit Rest – Bonbons in Tüten
+  // Dividieren – Bonbons in Tüten (Rest) und schriftlich Stelle für Stelle
+  //   ctx: { mode:'div', n, d, pre, post }
   // =====================================================
+  // Schritte der schriftlichen Division: [{ col, p, q, prod, r }]
+  function divSteps(n, d) {
+    const dg = String(n).split('').map(Number), out = [];
+    let i = 0, p = dg[0];
+    while (p < d && i < dg.length - 1) { i++; p = p * 10 + dg[i]; }
+    for (;;) {
+      const q = Math.floor(p / d), prod = q * d, r = p - prod;
+      out.push({ col: i, p, q, prod, r });
+      if (i === dg.length - 1) break;
+      i++; p = r * 10 + dg[i];
+    }
+    return out;
+  }
   reg('k5-division', {
-    title: 'Teilen mit Rest',
-    viewBox: '0 0 360 250',
-    create(api) {
-      let d, q, r, n, dots, boxes;
-      const pickN = () => { d = R(3, 5); q = R(2, 5); r = R(1, d - 1); n = q * d + r; };
-      pickN();
-      function scene() {
+    title: 'Dividieren: teilen und schriftlich rechnen',
+    viewBox: '0 0 360 280',
+    create(api, ctx) {
+      ctx = ctx || {};
+      let task = null;
+      if (ctx.mode === 'div' && (ctx.pre || ctx.post)) {
+        task = { n: ctx.n, d: ctx.d };
+        if (ctx.pre) {
+          const len = String(ctx.n).length;
+          let n, d;
+          do { d = R(3, 9); n = R(10 ** (len - 1), 10 ** len - 1); } while (n === ctx.n);
+          task = { n, d };
+        }
+      }
+      let mode = task ? 'schrift' : 'alle';
+      let bd, bq, br, bn, dots;
+      const pickB = () => { bd = R(3, 5); bq = R(2, 5); br = R(1, bd - 1); bn = bq * bd + br; };
+      pickB();
+      let sn, sd;
+      const pickS = () => { sd = R(3, 9); sn = R(1000, 9999); };
+      if (task) { sn = task.n; sd = task.d; } else pickS();
+
+      function bonbonScene() {
         api.clear();
-        dots = []; boxes = [];
-        for (let i = 0; i < n; i++) {
+        dots = [];
+        for (let i = 0; i < bn; i++) {
           const x = 30 + (i % 6) * 22 + R(-4, 4), y = 40 + Math.floor(i / 6) * 22 + R(-4, 4);
           dots.push(el('circle', { cx: x, cy: y, r: 8, class: 'candy', opacity: 0 }, api.svg));
         }
-        el('text', { x: 85, y: 22, class: 'ex-s', 'text-anchor': 'middle', text: n + ' Bonbons' }, api.svg);
+        el('text', { x: 85, y: 22, class: 'ex-s', 'text-anchor': 'middle', text: bn + ' Bonbons' }, api.svg);
       }
-      api.chips([{ label: 'Neue Aufgabe', onClick() { pickN(); api.replay(); } }]);
-      return {
-        reset: scene,
-        async play() {
-          api.say(`<b>${n}</b> Bonbons sollen in Tüten mit je <b>${d}</b> Stück.`);
-          for (const c of dots) { c.setAttribute('opacity', 1); await api.wait(45); }
-          await api.wait(700);
-          for (let gI = 0; gI < q; gI++) {
-            const y = 34 + gI * 36, x0 = 190;
-            const box = el('rect', { x: x0 - 14, y: y - 15, width: d * 24 + 6, height: 30, rx: 8, class: 'bag', opacity: 0 }, api.svg);
-            el('text', { x: x0 + d * 24, y: y + 5, class: 'ex-s', text: 'Tüte ' + (gI + 1) }, api.svg);
-            api.svg.insertBefore(box, dots[0]);
-            boxes.push(box);
-            await api.tw(250, (t) => box.setAttribute('opacity', t));
-            api.say(`Tüte ${gI + 1}: ${d} Bonbons hinein.`);
-            const grp = dots.slice(gI * d, gI * d + d);
-            const from = grp.map((c) => [+c.getAttribute('cx'), +c.getAttribute('cy')]);
-            await api.tw(550, (t) => grp.forEach((c, k) => { c.setAttribute('cx', lerp(from[k][0], x0 + k * 24, t)); c.setAttribute('cy', lerp(from[k][1], y, t)); }));
+      async function bonbon() {
+        bonbonScene();
+        api.say(`<b>${bn}</b> Bonbons sollen in Tüten mit je <b>${bd}</b> Stück.`);
+        for (const c of dots) { c.setAttribute('opacity', 1); await api.wait(45); }
+        await api.wait(700);
+        for (let gI = 0; gI < bq; gI++) {
+          const y = 34 + gI * 36, x0 = 190;
+          const box = el('rect', { x: x0 - 14, y: y - 15, width: bd * 24 + 6, height: 30, rx: 8, class: 'bag', opacity: 0 }, api.svg);
+          el('text', { x: x0 + bd * 24, y: y + 5, class: 'ex-s', text: 'Tüte ' + (gI + 1) }, api.svg);
+          api.svg.insertBefore(box, dots[0]);
+          await api.tw(250, (t) => box.setAttribute('opacity', t));
+          api.say(`Tüte ${gI + 1}: ${bd} Bonbons hinein.`);
+          const grp = dots.slice(gI * bd, gI * bd + bd);
+          const from = grp.map((c) => [+c.getAttribute('cx'), +c.getAttribute('cy')]);
+          await api.tw(550, (t) => grp.forEach((c, k) => { c.setAttribute('cx', lerp(from[k][0], x0 + k * 24, t)); c.setAttribute('cy', lerp(from[k][1], y, t)); }));
+        }
+        const rest = dots.slice(bq * bd);
+        const from = rest.map((c) => [+c.getAttribute('cx'), +c.getAttribute('cy')]);
+        const yR = 34 + bq * 36 + 10;
+        api.say(`Es bleiben <b>${br}</b> übrig. Für eine volle Tüte reicht das nicht.`);
+        rest.forEach((c) => c.setAttribute('class', 'candy rest'));
+        await api.tw(600, (t) => rest.forEach((c, k) => { c.setAttribute('cx', lerp(from[k][0], 190 + k * 24, t)); c.setAttribute('cy', lerp(from[k][1], yR, t)); }));
+        el('text', { x: 190 + br * 24, y: yR + 5, class: 'ex-s f1', text: 'Rest' }, api.svg);
+        await api.wait(1400);
+        api.say(`<b>${bn} : ${bd} = ${bq} Rest ${br}</b><br>Probe: ${bq} · ${bd} + ${br} = ${bq * bd} + ${br} = ${bn} ✓`);
+        await api.wait(2600);
+      }
+
+      // ---------- schriftlich ----------
+      const CW = 17, RH = 23, Y0 = 46;
+      let X0;
+      const X = (col) => X0 + col * CW;
+      const D = (x, y, t, cls) => el('text', { x, y, class: 'divd' + (cls ? ' ' + cls : ''), 'text-anchor': 'middle', text: t }, api.svg);
+      function schriftScene() {
+        api.clear();
+        const L = String(sn).length;
+        X0 = 180 - ((2 * L + String(sd).length + 7.2) * CW) / 2 + CW / 2;
+        String(sn).split('').forEach((c, i) => D(X(i), Y0, c));
+        const xs = X(L - 1) + CW;
+        el('text', { x: xs, y: Y0, class: 'divd', text: `: ${sd} =` }, api.svg);
+      }
+      async function schrift() {
+        schriftScene();
+        const n = sn, d = sd, L = String(n).length;
+        const steps = divSteps(n, d);
+        const qx0 = X(L - 1) + CW * (String(d).length + 4.2);
+        let qn = 0;
+        const putQ = (digit) => { D(qx0 + qn * CW, Y0, String(digit), 'f2'); qn++; };
+        const hl = el('rect', { x: 0, y: Y0 - 18, width: 0, height: 24, rx: 5, class: 'hl2', opacity: 0 }, api.svg);
+        api.svg.insertBefore(hl, api.svg.firstChild);
+        const hlCols = (c0, c1, y) => { hl.setAttribute('x', X(c0) - CW / 2 - 2); hl.setAttribute('width', (c1 - c0 + 1) * CW + 4); hl.setAttribute('y', y - 18); hl.setAttribute('opacity', 1); };
+        api.say(`<b>${fmt(n)} : ${d}</b> schriftlich: Wir teilen <b>Stelle für Stelle</b> von links.`);
+        await api.wait(1800);
+        let rowY = Y0;
+        let first = true;
+        for (let s = 0; s < steps.length; s++) {
+          const st = steps[s], pLen = String(st.p).length;
+          hlCols(st.col - pLen + 1, st.col, rowY);
+          if (first && st.col > 0) api.say(`${String(n)[0]} ist kleiner als ${d}, also nehmen wir gleich <b>${st.p}</b>.`);
+          else api.say(`Wie oft passt ${d} in <b>${st.p}</b>?`);
+          first = false;
+          await api.wait(1600);
+          putQ(st.q);
+          if (st.q === 0) {
+            api.say(`${d} passt <b>nicht</b> in ${st.p} → eine <b>0</b> ins Ergebnis!`);
+            await api.wait(1800);
+          } else {
+            api.say(`<b>${st.q}</b>-mal, denn ${st.q} · ${d} = ${st.prod}. Die ${st.q} kommt ins Ergebnis.`);
+            await api.wait(1600);
+            const py = rowY + RH, pStr = String(st.prod);
+            D(X(st.col - pStr.length), py, '−');
+            pStr.split('').forEach((c, k) => D(X(st.col - pStr.length + 1 + k), py, c));
+            el('line', { x1: X(st.col - pStr.length) - CW / 2, y1: py + 6, x2: X(st.col) + CW / 2, y2: py + 6, class: 'tk' }, api.svg);
+            await api.wait(900);
+            rowY = py + RH;
+            const rStr = String(st.r);
+            const lastStep = s === steps.length - 1;
+            if (st.r > 0 || lastStep) rStr.split('').forEach((c, k) => D(X(st.col - rStr.length + 1 + k), rowY, c, lastStep ? 'f1' : ''));
+            api.say(`${st.p} − ${st.prod} = <b>${st.r}</b>${lastStep ? '' : ' bleibt übrig.'}`);
+            await api.wait(1400);
           }
-          const rest = dots.slice(q * d);
-          const from = rest.map((c) => [+c.getAttribute('cx'), +c.getAttribute('cy')]);
-          const yR = 34 + q * 36 + 10;
-          api.say(`Es bleiben <b>${r}</b> übrig. Für eine volle Tüte reicht das nicht.`);
-          rest.forEach((c) => c.setAttribute('class', 'candy rest'));
-          await api.tw(600, (t) => rest.forEach((c, k) => { c.setAttribute('cx', lerp(from[k][0], 190 + k * 24, t)); c.setAttribute('cy', lerp(from[k][1], yR, t)); }));
-          el('text', { x: 190 + r * 24, y: yR + 5, class: 'ex-s f1', text: 'Rest' }, api.svg);
-          await api.wait(1400);
-          api.say(`<b>${n} : ${d} = ${q} Rest ${r}</b><br>Probe: ${q} · ${d} + ${r} = ${q * d} + ${r} = ${n} ✓`);
+          if (s < steps.length - 1) {
+            const nc = st.col + 1, digit = String(n)[nc];
+            const fly = D(X(nc), Y0, digit, 'f1');
+            api.say(`Nächste Ziffer <b>${digit}</b> herunterholen.`);
+            await api.tw(700, (t) => fly.setAttribute('y', lerp(Y0, rowY, t)));
+            fly.setAttribute('class', 'divd');
+            await api.wait(500);
+          }
+        }
+        hl.setAttribute('opacity', 0);
+        const q = Math.floor(n / d), r = n % d;
+        if (r) el('text', { x: qx0 + qn * CW + 4, y: Y0, class: 'divd f1', text: `R ${r}` }, api.svg);
+        api.say(`Fertig: <b>${fmt(n)} : ${d} = ${fmt(q)}${r ? ` Rest ${r}` : ''}</b><br><small>Probe: ${fmt(q)} · ${d}${r ? ` + ${r}` : ''} = ${fmt(n)} ✓</small>`);
+        await api.wait(3200);
+      }
+
+      api.chips([
+        { label: 'Bonbons: Was ist ein Rest?', onClick() { mode = 'bonbon'; pickB(); api.replay(); } },
+        { label: 'Schriftlich rechnen', onClick() { mode = 'schrift'; api.replay(); } },
+        { label: 'Neue Aufgabe', onClick() { task = null; pickB(); pickS(); api.replay(); } },
+      ]);
+      return {
+        reset() {
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe, Schritt für Schritt' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'bonbon' || mode === 'alle') bonbonScene(); else schriftScene();
         },
+        async play() {
+          if (mode === 'bonbon' || mode === 'alle') await bonbon();
+          if (mode === 'alle') { api.say('Und jetzt mit großen Zahlen: <b>schriftlich</b>.'); await api.wait(1600); }
+          if (mode === 'schrift' || mode === 'alle') await schrift();
+        },
+      };
+    },
+  });
+
+  // =====================================================
+  // Teilbarkeit – Regeln sichtbar machen & Teiler-Paare
+  //   ctx: { mode:'teil', n, d } | { mode:'teiler', n }, dazu pre/post
+  // =====================================================
+  reg('k5-teilbar', {
+    title: 'Teilbarkeit: Regeln und Teiler',
+    viewBox: '0 0 360 240',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const TEILER_N = [12, 16, 18, 20, 24, 28, 30, 32, 36, 40, 42, 45, 48, 50, 54, 56, 60, 64, 72];
+      let task = null;
+      if ((ctx.mode === 'teil' || ctx.mode === 'teiler') && (ctx.pre || ctx.post)) {
+        task = Object.assign({}, ctx);
+        if (ctx.pre) {
+          if (ctx.mode === 'teiler') { let n; do n = pick(TEILER_N); while (n === ctx.n); task.n = n; }
+          else { const len = String(ctx.n).length; let n; do n = R(10 ** (len - 1), 10 ** len - 1); while (n === ctx.n); task.n = n; }
+        }
+      }
+      let mode = task ? task.mode : 'teil', n, d;
+      const newDemo = (dd) => { d = dd || pick([3, 9, 3, 4, 6]); n = d * R(Math.ceil(1000 / d), Math.floor(99999 / d)); if (Math.random() < 0.4) n += R(1, d - 1); };
+      if (task) { n = task.n; d = task.d; } else newDemo(3);
+      const qs = (v) => String(v).split('').reduce((a, c) => a + +c, 0);
+      let boxes = [];
+      function digits(y) {
+        const ds = String(n).split(''), w = 34, x0 = 180 - (ds.length * w) / 2;
+        boxes = ds.map((c, i) => {
+          const g = el('g', {}, api.svg);
+          const r = el('rect', { x: x0 + i * w + 2, y: y - 26, width: w - 4, height: 38, rx: 8, class: 'vnum' }, g);
+          el('text', { x: x0 + i * w + w / 2, y: y, class: 'ex-b', 'text-anchor': 'middle', text: c }, g);
+          return { g, r, x: x0 + i * w + w / 2, y, c: +c };
+        });
+      }
+      const mark = (list) => list.forEach((b) => b.r.setAttribute('class', 'vnum vhotr'));
+      const verdict = (ok, y) => {
+        const t = el('text', { x: 180, y: y || 222, class: 'ex-b ' + (ok ? 'fok' : 'fbad'), 'text-anchor': 'middle', text: `${ok ? '✓' : '✗'} ${fmt(n)} ist ${ok ? '' : 'nicht '}durch ${d} teilbar` }, api.svg);
+        return t;
+      };
+      async function quer(dd) {
+        const s = qs(n);
+        api.say(`Durch <b>${dd}</b> teilbar? Dafür brauchen wir die <b>Quersumme</b>: alle Ziffern zusammenzählen.`);
+        await api.wait(1800);
+        mark(boxes);
+        const row = el('text', { x: 180, y: 140, class: 'vexpr', 'text-anchor': 'middle' }, api.svg);
+        let txt = '';
+        for (let i = 0; i < boxes.length; i++) {
+          txt += (i ? ' + ' : '') + boxes[i].c;
+          row.textContent = txt;
+          await api.wait(380);
+        }
+        row.textContent = `${txt} = ${s}`;
+        api.say(`Quersumme: <b>${s}</b>`);
+        await api.wait(1500);
+        const ok = s % dd === 0;
+        el('text', { x: 180, y: 180, class: 'ex-b', 'text-anchor': 'middle', text: `${s} ist ${ok ? '' : 'nicht '}durch ${dd} teilbar${ok ? ` (${s} = ${dd} · ${s / dd})` : ''}` }, api.svg);
+        api.say(`Ist die Quersumme durch ${dd} teilbar, dann auch die ganze Zahl. ${s} ist ${ok ? '' : '<b>nicht</b> '}durch ${dd} teilbar.`);
+        await api.wait(2000);
+        return ok;
+      }
+      async function ende(k, dd) {
+        const last = boxes.slice(-k), v = +last.map((b) => b.c).join('');
+        api.say(k === 1
+          ? `Durch <b>${dd}</b> teilbar? Dafür reicht ein Blick auf die <b>letzte Ziffer</b>.`
+          : `Durch <b>4</b> teilbar? Dafür reichen die <b>letzten zwei Ziffern</b>. <small>(Jede volle Hundert ist durch 4 teilbar.)</small>`);
+        await api.wait(1800);
+        mark(last);
+        await api.wait(900);
+        const ok = v % dd === 0;
+        const why = dd === 2 ? `Letzte Ziffer ${v}: ${ok ? 'gerade' : 'ungerade'}`
+          : dd === 5 ? `Letzte Ziffer ${v}: ${ok ? '0 oder 5' : 'weder 0 noch 5'}`
+            : dd === 10 ? `Letzte Ziffer ${v}: ${ok ? 'eine 0' : 'keine 0'}`
+              : `${v} ist ${ok ? `durch 4 teilbar (${v} = 4 · ${v / 4})` : 'nicht durch 4 teilbar'}`;
+        el('text', { x: 180, y: 150, class: 'ex-b', 'text-anchor': 'middle', text: why }, api.svg);
+        api.say(`${why}.`);
+        await api.wait(2000);
+        return ok;
+      }
+      async function teil() {
+        api.clear();
+        el('text', { x: 180, y: 20, class: 'ex-s f6', 'text-anchor': 'middle', text: `IST ${fmt(n)} DURCH ${d} TEILBAR?` }, api.svg);
+        digits(76);
+        let ok;
+        if (d === 3 || d === 9) ok = await quer(d);
+        else if (d === 2 || d === 5 || d === 10) ok = await ende(1, d);
+        else if (d === 4) ok = await ende(2, d);
+        else {
+          api.say('Durch <b>6</b> teilbar heißt: durch <b>2</b> und durch <b>3</b> teilbar. Wir prüfen beides.');
+          await api.wait(2200);
+          const ok2 = boxes[boxes.length - 1].c % 2 === 0;
+          mark([boxes[boxes.length - 1]]);
+          el('text', { x: 180, y: 130, class: 'ex-b ' + (ok2 ? 'fok' : 'fbad'), 'text-anchor': 'middle', text: `durch 2: ${ok2 ? '✓' : '✗'} (letzte Ziffer ${boxes[boxes.length - 1].c})` }, api.svg);
+          api.say(`Durch 2: letzte Ziffer ${boxes[boxes.length - 1].c} → ${ok2 ? 'ja' : 'nein'}.`);
+          await api.wait(1800);
+          const s = qs(n), ok3 = s % 3 === 0;
+          mark(boxes);
+          el('text', { x: 180, y: 165, class: 'ex-b ' + (ok3 ? 'fok' : 'fbad'), 'text-anchor': 'middle', text: `durch 3: ${ok3 ? '✓' : '✗'} (Quersumme ${s})` }, api.svg);
+          api.say(`Durch 3: Quersumme ${String(n).split('').join(' + ')} = ${s} → ${ok3 ? 'ja' : 'nein'}.`);
+          await api.wait(2000);
+          ok = ok2 && ok3;
+        }
+        verdict(ok);
+        api.say(`<b>${ok ? 'Ja' : 'Nein'}</b>, ${fmt(n)} ist ${ok ? '' : '<b>nicht</b> '}durch ${d} teilbar.${ok ? ` <small>${fmt(n)} : ${d} = ${fmt(n / d)}</small>` : ''}`);
+        await api.wait(2600);
+      }
+      async function teiler() {
+        api.clear();
+        el('text', { x: 180, y: 20, class: 'ex-s f6', 'text-anchor': 'middle', text: `TEILER VON ${n}: IMMER PAARWEISE` }, api.svg);
+        api.say(`Teiler findet man am besten <b>paarweise</b>: Welche zwei Zahlen ergeben malgenommen <b>${n}</b>?`);
+        await api.wait(2000);
+        const pairs = [];
+        for (let i = 1; i * i <= n; i++) if (n % i === 0) pairs.push([i, n / i]);
+        const sp = Math.min(30, 150 / pairs.length);
+        for (let k = 0; k < pairs.length; k++) {
+          const [a, b] = pairs[k], y = 52 + k * sp;
+          const t = el('text', { x: 180, y, class: 'vexpr', 'text-anchor': 'middle', style: `font-size:${Math.min(22, sp * 0.8)}px`, opacity: 0 }, api.svg);
+          t.innerHTML = `<tspan class="f2">${a}</tspan> · <tspan class="f1">${b}</tspan> = ${n}`;
+          api.say(a === b ? `${a} · ${a} = ${n}: Hier treffen sich die Paare, ${a} zählt nur einmal.` : `${a} · ${b} = ${n}: also sind <b>${a}</b> und <b>${b}</b> Teiler.`);
+          await api.tw(350, (tt) => t.setAttribute('opacity', tt));
+          await api.wait(a === b ? 1800 : 1100);
+        }
+        const all = [...pairs.map((p) => p[0]), ...pairs.map((p) => p[1]).reverse()].filter((v, i, arr) => arr.indexOf(v) === i);
+        el('text', { x: 180, y: 222, class: 'ex-b', 'text-anchor': 'middle' }, api.svg).innerHTML = `T<tspan dy="5" font-size="12">${n}</tspan><tspan dy="-5"> = {${all.join(', ')}}</tspan>`;
+        api.say(`<b>${n}</b> hat <b>${all.length} Teiler</b>. <small>Man kann aufhören, sobald die linke Zahl größer wäre als die rechte.</small>`);
+        await api.wait(3000);
+      }
+      api.chips([
+        { label: 'Quersumme (3, 9)', onClick() { task = null; mode = 'teil'; newDemo(pick([3, 9])); api.replay(); } },
+        { label: 'Endziffern (2, 4, 5, 10)', onClick() { task = null; mode = 'teil'; newDemo(pick([2, 4, 5, 10, 4])); api.replay(); } },
+        { label: 'Durch 6', onClick() { task = null; mode = 'teil'; newDemo(6); api.replay(); } },
+        { label: 'Teiler-Paare', onClick() { task = null; mode = 'teiler'; n = pick(TEILER_N); api.replay(); } },
+      ]);
+      return {
+        reset() {
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          api.clear();
+          if (mode === 'teil') { el('text', { x: 180, y: 20, class: 'ex-s f6', 'text-anchor': 'middle', text: `IST ${fmt(n)} DURCH ${d} TEILBAR?` }, api.svg); digits(76); }
+        },
+        async play() { if (mode === 'teiler') await teiler(); else await teil(); },
       };
     },
   });
@@ -339,21 +593,34 @@
   reg('k5-potenz', {
     title: 'Potenzen: wie oft malnehmen?',
     viewBox: '0 0 360 230',
-    create(api) {
+    create(api, ctx) {
       // Teile: grund · zwei · zehn · sonder · quad; 'alle' spielt sie nacheinander
-      let mode = 'alle';
+      //   ctx: { mode:'pow', b, e } | { mode:'zehn', k, a? } | { mode:'quad', n }, dazu pre/post
+      ctx = ctx || {};
+      const POWS = [[2, 3], [2, 4], [2, 5], [2, 6], [3, 3], [3, 4], [4, 3], [5, 3], [3, 2], [2, 7]];
+      let task = null;
+      if (ctx.mode && (ctx.pre || ctx.post)) {
+        task = Object.assign({}, ctx);
+        if (ctx.pre) {
+          if (ctx.mode === 'pow') { let p; do p = pick(POWS); while (p[0] === ctx.b && p[1] === ctx.e); task.b = p[0]; task.e = p[1]; }
+          else if (ctx.mode === 'zehn') { let k; do k = R(2, 6); while (k === ctx.k); task.k = k; if (ctx.a) task.a = R(2, 9); }
+          else { let n; do n = R(11, 20); while (n === ctx.n); task.n = n; }
+        }
+      }
+      let mode = task ? { pow: 'grund', zehn: 'zehn', quad: 'quad' }[task.mode] : 'alle';
       const T = (x, y, cls, anchor) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': anchor || 'middle' }, api.svg);
       const sup = (e, size) => `<tspan dy="${-size * 0.45}" font-size="${Math.round(size * 0.6)}">${e}</tspan><tspan dy="${size * 0.45}"></tspan>`;
       const pw = (b, e, size) => `${b}${sup(e, size)}`;
       const title = (t) => el('text', { x: 180, y: 18, class: 'ex-s f6', 'text-anchor': 'middle', text: t }, api.svg);
 
-      async function grund() {
+      const supTxt = (e) => String(e).split('').map((c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('');
+      async function grund(B = 2, E = 5) {
         api.clear();
         title('BASIS UND EXPONENT');
         const big = T(180, 68, 'vexpr potbig');
-        big.innerHTML = pw(2, 5, 46);
+        big.innerHTML = pw(B, E, 46);
         big.setAttribute('opacity', 0);
-        api.say('Was bedeutet <b>2⁵</b>, gesprochen „2 hoch 5“?');
+        api.say(`Was bedeutet <b>${B}${supTxt(E)}</b>, gesprochen „${B} hoch ${E}“?`);
         await api.tw(600, (t) => big.setAttribute('opacity', t));
         await api.wait(1400);
         const lb = el('g', { opacity: 0 }, api.svg);
@@ -362,36 +629,41 @@
         const le = el('g', { opacity: 0 }, api.svg);
         el('line', { x1: 240, y1: 30, x2: 200, y2: 36, class: 'tk' }, le);
         el('text', { x: 244, y: 34, class: 'ex-s f1', 'text-anchor': 'start', text: 'Exponent' }, le);
-        api.say('Die <b class="f2">Basis</b> 2 ist die Zahl, die malgenommen wird.');
+        api.say(`Die <b class="f2">Basis</b> ${B} ist die Zahl, die malgenommen wird.`);
         await api.tw(500, (t) => lb.setAttribute('opacity', t));
         await api.wait(1800);
-        api.say('Der <b class="f1">Exponent</b> 5 sagt, <b>wie oft</b> sie als Faktor vorkommt.');
+        api.say(`Der <b class="f1">Exponent</b> ${E} sagt, <b>wie oft</b> sie als Faktor vorkommt.`);
         await api.tw(500, (t) => le.setAttribute('opacity', t));
         await api.wait(1800);
-        const n = 5, w = 40, gap = 58, x0 = 180 - ((n - 1) * gap) / 2;
+        const n = E, gap = Math.min(58, 300 / n), w = Math.min(40, gap - 12), x0 = 180 - ((n - 1) * gap) / 2;
+        const ZAHL = ['', 'ein', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn'];
         for (let i = 0; i < n; i++) {
           const g = el('g', { opacity: 0 }, api.svg);
-          el('rect', { x: x0 + i * gap - w / 2, y: 98, width: w, height: w, rx: 9, class: 'vnum' }, g);
-          el('text', { x: x0 + i * gap, y: 125, class: 'ex-b', 'text-anchor': 'middle', text: '2' }, g);
+          el('rect', { x: x0 + i * gap - w / 2, y: 98, width: w, height: 40, rx: 9, class: 'vnum' }, g);
+          el('text', { x: x0 + i * gap, y: 125, class: 'ex-b', 'text-anchor': 'middle', text: B }, g);
           el('text', { x: x0 + i * gap, y: 156, class: 'ex-s f1', 'text-anchor': 'middle', text: `${i + 1}.` }, g);
           if (i > 0) el('text', { x: x0 + i * gap - gap / 2, y: 124, class: 'ex-b', 'text-anchor': 'middle', text: '·' }, g);
-          api.say(`${i + 1}-mal die 2${i === n - 1 ? ': fünf Faktoren!' : ' …'}`);
+          api.say(`${i + 1}-mal die ${B}${i === n - 1 ? `: ${n === 1 ? 'nur ein Faktor!' : (ZAHL[n] || n) + ' Faktoren!'}` : ' …'}`);
           await api.tw(350, (t) => g.setAttribute('opacity', t));
-          await api.wait(450);
+          await api.wait(n > 6 ? 250 : 450);
         }
         await api.wait(700);
         const run = T(180, 192, 'vexpr');
-        let p = 2;
+        let p = B;
         for (let i = 1; i < n; i++) {
-          run.textContent = `${p} · 2 = ${p * 2}`;
-          api.say(`Schritt für Schritt: <b>${p} · 2 = ${p * 2}</b>`);
-          p *= 2;
-          await api.wait(1000);
+          run.textContent = `${fmt(p)} · ${B} = ${fmt(p * B)}`;
+          api.say(`Schritt für Schritt: <b>${fmt(p)} · ${B} = ${fmt(p * B)}</b>`);
+          p *= B;
+          await api.wait(n > 6 ? 700 : 1000);
         }
-        run.innerHTML = `${pw(2, 5, 22)} = 2 · 2 · 2 · 2 · 2 = <tspan class="f3">32</tspan>`;
-        const no = T(180, 222, 'ex-b fbad');
-        no.textContent = '✗ nicht 2 · 5 = 10';
-        api.say('<b>2⁵ = 32</b>, und <b>nicht</b> 2 · 5 = 10! <small>Der Exponent zählt die Faktoren, er wird nicht malgenommen.</small>');
+        run.innerHTML = `${pw(B, E, 22)} = ${n <= 6 ? Array(n).fill(B).join(' · ') + ' = ' : ''}<tspan class="f3">${fmt(B ** E)}</tspan>`;
+        if (E > 1 && B > 1 && B * E !== B ** E) {
+          const no = T(180, 222, 'ex-b fbad');
+          no.textContent = `✗ nicht ${B} · ${E} = ${B * E}`;
+          api.say(`<b>${B}${supTxt(E)} = ${fmt(B ** E)}</b>, und <b>nicht</b> ${B} · ${E} = ${B * E}! <small>Der Exponent zählt die Faktoren, er wird nicht malgenommen.</small>`);
+        } else if (E === 1) api.say(`<b>${B}¹ = ${B}</b>: nur ein Faktor, also die Zahl selbst.`);
+        else if (B === 1) api.say(`<b>1${supTxt(E)} = 1</b>: 1 mal 1 bleibt immer 1.`);
+        else api.say(`<b>${B}${supTxt(E)} = ${fmt(B ** E)}</b>. <small>Der Exponent zählt die Faktoren.</small>`);
         await api.wait(3200);
       }
 
@@ -420,20 +692,34 @@
         await api.wait(2800);
       }
 
-      async function zehn() {
+      async function zehn(hl = 0, A = 0) {
         api.clear();
         title('ZEHNERPOTENZEN');
+        const K = Math.max(6, hl), rowsN = K + (A ? 1 : 0), sp = Math.min(30, 186 / rowsN), fs = Math.round(Math.min(22, sp * 0.8));
         api.say('Bei der Basis <b>10</b> wird es ganz einfach …');
         await api.wait(1400);
-        for (let k = 1; k <= 6; k++) {
-          const y = 22 + k * 30;
+        for (let k = 1; k <= K; k++) {
+          const y = 22 + k * sp;
           const row = el('g', { opacity: 0 }, api.svg);
-          const t = el('text', { x: 40, y, class: 'vexpr', 'text-anchor': 'start' }, row);
-          t.innerHTML = `${pw(10, k, 22)} = 1<tspan class="f1">${'0'.repeat(k)}</tspan>`;
-          el('text', { x: 336, y: y - 2, class: 'ex-s f6', 'text-anchor': 'end', text: `${k} ${k === 1 ? 'Null' : 'Nullen'}` }, row);
+          if (k === hl) el('rect', { x: 30, y: y - sp * 0.78, width: 310, height: sp * 0.98, rx: 8, class: 'hl2' }, row);
+          const t = el('text', { x: 40, y, class: 'vexpr', 'text-anchor': 'start', style: `font-size:${fs}px` }, row);
+          t.innerHTML = `${pw(10, k, fs)} = 1<tspan class="f1">${'0'.repeat(k)}</tspan>`;
+          el('text', { x: 334, y: y - 2, class: 'ex-s f6', 'text-anchor': 'end', text: `${k} ${k === 1 ? 'Null' : 'Nullen'}` }, row);
           api.say(`10<sup>${k}</sup> = ${k === 1 ? '10' : Array(k).fill(10).join(' · ')}${k > 1 ? ` = ${fmt(10 ** k)}` : ''}`);
           await api.tw(400, (tt) => row.setAttribute('opacity', tt));
-          await api.wait(k < 3 ? 1300 : 900);
+          await api.wait(hl ? 650 : k < 3 ? 1300 : 900);
+        }
+        if (hl) {
+          api.say(`Deine Zehnerpotenz: <b>10${supTxt(hl)}</b> = 1 mit <b>${hl} Nullen</b> = ${fmt(10 ** hl)}.`);
+          await api.wait(2400);
+          if (A) {
+            const y = 22 + (K + 1) * sp;
+            const t = el('text', { x: 40, y, class: 'vexpr', 'text-anchor': 'start', style: `font-size:${fs}px` }, api.svg);
+            t.innerHTML = `${A} · ${pw(10, hl, fs)} = ${A}<tspan class="f1">${'0'.repeat(hl)}</tspan>`;
+            api.say(`Und <b>${A} · 10${supTxt(hl)}</b>: Hinter die ${A} kommen ${hl} Nullen, also <b>${fmt(A * 10 ** hl)}</b>.`);
+            await api.wait(3000);
+          }
+          return;
         }
         api.say('Der <b>Exponent</b> sagt, wie viele <b class="f1">Nullen</b> hinter der 1 stehen. <small>10⁶ = 1 000 000, eine Million.</small>');
         await api.wait(3000);
@@ -470,16 +756,22 @@
         const t = T(180, 222, 'vexpr');
         t.innerHTML = `${pw(k, 2, 22)} = ${k} · ${k} = ${k * k}`;
       }
-      async function quad() {
+      async function quad(upTo = 0) {
         api.say('Bei <b>hoch 2</b> kommt die Zahl zweimal als Faktor vor. Das kann man als <b>Quadrat</b> legen:');
-        for (let k = 1; k <= 8; k++) { sl.value = k; drawSq(k, true); await api.wait(k < 4 ? 1000 : 700); }
+        const last = upTo || 8;
+        for (let k = 1; k <= last; k++) { sl.value = k; drawSq(k, true); await api.wait(k < 4 ? 1000 : last > 10 ? 350 : 700); }
+        if (upTo) {
+          api.say(`<b>${upTo}² = ${upTo} · ${upTo} = ${upTo * upTo}</b>: ${upTo} Reihen mit je ${upTo} Punkten.`);
+          await api.wait(2600);
+          return;
+        }
         api.say('<b>n² = n · n</b> ist die Anzahl der Punkte im Quadrat. Darum heißt „hoch 2“ auch „zum Quadrat“. <small>Probier den Regler bis 20!</small>');
         await api.wait(2400);
       }
 
       const sl = api.slider({ label: 'Quadrat: Seitenlänge', min: 1, max: 20, value: 1, onInput(v) { drawSq(v, false); api.say(`<b>${v}² = ${v} · ${v} = ${v * v}</b>`); } });
       const showSl = (on) => { sl.parentElement.style.display = on ? '' : 'none'; };
-      const go = (m) => { mode = m; showSl(m === 'quad'); api.replay(); };
+      const go = (m) => { mode = m; task = null; showSl(m === 'quad'); api.replay(); };
       api.chips([
         { label: 'Alles', onClick() { go('alle'); } },
         { label: 'Basis & Exponent', onClick() { go('grund'); } },
@@ -492,8 +784,9 @@
       return {
         reset() {
           showSl(mode === 'quad');
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
           if (mode === 'quad') drawSq(1, false);
-          else if (mode === 'alle' || mode === 'grund') { api.clear(); const b = T(180, 120, 'vexpr potbig'); b.innerHTML = pw(2, 5, 46); }
+          else if (mode === 'alle' || mode === 'grund') { api.clear(); const b = T(180, 120, 'vexpr potbig'); b.innerHTML = task && mode === 'grund' ? pw(task.b, task.e, 46) : pw(2, 5, 46); }
           else if (mode === 'zwei') drawPow2(0);
           else api.clear();
         },
@@ -504,7 +797,12 @@
             api.say('<b>Merke:</b> Der Exponent zählt, <b>wie oft</b> die Basis malgenommen wird. <small>2⁵ = 32 · 10³ = 1 000 · 7¹ = 7 · 1⁵ = 1 · 4² = 16</small>');
             return;
           }
-          await { grund, zwei, zehn, sonder, quad }[mode]();
+          if (task) {
+            if (mode === 'grund') return grund(task.b, task.e);
+            if (mode === 'zehn') return zehn(task.k, task.a || 0);
+            if (mode === 'quad') return quad(task.n);
+          }
+          await { grund: () => grund(), zwei, zehn: () => zehn(), sonder, quad: () => quad() }[mode]();
         },
       };
     },
@@ -1236,20 +1534,54 @@
 
   // =====================================================
   // Vorrangregeln – der Rechenbaum
+  //   ctx: { mode:'tree', e:'40 − 3 · (2 + 3)', pre, post }
+  //   pre = ähnliche Rechnung mit anderen Zahlen, post = genau die Rechnung der Aufgabe
   // =====================================================
-  const PREC = { '+': 1, '−': 1, '·': 2, ':': 2 };
-  const calc = (op, a, b) => (op === '+' ? a + b : op === '−' ? a - b : op === '·' ? a * b : a / b);
+  const PREC = { '+': 1, '−': 1, '·': 2, ':': 2, '^': 3 };
+  const calc = (op, a, b) => (op === '+' ? a + b : op === '−' ? a - b : op === '·' ? a * b : op === ':' ? a / b : a ** b);
   const needPar = (ch, pOp, right) => !!ch.op && (PREC[ch.op] < PREC[pOp] || (right && PREC[ch.op] === PREC[pOp] && (pOp === '−' || pOp === ':')));
+  // Liest Rechnungen wie „5 + 3² · (12 − 4) : 2“ als Baum { op, l, r } bzw. { v }
+  function parseExpr(str) {
+    const toks = str.match(/\d+|[+−·:()²]/g) || [];
+    let i = 0;
+    const peek = () => toks[i], next = () => toks[i++];
+    function primary() {
+      let n;
+      if (peek() === '(') { next(); n = sum(); next(); } else n = { v: +next() };
+      while (peek() === '²') { next(); n = { op: '^', l: n, r: { v: 2 } }; }
+      return n;
+    }
+    function prod() { let n = primary(); while (peek() === '·' || peek() === ':') { const op = next(); n = { op, l: n, r: primary() }; } return n; }
+    function sum() { let n = prod(); while (peek() === '+' || peek() === '−') { const op = next(); n = { op, l: n, r: prod() }; } return n; }
+    return sum();
+  }
+  // Wert, oder NaN wenn ein Zwischenergebnis negativ, nicht ganzzahlig oder zu groß ist
+  function treeVal(n) {
+    if (!n.op) return n.v;
+    const a = treeVal(n.l), b = treeVal(n.r), v = calc(n.op, a, b);
+    return Number.isInteger(v) && v >= 0 && v <= 2000 ? v : NaN;
+  }
+  // Ähnliche Rechnung: gleicher Aufbau, andere Zahlen (für „Beispiel vorher“)
+  function similarExpr(str) {
+    for (let k = 0; k < 400; k++) {
+      const s = str.replace(/\d+/g, (m) => { const v = +m; return String(v <= 12 ? R(2, 9) : R(Math.max(10, v - 25), v + 25)); });
+      if (s !== str && !Number.isNaN(treeVal(parseExpr(s)))) return s;
+    }
+    return null;
+  }
   reg('k5-vorrang', {
     title: 'Der Rechenbaum: wer gehört zu wem?',
-    viewBox: '0 0 360 270',
-    create(api) {
-      let mode = 'punkt', a, b, c, root, exprT, edgesG, nodesG;
+    viewBox: '0 0 360 275',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const taskE = ctx.e ? (ctx.post ? ctx.e : ctx.pre ? similarExpr(ctx.e) : null) : null;
+      let mode = taskE ? 'task' : 'punkt', a, b, c, root, exprT, edgesG, nodesG, startE = '';
       const N = (v) => ({ v });
       const O = (op, l, r) => ({ op, l, r });
       const pickN = () => { a = R(2, 9); do b = R(2, 9); while (b === a); do c = R(2, 9); while (c === a || c === b); };
       pickN();
       function build() {
+        if (mode === 'task') return parseExpr(taskE);
         if (mode === 'punkt') return O('+', N(a), O('·', N(b), N(c)));
         if (mode === 'klammer') return O('·', O('+', N(a), N(b)), N(c));
         const bb = R(2, 4), cc = R(2, 5), dd = R(2, 5), aa = bb * (cc + dd) + R(3, 25);
@@ -1258,13 +1590,16 @@
       const value = (n) => (n.op ? calc(n.op, value(n.l), value(n.r)) : n.v);
       const plain = (n, p, right) => {
         if (!n.op) return String(n.v);
+        if (n.op === '^') return `${plain(n.l, '^', false)}²`;
         const s = `${plain(n.l, n.op, false)} ${n.op} ${plain(n.r, n.op, true)}`;
         return p && needPar(n, p, right) ? `(${s})` : s;
       };
       function segs(n, hot, inHot, p, right) {
         const h = inHot || n === hot;
         if (!n.op) return [[String(n.v), h]];
-        let out = [...segs(n.l, hot, h, n.op, false), [` ${n.op} `, h], ...segs(n.r, hot, h, n.op, true)];
+        let out = n.op === '^'
+          ? [...segs(n.l, hot, h, '^', false), ['²', h]]
+          : [...segs(n.l, hot, h, n.op, false), [` ${n.op} `, h], ...segs(n.r, hot, h, n.op, true)];
         if (p && needPar(n, p, right)) out = [['(', h], ...out, [')', h]];
         return out;
       }
@@ -1282,10 +1617,12 @@
           if (!n.op) { leaves.push(n); return; }
           walk(n.l, dep + 1); walk(n.r, dep + 1);
         })(root, 0);
-        const step = leaves.length > 1 ? Math.min(110, 260 / (leaves.length - 1)) : 0;
+        const maxDep = Math.max(...leaves.map((l) => l.dep));
+        const dy = maxDep > 3 ? 44 : 56;
+        const step = leaves.length > 1 ? Math.min(110, 290 / (leaves.length - 1)) : 0;
         const x0 = 180 - (step * (leaves.length - 1)) / 2;
         leaves.forEach((n, i) => (n.x = x0 + i * step));
-        (function px(n) { n.y = 92 + n.dep * 56; if (n.op) { px(n.l); px(n.r); n.x = (n.l.x + n.r.x) / 2; } })(root);
+        (function px(n) { n.y = 92 + n.dep * dy; if (n.op) { px(n.l); px(n.r); n.x = (n.l.x + n.r.x) / 2; } })(root);
       }
       function drawLeaf(n, res) {
         n.g.innerHTML = '';
@@ -1304,7 +1641,8 @@
           n.g = el('g', { transform: `translate(${n.x},${n.y})` }, nodesG);
           if (n.op) {
             n.c = el('circle', { r: 19, class: 'vop' }, n.g);
-            el('text', { x: 0, y: 7, class: 'ex-b', 'text-anchor': 'middle', text: n.op }, n.g);
+            if (n.op === '^') el('text', { x: 0, y: 4, class: 'ex-xs', fill: 'var(--ink)', style: 'fill:var(--ink)', 'text-anchor': 'middle', text: 'hoch' }, n.g);
+            else el('text', { x: 0, y: 7, class: 'ex-b', 'text-anchor': 'middle', text: n.op }, n.g);
           } else drawLeaf(n, false);
         })(root);
       }
@@ -1313,6 +1651,7 @@
       function reason(n) {
         const p = parentOf(n);
         if (p && needPar(n, p.op, p.r === n)) return '<b>Klammer zuerst</b>';
+        if (n.op === '^') return '<b>Hochzahl zuerst</b>';
         if (PREC[n.op] === 2 && order().some((m) => m !== n && PREC[m.op] === 1)) return '<b>Punkt vor Strich</b>';
         if (!p) return 'Zum Schluss';
         return 'Von links nach rechts';
@@ -1321,33 +1660,38 @@
         { label: 'a + b · c', onClick() { mode = 'punkt'; api.replay(); } },
         { label: '(a + b) · c', onClick() { mode = 'klammer'; api.replay(); } },
         { label: 'Längere Rechnung', onClick() { mode = 'lang'; api.replay(); } },
-        { label: 'Neue Zahlen', onClick() { pickN(); api.replay(); } },
+        { label: 'Neue Zahlen', onClick() { pickN(); if (mode === 'task') mode = 'punkt'; api.replay(); } },
       ]);
       const relabel = () => { const bs = chips.querySelectorAll('button'); bs[0].textContent = `${a} + ${b} · ${c}`; bs[1].textContent = `(${a} + ${b}) · ${c}`; };
+      const sub = () => api.sub(mode !== 'task' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe als Rechenbaum' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
       return {
         reset() {
           api.clear();
-          relabel();
+          relabel(); sub();
           root = build();
           exprT = el('text', { x: 180, y: 40, class: 'vexpr', 'text-anchor': 'middle' }, api.svg);
           edgesG = el('g', {}, api.svg); nodesG = el('g', {}, api.svg);
-          layout(); draw(); showExpr(null);
+          layout(); draw(); showExpr(null); startE = plain(root);
           edgesG.setAttribute('opacity', 0); nodesG.setAttribute('opacity', 0);
         },
         async play() {
           const total = value(root);
           if (mode === 'punkt') api.say(`Wer gehört zu wem? Bei <b>${plain(root)}</b> hält das <b>Mal</b> die ${b} und die ${c} fester zusammen als das Plus.`);
           else if (mode === 'klammer') api.say(`Die <b>Klammer</b> packt ${a} und ${b} zu einem Paket zusammen.`);
-          else api.say(`Eine längere Rechnung. Der Baum zeigt, was zusammengehört.`);
+          else if (mode === 'task') api.say(`Wer gehört bei <b>${plain(root)}</b> zu wem? Der Baum zeigt es.`);
+          else api.say('Eine längere Rechnung. Der Baum zeigt, was zusammengehört.');
           await api.tw(800, (t) => { edgesG.setAttribute('opacity', t); nodesG.setAttribute('opacity', t); });
           await api.wait(2200);
           api.say('Gerechnet wird <b>von unten nach oben</b>: Immer zwei Zahlen werden zu einer.');
           await api.wait(2000);
+          const log = [];
           for (const n of order()) {
             const x = value(n.l), y = value(n.r), v = calc(n.op, x, y);
             n.c.setAttribute('class', 'vop vhot');
             showExpr(n);
-            api.say(`${reason(n)}: <b>${x} ${n.op} ${y} = ${v}</b>`);
+            const calcTxt = `${n.op === '^' ? `${x}² = ${x} · ${x}` : `${x} ${n.op} ${y}`} = ${v}`;
+            log.push([reason(n).replace(/<[^>]+>/g, ''), calcTxt]);
+            api.say(`${reason(n)}: <b>${calcTxt}</b>`);
             await api.wait(1500);
             const kids = [n.l, n.r];
             await api.tw(800, (t) => {
@@ -1359,8 +1703,16 @@
             showExpr(null);
             await api.wait(900);
           }
+          // Rechenweg stehen lassen
+          exprT.textContent = startE;
+          const sp = Math.min(26, 120 / log.length);
+          log.forEach(([why, txt], i) => {
+            const t = el('text', { x: 180, y: 142 + i * sp, class: 'ex-s', 'text-anchor': 'middle' }, api.svg);
+            t.innerHTML = `<tspan class="f6">${i + 1}. ${why}:</tspan> <tspan style="font-size:16px">${txt}</tspan>`;
+          });
           if (mode === 'punkt') api.say(`Ergebnis: <b>${total}</b>. <small>Punkt vor Strich! Wer zuerst ${a} + ${b} rechnet, bekommt ${(a + b) * c}, und das ist falsch.</small>`);
           else if (mode === 'klammer') api.say(`Ergebnis: <b>${total}</b>. <small>Ohne Klammer wäre es ${a} + ${b * c} = ${a + b * c}. Die Klammer ändert, wer zusammengehört!</small>`);
+          else if (mode === 'task') api.say(`Ergebnis: <b>${total}</b>. <small>Reihenfolge: Klammer, Hochzahl, Punkt, Strich. Sonst von links nach rechts.</small>`);
           else api.say(`Ergebnis: <b>${total}</b>. <small>Klammer zuerst, dann Punkt vor Strich, zum Schluss das Minus.</small>`);
         },
       };
