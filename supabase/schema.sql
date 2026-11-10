@@ -47,3 +47,9 @@ create policy "mathelix eigene Einstellungen" on public.mathelix_family_settings
   for all to authenticated using (owner = auth.uid()) with check (owner = auth.uid());
 
 create index if not exists mathelix_profiles_owner_idx on public.mathelix_profiles(owner);
+
+-- Zugriffsrechte: nur angemeldete Konten (die Zeilenregeln oben begrenzen auf die eigenen Daten).
+-- Nicht angemeldete Besucher (anon) bekommen bewusst keinen Zugriff.
+grant select, insert, update, delete on public.mathelix_profiles        to authenticated;
+grant select, insert, update, delete on public.mathelix_progress        to authenticated;
+grant select, insert, update, delete on public.mathelix_family_settings to authenticated;

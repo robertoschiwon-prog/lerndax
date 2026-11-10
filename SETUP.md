@@ -47,9 +47,12 @@ Konto, meldest du dich in Mathelix einfach mit denselben Zugangsdaten an.
 
 - Claude trägt URL und Key in `app/config.js` ein und lädt alles zu GitHub hoch.
 - Auf GitHub: **Settings → Pages → Source: GitHub Actions**.
-- In Supabase: **Authentication → URL Configuration → Redirect URLs → Add URL** und die neue
-  Mathelix-Adresse eintragen (z. B. `https://benutzername.github.io/mathelix/**`).
-  ⚠️ Die **Site URL** dort **nicht ändern**, die gehört dem Familienkalender.
+- In Supabase ist **nichts weiter einzustellen**: Weil im Familienkalender keine neuen Konten
+  angelegt werden können, meldet sich Mathelix nur mit E-Mail und Passwort an – ohne
+  Bestätigungslinks oder Weiterleitungen. Die Auth-Einstellungen des Kalenders bleiben unverändert.
+
+**Stand 10.11.2026:** Alles eingerichtet. Mathelix läuft unter
+**https://robertoschiwon-prog.github.io/mathelix/**
 
 ---
 
@@ -57,9 +60,8 @@ Konto, meldest du dich in Mathelix einfach mit denselben Zugangsdaten an.
 
 **Einmalig auf jedem Gerät** (Handy deines Sohnes, dein Handy, Computer):
 
-1. Adresse öffnen → unten **„Für Eltern: Fortschritt ansehen“**
-2. Beim ersten Mal **„Neues Konto anlegen“** (deine E-Mail + Passwort), E-Mail bestätigen,
-   danach **„Anmelden“**.
+1. **https://robertoschiwon-prog.github.io/mathelix/** öffnen → unten **„Für Eltern: Fortschritt ansehen“**
+2. Mit deinem **Familienkalender-Konto** anmelden (dieselbe E-Mail und dasselbe Passwort).
 3. **Profil anlegen** (Vorname oder Spitzname deines Kindes) bzw. auf weiteren Geräten
    das vorhandene Profil antippen.
 4. Empfohlen: **Eltern-PIN festlegen**. Dann kann sich dein Kind nicht selbst abmelden,
