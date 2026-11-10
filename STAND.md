@@ -37,6 +37,9 @@ Weitere Dokumente:
   Aufgaben aus den Büchern werden **nicht** abgeschrieben; LernDax erzeugt eigene Aufgaben zu
   denselben Themen. Seitenzahlen dienen nur zur Orientierung.
 - **Nächste Klassenarbeit:** **Mathe am 24.11.2026** (Details im Abschnitt 9 unter „Klassen-Bereich“).
+- **Danach bekannt:** **Mathe-Vergleichsarbeit am Mi 03.02.2027** (laut Schulunterlagen „vorher üben“;
+  Themen noch unbekannt). Weitere Lehrbücher Klasse 5 (für spätere Fächer): Linder 5 (Bio),
+  Terra 5 (Geo), Anno 1 (Geschichte).
 - **Name:** **LernDax**. Anspielung auf **LernSax** (Schulplattform aller sächsischen Schulen),
   „Dax“ klingt wie **Dachs**, das Maskottchen. Das Mathe-Fach heißt **Mathelix**.
 
@@ -375,7 +378,13 @@ Infos zur ersten Arbeit:
       Hinweis zu den `lerndax_`-Tabellen für deren status.md, Rückfrage zum LernDax-Link.
       Text: `notizen/auftrag-familienkalender-training.md`. Das Kalender-Projekt meldet sich mit
       einem Vorschlag, bevor es etwas ändert.
-- [ ] Antwort des Familienkalender-Projekts abwarten (Roberto antwortet dort)
+- [x] Familienkalender hat umgesetzt (10.11.2026, laut dessen `_Status.md`): Knopf „📚 Jetzt üben“
+      und Feld „Übungs-Adresse“ an Arbeiten in der Eltern-App; Mathe-Arbeit 24.11. eingetragen;
+      Hinweis zu den `lerndax_`-Tabellen steht dort. Für neue Trainingsseiten: Adresse in der
+      Eltern-App an der Arbeit ins Feld „Übungs-Adresse“ eintragen.
+- [ ] Trainingsseite für die **Mathe-Vergleichsarbeit 03.02.2027**, sobald die Themen bekannt sind
+- [ ] Idee: „Lange Nacht der Mathematik“ (online, mathenacht.de, nächste am 20.11.2026) im Entdecken-
+      Bereich oder Familienkalender erwähnen?
 - [ ] Nach der Arbeit (24.11.): Eintrag in `trainings.js` stehen lassen oder entfernen? (Die Seite
       zeigt danach „ist vorbei, Üben lohnt sich trotzdem“.)
 - Danach (Lehrplan-Lücken): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, unechte
@@ -423,6 +432,9 @@ Infos zur ersten Arbeit:
   Mathelix, Plan für die zwei Wochen bis zur Arbeit.
 - Entscheidung: Klassenarbeiten und Klassenspezifisches **nicht** in die allgemeine App, sondern
   später in einen eigenen Klassen-Bereich. Kachel „Klassenarbeit 24.11.“ daher nicht gebaut.
+- Schulunterlagen gesichtet (Robertos OneDrive-Ordner zu Bruno/Schule, Familienkalender-Status,
+  Schulhandbuch, Brunos LernSax): **keine Fachunterlagen** (Arbeitsblätter) vorhanden, Mathe-
+  Unterlagen kommen auf Papier. Neu: Mathe-Vergleichsarbeit 03.02.2027.
 - Konzept Trainingsseite je Arbeit festgehalten: zuerst nur für Bruno über den Familienkalender,
   ohne Anmeldung nutzbar gebaut, damit Klassenkameraden später per Link dazukommen können.
 - Potenzen, Division und Teilermengen erweitert (Version `lerndax-v9`).
