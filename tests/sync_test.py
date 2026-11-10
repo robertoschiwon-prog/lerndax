@@ -118,6 +118,15 @@ async def main():
         sA=await state(A); print('A got kuerzen:', 'k5-kuerzen' in sA['stats'], '| A total', sA['total'], 'B total', (await state(B))['total'])
         await A.click('[data-go="home"]'); await A.wait_for_timeout(200)
         await A.screenshot(path=f'{SHOTS}/s6_A_home.png')
+        # Trainingsseite (?t=…): angemeldet wird dort genauso synchronisiert
+        await B.goto(URL + '?t=mathe-2026-11-24'); await B.wait_for_timeout(600)
+        await round_(B,'k5-potenz'); await B.wait_for_timeout(3200)
+        print('training synced:', 'k5-potenz' in list(DB['progress'].values())[0]['state']['stats'], '| syncpill:', bool(await B.query_selector('#syncpill')))
+        await B.goto(URL); await B.wait_for_timeout(600)
+        # nach dem Neuladen ist der Elternbereich wieder gesperrt: PIN eingeben
+        await B.click('[data-go="parents"]'); await B.wait_for_timeout(300)
+        if await B.query_selector('form[data-syncform=unlock]'):
+            await B.fill('form[data-syncform=unlock] input','1234'); await B.click('form[data-syncform=unlock] button'); await B.wait_for_timeout(500)
         # Reset auf B, Abgleich auf A
         await B.click('[data-go="home"]'); await B.click('[data-go="parents"]'); await B.wait_for_timeout(300)
         await B.click('[data-reset=ask]'); await B.click('[data-reset=yes]'); await B.wait_for_timeout(3300)

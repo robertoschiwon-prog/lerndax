@@ -72,6 +72,17 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   Gespeichert wird nur ein Fingerabdruck (SHA-256 aus `lerndax:<Konto-ID>:<PIN>`), nie die PIN.
 - **Synchronisation:** Fortschritt pro Profil und Fach. Funktioniert auch offline; beim
   nächsten Kontakt wird zusammengeführt (Regeln siehe Technik).
+- **Trainingsseiten für Klassenarbeiten** (seit 10.11.2026): Aufruf mit `?t=<id>`, z. B.
+  **https://robertoschiwon-prog.github.io/lerndax/mathe/?t=mathe-2026-11-24**
+  Eintrag je Arbeit in `web/plattform/trainings.js` (Titel, Datum, Fach, Gruppen mit
+  Themen-IDs und Buchseiten, Buch-Hinweise). Die Seite zeigt Countdown, „So fit bist du“
+  (gesamt und je Gruppe), Trainingsrunde (8 Aufgaben nur aus den Arbeitsthemen, Schwaches
+  öfter), Fehler-Training, Mix je Gruppe, die Themen-Kacheln mit Erklärungen und „Im Buch üben“.
+  In der allgemeinen App **nicht** verlinkt. Funktioniert **ohne Anmeldung** (Fortschritt nur auf
+  dem Gerät); angemeldet wird synchronisiert. Fortschritt zählt auch in der allgemeinen App.
+  Fitness je Thema = Trefferquote der letzten Aufgaben × min(1, bearbeitete Aufgaben / 8).
+  **Neue Arbeit anlegen:** in `trainings.js` einen Eintrag ergänzen (keine Namen von Schule,
+  Lehrkraft oder Kind!), `VERSION` erhöhen, Link weitergeben.
 - **Avatare** (seit 10.11.2026): 12 eigene, gezeichnete Figuren (Fuchs, Eule, Pinguin, Katze,
   Hund, Igel, Waschbär, Drache, Roboter, Krake, Faultier, Axolotl) × 8 Hintergrundfarben
   (Orange, Blau, Grün, Lila, Gelb, Pink, Türkis, Nacht). Auswahl öffnet sich beim ersten Besuch
@@ -144,6 +155,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 | `web/plattform/config.js` | Supabase-Adresse, **öffentlicher** Schlüssel (`sb_publishable_…`), Tabellen-Präfix `lerndax_`, `allowSignup: false`, Kontoname |
 | `web/plattform/sync.js` | Anmeldung, Profile, PIN, Synchronisation, Avatar-Sync (`window.LernDaxSync`, Alias `MathelixSync`) |
 | `web/plattform/avatare.js` | Avatar-Figuren (SVG), Farben, Auswahlfenster (`window.LernDaxAvatare`) |
+| `web/plattform/trainings.js` | Trainings für einzelne Klassenarbeiten (`window.LERNDAX_TRAININGS`), Aufruf `<fach>/?t=<id>` |
 | `web/mathe/index.html` | Mathelix-App (Ansichten, Übungsrunde, Player, Elternansicht) |
 | `web/mathe/generatoren/klasse5.js` | Aufgabengeneratoren Klasse 5 (`window.Mathelix.grades[5]`) |
 | `web/mathe/symbole.js` | Themen-Symbole als SVG, Schlüssel = Themen-ID (`window.MathelixIcons`) |
@@ -197,7 +209,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v9`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v10`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -292,8 +304,8 @@ allgemeine App, sondern später in einen **eigenen Klassen-Bereich**, der geziel
 abrufbar ist. Roberto möchte diesen Bereich als **eigenes Thema** zuschneiden; bis dahin wird dort
 nichts gebaut.
 
-**Klassen-Bereich (eigenes Thema, noch nicht gebaut)**
-Gesammelte Infos für später:
+**Klassen-Bereich: Trainingsseiten für Klassenarbeiten**
+Infos zur ersten Arbeit:
 - Mathe-Klassenarbeit am **24.11.2026**, Themen laut Zettel der Lehrerin (Übungsseiten im
   Lambacher Schweizer in Klammern):
   1. Vorrangregeln und Rechengesetze: Kommutativ-, Assoziativ-, Distributivgesetz (S. 21–29)
@@ -303,7 +315,9 @@ Gesammelte Infos für später:
   Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53).
 - Diese Themen sind seit 10.11. alle als **allgemeine** Mathelix-Themen vorhanden (siehe
   Abschnitt 3). Ein Klassen-Bereich müsste sie nur auswählen und bündeln, nicht neu bauen.
-- **Konzept (besprochen mit Roberto am 10.11.2026, noch nicht gebaut):**
+- **Gebaut am 10.11.2026 (`lerndax-v10`)**, Link: https://robertoschiwon-prog.github.io/lerndax/mathe/?t=mathe-2026-11-24
+  Beschreibung siehe Abschnitt 3 („Trainingsseiten für Klassenarbeiten“).
+- **Konzept (besprochen mit Roberto am 10.11.2026):**
   - **Trainingsseite je Arbeit:** Eine Arbeit wird in LernDax als kleiner Eintrag beschrieben
     (Titel, Datum, Fach, Themen-IDs, Buchseiten). Daraus entsteht automatisch eine eigene
     Trainingsseite mit eigenem Link. Sie nutzt die allgemeinen Mathelix-Themen, zeigt aber nur
@@ -334,6 +348,11 @@ Gesammelte Infos für später:
 - [x] **Teilermengen** (`lerndax-v9`) im Thema „Teilbarkeit & Teiler“: Anzahl der Teiler,
       „Welche Zahl ist kein Teiler?“
 - [ ] Mit Bruno testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler
+- [ ] Trainingsseite mit Bruno testen
+- [ ] Auftrag „Jetzt üben“-Knopf an das Familienkalender-Projekt geben (Roberto, Text liegt in
+      `notizen/auftrag-familienkalender-training.md`)
+- [ ] Nach der Arbeit (24.11.): Eintrag in `trainings.js` stehen lassen oder entfernen? (Die Seite
+      zeigt danach „ist vorbei, Üben lohnt sich trotzdem“.)
 - Danach (Lehrplan-Lücken): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, unechte
   Brüche/gemischte Zahlen, Überschlag, Fermi-Aufgaben
 
@@ -380,6 +399,9 @@ Gesammelte Infos für später:
 - Konzept Trainingsseite je Arbeit festgehalten: zuerst nur für Bruno über den Familienkalender,
   ohne Anmeldung nutzbar gebaut, damit Klassenkameraden später per Link dazukommen können.
 - Potenzen, Division und Teilermengen erweitert (Version `lerndax-v9`).
+- **Trainingsseite** für die Mathe-Arbeit am 24.11. gebaut (`?t=mathe-2026-11-24`), nur über den Link
+  erreichbar, ohne Anmeldung nutzbar, angemeldet synchronisiert; neuer Test `tests/training.py`
+  (Version `lerndax-v10`).
 - **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
   mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
   (Version `lerndax-v8`). Aufgabenarten:

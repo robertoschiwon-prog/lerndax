@@ -65,7 +65,7 @@ LernDax
 |---|---|
 | `web/` | Alles, was online geht (wird automatisch veröffentlicht) |
 | `web/index.html` | LernDax-Startseite mit den Fächern |
-| `web/plattform/` | Gemeinsame Teile: Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`) |
+| `web/plattform/` | Gemeinsame Teile: Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
 | `web/mathe/` | **Mathelix**: App, `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
 | `web/icons/` | Dachs-Logo und App-Icons |
 | `faecher/mathe/lehrplan/` | Lehrplan-Auswertung Mathe |
@@ -102,7 +102,8 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [ ] Elternbereich von Mathelix auf die Startseite verlegen (sobald ein zweites Fach kommt)
 - [ ] Link „📚 LernDax“ im Familienkalender (Auftrag an das Kalender-Projekt übergeben)
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …)
-- [ ] Eigener Klassen-Bereich für Brunos Klasse (Klassenarbeiten, Termine), getrennt von der allgemeinen App
+- [x] Trainingsseiten für einzelne Klassenarbeiten (nur per Link, getrennt von der allgemeinen App)
+- [ ] Knopf „Jetzt üben“ im Familienkalender (Auftrag an das Kalender-Projekt)
 
 **Weitere Fächer**
 - [ ] Deutsch

@@ -15,7 +15,8 @@ Voraussetzung: Python 3 mit `pip install playwright` und `playwright install chr
 | `python3 tests/prim.py` | Primzahlen: Beispiel vor der Aufgabe, Lösung als Animation danach |
 | `python3 tests/pack2.py` | Entdecken-Bereich: alle Staunen-Momente laufen durch |
 | `python3 tests/two.py` | Zwei Animationen nacheinander (kein Überlappen) |
-| `python3 tests/sync_test.py` | Synchronisation zweier Geräte gegen eine Schein-Datenbank (`mock_supabase.js`), inkl. Zurücksetzen und Avatar |
+| `python3 tests/sync_test.py` | Synchronisation zweier Geräte gegen eine Schein-Datenbank (`mock_supabase.js`), inkl. Zurücksetzen, Avatar und Trainingsseite |
+| `python3 tests/training.py` | Trainingsseite für eine Klassenarbeit (`mathe/?t=…`): nur Arbeitsthemen in den Runden, Rückweg ins Training, Fit-Anzeige, unbekanntes Training, Fortschritt im allgemeinen Lernstand |
 | `python3 tests/hub.py` | LernDax-Startseite, Sprünge zu #eltern und #entdecken |
 | `python3 tests/ava_hub.py` | Avatar-Auswahl: öffnet sich beim ersten Besuch genau einmal |
 

@@ -80,6 +80,25 @@ button{font:inherit;color:inherit;cursor:pointer}
 .stars .on{color:var(--c5)}
 .bg1{background:var(--c1)}.bg2{background:var(--c2)}.bg3{background:var(--c3)}.bg4{background:var(--c4)}.bg5{background:var(--c5)}
 .foot{text-align:center;margin-top:10px}
+.trhero{margin-bottom:16px;background:#fff8ec}
+.trtop{display:flex;align-items:center;gap:10px}
+.trhi{flex:1;font-weight:800;font-size:17px}
+.trbadge{font-weight:900;font-size:13px;background:var(--ink);color:#fff;border-radius:99px;padding:4px 10px;white-space:nowrap}
+.trhero h1{font-size:28px;margin:10px 0 2px}
+.trdate{margin:0 0 14px;font-weight:700;color:var(--soft)}
+.trdate b{color:var(--ink)}
+.trfit{display:flex;justify-content:space-between;font-weight:800;margin-bottom:6px}
+.trfit b{font:800 20px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
+.fit{height:12px;border:2px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden}
+.fit i{display:block;height:100%;transition:width .4s}
+.lb .fit{height:8px;margin:0 0 10px;border-width:1.5px}
+.trtoday{margin:12px 0 0;font-weight:700}
+.trmeta{display:flex;justify-content:space-between;gap:10px;font-size:14px;font-weight:700;color:var(--soft);margin:-4px 0 6px}
+.trbook{margin:4px 0 14px}
+.trbook h2{font-size:20px}
+.trbook ul{margin:8px 0 0;padding-left:20px;line-height:1.6}
+.foot a.btn{color:var(--ink)}
+.trdate b{white-space:nowrap}
 
 /* Name */
 .namecard h2{font-size:22px;margin-bottom:6px}
@@ -446,6 +465,7 @@ body.noscroll{overflow:hidden}
 <script>window.LERNDAX_SUBJECT = 'mathe';</script>
 <script src="../plattform/avatare.js"></script>
 <script src="../plattform/config.js"></script>
+<script src="../plattform/trainings.js"></script>
 <script src="../plattform/sync.js"></script>
 <script src="generatoren/klasse5.js"></script>
 <script src="symbole.js"></script>
@@ -485,6 +505,16 @@ body.noscroll{overflow:hidden}
   const grade = () => M.grades[5];
   const allTopics = () => grade().lbs.flatMap((lb) => lb.topics.map((t) => Object.assign({ lb }, t)));
   const findTopic = (id) => allTopics().find((t) => t.id === id);
+  const TR = (() => {
+    let id = '';
+    try { id = new URLSearchParams(location.search).get('t') || ''; } catch (e) {}
+    if (!id) return null;
+    const def = (window.LERNDAX_TRAININGS || {})[id];
+    if (!def || def.fach !== 'mathe') return { id, missing: true };
+    const gruppen = def.gruppen.map((g) => Object.assign({}, g, { topics: g.themen.map(findTopic).filter(Boolean) }));
+    return Object.assign({ id }, def, { gruppen, topics: gruppen.flatMap((g) => g.topics) });
+  })();
+  if (TR && !TR.missing) document.title = `${TR.titel} · Training · Mathelix`;
 
   function mastery(id) {
     const st = S.stats[id];
@@ -555,17 +585,90 @@ body.noscroll{overflow:hidden}
       </section>`;
   }
 
-  function home() {
-    VIEW = 'home';
-    const weak = weakTopics();
-    const greet = S.name ? `Hallo ${esc(S.name)}!` : 'Hallo!';
-    $app.innerHTML = header() + `
-      ${S.name ? '' : `
+  function topicTile(t, nr) {
+    return `
+            <div class="twrap">
+              <button class="topic" data-topic="${t.id}">
+                <span class="ti bg${nr}">${(window.MathelixIcons && MathelixIcons.svg(t.id)) || t.icon}</span>
+                <span class="tt">${t.title}</span>
+                ${starHtml(mastery(t.id).stars)}
+              </button>
+              ${EXP[t.id] ? `<button class="explbtn" data-explain="${t.id}" aria-label="Erklärung zu ${t.title} ansehen">▶</button>` : ''}
+            </div>`;
+  }
+  const nameCard = () => (S.name ? '' : `
       <div class="card namecard" style="margin-bottom:18px">
         <h2>Willkommen bei Mathelix 👋</h2>
         <p>Wie heißt du?</p>
         <form id="nameF"><input id="nameI" maxlength="20" autocomplete="off" placeholder="Dein Vorname"><button class="btn org">Los</button></form>
-      </div>`}
+      </div>`);
+  function bindName() {
+    const f = document.getElementById('nameF');
+    if (f) f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = document.getElementById('nameI').value.trim();
+      if (v) { S.name = v; save(); home(); }
+    });
+  }
+
+  // ---------- Training für eine Klassenarbeit (Aufruf mit ?t=<id>) ----------
+  // Nur über den Link erreichbar, in der allgemeinen App nicht verlinkt (siehe plattform/trainings.js).
+  const fit = (id) => { const m = mastery(id); return m.n ? Math.round(100 * m.avg * Math.min(1, m.n / 8)) : 0; };
+  const fitAvg = (ts) => (ts.length ? Math.round(ts.reduce((a, t) => a + fit(t.id), 0) / ts.length) : 0);
+  const fitBar = (p) => `<div class="fit" role="img" aria-label="${p} Prozent"><i style="width:${p}%;background:${p >= 75 ? 'var(--ok)' : p >= 40 ? 'var(--c5)' : 'var(--c1)'}"></i></div>`;
+  const isWeak = (t) => { const m = mastery(t.id); return m.n > 0 && m.avg < 0.75; };
+  function daysUntil(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    const n = new Date();
+    return Math.round((new Date(y, m - 1, d) - new Date(n.getFullYear(), n.getMonth(), n.getDate())) / 864e5);
+  }
+  function trainingHome() {
+    VIEW = 'home';
+    if (TR.missing) {
+      $app.innerHTML = header() + `<div class="card"><h2>Dieses Training gibt es nicht (mehr)</h2>
+        <p style="color:var(--soft)">Vielleicht ist der Link falsch abgeschrieben. Alle Themen findest du in Mathelix.</p>
+        <a class="btn org" href="./">Zu Mathelix</a></div>`;
+      return;
+    }
+    const dl = daysUntil(TR.datum);
+    const [y, m, d] = TR.datum.split('-').map(Number);
+    const dstr = new Date(y, m - 1, d).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+    const count = dl > 1 ? `noch <b>${dl} Tage</b>` : dl === 1 ? '<b>morgen</b>!' : dl === 0 ? '<b>heute</b>. Viel Erfolg! 🍀' : 'ist vorbei. Üben lohnt sich trotzdem.';
+    const total = fitAvg(TR.topics);
+    const weak = TR.topics.filter(isWeak);
+    const greet = S.name ? `Hallo ${esc(S.name)}!` : 'Hallo!';
+    $app.innerHTML = header() + nameCard() + `
+      <div class="card trhero">
+        <div class="trtop">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 44)}</button>` : ''}<span class="trhi">${greet}</span><span class="trbadge">🎯 Training</span></div>
+        <h1>${esc(TR.titel)}</h1>
+        <p class="trdate">${dstr} · ${count}</p>
+        <div class="trfit"><span>So fit bist du</span><b>${total} %</b></div>
+        ${fitBar(total)}
+        <p class="trtoday">${S.days.includes(today()) ? '✅ Heute schon geübt. Super!' : 'Heute noch nicht geübt. Eine Runde dauert nur ein paar Minuten.'}</p>
+      </div>
+      <div class="quick">
+        <button class="btn org" data-tr="all"><span class="ic">🎯</span>Trainingsrunde<small>${TASKS_PER_ROUND} Aufgaben, Schwaches öfter</small></button>
+        <button class="btn" data-tr="review" ${weak.length ? '' : 'disabled'}><span class="ic">🔁</span>Fehler-Training<small>${weak.length ? weak.length + ' Thema' + (weak.length > 1 ? 's' : '') + ' zum Wiederholen' : 'gerade nichts offen'}</small></button>
+      </div>
+      ${TR.gruppen.map((g, i) => `
+        <section class="lb">
+          <div class="lbh"><span class="nr bg${(i % 5) + 1}">${i + 1}</span><h2>${esc(g.titel)}</h2>${g.topics.length > 1 ? `<button class="btn mix" data-tr="g${i}">Mix</button>` : ''}</div>
+          <div class="trmeta"><span>${g.buch ? `📖 Buch ${esc(g.buch)}` : ''}</span><span>fit: <b>${fitAvg(g.topics)} %</b></span></div>
+          ${fitBar(fitAvg(g.topics))}
+          <div class="topics">${g.topics.map((t) => topicTile(t, t.lb.nr)).join('')}</div>
+        </section>`).join('')}
+      ${TR.buch && TR.buch.length ? `<div class="card trbook"><h2>📖 Im Buch üben</h2><ul>${TR.buch.map((b) => `<li>${esc(b.text)}: <b>${esc(b.seiten)}</b></li>`).join('')}</ul></div>` : ''}
+      <div class="foot"><a class="btn ghost" href="./">Alle Mathe-Themen</a></div>`;
+    bindName();
+  }
+
+  function home() {
+    if (TR) return trainingHome();
+    VIEW = 'home';
+    const weak = weakTopics();
+    const greet = S.name ? `Hallo ${esc(S.name)}!` : 'Hallo!';
+    $app.innerHTML = header() + `
+      ${nameCard()}
       <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p></div></div>
       <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
       <div class="quick">
@@ -575,24 +678,11 @@ body.noscroll{overflow:hidden}
       ${grade().lbs.map((lb) => `
         <section class="lb">
           <div class="lbh"><span class="nr bg${lb.nr}">${lb.nr}</span><h2>${lb.title}</h2><button class="btn mix" data-mix="${lb.id}">Mix</button></div>
-          <div class="topics">${lb.topics.map((t) => `
-            <div class="twrap">
-              <button class="topic" data-topic="${t.id}">
-                <span class="ti bg${lb.nr}">${(window.MathelixIcons && MathelixIcons.svg(t.id)) || t.icon}</span>
-                <span class="tt">${t.title}</span>
-                ${starHtml(mastery(t.id).stars)}
-              </button>
-              ${EXP[t.id] ? `<button class="explbtn" data-explain="${t.id}" aria-label="Erklärung zu ${t.title} ansehen">▶</button>` : ''}
-            </div>`).join('')}</div>
+          <div class="topics">${lb.topics.map((t) => topicTile(t, lb.nr)).join('')}</div>
         </section>`).join('')}
       ${discoverHtml()}
       <div class="foot"><button class="btn ghost" data-go="parents">Für Eltern: Fortschritt ansehen</button></div>`;
-    const f = document.getElementById('nameF');
-    if (f) f.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const v = document.getElementById('nameI').value.trim();
-      if (v) { S.name = v; save(); home(); }
-    });
+    bindName();
   }
 
   function soon(g) {
@@ -620,7 +710,12 @@ body.noscroll{overflow:hidden}
 
   function start(mode, arg) {
     let pool, title;
-    if (mode === 'topic') { pool = [findTopic(arg)]; title = pool[0].title; }
+    if (mode === 'tr') {
+      if (arg === 'all') { pool = TR.topics; title = 'Training: ' + TR.titel; }
+      else if (arg === 'review') { pool = TR.topics.filter(isWeak); title = 'Fehler-Training'; }
+      else { const g = TR.gruppen[+arg.slice(1)]; pool = g ? g.topics : []; title = g ? g.titel : ''; }
+    }
+    else if (mode === 'topic') { pool = [findTopic(arg)]; title = pool[0].title; }
     else if (mode === 'review') { pool = weakTopics(); title = 'Fehler-Training'; }
     else if (arg === 'all') { pool = allTopics(); title = 'Gemischtes Training'; }
     else { const lb = grade().lbs.find((l) => l.id === arg); pool = lb.topics.map((t) => Object.assign({ lb }, t)); title = 'Mix: ' + lb.title; }
@@ -1100,6 +1195,7 @@ body.noscroll{overflow:hidden}
     else if (d.sync) syncAction(d.sync, b);
     else if (d.topic) { start('topic', d.topic); window.scrollTo(0, 0); }
     else if (d.mix) { start('mix', d.mix); window.scrollTo(0, 0); }
+    else if (d.tr) { start('tr', d.tr); window.scrollTo(0, 0); }
     else if ('review' in d) { start('review'); window.scrollTo(0, 0); }
     else if (d.grade) { if (+d.grade !== 5) soon(+d.grade); }
     else if ('ava' in d && AVA) AVA.picker(AVA.get() || AVA.STANDARD, (v) => { if (SYNC && SYS.enabled) SYNC.setAvatar(v); else AVA.set(v); try { localStorage.setItem('lerndax.avatar.asked', '1'); } catch (e) {} home(); });
