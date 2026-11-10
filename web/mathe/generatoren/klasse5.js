@@ -138,6 +138,247 @@
     };
   }
 
+  // ---------- Vorrangregeln ----------
+  // Klammer zuerst · Potenz vor Punkt · Punkt vor Strich · sonst von links nach rechts
+  const VR_HINT = 'Reihenfolge: <b>Klammer</b> zuerst, dann <b>Hochzahl</b>, dann <b>Punkt</b> (· und :), zuletzt <b>Strich</b> (+ und −). Sonst von links nach rechts.';
+  function vorrang() {
+    const v = R(1, 11);
+    if (v === 1) {
+      const a = R(2, 60), b = R(2, 9), c = R(2, 12), p = b * c;
+      return {
+        prompt: `Berechne: <b>${a} + ${b} · ${c}</b>`,
+        fields: [{ answer: a + p }],
+        hint: 'Punkt vor Strich: Was musst du zuerst rechnen?',
+        solution: `Punkt vor Strich: zuerst <b>${b} · ${c} = ${p}</b><br>${a} + ${p} = <b>${a + p}</b>`,
+      };
+    }
+    if (v === 2) {
+      const b = R(2, 9), c = R(2, 9), p = b * c, a = p + R(2, 60);
+      return {
+        prompt: `Berechne: <b>${a} − ${b} · ${c}</b>`,
+        fields: [{ answer: a - p }],
+        hint: 'Punkt vor Strich: Was musst du zuerst rechnen?',
+        solution: `Punkt vor Strich: zuerst <b>${b} · ${c} = ${p}</b><br>${a} − ${p} = <b>${a - p}</b>`,
+      };
+    }
+    if (v === 3) {
+      const a = R(2, 9), b = R(2, 9), c = R(2, 9), d = R(2, 9);
+      return {
+        prompt: `Berechne: <b>${a} · ${b} + ${c} · ${d}</b>`,
+        fields: [{ answer: a * b + c * d }],
+        hint: 'Punkt vor Strich: Rechne beide Malaufgaben zuerst.',
+        solution: `Punkt vor Strich: <b>${a} · ${b} = ${a * b}</b> und <b>${c} · ${d} = ${c * d}</b><br>${a * b} + ${c * d} = <b>${a * b + c * d}</b>`,
+      };
+    }
+    if (v === 4) {
+      const a = R(2, 30), b = R(2, 30), c = R(2, 9), s = a + b;
+      return {
+        prompt: `Berechne: <b>(${a} + ${b}) · ${c}</b>`,
+        fields: [{ answer: s * c }],
+        hint: 'Was in der Klammer steht, wird immer zuerst gerechnet.',
+        solution: `Klammer zuerst: <b>${a} + ${b} = ${s}</b><br>${s} · ${c} = <b>${s * c}</b>`,
+      };
+    }
+    if (v === 5) {
+      const c = R(2, 9), q = R(2, 15), s = c * q, b = R(1, s - 1), a = s + b;
+      // (a − b) : c mit Ergebnis q; a − b = s
+      return {
+        prompt: `Berechne: <b>(${a} − ${b}) : ${c}</b>`,
+        fields: [{ answer: q }],
+        hint: 'Was in der Klammer steht, wird immer zuerst gerechnet.',
+        solution: `Klammer zuerst: <b>${a} − ${b} = ${s}</b><br>${s} : ${c} = <b>${q}</b>`,
+      };
+    }
+    if (v === 6) {
+      const b = R(2, 9), q = R(2, 12), a = b * q, c = R(2, 50);
+      const front = Math.random() < 0.5;
+      const expr = front ? `${c} + ${a} : ${b}` : `${a} : ${b} + ${c}`;
+      return {
+        prompt: `Berechne: <b>${expr}</b>`,
+        fields: [{ answer: q + c }],
+        hint: 'Geteilt ist auch eine Punktrechnung: Punkt vor Strich.',
+        solution: `Punkt vor Strich: zuerst <b>${a} : ${b} = ${q}</b><br>${front ? `${c} + ${q}` : `${q} + ${c}`} = <b>${q + c}</b>`,
+      };
+    }
+    if (v === 7) {
+      // nur Strich oder nur Punkt: von links nach rechts
+      if (Math.random() < 0.5) {
+        const b = R(5, 40), a = b + R(5, 60), c = R(2, 30);
+        return {
+          prompt: `Berechne: <b>${a} − ${b} + ${c}</b>`,
+          fields: [{ answer: a - b + c }],
+          hint: 'Nur Plus und Minus: Rechne einfach von links nach rechts.',
+          solution: `Nur Strichrechnung → von links nach rechts:<br><b>${a} − ${b} = ${a - b}</b>, dann ${a - b} + ${c} = <b>${a - b + c}</b><br><small>Achtung: ${b} + ${c} zuerst wäre falsch!</small>`,
+        };
+      }
+      const b = R(2, 9), q = R(2, 12), a = b * q, c = R(2, 9);
+      return {
+        prompt: `Berechne: <b>${a} : ${b} · ${c}</b>`,
+        fields: [{ answer: q * c }],
+        hint: 'Nur Mal und Geteilt: Rechne einfach von links nach rechts.',
+        solution: `Nur Punktrechnung → von links nach rechts:<br><b>${a} : ${b} = ${q}</b>, dann ${q} · ${c} = <b>${q * c}</b>`,
+      };
+    }
+    if (v === 8) {
+      // Potenz vor Punkt vor Strich
+      const b = R(2, 9), sq = b * b;
+      if (Math.random() < 0.5) {
+        const a = R(2, 40), c = R(2, 5);
+        return {
+          prompt: `Berechne: <b>${a} + ${b}${sup(2)} · ${c}</b>`,
+          fields: [{ answer: a + sq * c }],
+          hint: 'Die Hochzahl kommt noch vor Punkt und Strich.',
+          solution: `Hochzahl zuerst: <b>${b}${sup(2)} = ${sq}</b><br>Punkt vor Strich: <b>${sq} · ${c} = ${sq * c}</b><br>${a} + ${sq * c} = <b>${a + sq * c}</b>`,
+        };
+      }
+      const a = R(1, 6), c = R(1, 6), s = a + c;
+      return {
+        prompt: `Berechne: <b>(${a} + ${c})${sup(2)}</b>`,
+        fields: [{ answer: s * s }],
+        hint: 'Erst die Klammer, dann quadrieren.',
+        solution: `Klammer zuerst: <b>${a} + ${c} = ${s}</b><br>${s}${sup(2)} = ${s} · ${s} = <b>${s * s}</b><br><small>Nicht ${a}${sup(2)} + ${c}${sup(2)} = ${a * a + c * c}!</small>`,
+      };
+    }
+    if (v === 9) {
+      // längere Kette
+      const b = R(2, 6), c = R(2, 6), d = R(2, 9);
+      const a = b * (c + d) + R(1, 40);
+      const k = c + d, m = b * k;
+      return {
+        prompt: `Berechne: <b>${a} − ${b} · (${c} + ${d})</b>`,
+        fields: [{ answer: a - m }],
+        hint: VR_HINT,
+        solution: `1. Klammer: <b>${c} + ${d} = ${k}</b><br>2. Punkt vor Strich: <b>${b} · ${k} = ${m}</b><br>3. ${a} − ${m} = <b>${a - m}</b>`,
+      };
+    }
+    if (v === 10) {
+      // Was rechnest du zuerst?
+      const a = R(2, 20), b = R(2, 9), c = R(2, 9), d = R(2, 9);
+      const forms = [
+        { e: `${a} + ${b} · ${c} − ${d}`, ch: [`${a} + ${b}`, `${b} · ${c}`, `${c} − ${d}`], k: 1, why: 'Punkt vor Strich.' },
+        { e: `${a} · (${b} + ${c}) − ${d}`, ch: [`${a} · ${b}`, `${b} + ${c}`, `${c} − ${d}`], k: 1, why: 'Klammer zuerst.' },
+        { e: `${a} − ${b} + ${c} · ${d}`, ch: [`${a} − ${b}`, `${b} + ${c}`, `${c} · ${d}`], k: 2, why: 'Punkt vor Strich.' },
+        { e: `${a} + ${b} − ${c} + ${d}`, ch: [`${a} + ${b}`, `${b} − ${c}`, `${c} + ${d}`], k: 0, why: 'Nur Strichrechnung: von links nach rechts.' },
+        { e: `${a} + ${b}² · ${c}`, ch: [`${a} + ${b}`, `${b}²`, `${b} · ${c}`], k: 1, why: 'Hochzahl vor Punkt vor Strich.' },
+      ];
+      const f = pick(forms);
+      return {
+        prompt: `Was rechnest du bei <b>${f.e.replace('²', sup(2))}</b> <i>zuerst</i>?`,
+        choices: f.ch.map((c) => c.replace('²', sup(2))),
+        correct: f.k,
+        hint: VR_HINT,
+        solution: `${f.why} Zuerst kommt <b>${f.ch[f.k].replace('²', sup(2))}</b>.`,
+      };
+    }
+    // v === 11: Wo gehört die Klammer hin?
+    const a = R(2, 9), b = R(2, 9), c = R(2, 9);
+    const withB = (a + b) * c, noB = a + b * c;
+    if (withB === noB) return vorrang();
+    const wantB = Math.random() < 0.5;
+    const target = wantB ? withB : noB;
+    return {
+      prompt: `Welche Rechnung ergibt <b>${target}</b>?`,
+      choices: [`(${a} + ${b}) · ${c}`, `${a} + ${b} · ${c}`],
+      correct: wantB ? 0 : 1,
+      hint: 'Rechne beide aus. Denk an Punkt vor Strich und Klammer zuerst.',
+      solution: `(${a} + ${b}) · ${c} = ${a + b} · ${c} = ${withB}<br>${a} + ${b} · ${c} = ${a} + ${b * c} = ${noB}<br>→ <b>${wantB ? `(${a} + ${b}) · ${c}` : `${a} + ${b} · ${c}`}</b>`,
+    };
+  }
+
+  // ---------- Rechengesetze ----------
+  const GESETZE = [
+    'Kommutativgesetz<br><small>Vertauschungsgesetz</small>',
+    'Assoziativgesetz<br><small>Verbindungsgesetz</small>',
+    'Distributivgesetz<br><small>Verteilungsgesetz</small>',
+  ];
+  const GESETZ_HINT = '<b>Kommutativ</b>: Zahlen vertauschen. <b>Assoziativ</b>: Klammern verschieben. <b>Distributiv</b>: einen Faktor auf eine Summe verteilen.';
+  const GESETZ_KURZ = ['Kommutativgesetz (Vertauschungsgesetz)', 'Assoziativgesetz (Verbindungsgesetz)', 'Distributivgesetz (Verteilungsgesetz)'];
+  function gesetze() {
+    const v = R(1, 7);
+    if (v <= 3) {
+      // Welches Gesetz?
+      const which = v - 1;
+      const a = R(2, 40), b = R(2, 40), c = R(2, 20), op = pick(['+', '·']);
+      const s = op === '·' ? [R(2, 12), R(2, 12), R(2, 12)] : [a, b, c];
+      let eq, why;
+      if (which === 0) {
+        eq = `${s[0]} ${op} ${s[1]} = ${s[1]} ${op} ${s[0]}`;
+        why = 'Die beiden Zahlen wurden <b>vertauscht</b>, das Ergebnis bleibt gleich.';
+      } else if (which === 1) {
+        eq = `(${s[0]} ${op} ${s[1]}) ${op} ${s[2]} = ${s[0]} ${op} (${s[1]} ${op} ${s[2]})`;
+        why = 'Die Zahlen bleiben an ihrem Platz, nur die <b>Klammer wurde verschoben</b>.';
+      } else {
+        const f = R(2, 9), x = R(10, 40), y = R(2, 9), minus = Math.random() < 0.3, o = minus ? '−' : '+';
+        eq = Math.random() < 0.5
+          ? `${f} · (${x} ${o} ${y}) = ${f} · ${x} ${o} ${f} · ${y}`
+          : `${f} · ${x} ${o} ${f} · ${y} = ${f} · (${x} ${o} ${y})`;
+        why = `Der Faktor <b>${f}</b> wird auf beide Zahlen in der Klammer <b>verteilt</b> (oder umgekehrt ausgeklammert).`;
+      }
+      return {
+        prompt: `Welches Rechengesetz wurde benutzt?<br><b>${eq}</b>`,
+        choices: GESETZE,
+        correct: which,
+        hint: GESETZ_HINT,
+        solution: `${why}<br>→ <b>${GESETZ_KURZ[which]}</b>`,
+        answerText: GESETZ_KURZ[which],
+      };
+    }
+    if (v === 4) {
+      // Lücke beim Distributivgesetz
+      const f = R(3, 9), t = pick([20, 30, 40, 50, 60, 70, 80, 90]), e = R(1, 9), n = t + e;
+      return {
+        prompt: `Ergänze mit dem Distributivgesetz:`,
+        fields: [{ answer: e, prefix: `${f} · ${n} = ${f} · ${t} + ${f} ·` }],
+        hint: `Zerlege ${n} in ${t} + ?`,
+        solution: `${n} = ${t} + ${e}, also ${f} · ${n} = ${f} · ${t} + ${f} · <b>${e}</b> = ${f * t} + ${f * e} = ${f * n}`,
+      };
+    }
+    if (v === 5) {
+      // Lücke beim Kommutativ-/Assoziativgesetz
+      const a = R(2, 30), b = R(2, 30), c = R(2, 30);
+      if (Math.random() < 0.5)
+        return {
+          prompt: `Ergänze so, dass das <b>Assoziativgesetz</b> passt:`,
+          fields: [{ answer: c, prefix: `(${a} + ${b}) + ${c} = ${a} + (${b} +`, suffix: ')' }],
+          hint: 'Beim Assoziativgesetz bleiben alle Zahlen gleich, nur die Klammer wandert.',
+          solution: `(${a} + ${b}) + ${c} = ${a} + (${b} + <b>${c}</b>)`,
+        };
+      return {
+        prompt: `Ergänze so, dass das <b>Kommutativgesetz</b> passt:`,
+        fields: [{ answer: a, prefix: `${a} · ${b} = ${b} ·` }],
+        hint: 'Beim Kommutativgesetz werden die Zahlen vertauscht.',
+        solution: `${a} · ${b} = ${b} · <b>${a}</b>`,
+      };
+    }
+    if (v === 6) {
+      // Gilt das Gesetz auch für Minus und Geteilt?
+      const cases = [
+        () => { const a = R(10, 30), b = R(2, 9); return { e: `${a} − ${b} = ${b} − ${a}`, ok: false, why: `${a} − ${b} = ${a - b}, aber ${b} − ${a} geht mit natürlichen Zahlen gar nicht. Bei <b>Minus</b> darf man <b>nicht</b> vertauschen.` }; },
+        () => { const b = R(2, 4), q = R(2, 5), a = b * q * 4; return { e: `${a} : ${b} = ${b} : ${a}`, ok: false, why: `${a} : ${b} = ${a / b}, aber ${b} : ${a} ist keine natürliche Zahl. Bei <b>Geteilt</b> darf man <b>nicht</b> vertauschen.` }; },
+        () => { const a = R(20, 40), b = R(5, 9), c = R(2, 4); return { e: `(${a} − ${b}) − ${c} = ${a} − (${b} − ${c})`, ok: false, why: `Links: ${a - b} − ${c} = ${a - b - c}. Rechts: ${a} − ${b - c} = ${a - b + c}. Bei <b>Minus</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
+        () => { const c = 2, b = 4, a = 8 * R(2, 6); return { e: `(${a} : ${b}) : ${c} = ${a} : (${b} : ${c})`, ok: false, why: `Links: ${a / b} : ${c} = ${a / b / c}. Rechts: ${a} : ${b / c} = ${a / (b / c)}. Bei <b>Geteilt</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
+        () => { const a = R(2, 12), b = R(2, 12); return { e: `${a} · ${b} = ${b} · ${a}`, ok: true, why: `Beide Seiten ergeben ${a * b}. Bei <b>Mal</b> darf man vertauschen (Kommutativgesetz).` }; },
+        () => { const a = R(2, 30), b = R(2, 30), c = R(2, 30); return { e: `(${a} + ${b}) + ${c} = ${a} + (${b} + ${c})`, ok: true, why: `Beide Seiten ergeben ${a + b + c}. Bei <b>Plus</b> darf man die Klammer verschieben (Assoziativgesetz).` }; },
+      ];
+      const k = pick(cases)();
+      return {
+        prompt: `Stimmt das?<br><b>${k.e}</b>`,
+        choices: ['Stimmt', 'Stimmt nicht'],
+        correct: k.ok ? 0 : 1,
+        hint: 'Kommutativ- und Assoziativgesetz gelten nur für <b>Plus</b> und <b>Mal</b>. Rechne zur Sicherheit beide Seiten aus.',
+        solution: `${k.why}<br>→ <b>${k.ok ? 'Stimmt' : 'Stimmt nicht'}</b>`,
+      };
+    }
+    // v === 7: Distributivgesetz rückwärts (ausklammern) mit Ergebnis
+    const f = R(3, 9), x = R(11, 89), y = 100 - x;
+    return {
+      prompt: `Klammere aus und rechne: <b>${f} · ${x} + ${f} · ${y}</b>`,
+      fields: [{ answer: f * 100 }],
+      hint: `Beide Produkte haben den Faktor ${f}. Schreibe ${f} · (… + …).`,
+      solution: `Distributivgesetz: ${f} · ${x} + ${f} · ${y} = ${f} · (${x} + ${y}) = ${f} · 100 = <b>${f * 100}</b>`,
+    };
+  }
+
   function potenzen() {
     const v = R(1, 4);
     if (v === 1) {
@@ -776,6 +1017,8 @@
         id: 'k5-lb1', nr: 1, title: 'Natürliche Zahlen', color: 'c1',
         topics: [
           { id: 'k5-runden', title: 'Runden', icon: '≈', gen: runden },
+          { id: 'k5-vorrang', title: 'Vorrangregeln', icon: '( )', gen: vorrang },
+          { id: 'k5-gesetze', title: 'Rechengesetze', icon: '⇄', gen: gesetze },
           { id: 'k5-vorteil', title: 'Geschickt rechnen', icon: '⚡', gen: vorteilhaft },
           { id: 'k5-potenz', title: 'Quadrat- & Zehnerpotenzen', icon: 'x²', gen: potenzen },
           { id: 'k5-division', title: 'Schriftlich dividieren', icon: '÷', gen: division },

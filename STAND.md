@@ -94,8 +94,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
-- **5 Lernbereiche, 22 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
-  - LB 1 Natürliche Zahlen: Runden · Geschickt rechnen · Quadrat- & Zehnerpotenzen ·
+- **5 Lernbereiche, 24 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
+  - LB 1 Natürliche Zahlen: Runden · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Quadrat- & Zehnerpotenzen ·
     Schriftlich dividieren · Teilbarkeitsregeln · Primzahlen & Primfaktoren · Einfache Gleichungen
   - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern ·
     Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Zahlen vergleichen · Arithmetisches Mittel
@@ -104,7 +104,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **18 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Teilen mit Rest ·
+- **20 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
+  Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Teilen mit Rest ·
   Primzahlen · Quadratzahlen sind Quadrate · Anteile berechnen · Erweitern & Kürzen ·
   Die Hundertertafel · Mal 10 (das Komma bleibt, die Ziffern wandern) · Der Mittelwert macht
   alles gerecht · Erst laufen, dann springen (Koordinaten) · Winkelarten · Winkel an Geraden ·
@@ -196,7 +197,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v7`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v8`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -296,14 +297,14 @@ Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53).
 Abgleich mit Mathelix (10.11.2026):
 | Thema | Stand in Mathelix | Fehlt |
 |---|---|---|
-| Vorrangregeln & Rechengesetze | „Geschickt rechnen“ **nutzt** die Gesetze nur | Vorrangregeln (Klammer zuerst, Punkt vor Strich, Potenz vor Punkt) fehlen ganz; Gesetze erkennen und benennen fehlt |
+| Vorrangregeln & Rechengesetze | seit 10.11. eigene Themen „Vorrangregeln“ und „Rechengesetze“ | erledigt |
 | Potenzen | nur Quadratzahlen bis 20² und Zehnerpotenzen | allgemeine Potenzen (2³, 3⁴ …), Basis/Exponent, „als Potenz schreiben“ |
 | Teilbarkeit & Primzahlen | gut abgedeckt (Regeln, Primzahltest, Primfaktorzerlegung) | evtl. Teilermengen |
 | Schriftliches Dividieren | nur dreistellig durch einstellig, mit Rest | größere Zahlen, Probe; zweistellige Teiler? (im Buch S. 36–40 prüfen) |
 
-Geplante Schritte (Vorschlag vom 10.11., Freigabe durch Roberto offen):
-- [ ] Neues Thema „Vorrangregeln“ mit Animation (Rechenbaum, der von innen nach außen
-      zusammenschrumpft) und Aufgaben „Welches Rechengesetz wurde benutzt?“
+Geplante Schritte (von Roberto am 10.11. freigegeben):
+- [x] Neue Themen **„Vorrangregeln“** und **„Rechengesetze“** (10.11., `lerndax-v8`), siehe unten
+- [ ] Mit Bruno testen: Vorrangregeln und Rechengesetze
 - [ ] Potenzen erweitern (2⁵ = 2·2·2·2·2, Basis/Exponent, Verknüpfung zum Reis-Schachbrett)
 - [ ] Division (größere Zahlen, Probe) und Teilermengen ergänzen
 - [ ] Kachel „Klassenarbeit 24.11.“ in Mathelix: Countdown, tägliche Runde nur aus diesen Themen,
@@ -348,3 +349,11 @@ Geplante Schritte (Vorschlag vom 10.11., Freigabe durch Roberto offen):
   in der Mathelix-Kopfzeile entfernt (Version `lerndax-v7`).
 - Schulbücher und Mathe-Klassenarbeit am 24.11. eingetragen, Abgleich der Arbeitsthemen mit
   Mathelix, Plan für die zwei Wochen bis zur Arbeit.
+- **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
+  mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
+  (Version `lerndax-v8`). Aufgabenarten:
+  - Vorrangregeln: Punkt vor Strich (+, −, :), Klammer zuerst, nur Strich bzw. nur Punkt von links
+    nach rechts, Hochzahl vor Punkt, (a + b)², längere Ketten, „Was rechnest du zuerst?“,
+    „Welche Rechnung ergibt …?“ (Klammer ja/nein)
+  - Rechengesetze: Gesetz benennen (Auswahl mit Fach- und deutschem Namen), Lücken füllen,
+  „Stimmt das?“ (Kommutativ-/Assoziativgesetz gelten nicht für − und :), ausklammern

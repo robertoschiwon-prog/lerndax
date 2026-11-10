@@ -1085,4 +1085,240 @@
       };
     },
   });
+
+  // =====================================================
+  // Vorrangregeln – der Rechenbaum
+  // =====================================================
+  const PREC = { '+': 1, '−': 1, '·': 2, ':': 2 };
+  const calc = (op, a, b) => (op === '+' ? a + b : op === '−' ? a - b : op === '·' ? a * b : a / b);
+  const needPar = (ch, pOp, right) => !!ch.op && (PREC[ch.op] < PREC[pOp] || (right && PREC[ch.op] === PREC[pOp] && (pOp === '−' || pOp === ':')));
+  reg('k5-vorrang', {
+    title: 'Der Rechenbaum: wer gehört zu wem?',
+    viewBox: '0 0 360 270',
+    create(api) {
+      let mode = 'punkt', a, b, c, root, exprT, edgesG, nodesG;
+      const N = (v) => ({ v });
+      const O = (op, l, r) => ({ op, l, r });
+      const pickN = () => { a = R(2, 9); do b = R(2, 9); while (b === a); do c = R(2, 9); while (c === a || c === b); };
+      pickN();
+      function build() {
+        if (mode === 'punkt') return O('+', N(a), O('·', N(b), N(c)));
+        if (mode === 'klammer') return O('·', O('+', N(a), N(b)), N(c));
+        const bb = R(2, 4), cc = R(2, 5), dd = R(2, 5), aa = bb * (cc + dd) + R(3, 25);
+        return O('−', N(aa), O('·', N(bb), O('+', N(cc), N(dd))));
+      }
+      const value = (n) => (n.op ? calc(n.op, value(n.l), value(n.r)) : n.v);
+      const plain = (n, p, right) => {
+        if (!n.op) return String(n.v);
+        const s = `${plain(n.l, n.op, false)} ${n.op} ${plain(n.r, n.op, true)}`;
+        return p && needPar(n, p, right) ? `(${s})` : s;
+      };
+      function segs(n, hot, inHot, p, right) {
+        const h = inHot || n === hot;
+        if (!n.op) return [[String(n.v), h]];
+        let out = [...segs(n.l, hot, h, n.op, false), [` ${n.op} `, h], ...segs(n.r, hot, h, n.op, true)];
+        if (p && needPar(n, p, right)) out = [['(', h], ...out, [')', h]];
+        return out;
+      }
+      function showExpr(hot) {
+        exprT.innerHTML = '';
+        for (const [t, h] of segs(root, hot, false, null, false)) {
+          const s = el('tspan', { text: t }, exprT);
+          if (h) s.setAttribute('class', 'f1');
+        }
+      }
+      function layout() {
+        const leaves = [];
+        (function walk(n, dep) {
+          n.dep = dep;
+          if (!n.op) { leaves.push(n); return; }
+          walk(n.l, dep + 1); walk(n.r, dep + 1);
+        })(root, 0);
+        const step = leaves.length > 1 ? Math.min(110, 260 / (leaves.length - 1)) : 0;
+        const x0 = 180 - (step * (leaves.length - 1)) / 2;
+        leaves.forEach((n, i) => (n.x = x0 + i * step));
+        (function px(n) { n.y = 92 + n.dep * 56; if (n.op) { px(n.l); px(n.r); n.x = (n.l.x + n.r.x) / 2; } })(root);
+      }
+      function drawLeaf(n, res) {
+        n.g.innerHTML = '';
+        const w = String(n.v).length > 2 ? 52 : 44;
+        el('rect', { x: -w / 2, y: -17, width: w, height: 34, rx: 9, class: res ? 'vnum vres' : 'vnum' }, n.g);
+        el('text', { x: 0, y: 7, class: 'ex-b', 'text-anchor': 'middle', text: n.v }, n.g);
+      }
+      function draw() {
+        edgesG.innerHTML = ''; nodesG.innerHTML = '';
+        (function d(n) {
+          if (n.op) {
+            n.el = el('line', { x1: n.x, y1: n.y, x2: n.l.x, y2: n.l.y, class: 'vedge' }, edgesG);
+            n.er = el('line', { x1: n.x, y1: n.y, x2: n.r.x, y2: n.r.y, class: 'vedge' }, edgesG);
+            d(n.l); d(n.r);
+          }
+          n.g = el('g', { transform: `translate(${n.x},${n.y})` }, nodesG);
+          if (n.op) {
+            n.c = el('circle', { r: 19, class: 'vop' }, n.g);
+            el('text', { x: 0, y: 7, class: 'ex-b', 'text-anchor': 'middle', text: n.op }, n.g);
+          } else drawLeaf(n, false);
+        })(root);
+      }
+      function order() { const o = []; (function w(n) { if (n.op) { w(n.l); w(n.r); o.push(n); } })(root); return o; }
+      function parentOf(t) { let p = null; (function w(n) { if (n.op) { if (n.l === t || n.r === t) p = n; w(n.l); w(n.r); } })(root); return p; }
+      function reason(n) {
+        const p = parentOf(n);
+        if (p && needPar(n, p.op, p.r === n)) return '<b>Klammer zuerst</b>';
+        if (PREC[n.op] === 2 && order().some((m) => m !== n && PREC[m.op] === 1)) return '<b>Punkt vor Strich</b>';
+        if (!p) return 'Zum Schluss';
+        return 'Von links nach rechts';
+      }
+      const chips = api.chips([
+        { label: 'a + b · c', onClick() { mode = 'punkt'; api.replay(); } },
+        { label: '(a + b) · c', onClick() { mode = 'klammer'; api.replay(); } },
+        { label: 'Längere Rechnung', onClick() { mode = 'lang'; api.replay(); } },
+        { label: 'Neue Zahlen', onClick() { pickN(); api.replay(); } },
+      ]);
+      const relabel = () => { const bs = chips.querySelectorAll('button'); bs[0].textContent = `${a} + ${b} · ${c}`; bs[1].textContent = `(${a} + ${b}) · ${c}`; };
+      return {
+        reset() {
+          api.clear();
+          relabel();
+          root = build();
+          exprT = el('text', { x: 180, y: 40, class: 'vexpr', 'text-anchor': 'middle' }, api.svg);
+          edgesG = el('g', {}, api.svg); nodesG = el('g', {}, api.svg);
+          layout(); draw(); showExpr(null);
+          edgesG.setAttribute('opacity', 0); nodesG.setAttribute('opacity', 0);
+        },
+        async play() {
+          const total = value(root);
+          if (mode === 'punkt') api.say(`Wer gehört zu wem? Bei <b>${plain(root)}</b> hält das <b>Mal</b> die ${b} und die ${c} fester zusammen als das Plus.`);
+          else if (mode === 'klammer') api.say(`Die <b>Klammer</b> packt ${a} und ${b} zu einem Paket zusammen.`);
+          else api.say(`Eine längere Rechnung. Der Baum zeigt, was zusammengehört.`);
+          await api.tw(800, (t) => { edgesG.setAttribute('opacity', t); nodesG.setAttribute('opacity', t); });
+          await api.wait(2200);
+          api.say('Gerechnet wird <b>von unten nach oben</b>: Immer zwei Zahlen werden zu einer.');
+          await api.wait(2000);
+          for (const n of order()) {
+            const x = value(n.l), y = value(n.r), v = calc(n.op, x, y);
+            n.c.setAttribute('class', 'vop vhot');
+            showExpr(n);
+            api.say(`${reason(n)}: <b>${x} ${n.op} ${y} = ${v}</b>`);
+            await api.wait(1500);
+            const kids = [n.l, n.r];
+            await api.tw(800, (t) => {
+              kids.forEach((k) => { k.g.setAttribute('transform', `translate(${lerp(k.x, n.x, t)},${lerp(k.y, n.y, t)})`); k.g.setAttribute('opacity', 1 - t); });
+              n.el.setAttribute('opacity', 1 - t); n.er.setAttribute('opacity', 1 - t);
+            });
+            kids.forEach((k) => k.g.remove()); n.el.remove(); n.er.remove();
+            delete n.op; n.v = v; drawLeaf(n, true);
+            showExpr(null);
+            await api.wait(900);
+          }
+          if (mode === 'punkt') api.say(`Ergebnis: <b>${total}</b>. <small>Punkt vor Strich! Wer zuerst ${a} + ${b} rechnet, bekommt ${(a + b) * c}, und das ist falsch.</small>`);
+          else if (mode === 'klammer') api.say(`Ergebnis: <b>${total}</b>. <small>Ohne Klammer wäre es ${a} + ${b * c} = ${a + b * c}. Die Klammer ändert, wer zusammengehört!</small>`);
+          else api.say(`Ergebnis: <b>${total}</b>. <small>Klammer zuerst, dann Punkt vor Strich, zum Schluss das Minus.</small>`);
+        },
+      };
+    },
+  });
+
+  // =====================================================
+  // Rechengesetze – Punkte drehen, Streifen umklammern, Rechteck teilen
+  // =====================================================
+  reg('k5-gesetze', {
+    title: 'Drei Rechengesetze zum Anschauen',
+    viewBox: '0 0 360 250',
+    create(api) {
+      let mode = 'alle';
+      const T = (x, y, text, cls, parent) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': 'middle', text }, parent || api.svg);
+      async function kommutativ() {
+        api.clear();
+        const r = R(2, 4), c = R(r + 1, 6), s = 24, cx = 180, cy = 112;
+        el('text', { x: 180, y: 26, class: 'ex-s f6', 'text-anchor': 'middle', text: 'KOMMUTATIVGESETZ (Vertauschungsgesetz)' }, api.svg);
+        const g = el('g', { opacity: 0 }, api.svg);
+        for (let i = 0; i < r; i++) for (let j = 0; j < c; j++)
+          el('circle', { cx: cx + (j - (c - 1) / 2) * s, cy: cy + (i - (r - 1) / 2) * s, r: 8, class: 'dotO' }, g);
+        const lab = T(180, 232, '', 'vexpr');
+        api.say(`<b>${r}</b> Reihen mit je <b>${c}</b> Punkten.`);
+        await api.tw(600, (t) => g.setAttribute('opacity', t));
+        lab.textContent = `${r} · ${c} = ${r * c}`;
+        await api.wait(1800);
+        api.say('Jetzt drehen wir das Bild um eine Vierteldrehung …');
+        await api.tw(1400, (t) => g.setAttribute('transform', `rotate(${90 * t} ${cx} ${cy})`));
+        lab.textContent = `${c} · ${r} = ${r * c}`;
+        api.say(`… jetzt sind es <b>${c}</b> Reihen mit je <b>${r}</b> Punkten. Aber es sind <b>dieselben</b> Punkte! <small>Beim Mal (und beim Plus) darf man die Zahlen vertauschen.</small>`);
+        await api.wait(3200);
+      }
+      async function assoziativ() {
+        api.clear();
+        const a = R(2, 5), b = R(2, 6), c = R(2, 5), u = Math.min(26, 260 / (a + b + c));
+        const x0 = 180 - ((a + b + c) * u) / 2, y = 92, h = 34;
+        el('text', { x: 180, y: 26, class: 'ex-s f6', 'text-anchor': 'middle', text: 'ASSOZIATIVGESETZ (Verbindungsgesetz)' }, api.svg);
+        const ex = T(180, 66, `(${a} + ${b}) + ${c}`, 'vexpr');
+        const xs = [x0, x0 + a * u, x0 + (a + b) * u, x0 + (a + b + c) * u];
+        [a, b, c].forEach((v, i) => {
+          el('rect', { x: xs[i], y, width: v * u, height: h, rx: 4, class: ['blk', 'blk mv', 'blk g3'][i] }, api.svg);
+          T((xs[i] + xs[i + 1]) / 2, y + 23, v, 'ex-b wtxt');
+        });
+        const br = el('path', { d: '', class: 'brk' }, api.svg);
+        const bl = T(0, 168, '', 'ex-b');
+        const tot = T(180, 222, '', 'vexpr');
+        const setBr = (p, q) => { br.setAttribute('d', `M ${p} 136 v 10 H ${q} v -10`); bl.setAttribute('x', (p + q) / 2); };
+        setBr(xs[0], xs[2]);
+        bl.textContent = `${a} + ${b} = ${a + b}`;
+        api.say(`Erst <b>${a} + ${b}</b> zusammenfassen, dann ${c} dazu.`);
+        await api.wait(1800);
+        tot.textContent = `${a + b} + ${c} = ${a + b + c}`;
+        await api.wait(1800);
+        api.say('Jetzt verschieben wir die Klammer …');
+        ex.textContent = `${a} + (${b} + ${c})`; tot.textContent = '';
+        await api.tw(1000, (t) => setBr(lerp(xs[0], xs[1], t), lerp(xs[2], xs[3], t)));
+        bl.textContent = `${b} + ${c} = ${b + c}`;
+        await api.wait(1200);
+        tot.textContent = `${a} + ${b + c} = ${a + b + c}`;
+        api.say(`Wieder <b>${a + b + c}</b>, der Streifen ist ja derselbe! <small>Bei Plus und Mal darf man die Klammer verschieben.</small>`);
+        await api.wait(3200);
+      }
+      async function distributiv() {
+        api.clear();
+        const f = R(3, 6), x = pick([10, 20]), y = R(2, 6), u = x === 20 ? 10 : 14;
+        const w1 = x * u, w2 = y * u, h = f * u, x0 = 180 - (w1 + w2 + 20) / 2, y0 = 104;
+        el('text', { x: 180, y: 26, class: 'ex-s f6', 'text-anchor': 'middle', text: 'DISTRIBUTIVGESETZ (Verteilungsgesetz)' }, api.svg);
+        const ex = T(180, 62, `${f} · (${x} + ${y})`, 'vexpr');
+        const L = el('rect', { x: x0, y: y0, width: w1, height: h, class: 'blk' }, api.svg);
+        const Rg = el('g', {}, api.svg);
+        const Rr = el('rect', { x: x0 + w1, y: y0, width: w2, height: h, class: 'blk' }, Rg);
+        T(x0 - 14, y0 + h / 2 + 6, f, 'ex-b');
+        T(x0 + w1 / 2, y0 - 8, x, 'ex-s');
+        const ty = T(x0 + w1 + w2 / 2, y0 - 8, y, 'ex-s', Rg);
+        const l1 = T(x0 + w1 / 2, y0 + h + 24, '', 'ex-s'), l2 = T(x0 + w1 + 20 + w2 / 2, y0 + h + 24, '', 'ex-s');
+        const tot = T(180, 236, '', 'vexpr');
+        api.say(`Ein Rechteck: <b>${f}</b> hoch und <b>${x} + ${y}</b> breit. Fläche: ${f} · (${x} + ${y}).`);
+        await api.wait(2400);
+        api.say('Wir schneiden es an der Stelle ' + x + ' durch …');
+        Rr.setAttribute('class', 'blk mv');
+        await api.tw(900, (t) => Rg.setAttribute('transform', `translate(${20 * t},0)`));
+        l1.textContent = `${f} · ${x} = ${f * x}`; l2.textContent = `${f} · ${y} = ${f * y}`;
+        ex.textContent = `${f} · ${x} + ${f} · ${y}`;
+        api.say(`Zwei Rechtecke: ${f} · ${x} und ${f} · ${y}. Die <b>${f}</b> wird auf beide Teile <b>verteilt</b>.`);
+        await api.wait(2200);
+        tot.textContent = `${f * x} + ${f * y} = ${f * (x + y)}`;
+        api.say(`Zusammen <b>${f * (x + y)}</b>, genauso viel wie ${f} · ${x + y}. <small>So rechnet man z. B. ${f} · ${x + y} im Kopf!</small>`);
+        void ty; void L;
+        await api.wait(3200);
+      }
+      api.chips([
+        { label: 'Alle drei', onClick() { mode = 'alle'; api.replay(); } },
+        { label: 'Kommutativ', onClick() { mode = 'kom'; api.replay(); } },
+        { label: 'Assoziativ', onClick() { mode = 'ass'; api.replay(); } },
+        { label: 'Distributiv', onClick() { mode = 'dis'; api.replay(); } },
+      ]);
+      return {
+        reset() { api.clear(); },
+        async play() {
+          if (mode === 'alle' || mode === 'kom') await kommutativ();
+          if (mode === 'alle' || mode === 'ass') await assoziativ();
+          if (mode === 'alle' || mode === 'dis') await distributiv();
+          if (mode === 'alle') api.say('<b>Kommutativ</b>: vertauschen · <b>Assoziativ</b>: Klammer verschieben · <b>Distributiv</b>: verteilen. <small>Die ersten beiden gelten nur für Plus und Mal!</small>');
+        },
+      };
+    },
+  });
 })();

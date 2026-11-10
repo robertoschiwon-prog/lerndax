@@ -7,6 +7,8 @@ window.MathelixIcons = (function () {
   const I = {
     // LB 1 Natürliche Zahlen
     'k5-runden': `<path d="M2 18h20M19 14.5v7"/><circle cx="6.5" cy="18" r="2.4" ${F}/><path d="M6.5 13.6C7.5 3.5 18 3.5 19 10.8"/><path d="M16.4 9l2.6 2.6L21.6 9"/>`,
+    'k5-vorrang': `<path d="M8.5 3C4.6 7 4.6 17 8.5 21M15.5 3c3.9 4 3.9 14 0 18"/><circle cx="12" cy="12" r="2.5" ${F}/>`,
+    'k5-gesetze': `<path d="M3.5 8h15"/><path d="M15 4.5 18.5 8 15 11.5"/><path d="M20.5 16h-15"/><path d="M9 12.5 5.5 16 9 19.5"/>`,
     'k5-vorteil': `<path d="M13.8 2 4.8 13.6h6.4L9.6 22 19.2 9.8h-6.4z" ${F}/>`,
     'k5-potenz': [6, 12, 18].map(y => [6, 12, 18].map(x => `<circle cx="${x}" cy="${y}" r="2.3" ${F}/>`).join('')).join(''),
     'k5-division': `<path d="M4.5 12h15"/><circle cx="12" cy="5.8" r="2.3" ${F}/><circle cx="12" cy="18.2" r="2.3" ${F}/>`,

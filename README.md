@@ -87,8 +87,8 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 ## Fahrplan
 
 **Mathe (Mathelix)**
-- [x] Klasse 5: alle 5 Lernbereiche, 22 Themen, Tipps und Lösungswege
-- [x] 18 Erklär-Animationen, Pause und Langsam-Modus, Lösung nach dem Antworten (Primzahlen)
+- [x] Klasse 5: alle 5 Lernbereiche, 24 Themen, Tipps und Lösungswege
+- [x] 20 Erklär-Animationen, Pause und Langsam-Modus, Lösung nach dem Antworten (Primzahlen)
 - [x] Entdecken: 14 visuelle Beweise und Staunen-Momente
 - [ ] Lösung-als-Animation auf weitere Themen übertragen
 - [ ] Reihenfolge mit dem Schulbuch abgleichen
