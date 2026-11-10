@@ -380,7 +380,7 @@
   }
 
   function potenzen() {
-    const v = R(1, 4);
+    const v = R(1, 10);
     if (v === 1) {
       const n = R(11, 20);
       return {
@@ -399,33 +399,172 @@
         solution: `${n} · ${n} = ${n * n}, also <b>${n}</b>`,
       };
     }
-    const k = R(2, 7);
-    if (v === 3)
+    if (v === 3 || v === 4) {
+      const k = R(2, 7);
+      if (v === 3)
+        return {
+          prompt: `Schreibe als Zahl: <b>10${sup(k)}</b>`,
+          fields: [{ answer: 10 ** k }],
+          hint: 'Der Exponent sagt dir, wie viele Nullen hinter der 1 stehen.',
+          solution: `10${sup(k)} = 1 mit ${k} Nullen = <b>${fmt(10 ** k)}</b>`,
+        };
       return {
-        prompt: `Schreibe als Zahl: <b>10${sup(k)}</b>`,
-        fields: [{ answer: 10 ** k }],
-        hint: 'Der Exponent sagt dir, wie viele Nullen hinter der 1 stehen.',
-        solution: `10${sup(k)} = 1 mit ${k} Nullen = <b>${fmt(10 ** k)}</b>`,
+        prompt: `Schreibe als Zehnerpotenz: <b>${fmt(10 ** k)}</b>`,
+        fields: [{ answer: k, prefix: '10 hoch' }],
+        hint: 'Zähle die Nullen.',
+        solution: `${fmt(10 ** k)} hat ${k} Nullen → <b>10${sup(k)}</b>`,
+        answerText: `10${sup(k)}`,
       };
+    }
+    // allgemeine Potenzen: Basis 2–6, Ergebnis höchstens 1024
+    const POW = [[2, 2], [2, 3], [2, 4], [2, 5], [2, 6], [2, 7], [2, 8], [2, 10], [3, 2], [3, 3], [3, 4], [3, 5], [4, 2], [4, 3], [4, 4], [5, 2], [5, 3], [5, 4], [6, 2], [6, 3], [1, 5], [1, 9], [7, 1], [9, 1]];
+    const prod = (b, e) => Array(e).fill(b).join(' · ');
+    if (v === 5 || v === 6) {
+      const [b, e] = pick(POW);
+      return {
+        prompt: `Berechne: <b>${b}${sup(e)}</b>`,
+        fields: [{ answer: b ** e }],
+        hint: `Die Basis ${b} wird <b>${e}-mal</b> mit sich selbst malgenommen. Nicht ${b} · ${e}!`,
+        solution: `${b}${sup(e)} = ${e > 1 ? prod(b, e) + ' = ' : ''}<b>${fmt(b ** e)}</b>${e === 1 ? ' (hoch 1: die Zahl selbst)' : b === 1 ? ' (1 mal 1 bleibt immer 1)' : ''}`,
+      };
+    }
+    if (v === 7) {
+      const [b, e] = pick(POW.filter(([b, e]) => b > 1 && e > 1));
+      return {
+        prompt: `Schreibe als Potenz: <b>${prod(b, e)}</b>`,
+        fields: [{ answer: b, label: 'Basis' }, { answer: e, label: 'Exponent' }],
+        hint: 'Die Basis ist die Zahl, die malgenommen wird. Der Exponent zählt, wie oft sie vorkommt.',
+        solution: `Die ${b} kommt <b>${e}-mal</b> vor → <b>${b}${sup(e)}</b> (Basis ${b}, Exponent ${e})`,
+        answerText: `${b}${sup(e)}`,
+      };
+    }
+    if (v === 8) {
+      // typischer Fehler: Basis · Exponent
+      const [b, e] = pick(POW.filter(([b, e]) => b > 1 && e > 1 && b * e !== b ** e && b + e !== b ** e && e ** b !== b ** e));
+      const opts = shuffle([b ** e, b * e, e ** b <= 2000 ? e ** b : b + e]);
+      return {
+        prompt: `Was ist <b>${b}${sup(e)}</b>?`,
+        choices: opts.map(fmt),
+        correct: opts.indexOf(b ** e),
+        hint: `Hochzahl heißt: ${b} so oft malnehmen, wie der Exponent sagt.`,
+        solution: `${b}${sup(e)} = ${prod(b, e)} = <b>${fmt(b ** e)}</b><br><small>Achtung: ${b} · ${e} = ${b * e} ist ein häufiger Fehler!</small>`,
+      };
+    }
+    if (v === 9) {
+      // Vergleichen
+      const pairs = [[2, 5, 5, 2], [2, 4, 4, 2], [3, 4, 4, 3], [2, 6, 6, 2], [2, 3, 3, 2], [3, 2, 2, 3], [5, 3, 3, 5], [2, 10, 10, 2], [4, 3, 3, 4]];
+      const [b1, e1, b2, e2] = pick(pairs);
+      const A = b1 ** e1, B = b2 ** e2;
+      const opts = [`${b1}${sup(e1)}`, `${b2}${sup(e2)}`, 'Beide gleich'];
+      const k = A > B ? 0 : A < B ? 1 : 2;
+      return {
+        prompt: `Was ist größer: <b>${b1}${sup(e1)}</b> oder <b>${b2}${sup(e2)}</b>?`,
+        choices: opts,
+        correct: k,
+        hint: 'Rechne beide Potenzen aus.',
+        solution: `${b1}${sup(e1)} = ${fmt(A)} und ${b2}${sup(e2)} = ${fmt(B)} → <b>${opts[k]}</b>`,
+      };
+    }
+    // v === 10: Zahl mal Zehnerpotenz oder Basis gesucht
+    if (Math.random() < 0.5) {
+      const a = R(2, 9), k = R(2, 6);
+      return Math.random() < 0.5
+        ? {
+          prompt: `Berechne: <b>${a} · 10${sup(k)}</b>`,
+          fields: [{ answer: a * 10 ** k }],
+          hint: `10${sup(k)} ist eine 1 mit ${k} Nullen.`,
+          solution: `${a} · ${fmt(10 ** k)} = <b>${fmt(a * 10 ** k)}</b>`,
+        }
+        : {
+          prompt: `Schreibe mit einer Zehnerpotenz: <b>${fmt(a * 10 ** k)}</b>`,
+          fields: [{ answer: k, prefix: `${a} · 10 hoch` }],
+          hint: 'Zähle die Nullen hinter der ersten Ziffer.',
+          solution: `${fmt(a * 10 ** k)} = ${a} · ${fmt(10 ** k)} = <b>${a} · 10${sup(k)}</b>`,
+          answerText: `${a} · 10${sup(k)}`,
+        };
+    }
+    const [b, e] = pick(POW.filter(([b, e]) => b > 1 && e >= 3));
     return {
-      prompt: `Schreibe als Zehnerpotenz: <b>${fmt(10 ** k)}</b>`,
-      fields: [{ answer: k, prefix: '10 hoch' }],
-      hint: 'Zähle die Nullen.',
-      solution: `${fmt(10 ** k)} hat ${k} Nullen → <b>10${sup(k)}</b>`,
-      answerText: `10${sup(k)}`,
+      prompt: `Welche Zahl hoch ${e} ergibt <b>${fmt(b ** e)}</b>?`,
+      fields: [{ answer: b, suffix: `<sup>${e}</sup> = ${fmt(b ** e)}` }],
+      hint: 'Probiere kleine Zahlen: 2, 3, 4, 5 …',
+      solution: `${prod(b, e)} = ${fmt(b ** e)} → <b>${b}</b>`,
     };
   }
 
   function division() {
-    const d = R(2, 9);
-    const n = R(100, 999);
-    const q = Math.floor(n / d), r = n % d;
+    const v = R(1, 4);
+    if (v === 1) {
+      const d = R(2, 9), n = R(100, 999), q = Math.floor(n / d), r = n % d;
+      return {
+        prompt: `Dividiere schriftlich: <b>${n} : ${d}</b>`,
+        fields: [{ answer: q, label: 'Ergebnis' }, { answer: r, label: 'Rest' }],
+        hint: 'Teile Stelle für Stelle von links. Bleibt am Ende nichts übrig, ist der Rest 0.',
+        solution: `${n} : ${d} = <b>${q} Rest ${r}</b><br>Probe: ${d} · ${q} + ${r} = ${d * q} + ${r} = ${n} ✓`,
+        answerText: `${q} Rest ${r}`,
+      };
+    }
+    if (v === 2) {
+      // größere Zahl, geht glatt auf (auch mit Null im Ergebnis)
+      const d = R(3, 9);
+      let q;
+      do q = R(105, 2400); while (Math.random() < 0.6 && !String(q).slice(1).includes('0'));
+      const n = d * q;
+      return {
+        prompt: `Dividiere schriftlich: <b>${fmt(n)} : ${d}</b>`,
+        fields: [{ answer: q, label: 'Ergebnis' }],
+        hint: `Teile Stelle für Stelle von links. Passt ${d} in eine Stelle nicht hinein, schreibst du eine <b>0</b> ins Ergebnis!`,
+        solution: `${fmt(n)} : ${d} = <b>${fmt(q)}</b><br>Probe: ${d} · ${fmt(q)} = ${fmt(n)} ✓`,
+      };
+    }
+    if (v === 3) {
+      const d = R(3, 9), n = R(1000, 9999), q = Math.floor(n / d), r = n % d;
+      return {
+        prompt: `Dividiere schriftlich: <b>${fmt(n)} : ${d}</b>`,
+        fields: [{ answer: q, label: 'Ergebnis' }, { answer: r, label: 'Rest' }],
+        hint: 'Teile Stelle für Stelle von links. Der Rest muss kleiner sein als die Zahl, durch die du teilst.',
+        solution: `${fmt(n)} : ${d} = <b>${fmt(q)} Rest ${r}</b><br>Probe: ${d} · ${fmt(q)} + ${r} = ${fmt(d * q)} + ${r} = ${fmt(n)} ✓`,
+        answerText: `${fmt(q)} Rest ${r}`,
+      };
+    }
+    // v === 4: Probe – stimmt die Rechnung?
+    const d = R(3, 9), q = R(102, 999), r = R(0, d - 1), n = d * q + r;
+    const ok = Math.random() < 0.5;
+    const shownQ = ok ? q : q + pick([-10, -1, 1, 10]);
+    const shown = `${fmt(n)} : ${d} = ${fmt(shownQ)}${r ? ` Rest ${r}` : ''}`;
+    const back = d * shownQ + r;
     return {
-      prompt: `Dividiere schriftlich: <b>${n} : ${d}</b>`,
-      fields: [{ answer: q, label: 'Ergebnis' }, { answer: r, label: 'Rest' }],
-      hint: 'Teile Stelle für Stelle von links. Bleibt am Ende nichts übrig, ist der Rest 0.',
-      solution: `${n} : ${d} = <b>${q} Rest ${r}</b><br>Probe: ${d} · ${q} + ${r} = ${d * q} + ${r} = ${n} ✓`,
-      answerText: `${q} Rest ${r}`,
+      prompt: `Mach die Probe: Stimmt <b>${shown}</b>?`,
+      choices: ['Stimmt', 'Stimmt nicht'],
+      correct: ok ? 0 : 1,
+      hint: `Probe: Ergebnis mal ${d}${r ? ', plus Rest' : ''}. Kommt ${fmt(n)} heraus?`,
+      solution: `Probe: ${d} · ${fmt(shownQ)}${r ? ` + ${r}` : ''} = ${fmt(back)} → ${ok ? `das ist ${fmt(n)}, <b>stimmt</b>` : `das ist nicht ${fmt(n)}, <b>stimmt nicht</b>. Richtig: ${fmt(q)}${r ? ` Rest ${r}` : ''}`}`,
+    };
+  }
+
+  // Teilermengen
+  const divisors = (n) => { const t = []; for (let i = 1; i <= n; i++) if (n % i === 0) t.push(i); return t; };
+  function teiler() {
+    const n = pick([12, 16, 18, 20, 24, 28, 30, 32, 36, 40, 42, 45, 48, 50, 54, 56, 60, 64, 72]);
+    const T = divisors(n);
+    const list = `T<sub>${n}</sub> = {${T.join(', ')}}`;
+    if (Math.random() < 0.5)
+      return {
+        prompt: `Wie viele Teiler hat <b>${n}</b>?`,
+        fields: [{ answer: T.length, suffix: 'Teiler' }],
+        hint: 'Suche Teiler-Paare: 1 · ' + n + ', 2 · …, und vergiss die 1 und die Zahl selbst nicht.',
+        solution: `${list} → <b>${T.length} Teiler</b>`,
+      };
+    const non = [];
+    for (let i = 2; i < n && non.length < 12; i++) if (n % i && i <= 12) non.push(i);
+    const wrong = pick(non);
+    const opts = shuffle([wrong, ...shuffle(T.filter((t) => t > 1 && t < n)).slice(0, 3)]);
+    return {
+      prompt: `Welche Zahl ist <b>kein</b> Teiler von <b>${n}</b>?`,
+      choices: opts.map(String),
+      correct: opts.indexOf(wrong),
+      hint: 'Prüfe für jede Zahl: Geht die Division ohne Rest auf?',
+      solution: `${list}<br>${n} : ${wrong} geht nicht auf → <b>${wrong}</b>`,
     };
   }
 
@@ -439,6 +578,7 @@
     10: 'Eine Zahl ist durch 10 teilbar, wenn ihre letzte Ziffer 0 ist.',
   };
   function teilbarkeit() {
+    if (Math.random() < 0.3) return teiler();
     const d = pick([2, 3, 4, 5, 6, 9, 10, 3, 4, 6]);
     const yes = Math.random() < 0.5;
     let n = d * R(Math.ceil(100 / d), Math.floor(99999 / d));
@@ -1020,9 +1160,9 @@
           { id: 'k5-vorrang', title: 'Vorrangregeln', icon: '( )', gen: vorrang },
           { id: 'k5-gesetze', title: 'Rechengesetze', icon: '⇄', gen: gesetze },
           { id: 'k5-vorteil', title: 'Geschickt rechnen', icon: '⚡', gen: vorteilhaft },
-          { id: 'k5-potenz', title: 'Quadrat- & Zehnerpotenzen', icon: 'x²', gen: potenzen },
+          { id: 'k5-potenz', title: 'Potenzen', icon: 'x²', gen: potenzen },
           { id: 'k5-division', title: 'Schriftlich dividieren', icon: '÷', gen: division },
-          { id: 'k5-teilbar', title: 'Teilbarkeitsregeln', icon: '∣', gen: teilbarkeit },
+          { id: 'k5-teilbar', title: 'Teilbarkeit & Teiler', icon: '∣', gen: teilbarkeit },
           { id: 'k5-prim', title: 'Primzahlen & Primfaktoren', icon: 'P', gen: primzahlen },
           { id: 'k5-gleichung', title: 'Einfache Gleichungen', icon: 'x', gen: gleichungen },
         ],

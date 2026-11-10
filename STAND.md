@@ -36,7 +36,7 @@ Weitere Dokumente:
   - Englisch: **Green Line 1** (Klett)
   Aufgaben aus den Büchern werden **nicht** abgeschrieben; LernDax erzeugt eigene Aufgaben zu
   denselben Themen. Seitenzahlen dienen nur zur Orientierung.
-- **Nächste Klassenarbeit:** **Mathe am 24.11.2026** (Details in Abschnitt 9).
+- **Nächste Klassenarbeit:** **Mathe am 24.11.2026** (Details im Abschnitt 9 unter „Klassen-Bereich“).
 - **Name:** **LernDax**. Anspielung auf **LernSax** (Schulplattform aller sächsischen Schulen),
   „Dax“ klingt wie **Dachs**, das Maskottchen. Das Mathe-Fach heißt **Mathelix**.
 
@@ -95,8 +95,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
 - **5 Lernbereiche, 24 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
-  - LB 1 Natürliche Zahlen: Runden · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Quadrat- & Zehnerpotenzen ·
-    Schriftlich dividieren · Teilbarkeitsregeln · Primzahlen & Primfaktoren · Einfache Gleichungen
+  - LB 1 Natürliche Zahlen: Runden · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen ·
+    Schriftlich dividieren · Teilbarkeit & Teiler · Primzahlen & Primfaktoren · Einfache Gleichungen
   - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern ·
     Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Zahlen vergleichen · Arithmetisches Mittel
   - LB 3 Geometrie: Koordinatensystem · Winkelarten · Winkel an Geraden
@@ -106,7 +106,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
 - **20 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Teilen mit Rest ·
-  Primzahlen · Quadratzahlen sind Quadrate · Anteile berechnen · Erweitern & Kürzen ·
+  Primzahlen · Potenzen: Quadrate und Verdoppeln (2ⁿ) · Anteile berechnen · Erweitern & Kürzen ·
   Die Hundertertafel · Mal 10 (das Komma bleibt, die Ziffern wandern) · Der Mittelwert macht
   alles gerecht · Erst laufen, dann springen (Koordinaten) · Winkelarten · Winkel an Geraden ·
   Fläche und Umfang · Volumen: Würfel stapeln · Gleichungen sind Waagen · Zeitspannen mit
@@ -197,7 +197,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v8`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v9`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -285,31 +285,41 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 
 ## 9. Offene Punkte & Ideen
 
-**Vorrang: Mathe-Klassenarbeit am 24.11.2026**
+**Grundsatz (Entscheidung Roberto, 10.11.2026): allgemein vs. Klasse**
+Mathelix bleibt **allgemein** nach dem Lehrplan Sachsen. Alles, was nur Brunos Klasse betrifft
+(Klassenarbeiten, Termine, Buchseiten, Themenauswahl der Lehrerin), kommt **nicht** in die
+allgemeine App, sondern später in einen **eigenen Klassen-Bereich**, der gezielt (spezialisiert)
+abrufbar ist. Roberto möchte diesen Bereich als **eigenes Thema** zuschneiden; bis dahin wird dort
+nichts gebaut.
 
-Themen laut Zettel der Lehrerin (Übungsseiten im Lambacher Schweizer in Klammern):
-1. Vorrangregeln und Rechengesetze: Kommutativ-, Assoziativ-, Distributivgesetz (S. 21–29)
-2. Potenzen (S. 30–31)
-3. Teilbarkeit und Primzahlen (S. 33–37)
-4. Schriftliches Dividieren (S. 40)
-Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53).
+**Klassen-Bereich (eigenes Thema, noch nicht gebaut)**
+Gesammelte Infos für später:
+- Mathe-Klassenarbeit am **24.11.2026**, Themen laut Zettel der Lehrerin (Übungsseiten im
+  Lambacher Schweizer in Klammern):
+  1. Vorrangregeln und Rechengesetze: Kommutativ-, Assoziativ-, Distributivgesetz (S. 21–29)
+  2. Potenzen (S. 30–31)
+  3. Teilbarkeit und Primzahlen (S. 33–37)
+  4. Schriftliches Dividieren (S. 40)
+  Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53).
+- Diese Themen sind seit 10.11. alle als **allgemeine** Mathelix-Themen vorhanden (siehe
+  Abschnitt 3). Ein Klassen-Bereich müsste sie nur auswählen und bündeln, nicht neu bauen.
+- Mögliche Bausteine (Ideen, nicht beschlossen): Countdown bis zur Arbeit, Runde nur aus den
+  Arbeitsthemen, schwache Themen häufiger, „wie fit bin ich“ je Thema, Buchseiten als Hinweis.
+- Offen: Werden im Buch (S. 36–40) auch zweistellige Teiler geübt? Mathelix nutzt bisher nur
+  einstellige.
 
-Abgleich mit Mathelix (10.11.2026):
-| Thema | Stand in Mathelix | Fehlt |
-|---|---|---|
-| Vorrangregeln & Rechengesetze | seit 10.11. eigene Themen „Vorrangregeln“ und „Rechengesetze“ | erledigt |
-| Potenzen | nur Quadratzahlen bis 20² und Zehnerpotenzen | allgemeine Potenzen (2³, 3⁴ …), Basis/Exponent, „als Potenz schreiben“ |
-| Teilbarkeit & Primzahlen | gut abgedeckt (Regeln, Primzahltest, Primfaktorzerlegung) | evtl. Teilermengen |
-| Schriftliches Dividieren | nur dreistellig durch einstellig, mit Rest | größere Zahlen, Probe; zweistellige Teiler? (im Buch S. 36–40 prüfen) |
-
-Geplante Schritte (von Roberto am 10.11. freigegeben):
-- [x] Neue Themen **„Vorrangregeln“** und **„Rechengesetze“** (10.11., `lerndax-v8`), siehe unten
-- [ ] Mit Bruno testen: Vorrangregeln und Rechengesetze
-- [ ] Potenzen erweitern (2⁵ = 2·2·2·2·2, Basis/Exponent, Verknüpfung zum Reis-Schachbrett)
-- [ ] Division (größere Zahlen, Probe) und Teilermengen ergänzen
-- [ ] Kachel „Klassenarbeit 24.11.“ in Mathelix: Countdown, tägliche Runde nur aus diesen Themen,
-      schwache Themen häufiger, „wie fit bin ich“ je Thema
-- Symmetrie, Würfelnetze/Quader-Ansichten, unechte Brüche, Fermi-Aufgaben: **nach** der Arbeit
+**Allgemeine Lehrplan-Ergänzungen vom 10.11.2026** (aus dem Abgleich mit der Arbeit entstanden)
+- [x] Neue Themen **„Vorrangregeln“** und **„Rechengesetze“** (`lerndax-v8`)
+- [x] **Potenzen** erweitert (`lerndax-v9`): 2³, 3⁴ … bis 1 024, Basis/Exponent, „als Potenz
+      schreiben“, „Was ist 2³? 6, 8 oder 9“, „Was ist größer: 2⁵ oder 5²?“, a · 10ⁿ, Basis gesucht;
+      Animation zusätzlich „2 hoch n: verdoppeln“. Thema heißt jetzt „Potenzen“.
+- [x] **Division** erweitert (`lerndax-v9`): bis vierstellig durch einstellig, Nullen im Ergebnis,
+      „Mach die Probe: Stimmt das?“
+- [x] **Teilermengen** (`lerndax-v9`) im Thema „Teilbarkeit & Teiler“: Anzahl der Teiler,
+      „Welche Zahl ist kein Teiler?“
+- [ ] Mit Bruno testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler
+- Danach (Lehrplan-Lücken): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, unechte
+  Brüche/gemischte Zahlen, Überschlag, Fermi-Aufgaben
 
 **Als Nächstes sinnvoll**
 - [x] Testrunde 1 mit Bruno (10.11.2026)
@@ -323,7 +333,7 @@ Geplante Schritte (von Roberto am 10.11. freigegeben):
 - [ ] Klasse 6 (Gebrochene Zahlen, Zuordnungen, Dreiecke & Vierecke, Prismen, Anteile), dann
       Klasse 4 und die übrigen Klassen
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …) als Belohnung
-- [ ] Klassenarbeits-Training dauerhaft (für jede Arbeit), später verknüpft mit Terminen aus dem Familienkalender
+- [ ] Klassen-Bereich für Brunos Klasse (eigenes Thema, siehe oben), evtl. mit Terminen aus dem Familienkalender
 - [ ] „Heute geübt“ im Familienkalender anzeigen (gemeinsam mit dem Kalender-Projekt)
 - [ ] Elternbereich von Mathelix auf die Startseite verlegen, sobald ein zweites Fach kommt
 - [ ] Fächer Deutsch und Englisch
@@ -349,6 +359,9 @@ Geplante Schritte (von Roberto am 10.11. freigegeben):
   in der Mathelix-Kopfzeile entfernt (Version `lerndax-v7`).
 - Schulbücher und Mathe-Klassenarbeit am 24.11. eingetragen, Abgleich der Arbeitsthemen mit
   Mathelix, Plan für die zwei Wochen bis zur Arbeit.
+- Entscheidung: Klassenarbeiten und Klassenspezifisches **nicht** in die allgemeine App, sondern
+  später in einen eigenen Klassen-Bereich. Kachel „Klassenarbeit 24.11.“ daher nicht gebaut.
+- Potenzen, Division und Teilermengen erweitert (Version `lerndax-v9`).
 - **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
   mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
   (Version `lerndax-v8`). Aufgabenarten:

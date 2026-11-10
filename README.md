@@ -101,7 +101,8 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Avatare (12 Figuren × 8 Farben), im Profil synchronisiert
 - [ ] Elternbereich von Mathelix auf die Startseite verlegen (sobald ein zweites Fach kommt)
 - [ ] Link „📚 LernDax“ im Familienkalender (Auftrag an das Kalender-Projekt übergeben)
-- [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …), Klassenarbeits-Training mit Kalender
+- [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …)
+- [ ] Eigener Klassen-Bereich für Brunos Klasse (Klassenarbeiten, Termine), getrennt von der allgemeinen App
 
 **Weitere Fächer**
 - [ ] Deutsch

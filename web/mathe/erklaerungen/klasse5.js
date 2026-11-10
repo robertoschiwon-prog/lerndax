@@ -337,10 +337,10 @@
   // Quadratzahlen – Punktquadrate
   // =====================================================
   reg('k5-potenz', {
-    title: 'Quadratzahlen sind Quadrate',
+    title: 'Potenzen: Quadrate und Verdoppeln',
     viewBox: '0 0 360 230',
     create(api) {
-      let n = 1;
+      let mode = 'quadrat';
       function draw(k, fresh) {
         api.clear();
         const s = Math.min(20, 200 / k), x0 = 180 - (k * s) / 2, y0 = 12;
@@ -350,13 +350,40 @@
         }
         api.say(`<b>${k}² = ${k} · ${k} = ${k * k}</b>${fresh && k > 1 ? `<br>Neu dazu (orange): ${2 * k - 1} Punkte` : ''}`);
       }
-      const sl = api.slider({ label: 'Seitenlänge', min: 1, max: 20, value: 1, onInput(v) { n = v; draw(v, false); } });
+      function drawPow2(k) {
+        api.clear();
+        const rows = 2 ** Math.floor(k / 2), cols = 2 ** Math.ceil(k / 2);
+        const s = Math.min(26, 300 / cols, 196 / rows), x0 = 180 - (cols * s) / 2, y0 = 6 + (196 - rows * s) / 2;
+        for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+          const isNew = k > 0 && (k % 2 === 1 ? j >= cols / 2 : i >= rows / 2);
+          el('rect', { x: x0 + j * s + 1, y: y0 + i * s + 1, width: s - 2, height: s - 2, rx: Math.min(4, s / 4), class: isNew ? 'blk mv' : 'blk' }, api.svg);
+        }
+        el('text', { x: 180, y: 224, class: 'vexpr', 'text-anchor': 'middle', text: k === 0 ? '1' : `2${k > 1 ? '' : ''}` }, api.svg).innerHTML =
+          k <= 1 ? (k === 0 ? 'Start: 1' : '2<tspan dy="-9" font-size="14">1</tspan><tspan dy="9"> = 2</tspan>')
+            : `2<tspan dy="-9" font-size="14">${k}</tspan><tspan dy="9"> = ${k <= 6 ? Array(k).fill(2).join(' · ') + ' = ' : ''}${2 ** k}</tspan>`;
+      }
+      const sl = api.slider({ label: 'Seitenlänge', min: 1, max: 20, value: 1, onInput(v) { draw(v, false); } });
+      api.chips([
+        { label: 'Quadratzahlen', onClick() { mode = 'quadrat'; sl.parentElement.style.display = ''; api.replay(); } },
+        { label: '2 hoch n: verdoppeln', onClick() { mode = 'zwei'; sl.parentElement.style.display = 'none'; api.replay(); } },
+      ]);
       return {
-        reset() { draw(1, false); },
+        reset() { if (mode === 'quadrat') draw(1, false); else drawPow2(0); },
         async play() {
-          for (let k = 1; k <= 12; k++) { sl.value = k; draw(k, true); await api.wait(k < 4 ? 900 : 650); }
-          await api.wait(600);
-          api.say('Eine Quadratzahl ist die Anzahl der Punkte in einem Quadrat: <b>n² = n · n</b>. Probier den Regler bis 20!');
+          if (mode === 'quadrat') {
+            for (let k = 1; k <= 12; k++) { sl.value = k; draw(k, true); await api.wait(k < 4 ? 900 : 650); }
+            await api.wait(600);
+            api.say('Eine Quadratzahl ist die Anzahl der Punkte in einem Quadrat: <b>n² = n · n</b>. Probier den Regler bis 20!');
+            return;
+          }
+          api.say('Wir starten mit <b>einem</b> Kästchen und verdoppeln immer wieder.');
+          await api.wait(1600);
+          for (let k = 1; k <= 8; k++) {
+            drawPow2(k);
+            api.say(`${k}-mal verdoppelt: <b>${2 ** k}</b> Kästchen${k === 1 ? '' : ` (orange: die neue Hälfte, ${2 ** (k - 1)} Stück)`}`);
+            await api.wait(k < 4 ? 1700 : 1300);
+          }
+          api.say('Der Exponent zählt, <b>wie oft</b> malgenommen wird: 2⁸ = 256. <small>Darum ist 2⁵ = 32 und nicht 2 · 5 = 10! Nach 10-mal Verdoppeln sind es schon 1 024.</small>');
         },
       };
     },
