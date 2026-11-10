@@ -1,7 +1,7 @@
 {
-  "name": "Mathelix – Mathe zum Verstehen",
-  "short_name": "Mathelix",
-  "description": "Mathe üben und entdecken – Klasse 1 bis 10, nach dem Lehrplan Gymnasium Sachsen.",
+  "name": "LernDax – verstehen statt pauken",
+  "short_name": "LernDax",
+  "description": "Üben, verstehen und entdecken – Klasse 1 bis 10, nach dem Lehrplan Sachsen. Mit Mathelix für Mathe.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",

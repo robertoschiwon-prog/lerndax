@@ -1,4 +1,6 @@
-/* Mathelix – Synchronisation über Supabase
+/* LernDax – Synchronisation über Supabase (Plattform, für alle Fächer)
+ *
+ * Ein Elternkonto, Kind-Profile für alle Fächer, Lernstand je Fach (window.LERNDAX_SUBJECT).
  *
  * Offline zuerst: Der Lernstand liegt immer im Gerät (localStorage).
  * Ist ein Elternkonto angemeldet und ein Kind-Profil gewählt, wird der Stand
@@ -16,8 +18,9 @@
   const inPreview = /claude\.ai$|claudeusercontent\.com$|anthropic\.com$/.test(location.hostname);
   const enabled = !!(CFG.supabaseUrl && CFG.supabaseKey) && !inPreview;
   const LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-  const DEV_KEY = 'mathelix.device';
-  const P = CFG.tablePrefix != null ? CFG.tablePrefix : 'mathelix_';
+  const DEV_KEY = 'lerndax.device';
+  const SUBJ = window.LERNDAX_SUBJECT || ''; // '' = Startseite: nur Konto/Status, kein Lernstand
+  const P = CFG.tablePrefix != null ? CFG.tablePrefix : 'lerndax_';
   const T = { profiles: P + 'profiles', progress: P + 'progress', family_settings: P + 'family_settings' };
 
   let sb = null, app = null, pushTimer = null, ready = null;
@@ -62,7 +65,7 @@
     ready = (async () => {
       try {
         await loadLib();
-        sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'mathelix.auth' } });
+        sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'lerndax.auth' } });
         const { data } = await sb.auth.getSession();
         setUser(data && data.session ? data.session.user : null);
         sb.auth.onAuthStateChange((_e, session) => { setUser(session ? session.user : null); emit(); });
@@ -131,7 +134,7 @@
 
   // ---------- Eltern-PIN ----------
   async function hash(pin) {
-    const txt = `mathelix:${status.userId}:${pin}`;
+    const txt = `lerndax:${status.userId}:${pin}`;
     try {
       const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt));
       return [...new Uint8Array(buf)].map((x) => x.toString(16).padStart(2, '0')).join('');
@@ -151,18 +154,18 @@
 
   // ---------- Abgleich ----------
   async function syncNow() {
-    if (!enabled || !sb || !status.loggedIn || !status.profileId || status.busy) return;
+    if (!enabled || !sb || !SUBJ || !status.loggedIn || !status.profileId || status.busy) return;
     if (!navigator.onLine) { status.online = false; emit(); return; }
     status.busy = true; status.error = ''; emit();
     try {
-      const { data, error } = await sb.from(T.progress).select('state').eq('profile_id', status.profileId).maybeSingle();
+      const { data, error } = await sb.from(T.progress).select('state').eq('profile_id', status.profileId).eq('subject', SUBJ).maybeSingle();
       if (error) throw error;
       const remote = data ? data.state : null;
       const local = app.getState();
       const merged = merge(local, remote);
       if (!same(merged, local)) app.applyState(merged);
       if (!remote || !same(merged, merge(remote, {}))) {
-        const { error: e2 } = await sb.from(T.progress).upsert({ profile_id: status.profileId, owner: status.userId, state: merged, updated_at: new Date().toISOString() });
+        const { error: e2 } = await sb.from(T.progress).upsert({ profile_id: status.profileId, subject: SUBJ, owner: status.userId, state: merged, updated_at: new Date().toISOString() }, { onConflict: 'profile_id,subject' });
         if (e2) throw e2;
       }
       status.lastSync = Date.now(); dev.lastSync = status.lastSync; saveDev();
@@ -170,10 +173,10 @@
     status.busy = false; emit();
   }
   function changed() {
-    if (!enabled || !status.profileId) return;
+    if (!enabled || !SUBJ || !status.profileId) return;
     clearTimeout(pushTimer);
     pushTimer = setTimeout(syncNow, 2500);
   }
 
-  window.MathelixSync = { init, status: () => Object.assign({}, status), signIn, signUp, signOut, listProfiles, createProfile, bindProfile, syncNow, changed, setPin, checkPin, getPinHash, merge };
+  window.LernDaxSync = window.MathelixSync = { init, status: () => Object.assign({}, status), signIn, signUp, signOut, listProfiles, createProfile, bindProfile, syncNow, changed, setPin, checkPin, getPinHash, merge };
 })();

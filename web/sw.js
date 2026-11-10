@@ -1,10 +1,11 @@
-/* Mathelix – Service Worker: App läuft auch offline.
+/* LernDax – Service Worker: App läuft auch offline.
  * Bei jeder neuen Version VERSION erhöhen, dann holen sich alle Geräte die neuen Dateien. */
-const VERSION = 'mathelix-v1';
+const VERSION = 'lerndax-v1';
 const SHELL = [
-  './', './index.html', './config.js', './sync.js', './manifest.webmanifest',
-  './generatoren/klasse5.js', './erklaerungen/klasse5.js', './erklaerungen/entdecken.js',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon.png',
+  './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js',
+  './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js',
+  './mathe/erklaerungen/klasse5.js', './mathe/erklaerungen/entdecken.js',
+  './icons/dachs.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon.png',
 ];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

@@ -1,5 +1,5 @@
-# Veröffentlicht den Ordner app/ automatisch auf GitHub Pages, sobald etwas auf main hochgeladen wird.
-name: Mathelix veröffentlichen
+# Veröffentlicht den Ordner web/ automatisch auf GitHub Pages, sobald etwas auf main hochgeladen wird.
+name: LernDax veröffentlichen
 on:
   push:
     branches: [main]
@@ -22,6 +22,6 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: app
+          path: web
       - id: deployment
         uses: actions/deploy-pages@v4

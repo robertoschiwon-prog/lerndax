@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#fbf6ee">
-<title>Mathelix</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icons/favicon.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Mathelix · LernDax</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/favicon.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mathelix">
+<meta name="apple-mobile-web-app-title" content="LernDax">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,6 +33,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* Kopfzeile */
 .top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.hubbtn{width:40px;height:40px;flex:0 0 auto;border-radius:12px;border:2px solid var(--ink);background:var(--c1);display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink)}
+.hubbtn img{width:32px;height:32px}
+.hubbtn:active{transform:translate(2px,2px);box-shadow:none}
 .logo{display:flex;align-items:center;gap:8px;font:800 24px "Bricolage Grotesque",sans-serif;background:none;border:0;padding:0}
 .logo .badge{width:34px;height:34px;border-radius:10px;background:var(--c1);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:grid;place-items:center;color:#fff;font-size:22px;line-height:1}
 .logo b{color:var(--c1)}
@@ -429,8 +432,9 @@ body.noscroll{overflow:hidden}
 <body>
 <div id="app"></div>
 
-<script src="config.js"></script>
-<script src="sync.js"></script>
+<script>window.LERNDAX_SUBJECT = 'mathe';</script>
+<script src="../plattform/config.js"></script>
+<script src="../plattform/sync.js"></script>
 <script src="generatoren/klasse5.js"></script>
 <script src="erklaerungen/klasse5.js"></script>
 <script src="erklaerungen/entdecken.js"></script>
@@ -501,7 +505,8 @@ body.noscroll{overflow:hidden}
   // ---------- Kopfzeile ----------
   const header = () => `
     <div class="top">
-      <button class="logo" data-go="home" aria-label="Start"><span class="badge">×</span><span>Mathe<b>lix</b></span></button>
+      <a class="hubbtn" href="../" aria-label="Zur LernDax-Startseite" title="Zur LernDax-Startseite"><img src="../icons/dachs.svg" alt=""></a>
+      <button class="logo" data-go="home" aria-label="Mathelix-Start"><span class="badge">×</span><span>Mathe<b>lix</b></span></button>
       <div class="pills">
         <span class="pill" title="Tage in Folge geübt">🔥 ${streak()}</span>
         <span class="pill" title="Gesammelte Sterne">⭐ ${totalStars()}</span>
@@ -524,7 +529,7 @@ body.noscroll{overflow:hidden}
     const ids = DISC_ORDER.filter((id) => EXP[id] && EXP[id].discover).concat(Object.keys(EXP).filter((id) => EXP[id].discover && !DISC_ORDER.includes(id)));
     if (!ids.length) return '';
     const seen = S.seen || {};
-    return `<section class="lb">
+    return `<section class="lb" id="entdecken">
         <div class="lbh"><span class="nr" style="background:var(--ink)">✦</span><h2>Entdecken</h2></div>
         <p class="disc-intro">Mathe zum Staunen: kleine Rätsel, die man <b>sieht</b>.</p>
         <div class="discs">${ids.map((id) => { const d = EXP[id].discover; return `
@@ -979,7 +984,7 @@ body.noscroll{overflow:hidden}
       body = `<p>Mathelix speichert den Lernstand gerade nur auf diesem Gerät. Für den Abgleich zwischen Handy und Computer wird Mathelix unter seiner eigenen Adresse eingerichtet.</p>`;
     } else if (!SYS.loggedIn) {
       const CF = window.MATHELIX_CONFIG || {};
-      body = `<p>Melde dich mit deinem <b>${esc(CF.accountName || 'Elternkonto')}</b> an. Dann lernt dein Kind auf jedem Gerät mit demselben Stand weiter, und du siehst den Fortschritt auch auf deinem Handy.</p>
+      body = `<p>Melde dich mit deinem <b>${esc(CF.accountName || 'Elternkonto')}</b> an. Dann lernt dein Kind auf jedem Gerät mit demselben Stand weiter, und du siehst den Fortschritt auch auf deinem Handy. Die Anmeldung gilt für alle LernDax-Fächer.</p>
         ${note}
         <form class="syncform" data-syncform="login">
           <input type="email" name="email" placeholder="E-Mail (Eltern)" autocomplete="username" required value="${esc(SY.lastEmail || '')}">
@@ -1115,10 +1120,17 @@ body.noscroll{overflow:hidden}
 
   // Installierbare App: Offline-Betrieb über Service Worker (nur unter eigener https-Adresse)
   if ('serviceWorker' in navigator && location.protocol === 'https:' && !/claude\.ai|claudeusercontent/.test(location.hostname)) {
-    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+    try { navigator.serviceWorker.register('../sw.js').catch(() => {}); } catch (e) {}
   }
 
   home();
+  // Direkt-Sprünge von der LernDax-Startseite (#eltern, #entdecken)
+  function jump() {
+    if (location.hash === '#eltern') { R = null; parents(false); window.scrollTo(0, 0); }
+    else if (location.hash === '#entdecken') { if (VIEW !== 'home') { R = null; home(); } setTimeout(() => { const e = document.getElementById('entdecken'); if (e) e.scrollIntoView(); }, 60); }
+  }
+  jump();
+  window.addEventListener('hashchange', jump);
 
   if (SYNC) {
     let lastKey = '';

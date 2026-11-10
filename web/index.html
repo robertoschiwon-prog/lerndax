@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6ee">
+<title>LernDax</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LernDax">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c1a33; --soft:#6b6680; --paper:#fbf6ee; --card:#fff; --tint:#f3ede2;
+  --c1:#ff6b3d; --c2:#3d7bff; --c3:#14a06c; --c4:#8b5cf6; --c5:#e9a800;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:500 17px/1.45 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+h1,h2,h3{font-family:"Bricolage Grotesque",Nunito,system-ui,sans-serif;letter-spacing:-.01em;margin:0}
+a{color:inherit}
+#app{max-width:560px;margin:0 auto;padding:14px 16px 40px;min-height:100vh}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px;font:800 26px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
+.brand .mark{width:44px;height:44px;border-radius:13px;background:var(--c1);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:grid;place-items:center}
+.brand .mark img{width:36px;height:36px}
+.brand b{color:var(--c1)}
+.pills{margin-left:auto;display:flex;gap:6px}
+.pill{display:flex;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;font-weight:800;font-size:15px}
+.hero{display:flex;align-items:center;gap:14px;margin:6px 0 20px}
+.hero img{width:78px;height:78px;flex:0 0 auto;background:var(--card);border:2px solid var(--ink);border-radius:22px;box-shadow:3px 3px 0 var(--ink);padding:6px}
+.hero h1{font-size:30px;line-height:1.1}
+.hero p{margin:4px 0 0;color:var(--soft);font-weight:700}
+.subjects{display:grid;gap:12px;margin-bottom:22px}
+.subj{display:flex;align-items:center;gap:14px;text-decoration:none;background:var(--card);border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);padding:14px;transition:transform .06s,box-shadow .06s}
+.subj:active{transform:translate(4px,4px);box-shadow:none}
+.subj .ic{flex:0 0 auto;width:62px;height:62px;border-radius:16px;border:2px solid var(--ink);display:grid;place-items:center;font:800 30px "Bricolage Grotesque",Nunito,sans-serif;color:#fff}
+.subj .tx{flex:1;display:flex;flex-direction:column;gap:2px}
+.subj .tx h2{font-size:21px}
+.subj .tx small{color:var(--soft);font-weight:800;font-size:13px}
+.subj .tx .meta{font-size:14px;font-weight:700}
+.subj .go{flex:0 0 auto;font-weight:800;font-size:22px}
+.subj.soon{opacity:.6;box-shadow:none;border-style:dashed;pointer-events:none}
+.subj.soon .ic{background:var(--tint) !important;color:var(--soft)}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--tint);color:var(--soft);margin-left:6px;vertical-align:middle}
+.stars{color:var(--c5);letter-spacing:1px}
+.disc{display:flex;align-items:center;gap:14px;text-decoration:none;background:#141628;color:#ece9f7;border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--c1);padding:14px;margin-bottom:22px}
+.disc .ic{flex:0 0 auto;width:52px;height:52px;border-radius:14px;background:#1f2240;display:grid;place-items:center;font:800 26px Georgia,serif;color:#ffd166}
+.disc b{display:block;font-size:17px}
+.disc small{color:#a9a6c6;font-weight:700}
+.foot{text-align:center;margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.foot a{font-weight:800}
+.foot p{margin:0;color:var(--soft);font-size:13px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="plattform/config.js"></script>
+<script src="plattform/sync.js"></script>
+<script>
+(function () {
+  // Fächer – neue Fächer werden hier ergänzt
+  const FAECHER = [
+    { id: 'mathe', name: 'Mathe', app: 'Mathelix', icon: '×', color: 'var(--c1)', href: 'mathe/', key: 'mathelix.v1', topics: 22 },
+    { id: 'deutsch', name: 'Deutsch', icon: 'Aa', color: 'var(--c2)', soon: true },
+    { id: 'englisch', name: 'Englisch', icon: 'En', color: 'var(--c3)', soon: true },
+  ];
+  const $ = document.getElementById('app');
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const load = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+  const dayStr = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  let SYS = { enabled: false };
+
+  function stats(f) {
+    const S = f.key ? load(f.key) : null;
+    if (!S) return { name: '', days: [], tasks: 0, stars: 0 };
+    let stars = 0;
+    for (const id in S.stats || {}) {
+      const h = S.stats[id].hist || [];
+      if (h.length >= 3) { const a = h.reduce((x, y) => x + y, 0) / h.length; stars += a >= 0.9 && h.length >= 8 ? 3 : a >= 0.75 ? 2 : a >= 0.5 ? 1 : 0; }
+    }
+    return { name: S.name || '', days: S.days || [], tasks: S.total || 0, stars };
+  }
+  function streak(days) {
+    const set = new Set(days), d = new Date();
+    if (!set.has(dayStr(d))) d.setDate(d.getDate() - 1);
+    let n = 0; while (set.has(dayStr(d))) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+
+  function render() {
+    const all = FAECHER.filter((f) => !f.soon).map((f) => ({ f, s: stats(f) }));
+    const days = [...new Set(all.flatMap((x) => x.s.days))];
+    const name = (SYS.profileName || all.map((x) => x.s.name).find(Boolean) || '').trim();
+    const today = days.includes(dayStr(new Date()));
+    $.innerHTML = `
+      <div class="top">
+        <div class="brand"><span class="mark"><img src="icons/dachs.svg" alt=""></span><span>Lern<b>Dax</b></span></div>
+        <div class="pills">
+          <span class="pill" title="Tage in Folge gelernt">🔥 ${streak(days)}</span>
+          ${SYS.enabled && SYS.profileId ? `<span class="pill" title="Mit allen Geräten abgeglichen">☁︎ ✓</span>` : ''}
+        </div>
+      </div>
+      <div class="hero">
+        <img src="icons/dachs.svg" alt="Der LernDax-Dachs">
+        <div><h1>${name ? `Hallo ${esc(name)}!` : 'Hallo!'}</h1>
+        <p>${today ? 'Heute schon gelernt – stark! 💪' : 'Was möchtest du heute lernen?'}</p></div>
+      </div>
+      <div class="subjects">
+        ${FAECHER.map((f) => {
+          if (f.soon) return `<div class="subj soon"><span class="ic" style="background:${f.color}">${f.icon}</span><span class="tx"><h2>${f.name}<span class="tag">kommt bald</span></h2></span></div>`;
+          const s = stats(f);
+          return `<a class="subj" href="${f.href}">
+            <span class="ic" style="background:${f.color}">${f.icon}</span>
+            <span class="tx"><small>${f.app} · Klasse 5</small><h2>${f.name}</h2>
+              <span class="meta">${s.tasks ? `${s.tasks} Aufgaben · <span class="stars">★ ${s.stars}</span> von ${f.topics * 3}` : `${f.topics} Themen nach Lehrplan Sachsen`}</span></span>
+            <span class="go">→</span></a>`;
+        }).join('')}
+      </div>
+      <a class="disc" href="mathe/#entdecken">
+        <span class="ic">✦</span>
+        <span><b>Entdecken</b><small>Mathe zum Staunen: Gedankenlesen, das Galton-Brett, π und mehr</small></span>
+      </a>
+      <div class="foot">
+        <a href="mathe/#eltern">Für Eltern: Fortschritt &amp; Geräte</a>
+        <p>LernDax · ein Familienprojekt · nach dem Lehrplan Sachsen</p>
+      </div>`;
+  }
+
+  render();
+  if (window.LernDaxSync) window.LernDaxSync.init({ getState: () => ({}), applyState() {}, onStatus(st) { SYS = st; render(); } });
+  window.addEventListener('pageshow', render);
+
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && !/claude\.ai|claudeusercontent/.test(location.hostname)) {
+    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+  }
+})();
+</script>
+</body>
+</html>

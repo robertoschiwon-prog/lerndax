@@ -1,13 +1,12 @@
--- Mathelix – Datenbank-Schema für Supabase
--- Einmal im SQL Editor ausführen (Supabase → SQL Editor → New query → einfügen → Run).
+-- LernDax – Datenbank-Schema (Supabase, Projekt „familienkalender“)
+-- Im SQL Editor ausführen. Alle Tabellen beginnen mit lerndax_, die Tabellen des Kalenders
+-- bleiben unberührt. Login = dasselbe Familienkonto wie im Kalender.
 --
--- Läuft im bestehenden Projekt „Familienkalender“ mit: Alle Tabellen beginnen mit mathelix_,
--- bestehende Tabellen werden nicht angefasst. Das Elternkonto ist dasselbe Supabase-Login.
---
--- Datensparsam: Elternkonto (E-Mail), Kind-Profile nur mit Vor- oder Spitzname,
--- Lernstand als JSON. Jede Familie sieht ausschließlich ihre eigenen Daten (Row Level Security).
+-- Aufbau: Kind-Profile gelten für alle Fächer, der Lernstand wird je Fach gespeichert.
+-- Datensparsam: Kind-Profile nur mit Vor- oder Spitzname, Lernstand als JSON.
+-- Jedes Konto sieht ausschließlich seine eigenen Daten (Row Level Security).
 
-create table if not exists public.mathelix_profiles (
+create table if not exists public.lerndax_profiles (
   id          uuid primary key default gen_random_uuid(),
   owner       uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name        text not null check (char_length(name) between 1 and 30),
@@ -15,41 +14,45 @@ create table if not exists public.mathelix_profiles (
   created_at  timestamptz not null default now()
 );
 
-create table if not exists public.mathelix_progress (
-  profile_id  uuid primary key references public.mathelix_profiles(id) on delete cascade,
+create table if not exists public.lerndax_progress (
+  profile_id  uuid not null references public.lerndax_profiles(id) on delete cascade,
+  subject     text not null check (subject ~ '^[a-z]{2,20}$'),   -- z. B. mathe, deutsch, englisch
   owner       uuid not null default auth.uid() references auth.users(id) on delete cascade,
   state       jsonb not null default '{}'::jsonb,
-  updated_at  timestamptz not null default now()
+  updated_at  timestamptz not null default now(),
+  primary key (profile_id, subject)
 );
 
-create table if not exists public.mathelix_family_settings (
+create table if not exists public.lerndax_family_settings (
   owner       uuid primary key default auth.uid() references auth.users(id) on delete cascade,
   pin_hash    text,
   updated_at  timestamptz not null default now()
 );
 
-alter table public.mathelix_profiles        enable row level security;
-alter table public.mathelix_progress        enable row level security;
-alter table public.mathelix_family_settings enable row level security;
+alter table public.lerndax_profiles        enable row level security;
+alter table public.lerndax_progress        enable row level security;
+alter table public.lerndax_family_settings enable row level security;
 
-drop policy if exists "mathelix eigene Profile" on public.mathelix_profiles;
-create policy "mathelix eigene Profile" on public.mathelix_profiles
+drop policy if exists "lerndax eigene Profile" on public.lerndax_profiles;
+create policy "lerndax eigene Profile" on public.lerndax_profiles
   for all to authenticated using (owner = auth.uid()) with check (owner = auth.uid());
 
-drop policy if exists "mathelix eigener Lernstand" on public.mathelix_progress;
-create policy "mathelix eigener Lernstand" on public.mathelix_progress
+drop policy if exists "lerndax eigener Lernstand" on public.lerndax_progress;
+create policy "lerndax eigener Lernstand" on public.lerndax_progress
   for all to authenticated
   using (owner = auth.uid())
-  with check (owner = auth.uid() and exists (select 1 from public.mathelix_profiles p where p.id = profile_id and p.owner = auth.uid()));
+  with check (owner = auth.uid() and exists (select 1 from public.lerndax_profiles p where p.id = profile_id and p.owner = auth.uid()));
 
-drop policy if exists "mathelix eigene Einstellungen" on public.mathelix_family_settings;
-create policy "mathelix eigene Einstellungen" on public.mathelix_family_settings
+drop policy if exists "lerndax eigene Einstellungen" on public.lerndax_family_settings;
+create policy "lerndax eigene Einstellungen" on public.lerndax_family_settings
   for all to authenticated using (owner = auth.uid()) with check (owner = auth.uid());
 
-create index if not exists mathelix_profiles_owner_idx on public.mathelix_profiles(owner);
+create index if not exists lerndax_profiles_owner_idx on public.lerndax_profiles(owner);
 
--- Zugriffsrechte: nur angemeldete Konten (die Zeilenregeln oben begrenzen auf die eigenen Daten).
--- Nicht angemeldete Besucher (anon) bekommen bewusst keinen Zugriff.
-grant select, insert, update, delete on public.mathelix_profiles        to authenticated;
-grant select, insert, update, delete on public.mathelix_progress        to authenticated;
-grant select, insert, update, delete on public.mathelix_family_settings to authenticated;
+-- Zugriffsrechte: nur angemeldete Konten; nicht angemeldete Besucher (anon) bekommen keinen Zugriff.
+grant select, insert, update, delete on public.lerndax_profiles        to authenticated;
+grant select, insert, update, delete on public.lerndax_progress        to authenticated;
+grant select, insert, update, delete on public.lerndax_family_settings to authenticated;
+revoke all on public.lerndax_profiles        from anon;
+revoke all on public.lerndax_progress        from anon;
+revoke all on public.lerndax_family_settings from anon;
