@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6ee">
+<title>Mathelix</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mathelix">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c1a33; --soft:#6b6680; --paper:#fbf6ee; --card:#fff; --tint:#f3ede2;
+  --c1:#ff6b3d; --c2:#3d7bff; --c3:#14a06c; --c4:#8b5cf6; --c5:#e9a800;
+  --ok:#14a06c; --bad:#e11d48; --warn:#f08a00;
+  --r:16px; --sh:4px 4px 0 var(--ink);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:500 17px/1.45 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+h1,h2,h3,.disp{font-family:"Bricolage Grotesque",Nunito,sans-serif;letter-spacing:-.01em;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+#app{max-width:560px;margin:0 auto;padding:14px 16px 40px;min-height:100vh}
+
+/* Kopfzeile */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.logo{display:flex;align-items:center;gap:8px;font:800 24px "Bricolage Grotesque",sans-serif;background:none;border:0;padding:0}
+.logo .badge{width:34px;height:34px;border-radius:10px;background:var(--c1);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:grid;place-items:center;color:#fff;font-size:22px;line-height:1}
+.logo b{color:var(--c1)}
+.pills{margin-left:auto;display:flex;gap:6px}
+.pill{display:flex;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;font-weight:800;font-size:15px}
+
+/* Karten & Buttons */
+.card{background:var(--card);border:2px solid var(--ink);border-radius:var(--r);box-shadow:var(--sh);padding:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);background:var(--card);padding:12px 18px;font-weight:800;font-size:17px;transition:transform .06s,box-shadow .06s}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.btn.pri{background:var(--ink);color:#fff}
+.btn.org{background:var(--c1);color:#fff}
+.btn.wide{width:100%}
+.btn.ghost{box-shadow:none;border-color:transparent;background:transparent;text-decoration:underline;padding:8px}
+.btn:disabled{opacity:.45}
+
+/* Start */
+.hello{margin:4px 0 14px}
+.hello h1{font-size:30px;line-height:1.1}
+.hello p{margin:4px 0 0;color:var(--soft);font-weight:700}
+.grades{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 10px;margin:0 -4px 6px;scrollbar-width:none}
+.grades::-webkit-scrollbar{display:none}
+.gchip{flex:0 0 auto;min-width:46px;height:46px;border-radius:12px;border:2px solid var(--ink);background:var(--card);font:800 18px "Bricolage Grotesque",Nunito,system-ui,sans-serif;display:grid;place-items:center;position:relative}
+.gchip.on{background:var(--ink);color:#fff;box-shadow:3px 3px 0 var(--c1)}
+.gchip.soon{opacity:.5;border-style:dashed}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 22px}
+.quick .btn{flex-direction:column;align-items:flex-start;text-align:left;padding:12px 14px;gap:2px;font-size:16px}
+.quick .btn small{font-weight:700;font-size:13px;opacity:.75}
+.quick .btn .ic{font-size:22px}
+.lb{margin:0 0 22px}
+.lbh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.lbh .nr{width:30px;height:30px;border-radius:9px;border:2px solid var(--ink);display:grid;place-items:center;font:800 15px "Bricolage Grotesque",Nunito,system-ui,sans-serif;color:#fff}
+.lbh h2{font-size:20px;flex:1}
+.lbh .mix{font-size:14px;padding:6px 10px;border-radius:10px;box-shadow:2px 2px 0 var(--ink)}
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.topic{text-align:left;background:var(--card);border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-height:96px;transition:transform .06s,box-shadow .06s}
+.topic:active{transform:translate(3px,3px);box-shadow:none}
+.topic .ti{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font:800 16px "Bricolage Grotesque",Nunito,system-ui,sans-serif;color:#fff;border:2px solid var(--ink)}
+.topic .tt{font-weight:800;font-size:15px;line-height:1.2;flex:1}
+.stars{font-size:15px;letter-spacing:1px;color:#d8d0c2}
+.stars .on{color:var(--c5)}
+.bg1{background:var(--c1)}.bg2{background:var(--c2)}.bg3{background:var(--c3)}.bg4{background:var(--c4)}.bg5{background:var(--c5)}
+.foot{text-align:center;margin-top:10px}
+
+/* Name */
+.namecard h2{font-size:22px;margin-bottom:6px}
+.namecard p{margin:0 0 12px;color:var(--soft)}
+.namecard form{display:flex;gap:8px}
+.namecard input{flex:1;min-width:0;font:700 19px Nunito,system-ui,sans-serif;border:2px solid var(--ink);border-radius:12px;padding:10px 12px}
+
+/* Üben */
+.ptop{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.x{width:42px;height:42px;border-radius:12px;border:2px solid var(--ink);background:var(--card);font-size:20px;font-weight:800;display:grid;place-items:center;flex:0 0 auto}
+.bar{flex:1;display:flex;gap:4px}
+.bar i{flex:1;height:12px;border-radius:6px;border:2px solid var(--ink);background:var(--card)}
+.bar i.cur{background:var(--tint)}
+.bar i.r1{background:var(--ok)}.bar i.r2{background:var(--c5)}.bar i.r0{background:var(--bad)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;padding:3px 10px;border-radius:99px;color:#fff;border:2px solid var(--ink);margin-bottom:12px}
+.q{font-size:20px;line-height:1.5;margin:0 0 12px}
+.q b{font-weight:800}
+.fig{margin:4px 0 14px;background:#fffdf9;border:2px solid var(--tint);border-radius:12px;padding:6px}
+.fig svg{width:100%;height:auto;max-height:260px;display:block}
+.answer{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:6px 0 16px;font-size:22px;font-weight:800}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:13px;color:var(--soft);font-weight:800}
+.fld .row{display:flex;align-items:center;gap:8px}
+.answer input{font:800 26px Nunito,system-ui,sans-serif;width:150px;max-width:100%;border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:#fff;color:var(--ink);outline:none}
+.answer input:focus{box-shadow:0 0 0 4px rgba(61,123,255,.3)}
+.answer input.w{border-color:var(--bad);background:#fff1f3}
+.answer input.g{border-color:var(--ok);background:#effbf5}
+.answer.frac{align-items:center}
+.fracin{display:inline-flex;flex-direction:column;align-items:center;gap:6px}
+.fracin input{width:96px;text-align:center}
+.fracin hr{width:110px;border:0;border-top:3px solid var(--ink);margin:0}
+.fracin .fx{font:800 26px Nunito,system-ui,sans-serif;padding:8px 0}
+.answer.coord input,.answer.time input{width:76px;text-align:center}
+.sym{font-size:26px;font-weight:800}
+.factbtn{border:2px solid var(--ink);border-radius:10px;background:var(--tint);width:44px;height:44px;font-size:24px;font-weight:800}
+.choices{display:grid;gap:10px;margin:6px 0 16px}
+.choices.two{grid-template-columns:1fr 1fr}
+.choice{text-align:left;font-size:18px;font-weight:800;padding:14px 16px;border:2px solid var(--ink);border-radius:14px;background:var(--card);box-shadow:3px 3px 0 var(--ink)}
+.choice:active{transform:translate(3px,3px);box-shadow:none}
+.choice.g{background:#e3f7ee;border-color:var(--ok)}
+.choice.w{background:#ffe9ee;border-color:var(--bad)}
+.choice:disabled{opacity:1}
+.acts{display:flex;gap:10px}
+.acts .btn.pri{flex:1}
+.hint{background:#fff7e0;border:2px dashed var(--c5);border-radius:12px;padding:10px 12px;margin:0 0 14px;font-size:16px}
+.fb{border-radius:14px;border:2px solid var(--ink);padding:12px 14px;margin:0 0 14px;font-size:16px;animation:pop .18s ease-out}
+.fb h3{font-size:20px;margin-bottom:4px}
+.fb.ok{background:#e3f7ee}.fb.mid{background:#fff3dc}.fb.no{background:#ffe9ee}
+.fb .sol{margin-top:8px;padding-top:8px;border-top:2px dashed rgba(28,26,51,.2)}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* Brüche & Formeln */
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;font-weight:800;line-height:1.1;font-size:.95em}
+.fr>span:first-child{border-bottom:2px solid currentColor;padding:0 3px 1px}
+.fr>span:last-child{padding:1px 3px 0}
+.var{font-family:Georgia,serif;font-weight:700}
+.mono{font-variant-numeric:tabular-nums}
+.cB{color:var(--c1)}
+
+/* SVG-Figuren */
+.grid{stroke:#e8e1d4;stroke-width:1}
+.axis{stroke:var(--ink);stroke-width:1.6}
+.arrh{fill:var(--ink)}
+.tick{font:700 11px Nunito,system-ui,sans-serif;fill:var(--soft)}
+.tick.b{font-size:13px;fill:var(--ink)}
+.pt{fill:var(--c1);stroke:var(--ink);stroke-width:2}
+.ptl{font:800 16px Nunito,system-ui,sans-serif;fill:var(--ink)}
+.ray{stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+.wA{fill:rgba(61,123,255,.22);stroke:var(--c2);stroke-width:1.5}
+.wB{fill:rgba(255,107,61,.3);stroke:var(--c1);stroke-width:1.5}
+.albl{font:800 15px Nunito,system-ui,sans-serif;fill:var(--c2)}
+.blbl{font:800 17px Nunito,system-ui,sans-serif;fill:var(--c1)}
+.dot{fill:var(--ink)}
+.shape{fill:#fff1e6;stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.face{fill:#e6edff;stroke:var(--ink);stroke-width:2}
+.face2{fill:#d3dfff;stroke:var(--ink);stroke-width:2}
+.edge{stroke:var(--ink);stroke-width:2.5}
+.hid{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:5 5;opacity:.5}
+.dim{font:800 14px Nunito,system-ui,sans-serif;fill:var(--ink)}
+
+/* Ergebnis */
+.res{text-align:center;padding:26px 18px}
+.res .big{font-size:64px;line-height:1}
+.res h1{font-size:30px;margin:10px 0 4px}
+.res p{margin:0 0 14px;color:var(--soft);font-weight:700}
+.dots{display:flex;justify-content:center;gap:6px;margin:12px 0 18px}
+.dots i{width:22px;height:22px;border-radius:7px;border:2px solid var(--ink)}
+.dots i.r1{background:var(--ok)}.dots i.r2{background:var(--c5)}.dots i.r0{background:var(--bad)}
+.res .stars{font-size:34px;letter-spacing:4px;margin-bottom:16px}
+.res .btns{display:grid;gap:10px}
+
+/* Eltern */
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.ph h1{font-size:26px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.kpi{padding:12px}
+.kpi b{display:block;font:800 26px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
+.kpi span{font-size:13px;color:var(--soft);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-size:12px;color:var(--soft);text-transform:uppercase;letter-spacing:.04em;padding:6px 4px;border-bottom:2px solid var(--ink)}
+td{padding:8px 4px;border-bottom:1px solid var(--tint);vertical-align:middle}
+td small.when{display:block;font-size:12px;color:var(--soft);font-weight:600}
+.tablecard{padding:12px}
+.tablecard .stars{white-space:nowrap;font-size:13px}
+td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
+th.n{text-align:right}
+.qbar{height:8px;border-radius:4px;background:var(--tint);overflow:hidden;min-width:50px}
+.qbar i{display:block;height:100%}
+.lbt{margin:18px 0 6px;font-size:17px}
+.note{font-size:14px;color:var(--soft);margin-top:18px}
+.soon h2{font-size:22px;margin:0 0 4px}
+.soon ul{margin:10px 0 0;padding-left:20px}
+.soon li{margin:4px 0;font-weight:700}
+.overlay{position:fixed;inset:0;background:rgba(28,26,51,.45);display:grid;place-items:center;padding:20px;z-index:10}
+.overlay .card{max-width:420px;width:100%}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+
+/* Themenkarten mit Erklär-Knopf */
+.twrap{position:relative;display:flex}
+.twrap .topic{flex:1}
+.explbtn{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:var(--c5);font-size:13px;font-weight:800;display:grid;place-items:center;padding:0 0 0 2px;box-shadow:2px 2px 0 var(--ink)}
+.explbtn:active{transform:translate(2px,2px);box-shadow:none}
+.discover{width:100%;display:flex;align-items:center;gap:14px;text-align:left;font:inherit;cursor:pointer}
+.discover small{color:var(--soft);font-weight:700}
+.disc-ic{width:52px;height:52px;flex:0 0 auto;border-radius:14px;background:var(--ink);color:#fff;display:grid;place-items:center;font:800 30px Georgia,serif}
+.disc-go{margin-left:auto;flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:var(--c5);border:2px solid var(--ink);display:grid;place-items:center;font-weight:800;font-size:14px}
+.acts{flex-wrap:wrap}
+.acts [data-explain]{padding-left:12px;padding-right:12px}
+.exinline{margin-top:10px;font-size:15px;padding:8px 12px;background:var(--c5)}
+
+/* Erklär-Fenster */
+body.noscroll{overflow:hidden}
+.exov{align-items:end;padding:0}
+@media (min-width:600px){.exov{align-items:center;padding:20px}}
+.exsheet{max-width:560px !important;width:100%;max-height:96vh;overflow:auto;border-radius:22px 22px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+@media (min-width:600px){.exsheet{border-radius:22px}}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.exhead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.exhead h2{font-size:20px;flex:1;line-height:1.2}
+.exsub{margin:-4px 0 10px;font-size:14px;font-weight:700;color:var(--soft);background:var(--tint);border-radius:10px;padding:6px 10px}
+.exstage{background:#fffdf9;border:2px solid var(--tint);border-radius:14px;padding:6px}
+.exstage svg{width:100%;height:auto;display:block;max-height:46vh}
+.excap{min-height:3.6em;margin:12px 2px 8px;font-size:17px;line-height:1.45}
+.excap.in{animation:pop .25s ease-out}
+.excap small{color:var(--soft)}
+.exbig{font:800 24px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
+.exctl{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.exslider{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--soft)}
+.exslider input{width:100%;accent-color:var(--c1);height:28px}
+.exchips{display:flex;flex-wrap:wrap;gap:8px}
+.exchip{border:2px solid var(--ink);background:var(--card);border-radius:99px;padding:6px 12px;font-weight:800;font-size:14px;box-shadow:2px 2px 0 var(--ink)}
+.exchip:active{transform:translate(2px,2px);box-shadow:none}
+.exbtns{display:flex;gap:8px}
+.exbtns #exPlay{flex:1;font-size:16px}
+.exsec{padding:12px 14px;font-size:18px;white-space:nowrap}
+.exsec.on{background:var(--c5)}
+#exSpeed.on{font-size:15px}
+.exstage{position:relative}
+.exstage.live{cursor:pointer}
+.pausebadge{position:absolute;inset:0;display:none;place-items:center;background:rgba(251,246,238,.6);border-radius:12px;backdrop-filter:blur(1px)}
+.pausebadge span{background:var(--ink);color:#fff;border-radius:14px;padding:10px 16px;font:800 20px "Bricolage Grotesque",Nunito,system-ui,sans-serif;text-align:center;box-shadow:3px 3px 0 var(--c1)}
+.pausebadge small{display:block;font:700 12px Nunito,system-ui,sans-serif;opacity:.8;margin-top:2px}
+.exstage.paused .pausebadge{display:grid}
+
+/* Figuren in Erklärungen */
+.ex-t{font:800 13px Nunito,system-ui,sans-serif;fill:var(--ink)}
+.ex-s{font:800 13px Nunito,system-ui,sans-serif;fill:var(--ink)}
+.ex-xs{font:800 10px Nunito,system-ui,sans-serif;fill:#fff}
+.ex-b{font:800 18px Nunito,system-ui,sans-serif;fill:var(--ink)}
+.f1{fill:var(--c1)}.f2{fill:var(--c2)}.f3{fill:var(--c3)}.f4{fill:var(--c4)}.f5{fill:#b88400}.f6{fill:var(--soft)}
+.exbig.f1,.excap .f1{color:var(--c1)}.excap .f2{color:var(--c2)}.excap .f3{color:var(--c3)}.excap .f4{color:var(--c4)}.excap .f5{color:#b88400}.excap .f6{color:var(--soft)}
+.cA{color:var(--c2)}.cB2{color:var(--c2)}
+.tk{stroke:var(--ink);stroke-width:1.5}
+.hl2{fill:rgba(61,123,255,.18);stroke:var(--c2);stroke-width:2}
+.dash{stroke:var(--soft);stroke-width:1.5;stroke-dasharray:4 4}
+.stem{stroke:var(--c1);stroke-width:2}
+.mk{fill:var(--c1);stroke:var(--ink);stroke-width:2}
+.arcG{fill:none;stroke:var(--c3);stroke-width:3}
+.arcN{fill:none;stroke:#cfc7b8;stroke-width:2;stroke-dasharray:3 4}
+.candy{fill:var(--c4);stroke:var(--ink);stroke-width:1.5}
+.candy.rest{fill:var(--bad)}
+.candy.take{fill:var(--c1)}
+.bag{fill:#f6f0ff;stroke:var(--ink);stroke-width:1.5}
+.bag.take{fill:#fff0e8;stroke:var(--c1);stroke-width:2.5}
+.pr{fill:#e3f7ee;stroke:var(--c3);stroke-width:2.5}
+.tile{fill:var(--c4);stroke:var(--ink);stroke-width:1}
+.tile.ok{fill:var(--c1)}
+.tile.prime{fill:var(--c3)}
+.gap{fill:#ffe9ee;stroke:var(--bad);stroke-width:1.5;stroke-dasharray:3 2}
+.sep{stroke:var(--tint);stroke-width:2}
+.br{stroke:var(--ink);stroke-width:2}
+.dotO{fill:var(--c2)}.dotN{fill:var(--c1)}
+.cellOn{fill:#bcd0ff}.cellOff{fill:#fff}
+.div{stroke:var(--ink);stroke-width:2.5}
+.div2{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:6 4}
+.frame{fill:none;stroke:var(--ink);stroke-width:3}
+.hc{fill:#fff;stroke:#d9d1c3;stroke-width:1}
+.hc.on{fill:var(--c2);stroke:var(--ink)}
+.col{fill:#fff;stroke:#d9d1c3;stroke-width:1.5}
+.col.dec{fill:#f5f8ff}
+.comma{fill:var(--bad)}
+.dig{font:800 30px Nunito,system-ui,sans-serif;fill:var(--ink)}
+.blk{fill:var(--c2);stroke:var(--ink);stroke-width:1.5}
+.blk.mv{fill:var(--c1)}
+.mean{stroke:var(--c1);stroke-width:3;stroke-dasharray:8 5}
+.trail{fill:none;stroke:var(--c1);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+.trail2{fill:none;stroke:var(--c1);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.fox{font-size:24px}
+.unit{fill:#cfe0ff;stroke:var(--c2);stroke-width:1.5}
+.cT{fill:#ffd9c8;stroke:var(--ink);stroke-width:1.2;stroke-linejoin:round}
+.cR{fill:#ff9b75;stroke:var(--ink);stroke-width:1.2;stroke-linejoin:round}
+.cL{fill:#ffbb9e;stroke:var(--ink);stroke-width:1.2;stroke-linejoin:round}
+.stand{fill:#e9e2d5;stroke:var(--ink);stroke-width:2}
+.beam{stroke:var(--ink);stroke-width:6;stroke-linecap:round}
+.rope{stroke:var(--soft);stroke-width:1.5}
+.pan{fill:#e9e2d5;stroke:var(--ink);stroke-width:2}
+.xbox{fill:var(--c1);stroke:var(--ink);stroke-width:2}
+.wt{fill:var(--c2);stroke:var(--ink);stroke-width:1.5}
+.jump{fill:none;stroke:var(--c1);stroke-width:3;stroke-linecap:round}
+.rul{fill:#ffe9a8;stroke:var(--ink);stroke-width:2}
+.zoom{fill:rgba(255,107,61,.25);stroke:var(--c1);stroke-width:2.5}
+.rimBase{fill:#fff;stroke:#d9d1c3;stroke-width:5}
+.rim{fill:none;stroke:var(--c1);stroke-width:5;stroke-linecap:round}
+.unroll{stroke:var(--c1);stroke-width:6;stroke-linecap:round}
+.diam{stroke:var(--c2);stroke-width:3}
+.spoke{stroke:#cfc7b8;stroke-width:1.5}
+.dseg{stroke:var(--c2);stroke-width:3}
+.piMark{stroke:var(--c1);stroke-width:3}
+
+/* Entdecken */
+.disc-intro{margin:-4px 0 12px;color:var(--soft);font-weight:700;font-size:15px}
+.discs{display:grid;gap:10px}
+.disc{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:2px solid var(--ink);border-radius:16px;box-shadow:3px 3px 0 var(--ink);padding:10px 12px;font:inherit;position:relative;transition:transform .06s,box-shadow .06s}
+.disc:active{transform:translate(3px,3px);box-shadow:none}
+.disc-ic{flex:0 0 auto;width:50px;height:50px;border-radius:13px;background:#141628;color:#ffd166;display:grid;place-items:center;font:800 24px Georgia,"Bricolage Grotesque",serif;box-shadow:inset 0 0 0 2px #2c3058}
+.disc:nth-child(3n+2) .disc-ic{color:#58c4dd}
+.disc:nth-child(3n) .disc-ic{color:#83d483}
+.disc-tx{flex:1;display:flex;flex-direction:column;gap:2px;line-height:1.25}
+.disc-tx b{font-size:15px}
+.disc-tx small{font-size:12px;color:var(--soft);font-weight:800}
+.disc-new{flex:0 0 auto;background:var(--c1);color:#fff;border:2px solid var(--ink);border-radius:99px;font-size:11px;font-weight:800;padding:2px 8px}
+.disc-seen{flex:0 0 auto;color:var(--ok);font-weight:800;font-size:18px}
+
+/* Dunkle Bühne */
+.exsheet.dark .exstage{background:#141628;border-color:#141628}
+.exsheet.dark .pausebadge{background:rgba(20,22,40,.55)}
+.kb{color:#1c8db0}.ky{color:#c28e00}.kg{color:#2f9e44}.kr{color:#e03131}
+.k-blue{fill:#58c4dd}.k-yel{fill:#ffd166}.k-green{fill:#83d483}.k-red{fill:#ff6b6b}.k-purple{fill:#b18cff}.k-orange{fill:#ff9f43}
+.k-dim{font:700 10px Nunito,system-ui,sans-serif;fill:#8a8fb5}
+.k-txt{font:800 14px Nunito,system-ui,sans-serif;fill:#ece9f7}
+.k-on{font-family:Nunito,system-ui,sans-serif;font-weight:800;fill:#141628}
+.k-big{font:800 22px Nunito,system-ui,sans-serif;fill:#141628}
+.k-frame{fill:none;stroke:#ece9f7;stroke-width:2}
+.k-cell{fill:#1f2240;stroke:#2c3058;stroke-width:1}
+.k-num{font:800 12px Nunito,system-ui,sans-serif;fill:#ece9f7}
+.k-cell.x0{fill:#24263d;stroke:#24263d}
+.k-cell.x2{fill:rgba(88,196,221,.18);stroke:rgba(88,196,221,.5)}
+.k-cell.x3{fill:rgba(255,209,102,.18);stroke:rgba(255,209,102,.5)}
+.k-cell.x5{fill:rgba(131,212,131,.18);stroke:rgba(131,212,131,.5)}
+.k-cell.x7{fill:rgba(255,107,107,.18);stroke:rgba(255,107,107,.5)}
+.k-cell.pr{stroke-width:3}
+.k-cell.pr.x2{stroke:#58c4dd}.k-cell.pr.x3{stroke:#ffd166}.k-cell.pr.x5{stroke:#83d483}.k-cell.pr.x7{stroke:#ff6b6b}
+.k-cell.glow{fill:#ffd166;stroke:#fff3c4;stroke-width:1.5}
+.k-cell.glow+.k-num{fill:#141628}
+.k-sq0{fill:#1f2240}.k-sq1{fill:#2a2e52}
+.k-grain{fill:#fff6dc}
+.k-tri{fill:rgba(236,233,247,.06);stroke:#ece9f7;stroke-width:2;stroke-linejoin:round}
+.k-wblue{fill:rgba(88,196,221,.75);stroke:#58c4dd;stroke-width:1.5}
+.k-wyel{fill:rgba(255,209,102,.8);stroke:#ffd166;stroke-width:1.5}
+.k-wgreen{fill:rgba(131,212,131,.8);stroke:#83d483;stroke-width:1.5}
+.k-lblue,.k-lyel,.k-lgreen{font:800 13px Nunito,system-ui,sans-serif;fill:#141628}
+.k-line{stroke:#ece9f7;stroke-width:2.5;stroke-linecap:round}
+.k-line2{stroke:#ff6b6b;stroke-width:3;stroke-linecap:round}
+.k-pz1{fill:#58c4dd;stroke:#141628;stroke-width:1}
+.k-pz2{fill:#ffd166;stroke:#141628;stroke-width:1}
+.k-dash{fill:none;stroke:#ff6b6b;stroke-width:1.5;stroke-dasharray:5 4}
+.k-sqc{fill:rgba(255,209,102,.9)}.k-sqa{fill:rgba(131,212,131,.9)}.k-sqb{fill:rgba(255,107,107,.9)}
+.k-trip{fill:#58c4dd;stroke:#141628;stroke-width:1.5;stroke-linejoin:round}
+.dark .ray,.dark .tk{stroke:#ece9f7}
+.dark .ex-s,.dark .ex-b{fill:#ece9f7}
+.dark .ex-s.f2{fill:#58c4dd}.dark .ex-b.f1{fill:#ff9f43}
+.dark .rimBase{fill:#1f2240;stroke:#3a3e66}
+.dark .dot{fill:#ece9f7}
+.dark .spoke{stroke:#3a3e66}
+.dark .diam,.dark .dseg{stroke:#58c4dd}
+.dark .unroll,.dark .rim{stroke:#ff9f43}
+
+.k-card{fill:#1f2240;stroke:#58c4dd;stroke-width:2}
+.k-cardnum{font:800 19px Nunito,system-ui,sans-serif;fill:#ece9f7}
+.k-cardnum.first{fill:#ffd166}
+.k-thumb{fill:#1f2240;stroke:#2c3058}
+.k-ok{font:800 18px Nunito,system-ui,sans-serif;fill:#83d483}
+.k-no{font:800 18px Nunito,system-ui,sans-serif;fill:#ff6b6b}
+.k-huge{font:800 96px "Bricolage Grotesque",Nunito,system-ui,sans-serif;fill:#ffd166}
+.k-bit{fill:#1f2240;stroke:#2c3058;stroke-width:2}
+.k-bit.on{fill:#ffd166;stroke:#fff3c4}
+.k-bitv{font:800 20px Nunito,system-ui,sans-serif;fill:#5a5f88}
+.k-bitv.on{fill:#141628}
+.k-big1{font:800 28px Nunito,system-ui,sans-serif;fill:#ffd166}
+.k-big0{font:800 28px Nunito,system-ui,sans-serif;fill:#5a5f88}
+.exchips.asking .exchip-big{background:var(--c5);animation:pop .3s}
+.exchip-big{font-size:16px !important;padding:10px 16px !important}
+.exchip:disabled{opacity:.4}
+.k-peg{fill:#8a8fb5}
+.k-ball{fill:#ffd166}
+.k-trail{fill:none;stroke:#ffd166;stroke-width:1.5;opacity:.45}
+.k-binline{stroke:#2c3058;stroke-width:1}
+.k-bar{fill:#58c4dd}
+.k-curve{fill:none;stroke:#ff6b6b;stroke-width:3;stroke-linejoin:round}
+.k-pc{fill:#1f2240;stroke:#58c4dd;stroke-width:1.5}
+.k-pc.odd{fill:#ffd166;stroke:#fff3c4}
+.k-pn{font:800 13px Nunito,system-ui,sans-serif;fill:#ece9f7}
+.k-pc.odd+.k-pn{fill:#141628}
+.k-add{stroke:#ff9f43;stroke-width:2;opacity:.8}
+.k-sp{fill:#262947}
+.k-sp.odd{fill:#ffd166}
+.k-sun{fill:#ffd166}
+.k-sunray{stroke:#ffd166;stroke-width:2.5;stroke-linecap:round}
+.k-ground{stroke:#5a5f88;stroke-width:2}
+.k-trunk{fill:#8d6748}
+.k-crown{fill:#4caf6a}
+.k-shadow{stroke:#05060d;stroke-width:7;stroke-linecap:round;opacity:.9}
+.k-stick{stroke:#ff9f43;stroke-width:4;stroke-linecap:round}
+.k-ray{stroke:#ffd166;stroke-width:1.5;stroke-dasharray:5 4}
+.k-copy{fill:rgba(88,196,221,.35);stroke:#58c4dd;stroke-width:2}
+
+/* Synchronisation */
+.synccard{margin:0 0 18px}
+.synccard h3{font-size:18px;margin-bottom:8px}
+.synccard p{margin:0 0 10px}
+.syncform{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.syncform.row{flex-direction:row}
+.syncform input{flex:1;min-width:0;font:700 17px Nunito,system-ui,sans-serif;border:2px solid var(--ink);border-radius:12px;padding:10px 12px}
+.syncbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.syncbtns .btn{font-size:15px;padding:10px 14px}
+.syncsmall{font-size:13px;color:var(--soft)}
+.syncline{font-size:14px;font-weight:700;color:var(--soft)}
+.syncerr{background:#ffe9ee;border:2px solid var(--bad);border-radius:10px;padding:8px 10px;font-weight:700}
+.syncmsg{background:#e3f7ee;border:2px solid var(--ok);border-radius:10px;padding:8px 10px}
+.profiles{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.profbtn{background:var(--c5)}
+.pindet{margin-top:12px}
+.pindet summary{cursor:pointer;font-weight:800}
+.syncpill{font-size:13px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script src="generatoren/klasse5.js"></script>
+<script src="erklaerungen/klasse5.js"></script>
+<script src="erklaerungen/entdecken.js"></script>
+<script>
+(function () {
+  const M = window.Mathelix;
+  const U = M.util;
+  const $app = document.getElementById('app');
+  const TASKS_PER_ROUND = 8;
+  const EXP = M.explainers || {};
+
+  // ---------- Speicher (nur auf diesem Gerät) ----------
+  const KEY = 'mathelix.v1';
+  let S = { name: '', grade: 5, stats: {}, days: [], total: 0, seen: {}, resetAt: 0 };
+  try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+  const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  const SYNC = window.MathelixSync || null;
+  const save = () => { saveLocal(); if (SYNC) SYNC.changed(); };
+  let VIEW = 'home';
+  let SYS = { enabled: false };
+
+  // ---------- Hilfen ----------
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const dayStr = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  function streak() {
+    const set = new Set(S.days);
+    const d = new Date();
+    if (!set.has(dayStr(d))) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while (set.has(dayStr(d))) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  const grade = () => M.grades[5];
+  const allTopics = () => grade().lbs.flatMap((lb) => lb.topics.map((t) => Object.assign({ lb }, t)));
+  const findTopic = (id) => allTopics().find((t) => t.id === id);
+
+  function mastery(id) {
+    const st = S.stats[id];
+    if (!st || !st.hist.length) return { avg: 0, n: 0, stars: 0 };
+    const avg = st.hist.reduce((a, b) => a + b, 0) / st.hist.length;
+    let stars = 0;
+    if (st.hist.length >= 3) stars = avg >= 0.9 && st.hist.length >= 8 ? 3 : avg >= 0.75 ? 2 : avg >= 0.5 ? 1 : 0;
+    return { avg, n: st.n, stars };
+  }
+  const starHtml = (n) => `<span class="stars">${[0, 1, 2].map((i) => `<span class="${i < n ? 'on' : ''}">★</span>`).join('')}</span>`;
+  const totalStars = () => allTopics().reduce((s, t) => s + mastery(t.id).stars, 0);
+  const weakTopics = () => allTopics().filter((t) => { const m = mastery(t.id); return m.n > 0 && m.avg < 0.75; });
+
+  function parseNum(s) {
+    s = String(s).trim().replace(/[\s  ]/g, '').replace(/−/g, '-');
+    s = s.replace(/(%|€|°|[a-zA-ZäöüÄÖÜ²³]+)$/g, '');
+    if (s === '') return NaN;
+    if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+    return /^-?\d*\.?\d+$/.test(s) ? Number(s) : NaN;
+  }
+  const parseFactors = (s) => String(s).split(/[^0-9]+/).filter(Boolean).map(Number).sort((a, b) => a - b);
+  const near = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(b));
+
+  function answerText(t) {
+    if (t.answerText) return t.answerText;
+    if (t.choices) return t.choices[t.correct];
+    const parts = t.fields.filter((f) => !('fixed' in f)).map((f) => `${f.prefix ? f.prefix + ' ' : ''}${U.fmt(f.answer)}${f.suffix ? ' ' + f.suffix : ''}`);
+    return parts.join(', ');
+  }
+
+  // ---------- Kopfzeile ----------
+  const header = () => `
+    <div class="top">
+      <button class="logo" data-go="home" aria-label="Start"><span class="badge">×</span><span>Mathe<b>lix</b></span></button>
+      <div class="pills">
+        <span class="pill" title="Tage in Folge geübt">🔥 ${streak()}</span>
+        <span class="pill" title="Gesammelte Sterne">⭐ ${totalStars()}</span>
+        ${SYS.enabled && SYS.profileId ? `<span class="pill syncpill" id="syncpill" title="${syncTitle()}">${syncIcon()}</span>` : ''}
+      </div>
+    </div>`;
+
+  // ---------- Startseite ----------
+  const OTHER = {
+    1: null, 2: null, 3: null, 4: null,
+    6: ['Arbeiten mit gebrochenen Zahlen', 'Zuordnungen in der Umwelt', 'Dreiecke und Vierecke', 'Prismen', 'Vernetzung: Anteile'],
+    7: ['Geometrie in der Ebene', 'Arbeiten mit rationalen Zahlen', 'Prismen und Pyramiden', 'Vernetzung: Darstellen von Daten'],
+    8: ['Terme und Gleichungen', 'Zufallsversuche', 'Funktionen und lineare Gleichungssysteme', 'Ähnlichkeit', 'Vernetzung: Heuristische Strategien'],
+    9: ['Funktionen und Potenzen', 'Kreise, Zylinder und Kugeln', 'Rechtwinklige Dreiecke', 'Auswerten von Daten', 'Vernetzung: Moderne Rechentechnik'],
+    10: ['Wachstum und periodische Vorgänge', 'Diskrete Zufallsgrößen', 'Algebraisches Lösen geometrischer Probleme', 'Funktionale Zusammenhänge', 'Vernetzung: Zinsrechnung'],
+  };
+
+  const DISC_ORDER = ['mindread', 'gauss', 'odd', 'halves', 'sieve', 'chess', 'galton', 'pascal', 'tree', 'triangle', 'sunflower', 'pi', 'pizza', 'pythagoras'];
+  function discoverHtml() {
+    const ids = DISC_ORDER.filter((id) => EXP[id] && EXP[id].discover).concat(Object.keys(EXP).filter((id) => EXP[id].discover && !DISC_ORDER.includes(id)));
+    if (!ids.length) return '';
+    const seen = S.seen || {};
+    return `<section class="lb">
+        <div class="lbh"><span class="nr" style="background:var(--ink)">✦</span><h2>Entdecken</h2></div>
+        <p class="disc-intro">Mathe zum Staunen: kleine Rätsel, die man <b>sieht</b>.</p>
+        <div class="discs">${ids.map((id) => { const d = EXP[id].discover; return `
+          <button class="disc" data-explain="${id}">
+            <span class="disc-ic">${d.icon}</span>
+            <span class="disc-tx"><b>${d.q}</b><small>${d.tag}</small></span>
+            ${seen[id] ? '<span class="disc-seen" title="schon angesehen">✓</span>' : '<span class="disc-new">neu</span>'}
+          </button>`; }).join('')}</div>
+      </section>`;
+  }
+
+  function home() {
+    VIEW = 'home';
+    const weak = weakTopics();
+    const greet = S.name ? `Hallo ${esc(S.name)}!` : 'Hallo!';
+    $app.innerHTML = header() + `
+      ${S.name ? '' : `
+      <div class="card namecard" style="margin-bottom:18px">
+        <h2>Willkommen bei Mathelix 👋</h2>
+        <p>Wie heißt du?</p>
+        <form id="nameF"><input id="nameI" maxlength="20" autocomplete="off" placeholder="Dein Vorname"><button class="btn org">Los</button></form>
+      </div>`}
+      <div class="hello"><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p></div>
+      <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
+      <div class="quick">
+        <button class="btn org" data-mix="all"><span class="ic">🎲</span>Gemischt<small>${TASKS_PER_ROUND} Aufgaben aus allem</small></button>
+        <button class="btn" data-review ${weak.length ? '' : 'disabled'}><span class="ic">🔁</span>Fehler-Training<small>${weak.length ? weak.length + ' Thema' + (weak.length > 1 ? 's' : '') + ' zum Wiederholen' : 'gerade nichts offen'}</small></button>
+      </div>
+      ${grade().lbs.map((lb) => `
+        <section class="lb">
+          <div class="lbh"><span class="nr bg${lb.nr}">${lb.nr}</span><h2>${lb.title}</h2><button class="btn mix" data-mix="${lb.id}">Mix</button></div>
+          <div class="topics">${lb.topics.map((t) => `
+            <div class="twrap">
+              <button class="topic" data-topic="${t.id}">
+                <span class="ti bg${lb.nr}">${t.icon}</span>
+                <span class="tt">${t.title}</span>
+                ${starHtml(mastery(t.id).stars)}
+              </button>
+              ${EXP[t.id] ? `<button class="explbtn" data-explain="${t.id}" aria-label="Erklärung zu ${t.title} ansehen">▶</button>` : ''}
+            </div>`).join('')}</div>
+        </section>`).join('')}
+      ${discoverHtml()}
+      <div class="foot"><button class="btn ghost" data-go="parents">Für Eltern: Fortschritt ansehen</button></div>`;
+    const f = document.getElementById('nameF');
+    if (f) f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const v = document.getElementById('nameI').value.trim();
+      if (v) { S.name = v; save(); home(); }
+    });
+  }
+
+  function soon(g) {
+    const list = OTHER[g];
+    const ov = document.createElement('div');
+    ov.className = 'overlay';
+    ov.innerHTML = `<div class="card soon">
+      <h2>Klasse ${g} kommt bald</h2>
+      <p style="margin:0;color:var(--soft)">${list ? 'Diese Lernbereiche sind geplant (Lehrplan Gymnasium Sachsen):' : 'Für die Grundschule werten wir den sächsischen Lehrplan noch aus.'}</p>
+      ${list ? `<ul>${list.map((l) => `<li>${l}</li>`).join('')}</ul>` : ''}
+      <button class="btn pri wide" style="margin-top:16px">Okay</button></div>`;
+    ov.addEventListener('click', (e) => { if (e.target === ov || e.target.tagName === 'BUTTON') ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
+  // ---------- Übungsrunde ----------
+  let R = null; // laufende Runde
+
+  function weightedPick(topics) {
+    const w = topics.map((t) => { const m = mastery(t.id); return m.n === 0 ? 1 : 1.25 - m.avg; });
+    let r = Math.random() * w.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < topics.length; i++) { r -= w[i]; if (r <= 0) return topics[i]; }
+    return topics[topics.length - 1];
+  }
+
+  function start(mode, arg) {
+    let pool, title;
+    if (mode === 'topic') { pool = [findTopic(arg)]; title = pool[0].title; }
+    else if (mode === 'review') { pool = weakTopics(); title = 'Fehler-Training'; }
+    else if (arg === 'all') { pool = allTopics(); title = 'Gemischtes Training'; }
+    else { const lb = grade().lbs.find((l) => l.id === arg); pool = lb.topics.map((t) => Object.assign({ lb }, t)); title = 'Mix: ' + lb.title; }
+    if (!pool.length) return home();
+    const seq = Array.from({ length: TASKS_PER_ROUND }, () => (pool.length === 1 ? pool[0] : weightedPick(pool)));
+    R = { mode, arg, title, seq, idx: 0, results: [], before: mode === 'topic' ? mastery(arg).stars : null };
+    nextTask();
+  }
+
+  function nextTask() {
+    if (R.idx >= R.seq.length) return result();
+    const topic = R.seq[R.idx];
+    let task;
+    for (let i = 0; i < 5; i++) { try { task = topic.gen(); break; } catch (e) { console.error(e); } }
+    R.cur = { topic, task, attempt: 1, done: false, hintShown: false };
+    renderTask();
+  }
+
+  function renderTask() {
+    VIEW = 'task';
+    const { topic, task } = R.cur;
+    const lb = topic.lb;
+    const bar = R.seq.map((_, i) => `<i class="${i < R.results.length ? 'r' + (R.results[i] === 1 ? 1 : R.results[i] === 0.5 ? 2 : 0) : i === R.idx ? 'cur' : ''}"></i>`).join('');
+    let inputs = '';
+    if (task.choices) {
+      inputs = `<div class="choices ${task.choices.length === 2 ? 'two' : ''}">${task.choices.map((c, i) => `<button class="choice" data-choice="${i}">${c}</button>`).join('')}</div>`;
+    } else {
+      const inp = (f, i) => 'fixed' in f
+        ? `<span class="fx">${f.fixed}</span>`
+        : `<input id="f${i}" data-i="${i}" ${f.type === 'factors' ? 'inputmode="text"' : 'inputmode="decimal"'} autocomplete="off" autocorrect="off" spellcheck="false" ${f.placeholder ? `placeholder="${f.placeholder}"` : ''} aria-label="${f.label || 'Antwort'}">`;
+      const L = task.layout || 'row';
+      if (L === 'frac') {
+        inputs = `<div class="answer frac">${task.pre ? `<span>${task.pre}</span>` : ''}<span class="fracin">${inp(task.fields[0], 0)}<hr>${inp(task.fields[1], 1)}</span></div>`;
+      } else if (L === 'coord') {
+        inputs = `<div class="answer coord"><span class="sym">P(</span>${inp(task.fields[0], 0)}<span class="sym">|</span>${inp(task.fields[1], 1)}<span class="sym">)</span></div>`;
+      } else if (L === 'time') {
+        inputs = `<div class="answer time">${inp(task.fields[0], 0)}<span class="sym">:</span>${inp(task.fields[1], 1)}<span class="sym">Uhr</span></div>`;
+      } else {
+        inputs = `<div class="answer">${task.fields.map((f, i) => `
+          <div class="fld">${task.fields.length > 1 && f.label ? `<label for="f${i}">${f.label}</label>` : ''}
+            <div class="row">${f.prefix ? `<span>${f.prefix}</span>` : ''}${inp(f, i)}${f.suffix ? `<span>${f.suffix}</span>` : ''}${f.type === 'factors' ? `<button class="factbtn" data-dot="${i}" aria-label="Malpunkt einfügen">·</button>` : ''}</div>
+          </div>`).join('')}</div>`;
+      }
+    }
+    $app.innerHTML = `
+      <div class="ptop"><button class="x" data-go="home" aria-label="Runde beenden">✕</button><div class="bar">${bar}</div></div>
+      <div class="card">
+        <span class="tag bg${lb.nr}">${topic.title}</span>
+        <p class="q">${task.prompt}</p>
+        ${task.figure ? `<div class="fig">${task.figure}</div>` : ''}
+        ${inputs}
+        <div id="hint"></div>
+        <div id="fb"></div>
+        <div class="acts" id="acts">
+          <button class="btn" id="hintB">💡 Tipp</button>
+          ${EXP[topic.id] ? `<button class="btn" data-explain="${topic.id}" data-when="pre">▶ Erklärung</button>` : ''}
+          ${task.choices ? '' : '<button class="btn pri" id="checkB">Prüfen</button>'}
+        </div>
+      </div>`;
+    const first = document.getElementById('f0') || document.querySelector('input');
+    if (first && window.matchMedia('(pointer:fine)').matches) first.focus();
+  }
+
+  function showHint() {
+    if (R.cur.hintShown) return;
+    R.cur.hintShown = true;
+    document.getElementById('hint').innerHTML = `<div class="hint">💡 ${R.cur.task.hint}</div>`;
+  }
+
+  function check(choiceIdx) {
+    const c = R.cur, t = c.task;
+    if (c.done) return;
+    let ok, note = '', wrongFields = [];
+    if (t.choices) {
+      ok = choiceIdx === t.correct;
+    } else {
+      const els = t.fields.map((f, i) => document.getElementById('f' + i));
+      const raw = els.map((el) => (el ? el.value : null));
+      if (raw.some((v, i) => v !== null && v.trim() === '')) {
+        const card = document.querySelector('.card');
+        card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+        const empty = els.find((el) => el && !el.value.trim()); if (empty) empty.focus();
+        return;
+      }
+      const vals = t.fields.map((f, i) => ('fixed' in f ? f.fixed : f.type === 'factors' ? parseFactors(raw[i]) : parseNum(raw[i])));
+      if (t.check) {
+        const r = t.check(vals); ok = r.ok; note = r.note || '';
+        if (!ok) wrongFields = els.map((_, i) => i);
+      } else {
+        t.fields.forEach((f, i) => {
+          if ('fixed' in f) return;
+          const good = f.type === 'factors'
+            ? vals[i].length === f.answer.length && vals[i].every((v, k) => v === f.answer[k])
+            : near(vals[i], f.answer);
+          if (!good) wrongFields.push(i);
+        });
+        ok = wrongFields.length === 0;
+        if (!ok && t.fields.some((f, i) => !('fixed' in f) && f.type !== 'factors' && isNaN(vals[i]))) note = 'Gib bitte nur eine Zahl ein (Komma ist erlaubt).';
+      }
+      els.forEach((el, i) => {
+        if (!el) return;
+        el.classList.remove('w', 'g');
+        if (wrongFields.includes(i)) el.classList.add('w');
+        else if (ok) el.classList.add('g');
+      });
+    }
+
+    const fb = document.getElementById('fb');
+    const fewChoices = t.choices && t.choices.length <= 3;
+    if (ok) {
+      const score = c.attempt === 1 ? 1 : 0.5;
+      finish(score);
+      if (t.choices) markChoices(choiceIdx);
+      const msg = c.attempt === 1 ? U.pick(['Richtig! 🎉', 'Stark! 💪', 'Genau so! ✨', 'Volltreffer! 🎯', 'Super gemacht! 🌟']) : 'Jetzt passt’s! 👍';
+      fb.innerHTML = `<div class="fb ok"><h3>${msg}</h3>${note ? `<div>${note}</div>` : ''}<div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${t.ex && EXP[c.topic.id] ? `<button class="btn exinline" data-explain="${c.topic.id}" data-when="post">▶ Lösung als Animation</button>` : ''}</div>`;
+    } else if (c.attempt === 1 && !fewChoices) {
+      c.attempt = 2;
+      if (t.choices) { const b = document.querySelector(`[data-choice="${choiceIdx}"]`); b.classList.add('w'); b.disabled = true; }
+      fb.innerHTML = `<div class="fb mid"><h3>Noch nicht ganz 🤔</h3>${note ? note + '<br>' : ''}Schau dir den Tipp an und probier’s nochmal.</div>`;
+      showHint();
+      const firstWrong = document.getElementById('f' + (wrongFields[0] ?? 0));
+      if (firstWrong) { firstWrong.focus(); firstWrong.select(); }
+      return;
+    } else {
+      finish(0);
+      if (t.choices) markChoices(choiceIdx);
+      fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[c.topic.id] ? `<button class="btn exinline" data-explain="${c.topic.id}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
+    }
+    document.getElementById('acts').innerHTML = `<button class="btn pri wide" id="nextB">${R.idx + 1 < R.seq.length ? 'Weiter →' : 'Fertig →'}</button>`;
+    document.getElementById('nextB').focus();
+    fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function markChoices(sel) {
+    document.querySelectorAll('[data-choice]').forEach((b) => {
+      const i = +b.dataset.choice;
+      b.disabled = true;
+      if (i === R.cur.task.correct) b.classList.add('g');
+      else if (i === sel) b.classList.add('w');
+    });
+  }
+
+  function finish(score) {
+    const c = R.cur;
+    c.done = true;
+    document.querySelectorAll('.answer input').forEach((el) => (el.readOnly = true));
+    R.results.push(score);
+    const id = c.topic.id;
+    const st = S.stats[id] || (S.stats[id] = { n: 0, hist: [], last: '' });
+    st.n++; st.hist.push(score); if (st.hist.length > 10) st.hist.shift(); st.last = today();
+    if (!S.days.includes(today())) S.days.push(today());
+    if (S.days.length > 400) S.days = S.days.slice(-400);
+    S.total = (S.total || 0) + 1;
+    save();
+  }
+
+  function result() {
+    VIEW = 'result';
+    const first = R.results.filter((r) => r === 1).length;
+    const solved = R.results.filter((r) => r > 0).length;
+    const n = R.results.length;
+    const ratio = R.results.reduce((a, b) => a + b, 0) / n;
+    const [emoji, head] = ratio >= 0.9 ? ['🏆', 'Mega stark!'] : ratio >= 0.7 ? ['🌟', 'Richtig gut!'] : ratio >= 0.5 ? ['💪', 'Gut dabei!'] : ['🌱', 'Dranbleiben!'];
+    let starBlock = '';
+    if (R.mode === 'topic') {
+      const now = mastery(R.arg).stars;
+      starBlock = `${starHtml(now)}${now > R.before ? '<p style="color:var(--ok)">Neuer Stern! ⭐</p>' : ''}`;
+    }
+    $app.innerHTML = header() + `
+      <div class="card res">
+        <div class="big">${emoji}</div>
+        <h1>${head}</h1>
+        <p>${first} von ${n} beim ersten Versuch richtig${solved > first ? `, ${solved - first} im zweiten` : ''}</p>
+        <div class="dots">${R.results.map((r) => `<i class="r${r === 1 ? 1 : r === 0.5 ? 2 : 0}"></i>`).join('')}</div>
+        ${starBlock}
+        <div class="btns">
+          <button class="btn org wide" data-again>Nochmal üben</button>
+          <button class="btn wide" data-go="home">Zur Übersicht</button>
+        </div>
+      </div>`;
+    if (ratio >= 0.85) confetti();
+  }
+
+  function confetti() {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    const cols = ['#ff6b3d', '#3d7bff', '#14a06c', '#8b5cf6', '#e9a800'];
+    c.innerHTML = Array.from({ length: 60 }, () => `<i style="left:${Math.random() * 100}%;background:${U.pick(cols)};animation-delay:${Math.random() * 0.6}s;animation-duration:${1.4 + Math.random()}s"></i>`).join('');
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3200);
+  }
+
+
+  // ---------- Erklär-Animationen ----------
+  // Eigene Uhr: läuft nur, wenn nicht pausiert, und im Langsam-Modus mit halber Geschwindigkeit.
+  const ABORT = { abort: true };
+  let EXAPI = null;
+  function openExplainer(id, when) {
+    const def = EXP[id];
+    let ctx = {};
+    if (when && R && R.cur && R.cur.task.ex) ctx = Object.assign({}, R.cur.task.ex, when === 'post' ? { post: true } : { pre: true });
+    if (!def) return;
+    closeExplainer();
+    const ov = document.createElement('div');
+    ov.className = 'overlay exov';
+    ov.innerHTML = `<div class="card exsheet${def.dark ? ' dark' : ''}" role="dialog" aria-label="${def.title}">
+      <div class="exhead"><h2>${def.title}</h2><button class="x" data-exclose aria-label="Schließen">✕</button></div>
+      <div class="exsub"></div>
+      <div class="exstage" title="Antippen zum Anhalten"><svg viewBox="${def.viewBox}" xmlns="http://www.w3.org/2000/svg"></svg><div class="pausebadge"><span>❚❚ Pause<small>Antippen zum Weiterspielen</small></span></div></div>
+      <div class="excap" aria-live="polite"></div>
+      <div class="exctl"></div>
+      <div class="exbtns">
+        <button class="btn org" id="exPlay">▶ Abspielen</button>
+        <button class="btn exsec" id="exRestart" aria-label="Von vorn" title="Von vorn">↺</button>
+        <button class="btn exsec" id="exSpeed" aria-pressed="false" title="Langsamer abspielen">🐢</button>
+      </div>
+    </div>`;
+    ov.addEventListener('click', (e) => { if (e.target === ov) closeExplainer(); });
+    document.body.appendChild(ov);
+    document.body.classList.add('noscroll');
+    const svg = ov.querySelector('svg'), cap = ov.querySelector('.excap'), ctl = ov.querySelector('.exctl');
+    const stage = ov.querySelector('.exstage'), playB = ov.querySelector('#exPlay'), restartB = ov.querySelector('#exRestart'), speedB = ov.querySelector('#exSpeed');
+
+    const clock = { v: 0, last: 0, paused: false, speed: S.exSlow ? 0.5 : 1, subs: new Set(), on: true };
+    const tick = (now) => {
+      if (!clock.on) return;
+      if (clock.last) { const dt = Math.min(250, now - clock.last); if (!clock.paused) clock.v += dt * clock.speed; }
+      clock.last = now;
+      clock.subs.forEach((f) => f());
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    const until = (ms, g, each) => new Promise((res, rej) => {
+      const start = clock.v;
+      const f = () => {
+        if (g !== api.gen) { clock.subs.delete(f); return rej(ABORT); }
+        const t = ms <= 0 ? 1 : Math.min(1, (clock.v - start) / ms);
+        if (each) each(t);
+        if (t >= 1) { clock.subs.delete(f); res(); }
+      };
+      clock.subs.add(f);
+    });
+
+    const api = {
+      svg, gen: 0, playing: false, played: false, clock,
+      clear() { svg.innerHTML = ''; },
+      sub(h) { const e = ov.querySelector('.exsub'); e.innerHTML = h || ''; e.style.display = h ? '' : 'none'; },
+      say(h) { cap.innerHTML = h; cap.classList.remove('in'); void cap.offsetWidth; cap.classList.add('in'); },
+      ui() {
+        const paused = api.playing && clock.paused;
+        playB.textContent = api.playing ? (paused ? '▶ Weiter' : '❚❚ Pause') : api.played ? '▶ Nochmal abspielen' : '▶ Abspielen';
+        playB.classList.toggle('pri', api.playing && !paused);
+        playB.classList.toggle('org', !(api.playing && !paused));
+        restartB.style.display = api.playing ? '' : 'none';
+        stage.classList.toggle('paused', paused);
+        stage.classList.toggle('live', api.playing);
+        speedB.classList.toggle('on', clock.speed < 1);
+        speedB.setAttribute('aria-pressed', clock.speed < 1);
+        speedB.textContent = clock.speed < 1 ? '🐢 Langsam' : '🐢';
+      },
+      stop() { api.gen++; api.playing = false; clock.paused = false; api.ui(); },
+      pause() { if (api.playing) { clock.paused = true; api.ui(); } },
+      resume() { clock.paused = false; api.ui(); },
+      wait(ms) { return until(ms, api.gen); },
+      tw(ms, fn, ease) {
+        const e = ease || ((t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2));
+        return until(ms, api.gen, (t) => fn(e(t)));
+      },
+      run(fn) {
+        const g = ++api.gen;
+        api.playing = true; clock.paused = false; api.ui();
+        Promise.resolve().then(fn).catch((e) => { if (e !== ABORT) console.error(e); }).finally(() => {
+          if (g === api.gen) { api.playing = false; api.played = true; clock.paused = false; api.ui(); }
+        });
+      },
+      replay() { api.stop(); inst.reset(); api.played = true; api.run(() => inst.play()); },
+      slider({ label, min, max, value, onInput }) {
+        const w = document.createElement('label');
+        w.className = 'exslider';
+        w.innerHTML = `<span>${label}</span><input type="range" min="${min}" max="${max}" step="1" value="${value}">`;
+        const inp = w.querySelector('input');
+        inp.addEventListener('input', () => { api.stop(); onInput(+inp.value); });
+        ctl.appendChild(w);
+        return inp;
+      },
+      chips(list) {
+        const w = document.createElement('div');
+        w.className = 'exchips';
+        list.forEach((c) => { const b = document.createElement('button'); b.className = 'exchip'; b.innerHTML = c.label; b.addEventListener('click', (e) => { e.stopPropagation(); c.onClick(); }); w.appendChild(b); });
+        ctl.appendChild(w);
+        return w;
+      },
+    };
+    EXAPI = api;
+    api.discover = !!def.discover;
+    if (def.discover) { S.seen = S.seen || {}; S.seen[id] = true; save(); }
+    api.sub('');
+    const inst = def.create(api, ctx);
+    const toggle = () => { if (!api.playing) api.replay(); else if (clock.paused) api.resume(); else api.pause(); };
+    playB.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+    stage.addEventListener('click', (e) => { e.stopPropagation(); if (api.playing) toggle(); });
+    restartB.addEventListener('click', (e) => { e.stopPropagation(); api.replay(); });
+    speedB.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clock.speed = clock.speed < 1 ? 1 : 0.5;
+      S.exSlow = clock.speed < 1; save();
+      api.ui();
+    });
+    inst.reset();
+    api.say('');
+    api.ui();
+    setTimeout(() => { if (EXAPI === api) { api.played = false; api.replay(); } }, 350);
+  }
+  function closeExplainer() {
+    const ov = document.querySelector('.exov');
+    const wasDiscover = EXAPI && EXAPI.discover;
+    if (EXAPI) { EXAPI.stop(); EXAPI.clock.on = false; EXAPI = null; }
+    if (ov) ov.remove();
+    document.body.classList.remove('noscroll');
+    if (wasDiscover && !R) { const y = window.scrollY; home(); window.scrollTo(0, y); }
+  }
+
+  // ---------- Elternansicht ----------
+  function parents(confirmReset) {
+    VIEW = 'parents';
+    const topics = allTopics();
+    const practiced = topics.filter((t) => mastery(t.id).n > 0);
+    const avg = practiced.length ? practiced.reduce((s, t) => s + mastery(t.id).avg, 0) / practiced.length : 0;
+    $app.innerHTML = `
+      <div class="ph"><button class="x" data-go="home" aria-label="Zurück">←</button><h1>Fortschritt</h1></div>
+      <div class="kpis">
+        <div class="card kpi"><b>${S.total || 0}</b><span>Aufgaben bearbeitet</span></div>
+        <div class="card kpi"><b>${S.days.length}</b><span>Übungstage</span></div>
+        <div class="card kpi"><b>${practiced.length ? Math.round(avg * 100) + ' %' : '–'}</b><span>Trefferquote*</span></div>
+      </div>
+      <div id="synccard" class="${SYS.enabled && SYS.profileId ? 'syncbottom' : ''}"></div>
+      <div class="card tablecard">
+        ${grade().lbs.map((lb) => `
+          <h3 class="lbt"><span class="tag bg${lb.nr}" style="margin:0 6px 0 0">LB ${lb.nr}</span>${lb.title}</h3>
+          <table><thead><tr><th>Thema</th><th class="n">Aufg.</th><th>Quote*</th><th>Sterne</th></tr></thead><tbody>
+          ${lb.topics.map((t) => { const m = mastery(t.id); const st = S.stats[t.id];
+            const col = m.avg >= 0.75 ? 'var(--ok)' : m.avg >= 0.5 ? 'var(--c5)' : 'var(--bad)';
+            return `<tr><td>${t.title}${st && st.last ? `<small class="when">zuletzt ${st.last.slice(8, 10)}.${st.last.slice(5, 7)}.</small>` : ''}</td><td class="n">${m.n || '–'}</td>
+              <td>${m.n ? `<div class="qbar"><i style="width:${Math.round(m.avg * 100)}%;background:${col}"></i></div>` : '<span style="color:var(--soft)">–</span>'}</td>
+              <td>${starHtml(m.stars)}</td></tr>`; }).join('')}
+          </tbody></table>`).join('')}
+      </div>
+      <p class="note">* Quote = Durchschnitt der letzten 10 Aufgaben je Thema (erster Versuch richtig = 100 %, zweiter Versuch = 50 %).<br>${SYS.enabled && SYS.profileId ? 'Der Fortschritt wird mit allen Geräten dieses Profils abgeglichen.' : 'Der Fortschritt wird nur auf diesem Gerät gespeichert.'}</p>
+      <div style="text-align:center;margin-top:10px">${SYS.loggedIn && SY.hasPin && !SY.unlocked ? '' : confirmReset
+        ? `<p style="font-weight:800">Wirklich alles zurücksetzen?</p><button class="btn" data-go="parents">Abbrechen</button> <button class="btn" style="background:var(--bad);color:#fff" data-reset="yes">Ja, zurücksetzen</button>`
+        : `<button class="btn ghost" data-reset="ask">Fortschritt zurücksetzen</button>`}</div>`;
+    renderSyncCard();
+  }
+
+  // ---------- Geräte & Synchronisation ----------
+  const SY = { msg: '', err: '', profiles: null, switching: false, hasPin: null, unlocked: false, busy: false };
+  const syncIcon = () => (SYS.busy ? '☁︎ …' : SYS.error ? '☁︎ !' : !SYS.online ? '☁︎ ⨯' : '☁︎ ✓');
+  function syncTitle() {
+    if (SYS.error) return 'Synchronisation: ' + SYS.error;
+    if (!SYS.online) return 'Offline – wird später abgeglichen';
+    return SYS.lastSync ? 'Synchronisiert um ' + new Date(SYS.lastSync).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Synchronisation aktiv';
+  }
+  function syncLine() {
+    if (SYS.busy) return 'Gleiche ab …';
+    if (SYS.error) return '⚠️ ' + esc(SYS.error);
+    if (!SYS.online) return 'Offline – der Abgleich passiert automatisch, sobald wieder Internet da ist.';
+    return SYS.lastSync ? 'Zuletzt abgeglichen: ' + new Date(SYS.lastSync).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + ' Uhr' : 'Noch nicht abgeglichen.';
+  }
+  function renderSyncCard() {
+    const box = document.getElementById('synccard');
+    if (!box) return;
+    const note = (SY.err ? `<p class="syncerr">${esc(SY.err)}</p>` : '') + (SY.msg ? `<p class="syncmsg">${SY.msg}</p>` : '');
+    let body;
+    if (!SYS.enabled) {
+      body = `<p>Mathelix speichert den Lernstand gerade nur auf diesem Gerät. Für den Abgleich zwischen Handy und Computer wird Mathelix unter seiner eigenen Adresse eingerichtet.</p>`;
+    } else if (!SYS.loggedIn) {
+      const CF = window.MATHELIX_CONFIG || {};
+      body = `<p>Melde dich mit deinem <b>${esc(CF.accountName || 'Elternkonto')}</b> an. Dann lernt dein Kind auf jedem Gerät mit demselben Stand weiter, und du siehst den Fortschritt auch auf deinem Handy.</p>
+        ${note}
+        <form class="syncform" data-syncform="login">
+          <input type="email" name="email" placeholder="E-Mail (Eltern)" autocomplete="username" required value="${esc(SY.lastEmail || '')}">
+          <input type="password" name="pw" placeholder="Passwort" autocomplete="current-password" required minlength="6">
+          <div class="syncbtns"><button class="btn pri" type="submit">Anmelden</button>${CF.allowSignup === false ? '' : '<button class="btn" type="submit" data-signup="1">Neues Konto anlegen</button>'}</div>
+        </form>
+        <p class="syncsmall">Für dein Kind wird keine E-Mail-Adresse gebraucht, nur ein Vorname oder Spitzname.</p>`;
+    } else if (SY.hasPin === null) {
+      body = `<p>Lade …</p>`;
+      SYNC.getPinHash().then((h) => { SY.hasPin = !!h; renderSyncCard(); if (h) parents(false); }).catch(() => { SY.hasPin = false; renderSyncCard(); });
+    } else if (SY.hasPin && !SY.unlocked) {
+      body = `<p>Angemeldet als <b>${esc(SYS.email)}</b>${SYS.profileName ? ` · Dieses Gerät lernt als <b>${esc(SYS.profileName)}</b>` : ''}.</p>
+        <p class="syncline" id="syncline">${syncLine()}</p>
+        ${note}
+        <form class="syncform row" data-syncform="unlock"><input name="pin" inputmode="numeric" maxlength="6" placeholder="Eltern-PIN" autocomplete="off" required><button class="btn" type="submit">Entsperren</button></form>
+        <p class="syncsmall">Zum Wechseln des Profils oder Abmelden brauchst du die Eltern-PIN.</p>`;
+    } else if (!SYS.profileId || SY.switching) {
+      if (SY.profiles === null) { SYNC.listProfiles().then((ps) => { SY.profiles = ps; renderSyncCard(); }).catch((e) => { SY.err = e.message; SY.profiles = []; renderSyncCard(); }); }
+      body = `<p>Angemeldet als <b>${esc(SYS.email)}</b>. <b>Wer lernt auf diesem Gerät?</b></p>
+        ${note}
+        <div class="profiles">${(SY.profiles || []).map((p) => `<button class="btn profbtn" data-sync="bind" data-id="${esc(p.id)}" data-name="${esc(p.name)}">👤 ${esc(p.name)}</button>`).join('') || (SY.profiles ? '<p class="syncsmall">Noch kein Kind-Profil angelegt.</p>' : '<p>Lade …</p>')}</div>
+        <form class="syncform row" data-syncform="newprofile"><input name="name" maxlength="30" placeholder="Vorname oder Spitzname" value="${esc(S.name || '')}" required><button class="btn" type="submit">+ Profil anlegen</button></form>
+        <div class="syncbtns">${SY.switching ? '<button class="btn ghost" data-sync="cancel">Abbrechen</button>' : ''}<button class="btn ghost" data-sync="logout">Abmelden</button></div>`;
+    } else {
+      body = `<p>Angemeldet als <b>${esc(SYS.email)}</b>.<br>Dieses Gerät lernt als <b>${esc(SYS.profileName)}</b>.</p>
+        <p class="syncline" id="syncline">${syncLine()}</p>
+        ${note}
+        <div class="syncbtns"><button class="btn" data-sync="now">Jetzt abgleichen</button><button class="btn ghost" data-sync="switch">Profil wechseln</button><button class="btn ghost" data-sync="logout">Abmelden</button></div>
+        <details class="pindet"><summary>${SY.hasPin ? 'Eltern-PIN ändern' : 'Eltern-PIN festlegen (empfohlen)'}</summary>
+          <p class="syncsmall">Mit der PIN kann dein Kind sich nicht selbst abmelden, das Profil wechseln oder den Fortschritt löschen.</p>
+          <form class="syncform row" data-syncform="setpin"><input name="pin" inputmode="numeric" pattern="[0-9]{4,6}" maxlength="6" placeholder="4–6 Ziffern" autocomplete="off" required><button class="btn" type="submit">Speichern</button></form>
+        </details>`;
+    }
+    box.innerHTML = `<div class="card synccard"><h3>☁︎ Geräte &amp; Synchronisation</h3>${body}</div>`;
+  }
+  function refreshSyncBits() {
+    const line = document.getElementById('syncline'); if (line) line.innerHTML = syncLine();
+    const pill = document.getElementById('syncpill'); if (pill) { pill.textContent = syncIcon(); pill.title = syncTitle(); }
+  }
+  async function syncAction(act, b) {
+    SY.err = ''; SY.msg = '';
+    try {
+      if (act === 'bind') {
+        S.name = b.dataset.name; saveLocal();
+        SY.switching = false;
+        await SYNC.bindProfile(b.dataset.id, b.dataset.name);
+        SY.msg = `Fertig! Dieses Gerät lernt jetzt als <b>${esc(b.dataset.name)}</b>. Der bisherige Fortschritt auf diesem Gerät wurde übernommen.`;
+        parents(false);
+      } else if (act === 'now') { await SYNC.syncNow(); }
+      else if (act === 'switch') { SY.switching = true; SY.profiles = null; }
+      else if (act === 'cancel') { SY.switching = false; }
+      else if (act === 'logout') { await SYNC.signOut(); SY.hasPin = null; SY.unlocked = false; SY.profiles = null; SY.switching = false; SY.msg = 'Abgemeldet. Der Fortschritt bleibt auf diesem Gerät gespeichert.'; parents(false); return; }
+    } catch (e) { SY.err = e.message || String(e); }
+    renderSyncCard();
+  }
+  document.addEventListener('submit', async (e) => {
+    const f = e.target.closest('form[data-syncform]');
+    if (!f) return;
+    e.preventDefault();
+    const kind = f.dataset.syncform, v = (n) => (f.elements[n] ? f.elements[n].value.trim() : '');
+    const btns = f.querySelectorAll('button'); btns.forEach((x) => (x.disabled = true));
+    SY.err = ''; SY.msg = '';
+    try {
+      if (kind === 'login') {
+        SY.lastEmail = v('email');
+        if (e.submitter && e.submitter.dataset.signup) {
+          const needsConfirm = await SYNC.signUp(v('email'), f.elements.pw.value);
+          SY.msg = needsConfirm ? '📬 Konto angelegt! Bitte klicke auf den Bestätigungslink in deiner E-Mail und melde dich dann hier an.' : 'Konto angelegt.';
+        } else { await SYNC.signIn(v('email'), f.elements.pw.value); SY.hasPin = null; SY.profiles = null; }
+      } else if (kind === 'unlock') {
+        if (await SYNC.checkPin(v('pin'))) { SY.unlocked = true; parents(false); return; }
+        SY.err = 'Die PIN stimmt nicht.';
+      } else if (kind === 'newprofile') {
+        const p = await SYNC.createProfile(v('name'), 5);
+        SY.profiles = null;
+        S.name = p.name; saveLocal();
+        SY.switching = false;
+        await SYNC.bindProfile(p.id, p.name);
+        SY.msg = `Profil <b>${esc(p.name)}</b> angelegt. Dieses Gerät lernt jetzt als ${esc(p.name)}.`;
+        parents(false); return;
+      } else if (kind === 'setpin') {
+        if (!/^\d{4,6}$/.test(v('pin'))) throw new Error('Bitte 4 bis 6 Ziffern eingeben.');
+        await SYNC.setPin(v('pin')); SY.hasPin = true; SY.unlocked = true;
+        SY.msg = '🔒 Eltern-PIN gespeichert.';
+      }
+    } catch (err) { SY.err = err.message || String(err); }
+    renderSyncCard();
+  });
+
+  // ---------- Ereignisse ----------
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const d = b.dataset;
+    if (d.go === 'home') { R = null; home(); window.scrollTo(0, 0); }
+    else if (d.go === 'parents') { parents(false); window.scrollTo(0, 0); }
+    else if (d.reset === 'ask') parents(true);
+    else if (d.reset === 'yes') { S = { name: S.name, grade: 5, stats: {}, days: [], total: 0, seen: {}, resetAt: Date.now(), exSlow: S.exSlow }; save(); parents(false); }
+    else if (d.sync) syncAction(d.sync, b);
+    else if (d.topic) { start('topic', d.topic); window.scrollTo(0, 0); }
+    else if (d.mix) { start('mix', d.mix); window.scrollTo(0, 0); }
+    else if ('review' in d) { start('review'); window.scrollTo(0, 0); }
+    else if (d.grade) { if (+d.grade !== 5) soon(+d.grade); }
+    else if (d.explain) openExplainer(d.explain, d.when);
+    else if ('exclose' in d) closeExplainer();
+    else if (d.choice !== undefined) check(+d.choice);
+    else if (d.dot !== undefined) { const el = document.getElementById('f' + d.dot); el.value = el.value.replace(/\s*·?\s*$/, '') + '·'; el.focus(); }
+    else if ('again' in d) { start(R.mode, R.arg); window.scrollTo(0, 0); }
+    else if (b.id === 'hintB') showHint();
+    else if (b.id === 'checkB') check();
+    else if (b.id === 'nextB') { R.idx++; nextTask(); window.scrollTo(0, 0); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.querySelector('.exov')) return closeExplainer();
+    if (document.querySelector('.exov')) {
+      if (e.key === ' ' && EXAPI && EXAPI.playing && !/INPUT|BUTTON/.test(e.target.tagName)) { e.preventDefault(); EXAPI.clock.paused ? EXAPI.resume() : EXAPI.pause(); }
+      return;
+    }
+    if (e.key !== 'Enter' || !R || !R.cur) return;
+    if (e.target.id === 'nameI') return;
+    e.preventDefault();
+    if (R.cur.done) { const n = document.getElementById('nextB'); if (n) n.click(); }
+    else if (!R.cur.task.choices) {
+      const inputs = [...document.querySelectorAll('.answer input')];
+      const i = inputs.indexOf(e.target);
+      if (i >= 0 && i < inputs.length - 1 && !inputs[i + 1].value) inputs[i + 1].focus();
+      else check();
+    }
+  });
+
+  // Für automatische Tests: aktuelle Runde auslesen
+  window.__mathelix = { round: () => R };
+
+  // Installierbare App: Offline-Betrieb über Service Worker (nur unter eigener https-Adresse)
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && !/claude\.ai|claudeusercontent/.test(location.hostname)) {
+    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+  }
+
+  home();
+
+  if (SYNC) {
+    let lastKey = '';
+    SYNC.init({
+      getState: () => ({ stats: S.stats, days: S.days, total: S.total || 0, seen: S.seen || {}, resetAt: S.resetAt || 0 }),
+      applyState(m) {
+        Object.assign(S, m); saveLocal();
+        if (VIEW === 'home' && !document.querySelector('.exov')) home();
+        else if (VIEW === 'parents') parents(false);
+      },
+      onStatus(st) {
+        SYS = st;
+        const key = [st.enabled, st.loggedIn, st.profileId].join('|');
+        if (key !== lastKey) {
+          lastKey = key;
+          if (VIEW === 'parents') parents(false);
+          else if (VIEW === 'home' && !document.querySelector('.exov')) { const y = window.scrollY; home(); window.scrollTo(0, y); }
+        } else refreshSyncBits();
+      },
+    });
+  }
+})();
+</script>
+</body>
+</html>
