@@ -1,6 +1,6 @@
 /* LernDax – Service Worker: App läuft auch offline.
  * Bei jeder neuen Version VERSION erhöhen, dann holen sich alle Geräte die neuen Dateien. */
-const VERSION = 'lerndax-v2';
+const VERSION = 'lerndax-v3';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js',
   './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js',
