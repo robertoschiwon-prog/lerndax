@@ -34,6 +34,17 @@
       : `M ${p0[0].toFixed(2)} ${p0[1].toFixed(2)} ${arc}`;
   }
   const reg = (ids, def) => [].concat(ids).forEach((id) => (EX[id] = def));
+  // Legt einen Markierungs-Kasten genau um die gezeichneten Elemente (gemessen, nicht geschätzt)
+  function fitBox(rect, elems, padX, padY) {
+    try {
+      const bs = elems.map((e) => e.getBBox()).filter((b) => b.width || b.height);
+      if (!bs.length) return;
+      const x0 = Math.min(...bs.map((b) => b.x)), y0 = Math.min(...bs.map((b) => b.y));
+      const x1 = Math.max(...bs.map((b) => b.x + b.width)), y1 = Math.max(...bs.map((b) => b.y + b.height));
+      rect.setAttribute('x', x0 - padX); rect.setAttribute('y', y0 - padY);
+      rect.setAttribute('width', x1 - x0 + 2 * padX); rect.setAttribute('height', y1 - y0 + 2 * padY);
+    } catch (e) { /* ohne Darstellung (z. B. Test ohne Layout): Kasten bleibt, wo er ist */ }
+  }
   M.exUtil = { el, arcD, pt };
 
   // =====================================================
@@ -211,7 +222,10 @@
         const putQ = (digit) => { D(qx0 + qn * CW, Y0, String(digit), 'f2'); qn++; };
         const hl = el('rect', { x: 0, y: Y0 - 18, width: 0, height: 24, rx: 5, class: 'hl2', opacity: 0 }, api.svg);
         api.svg.insertBefore(hl, api.svg.firstChild);
-        const hlCols = (c0, c1, y) => { hl.setAttribute('x', X(c0) - CW / 2 - 2); hl.setAttribute('width', (c1 - c0 + 1) * CW + 4); hl.setAttribute('y', y - 18); hl.setAttribute('opacity', 1); };
+        // Ziffernhöhe einmal messen, damit die Markierung genau sitzt
+        let dTop = -16, dH = 20;
+        try { const probe = D(X(0), Y0, '0'); const bb = probe.getBBox(); if (bb.height) { dTop = bb.y - Y0; dH = bb.height; } probe.remove(); } catch (e) {}
+        const hlCols = (c0, c1, y) => { hl.setAttribute('x', X(c0) - CW / 2 - 1); hl.setAttribute('width', (c1 - c0 + 1) * CW + 2); hl.setAttribute('y', y + dTop - 3); hl.setAttribute('height', dH + 6); hl.setAttribute('opacity', 1); };
         api.say(`<b>${fmt(n)} : ${d}</b> schriftlich: Wir teilen <b>Stelle für Stelle</b> von links.`);
         await api.wait(1800);
         let rowY = Y0;
@@ -609,7 +623,9 @@
       }
       let mode = task ? { pow: 'grund', zehn: 'zehn', quad: 'quad' }[task.mode] : 'alle';
       const T = (x, y, cls, anchor) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': anchor || 'middle' }, api.svg);
-      const sup = (e, size) => `<tspan dy="${-size * 0.45}" font-size="${Math.round(size * 0.6)}">${e}</tspan><tspan dy="${size * 0.45}"></tspan>`;
+      // Hochzahl: hochstellen und danach zurück auf die Grundlinie. Das leere Zeichen (\u200B) ist nötig,
+      // weil Browser ein leeres <tspan> ignorieren – sonst bliebe der Rest der Zeile hochgestellt.
+      const sup = (e, size) => `<tspan dy="${-size * 0.45}" font-size="${Math.round(size * 0.6)}">${e}</tspan><tspan dy="${size * 0.45}">\u200B</tspan>`;
       const pw = (b, e, size) => `${b}${sup(e, size)}`;
       const title = (t) => el('text', { x: 180, y: 18, class: 'ex-s f6', 'text-anchor': 'middle', text: t }, api.svg);
 
@@ -695,16 +711,17 @@
       async function zehn(hl = 0, A = 0) {
         api.clear();
         title('ZEHNERPOTENZEN');
-        const K = Math.max(6, hl), rowsN = K + (A ? 1 : 0), sp = Math.min(30, 186 / rowsN), fs = Math.round(Math.min(22, sp * 0.8));
+        const K = Math.max(6, hl), rowsN = K + (A ? 1 : 0), sp = Math.min(30, 186 / rowsN), fs = Math.round(Math.min(22, sp * 0.72));
         api.say('Bei der Basis <b>10</b> wird es ganz einfach …');
         await api.wait(1400);
         for (let k = 1; k <= K; k++) {
           const y = 22 + k * sp;
           const row = el('g', { opacity: 0 }, api.svg);
-          if (k === hl) el('rect', { x: 30, y: y - sp * 0.78, width: 310, height: sp * 0.98, rx: 8, class: 'hl2' }, row);
+          const box = k === hl ? el('rect', { x: 30, y: y - sp * 0.78, width: 310, height: sp * 0.98, rx: 8, class: 'hl2' }, row) : null;
           const t = el('text', { x: 40, y, class: 'vexpr', 'text-anchor': 'start', style: `font-size:${fs}px` }, row);
           t.innerHTML = `${pw(10, k, fs)} = 1<tspan class="f1">${'0'.repeat(k)}</tspan>`;
-          el('text', { x: 334, y: y - 2, class: 'ex-s f6', 'text-anchor': 'end', text: `${k} ${k === 1 ? 'Null' : 'Nullen'}` }, row);
+          const lbl = el('text', { x: 334, y: y - 2, class: 'ex-s f6', 'text-anchor': 'end', text: `${k} ${k === 1 ? 'Null' : 'Nullen'}` }, row);
+          if (box) fitBox(box, [t, lbl], 8, 1);
           api.say(`10<sup>${k}</sup> = ${k === 1 ? '10' : Array(k).fill(10).join(' · ')}${k > 1 ? ` = ${fmt(10 ** k)}` : ''}`);
           await api.tw(400, (tt) => row.setAttribute('opacity', tt));
           await api.wait(hl ? 650 : k < 3 ? 1300 : 900);
