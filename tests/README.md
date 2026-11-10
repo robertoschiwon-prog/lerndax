@@ -8,7 +8,7 @@ Voraussetzung: Python 3 mit `pip install playwright` und `playwright install chr
 
 | Test | Prüft |
 |---|---|
-| `node tests/gen-test.js web/mathe/generatoren/klasse5.js` | Alle Aufgabengeneratoren je 3000-mal: keine Fehler, kein NaN/undefined, Antworten gültig |
+| `node tests/gen-test.js $PWD/web/mathe/generatoren/klasse5.js` | Alle Aufgabengeneratoren je 3000-mal: keine Fehler, kein NaN/undefined, Antworten gültig |
 | `python3 tests/ui2.py` | Alle 22 Themen durchspielen und richtig beantworten (352 Aufgaben müssen als richtig erkannt werden) |
 | `python3 tests/ex.py` | Alle Erklär-Animationen abspielen (Schnelldurchlauf) |
 | `python3 tests/pause.py` | Pause- und Langsam-Modus im Erklär-Player |

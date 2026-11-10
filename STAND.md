@@ -75,10 +75,18 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 - **Dachs-Logo:** `web/icons/dachs.svg`, App-Icons als PNG in mehreren Größen.
 
 ### Mathelix (Mathe), Klasse 5 vollständig
+- **Kopfzeile:** Dachs (zurück zur LernDax-Startseite), Schriftzug „Mathelix“ (zum Mathe-Start),
+  Serie 🔥 und Sterne ⭐. Das frühere orange „×“-Kästchen ist seit 10.11.2026 entfernt
+  (wirkte doppelt und wie ein Schließen-Knopf).
 - **Startbildschirm:** Avatar + „Hallo Bruno!“, Klassen-Chips 1–10 (nur 5 aktiv; andere zeigen
   die geplanten Lernbereiche laut Lehrplan), „🎲 Gemischt“ (Runde aus allem),
   „🔁 Fehler-Training“ (Themen mit vielen Fehlern), Lernbereiche mit Themen und Sternen
   (Beherrschung), ▶-Knopf für die Erklärung, Entdecken-Bereich, Elternansicht.
+- **Themen-Symbole** (seit 10.11.2026): Jedes Thema hat ein selbst gezeichnetes Bildchen
+  (z. B. Waage für Gleichungen, Faktorbaum für Primzahlen, Stoppuhr für Zeit) in einem
+  44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
+  kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
+  zeigt die App das Zeichen aus `icon` im Generator.
 - **5 Lernbereiche, 22 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
   - LB 1 Natürliche Zahlen: Runden · Geschickt rechnen · Quadrat- & Zehnerpotenzen ·
     Schriftlich dividieren · Teilbarkeitsregeln · Primzahlen & Primfaktoren · Einfache Gleichungen
@@ -130,6 +138,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 | `web/plattform/avatare.js` | Avatar-Figuren (SVG), Farben, Auswahlfenster (`window.LernDaxAvatare`) |
 | `web/mathe/index.html` | Mathelix-App (Ansichten, Übungsrunde, Player, Elternansicht) |
 | `web/mathe/generatoren/klasse5.js` | Aufgabengeneratoren Klasse 5 (`window.Mathelix.grades[5]`) |
+| `web/mathe/symbole.js` | Themen-Symbole als SVG, Schlüssel = Themen-ID (`window.MathelixIcons`) |
 | `web/mathe/erklaerungen/klasse5.js` | Erklär-Animationen zu den Themen |
 | `web/mathe/erklaerungen/entdecken.js` | Entdecken-Animationen |
 | `web/sw.js` | Service Worker (Offline, Aktualisierung), `VERSION` |
@@ -180,7 +189,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v6`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v7`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -269,7 +278,7 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 ## 9. Offene Punkte & Ideen
 
 **Als Nächstes sinnvoll**
-- [ ] Bruno sucht sich seinen Avatar aus und testet (Vorlage: `notizen/feedback.md`, Testrunde 1)
+- [x] Testrunde 1 mit Bruno (10.11.2026)
 - [ ] Offene Fragen klären: Welches Mathebuch nutzt die Klasse? Welche Themen sind gerade dran,
       wann ist die nächste Arbeit?
 - [ ] Reihenfolge der Themen mit dem Schulbuch abgleichen
@@ -302,3 +311,6 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
   Kopfbereich mit mehr Rand.
 - **Avatare** eingeführt (Spalte `avatar` in `lerndax_profiles`, Version `lerndax-v6`).
 - Tests ins Projekt übernommen (`tests/`), diese Datei angelegt.
+- Testrunde mit Bruno erledigt.
+- **Themen-Symbole** neu gezeichnet und größer (44 statt 34 Pixel); orange „×“-Kästchen
+  in der Mathelix-Kopfzeile entfernt (Version `lerndax-v7`).

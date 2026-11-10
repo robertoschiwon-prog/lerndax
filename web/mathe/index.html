@@ -37,7 +37,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 .hubbtn img{width:32px;height:32px}
 .hubbtn:active{transform:translate(2px,2px);box-shadow:none}
 .logo{display:flex;align-items:center;gap:8px;font:800 24px "Bricolage Grotesque",sans-serif;background:none;border:0;padding:0}
-.logo .badge{width:34px;height:34px;border-radius:10px;background:var(--c1);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:grid;place-items:center;color:#fff;font-size:22px;line-height:1}
 .logo b{color:var(--c1)}
 .pills{margin-left:auto;display:flex;gap:6px}
 .pill{display:flex;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;font-weight:800;font-size:15px}
@@ -74,7 +73,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .topics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .topic{text-align:left;background:var(--card);border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-height:96px;transition:transform .06s,box-shadow .06s}
 .topic:active{transform:translate(3px,3px);box-shadow:none}
-.topic .ti{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font:800 16px "Bricolage Grotesque",Nunito,system-ui,sans-serif;color:#fff;border:2px solid var(--ink)}
+.topic .ti{width:44px;height:44px;border-radius:11px;padding:6px;box-sizing:border-box;display:grid;place-items:center;font:800 18px "Bricolage Grotesque",Nunito,system-ui,sans-serif;color:#fff;border:2px solid var(--ink)}
+.topic .ti svg{display:block;width:100%;height:100%}
 .topic .tt{font-weight:800;font-size:15px;line-height:1.2;flex:1}
 .stars{font-size:15px;letter-spacing:1px;color:#d8d0c2}
 .stars .on{color:var(--c5)}
@@ -438,6 +438,7 @@ body.noscroll{overflow:hidden}
 <script src="../plattform/config.js"></script>
 <script src="../plattform/sync.js"></script>
 <script src="generatoren/klasse5.js"></script>
+<script src="symbole.js"></script>
 <script src="erklaerungen/klasse5.js"></script>
 <script src="erklaerungen/entdecken.js"></script>
 <script>
@@ -509,7 +510,7 @@ body.noscroll{overflow:hidden}
   const header = () => `
     <div class="top">
       <a class="hubbtn" href="../" aria-label="Zur LernDax-Startseite" title="Zur LernDax-Startseite"><img src="../icons/dachs.svg" alt=""></a>
-      <button class="logo" data-go="home" aria-label="Mathelix-Start"><span class="badge">×</span><span>Mathe<b>lix</b></span></button>
+      <button class="logo" data-go="home" aria-label="Mathelix-Start"><span>Mathe<b>lix</b></span></button>
       <div class="pills">
         <span class="pill" title="Tage in Folge geübt">🔥 ${streak()}</span>
         <span class="pill" title="Gesammelte Sterne">⭐ ${totalStars()}</span>
@@ -567,7 +568,7 @@ body.noscroll{overflow:hidden}
           <div class="topics">${lb.topics.map((t) => `
             <div class="twrap">
               <button class="topic" data-topic="${t.id}">
-                <span class="ti bg${lb.nr}">${t.icon}</span>
+                <span class="ti bg${lb.nr}">${(window.MathelixIcons && MathelixIcons.svg(t.id)) || t.icon}</span>
                 <span class="tt">${t.title}</span>
                 ${starHtml(mastery(t.id).stars)}
               </button>
