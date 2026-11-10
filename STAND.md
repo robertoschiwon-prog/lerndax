@@ -303,8 +303,24 @@ Gesammelte Infos für später:
   Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53).
 - Diese Themen sind seit 10.11. alle als **allgemeine** Mathelix-Themen vorhanden (siehe
   Abschnitt 3). Ein Klassen-Bereich müsste sie nur auswählen und bündeln, nicht neu bauen.
-- Mögliche Bausteine (Ideen, nicht beschlossen): Countdown bis zur Arbeit, Runde nur aus den
-  Arbeitsthemen, schwache Themen häufiger, „wie fit bin ich“ je Thema, Buchseiten als Hinweis.
+- **Konzept (besprochen mit Roberto am 10.11.2026, noch nicht gebaut):**
+  - **Trainingsseite je Arbeit:** Eine Arbeit wird in LernDax als kleiner Eintrag beschrieben
+    (Titel, Datum, Fach, Themen-IDs, Buchseiten). Daraus entsteht automatisch eine eigene
+    Trainingsseite mit eigenem Link. Sie nutzt die allgemeinen Mathelix-Themen, zeigt aber nur
+    die ausgewählten. Die allgemeine App bleibt unverändert.
+  - Mögliche Bausteine: Countdown bis zur Arbeit, Runde nur aus den Arbeitsthemen, schwache
+    Themen häufiger, „wie fit bin ich“ je Thema, Buchseiten als Hinweis.
+  - **Zugang zuerst nur für Bruno:** Die Seite wird in der allgemeinen App **nicht** verlinkt.
+    Bruno erreicht sie über den **Familienkalender** (Knopf „Jetzt üben“ beim Termin der Arbeit
+    oder Sektion „Lernen“). Das baut das Kalender-Projekt; LernDax liefert dafür nur Link und
+    Beschreibung (Auftrag über Roberto, wie beim LernDax-Link). Angemeldet wird der Fortschritt
+    wie gewohnt synchronisiert.
+  - **Option Klassenkameraden offenhalten:** Die Seite so bauen, dass sie auch **ohne Anmeldung**
+    funktioniert (Fortschritt dann nur auf dem Gerät, nichts in der Datenbank). Dann genügt
+    später, den Link weiterzugeben (z. B. Eltern-Chat der Klasse). Klassenkameraden bekommen
+    **keine** Konten im Familienkalender.
+  - Auf der Seite **keine** Namen von Schule, Lehrerin oder Bruno, weil sie technisch für jeden
+    mit dem Link erreichbar ist.
 - Offen: Werden im Buch (S. 36–40) auch zweistellige Teiler geübt? Mathelix nutzt bisher nur
   einstellige.
 
@@ -361,6 +377,8 @@ Gesammelte Infos für später:
   Mathelix, Plan für die zwei Wochen bis zur Arbeit.
 - Entscheidung: Klassenarbeiten und Klassenspezifisches **nicht** in die allgemeine App, sondern
   später in einen eigenen Klassen-Bereich. Kachel „Klassenarbeit 24.11.“ daher nicht gebaut.
+- Konzept Trainingsseite je Arbeit festgehalten: zuerst nur für Bruno über den Familienkalender,
+  ohne Anmeldung nutzbar gebaut, damit Klassenkameraden später per Link dazukommen können.
 - Potenzen, Division und Teilermengen erweitert (Version `lerndax-v9`).
 - **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
   mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
