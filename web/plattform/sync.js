@@ -47,7 +47,11 @@
     });
     const days = [...new Set([...(A.days || []), ...(B.days || [])])].sort().slice(-400);
     const seen = Object.assign({}, A.seen || {}, B.seen || {});
-    return { stats, days, seen, total: Math.max(A.total || 0, B.total || 0), resetAt: r };
+    // Runden pro Tag (für das Tagesziel): je Tag der höhere Wert, nur die letzten 60 Tage
+    const rounds = {};
+    [...new Set([...Object.keys(A.rounds || {}), ...Object.keys(B.rounds || {})])].sort().slice(-60)
+      .forEach((d) => { rounds[d] = Math.max((A.rounds || {})[d] || 0, (B.rounds || {})[d] || 0); });
+    return { stats, days, seen, rounds, total: Math.max(A.total || 0, B.total || 0), resetAt: r };
   }
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 

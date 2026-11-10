@@ -56,6 +56,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .avabtn{border:0;background:none;padding:0;cursor:pointer;line-height:0;flex:0 0 auto}
 .hello h1{font-size:30px;line-height:1.1}
 .hello p{margin:4px 0 0;color:var(--soft);font-weight:700}
+.hello p.goal{display:inline-block;margin-top:6px;font-size:14px;color:var(--ink);background:#fff3c4;border:2px solid var(--ink);border-radius:99px;padding:2px 10px}
+.hello p.goal.done{background:#e3f7ee;border-color:var(--ok);color:#0b6b48}
+.goaldone{font-weight:800;color:var(--ok);margin:6px 0}
 .grades{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 10px;margin:0 -4px 6px;scrollbar-width:none}
 .grades::-webkit-scrollbar{display:none}
 .gchip{flex:0 0 auto;min-width:46px;height:46px;border-radius:12px;border:2px solid var(--ink);background:var(--card);font:800 18px "Bricolage Grotesque",Nunito,system-ui,sans-serif;display:grid;place-items:center;position:relative}
@@ -523,6 +526,13 @@ body.noscroll{overflow:hidden}
   })();
   if (TR && !TR.missing) document.title = `${TR.titel} · Training · Mathelix`;
 
+  // Tagesziel: eine vollständige Runde pro Tag (Wunsch Roberto). S.rounds = { 'JJJJ-MM-TT': Anzahl },
+  // wird mit synchronisiert (Bruno übt an Papas Handy, am Computer und am Tablet).
+  const roundsToday = () => ((S.rounds || {})[today()] || 0);
+  const goalLine = () => (roundsToday() >= 1
+    ? `🎯 Tagesziel geschafft${roundsToday() > 1 ? ` (${roundsToday()} Runden)` : ''} ✓`
+    : '🎯 Tagesziel: eine Runde');
+
   function mastery(id) {
     const st = S.stats[id];
     if (!st || !st.hist.length) return { avg: 0, n: 0, stars: 0 };
@@ -651,7 +661,7 @@ body.noscroll{overflow:hidden}
         <p class="trdate">${dstr} · ${count}</p>
         <div class="trfit"><span>So fit bist du</span><b>${total} %</b></div>
         ${fitBar(total)}
-        <p class="trtoday">${S.days.includes(today()) ? '✅ Heute schon geübt. Super!' : 'Heute noch nicht geübt. Eine Runde dauert nur ein paar Minuten.'}</p>
+        <p class="trtoday">${roundsToday() >= 1 ? `✅ Tagesziel geschafft: heute ${roundsToday() === 1 ? 'eine Runde' : roundsToday() + ' Runden'} geübt. Super!` : '🎯 Tagesziel: eine Runde. Das dauert nur ein paar Minuten.'}</p>
       </div>
       <div class="quick">
         <button class="btn org" data-tr="all"><span class="ic">🎯</span>Trainingsrunde<small>${TASKS_PER_ROUND} Aufgaben, Schwaches öfter</small></button>
@@ -676,7 +686,7 @@ body.noscroll{overflow:hidden}
     const greet = S.name ? `Hallo ${esc(S.name)}!` : 'Hallo!';
     $app.innerHTML = header() + `
       ${nameCard()}
-      <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p></div></div>
+      <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p><p class="goal${roundsToday() >= 1 ? ' done' : ''}">${goalLine()}</p></div></div>
       <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
       <div class="quick">
         <button class="btn org" data-mix="all"><span class="ic">🎲</span>Gemischt<small>${TASKS_PER_ROUND} Aufgaben aus allem</small></button>
@@ -886,10 +896,15 @@ body.noscroll{overflow:hidden}
     const n = R.results.length;
     const ratio = R.results.reduce((a, b) => a + b, 0) / n;
     const [emoji, head] = ratio >= 0.9 ? ['🏆', 'Mega stark!'] : ratio >= 0.7 ? ['🌟', 'Richtig gut!'] : ratio >= 0.5 ? ['💪', 'Gut dabei!'] : ['🌱', 'Dranbleiben!'];
-    let starBlock = '';
+    const firstToday = roundsToday() === 0;
+    S.rounds = Object.assign({}, S.rounds || {}, { [today()]: roundsToday() + 1 });
+    const keep = Object.keys(S.rounds).sort().slice(-60);
+    S.rounds = Object.fromEntries(keep.map((d) => [d, S.rounds[d]]));
+    save();
+    let starBlock = firstToday ? '<p class="goaldone">🎯 Tagesziel für heute geschafft!</p>' : '';
     if (R.mode === 'topic') {
       const now = mastery(R.arg).stars;
-      starBlock = `${starHtml(now)}${now > R.before ? '<p style="color:var(--ok)">Neuer Stern! ⭐</p>' : ''}`;
+      starBlock += `${starHtml(now)}${now > R.before ? '<p style="color:var(--ok)">Neuer Stern! ⭐</p>' : ''}`;
     }
     $app.innerHTML = header() + `
       <div class="card res">
@@ -1254,7 +1269,7 @@ body.noscroll{overflow:hidden}
   if (SYNC) {
     let lastKey = '';
     SYNC.init({
-      getState: () => ({ stats: S.stats, days: S.days, total: S.total || 0, seen: S.seen || {}, resetAt: S.resetAt || 0 }),
+      getState: () => ({ stats: S.stats, days: S.days, total: S.total || 0, seen: S.seen || {}, rounds: S.rounds || {}, resetAt: S.resetAt || 0 }),
       applyState(m) {
         Object.assign(S, m); saveLocal();
         if (VIEW === 'home' && !document.querySelector('.exov')) home();

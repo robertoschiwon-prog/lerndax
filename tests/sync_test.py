@@ -116,6 +116,9 @@ async def main():
         print('server has kuerzen:', 'k5-kuerzen' in list(DB['progress'].values())[0]['state']['stats'])
         await A.click('[data-sync=now]'); await A.wait_for_timeout(800)
         sA=await state(A); print('A got kuerzen:', 'k5-kuerzen' in sA['stats'], '| A total', sA['total'], 'B total', (await state(B))['total'])
+        import datetime; heute=datetime.date.today().isoformat()
+        print('tagesziel synced:', (sA.get('rounds') or {}).get(heute, 0) >= 1, '| B rounds', (await state(B)).get('rounds'))
+        if not (sA.get('rounds') or {}).get(heute, 0) >= 1: A.errs.append('Tagesziel nicht synchronisiert')
         await A.click('[data-go="home"]'); await A.wait_for_timeout(200)
         await A.screenshot(path=f'{SHOTS}/s6_A_home.png')
         # Trainingsseite (?t=…): angemeldet wird dort genauso synchronisiert
