@@ -1,0 +1,304 @@
+# LernDax – Projektstand & Gedächtnis
+
+**Stand: 10.11.2026** · Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
+Mensch) ohne Vorwissen weitermachen kann.
+
+**Bitte nach jeder Änderung aktualisieren:** Abschnitt „Was fertig ist“, „Offene Punkte“ und
+unten den „Verlauf“.
+
+Weitere Dokumente:
+- `README.md`: Projektsteckbrief, Grundsätze, Ordner, neues Fach hinzufügen, Fahrplan
+- `SETUP.md`: Kurzanleitung für Eltern (Anmelden, Profil, PIN, App aufs Handy)
+- `tests/README.md`: automatische Tests
+- `faecher/mathe/lehrplan/sachsen-gymnasium.md`: Lehrplan Mathe Gymnasium Sachsen, Klasse 5–10
+- `notizen/feedback.md`: offene Fragen an Bruno und Vorlage für Testrunden (nur lokal, nicht auf GitHub)
+
+---
+
+## 1. Worum es geht
+
+- **Für wen:** Bruno, Klasse 5, Gymnasium Klotzsche (Dresden, Sachsen). Später Klasse 1–10,
+  eventuell Geschwister oder Freunde.
+- **Auftraggeber:** Roberto Schiwon (Vater). Er programmiert nicht selbst; Claude baut, Roberto
+  entscheidet und testet. Kommunikation auf Deutsch, verständlich, ohne Fachchinesisch.
+- **Ziel:** Schulstoff **verstehen statt pauken**. Wichtigstes Vorbild: die Videos von
+  **3Blue1Brown**: anschauliche, animierte Erklärungen, die zeigen *warum* etwas stimmt.
+- **Was die App können soll:**
+  1. Üben mit unendlich vielen, zufällig erzeugten Aufgaben, passend zum sächsischen Lehrplan.
+  2. Erklär-Animationen zu jedem Thema, die man pausieren und verlangsamen kann.
+  3. Vor dem Antworten ein ähnliches Beispiel, nach dem Antworten die Lösung genau dieser Aufgabe.
+  4. „Entdecken“: Staunen-Momente und visuelle Beweise, die neugierig machen.
+  5. Fortschritt auf allen Geräten gleich (Handy, Tablet, Computer).
+- **Name:** **LernDax**. Anspielung auf **LernSax** (Schulplattform aller sächsischen Schulen),
+  „Dax“ klingt wie **Dachs**, das Maskottchen. Das Mathe-Fach heißt **Mathelix**.
+
+## 2. Wo alles liegt
+
+| Was | Wo |
+|---|---|
+| Website (live) | **https://robertoschiwon-prog.github.io/lerndax/** |
+| Mathe direkt | https://robertoschiwon-prog.github.io/lerndax/mathe/ |
+| Code (Hauptstand) | GitHub: **robertoschiwon-prog/lerndax** (öffentlich, Branch `main`) |
+| Code (Kopie für Roberto) | OneDrive: `C:\Users\rober\OneDrive\Roberto\20_Projekte\Lerndax` |
+| Datenbank | Supabase, Organisation „Familie“, Projekt **familienkalender** (Ref `bpwdmdcnvdolpsxdvblq`), nur Tabellen `lerndax_…` |
+| Anmeldung | dasselbe Familienkonto wie im Familienkalender |
+| Veröffentlichen | automatisch bei jedem Push auf `main` (GitHub Actions „LernDax veröffentlichen“) |
+
+**GitHub ist der maßgebliche Stand.** Der OneDrive-Ordner ist eine Kopie. Ausnahme: der Ordner
+`.github/` (Veröffentlichungs-Ablauf) liegt nur auf GitHub, weil Claude in diesen Ordner auf
+dem PC nicht schreiben darf. `notizen/` liegt nur auf OneDrive (privat).
+
+**Wenn Claude in einem neuen Chat weiterarbeitet:** GitHub-Repository einbinden und klonen,
+dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner kopieren.
+
+## 3. Was fertig ist
+
+### Plattform (für alle Fächer)
+- **Startseite** (`web/index.html`): Dachs-Logo, Begrüßung mit Avatar, Fächerliste
+  (Mathe aktiv; Deutsch und Englisch als „bald“), Entdecken-Kachel, Link „Für Eltern:
+  Fortschritt & Geräte“. Zeigt Serie 🔥 und Sync-Status ☁︎.
+- **Familienkonto & Kind-Profile:** Anmeldung mit dem Familienkalender-Konto in der
+  Elternansicht. Pro Kind ein Profil (nur Vor- oder Spitzname + Klasse). Neue Konten können in
+  LernDax **nicht** angelegt werden (`allowSignup: false`), das macht nur der Admin.
+- **Eltern-PIN:** Optional. Schützt Abmelden, Profilwechsel und „Fortschritt löschen“.
+  Gespeichert wird nur ein Fingerabdruck (SHA-256 aus `lerndax:<Konto-ID>:<PIN>`), nie die PIN.
+- **Synchronisation:** Fortschritt pro Profil und Fach. Funktioniert auch offline; beim
+  nächsten Kontakt wird zusammengeführt (Regeln siehe Technik).
+- **Avatare** (seit 10.11.2026): 12 eigene, gezeichnete Figuren (Fuchs, Eule, Pinguin, Katze,
+  Hund, Igel, Waschbär, Drache, Roboter, Krake, Faultier, Axolotl) × 8 Hintergrundfarben
+  (Orange, Blau, Grün, Lila, Gelb, Pink, Türkis, Nacht). Auswahl öffnet sich beim ersten Besuch
+  automatisch (einmal pro Gerät), später über Tippen auf den Avatar (✏️). Gespeichert im
+  Kind-Profil, also auf allen Geräten gleich. Bewusst **keine** bekannten Figuren aus Filmen,
+  Spielen usw.
+- **Installierbare App (PWA):** Manifest, App-Icons (Dachs-Kopf), offline nutzbar.
+- **Dachs-Logo:** `web/icons/dachs.svg`, App-Icons als PNG in mehreren Größen.
+
+### Mathelix (Mathe), Klasse 5 vollständig
+- **Startbildschirm:** Avatar + „Hallo Bruno!“, Klassen-Chips 1–10 (nur 5 aktiv; andere zeigen
+  die geplanten Lernbereiche laut Lehrplan), „🎲 Gemischt“ (Runde aus allem),
+  „🔁 Fehler-Training“ (Themen mit vielen Fehlern), Lernbereiche mit Themen und Sternen
+  (Beherrschung), ▶-Knopf für die Erklärung, Entdecken-Bereich, Elternansicht.
+- **5 Lernbereiche, 22 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
+  - LB 1 Natürliche Zahlen: Runden · Geschickt rechnen · Quadrat- & Zehnerpotenzen ·
+    Schriftlich dividieren · Teilbarkeitsregeln · Primzahlen & Primfaktoren · Einfache Gleichungen
+  - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern ·
+    Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Zahlen vergleichen · Arithmetisches Mittel
+  - LB 3 Geometrie: Koordinatensystem · Winkelarten · Winkel an Geraden
+  - LB 4 Rechtecke & Quader: Umfang & Fläche · Volumen & Oberfläche
+  - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld
+- **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
+  bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
+- **18 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Teilen mit Rest ·
+  Primzahlen · Quadratzahlen sind Quadrate · Anteile berechnen · Erweitern & Kürzen ·
+  Die Hundertertafel · Mal 10 (das Komma bleibt, die Ziffern wandern) · Der Mittelwert macht
+  alles gerecht · Erst laufen, dann springen (Koordinaten) · Winkelarten · Winkel an Geraden ·
+  Fläche und Umfang · Volumen: Würfel stapeln · Gleichungen sind Waagen · Zeitspannen mit
+  Sprüngen · Zoom ins Maßband · Was ist π? Das abrollende Rad.
+- **Erklär-Player:** Abspielen, **Pause**, **Langsam-Modus**, „Nochmal“; viele Animationen
+  haben Regler oder Auswahl-Chips zum Selbst-Ausprobieren.
+- **Beispiel vorher / Lösung als Animation nachher:** umgesetzt für **Primzahlen**
+  (Rechteck-Legen) und **Primfaktorzerlegung** (Faktorbaum). Vorlage für weitere Themen.
+- **Entdecken (14 Staunen-Momente, dunkle „Bühne“):** Ich kann Gedanken lesen! · Der Trick
+  des kleinen Gauß · Ungerade Zahlen bauen Quadrate · Unendlich viele Brüche ergeben 1 ·
+  Das Sieb des Eratosthenes · Reis auf dem Schachbrett · Das Galton-Brett · Das Pascalsche
+  Dreieck · Wie hoch ist der Baum? · Warum hat jedes Dreieck 180°? · Das Geheimnis der
+  Sonnenblume · Was ist π? · Aus der Pizza wird ein Rechteck · Der Satz des Pythagoras.
+  Schon angesehene sind mit ✓ markiert, neue mit „neu“.
+- **Elternansicht** (Mathe → ganz unten, oder Startseite → „Für Eltern“): Fortschritt je Thema,
+  Anmeldung/Profile/PIN, Fortschritt zurücksetzen.
+
+### Live geprüft (10.11.2026)
+- Bruno-Profil existiert, PIN gesetzt, Mathe-Fortschritt wird in der Datenbank gespeichert.
+- Avatar-Auswahl öffnet sich live; Bruno hat seinen Avatar noch selbst auszusuchen.
+
+## 4. Technik
+
+### Aufbau
+- Reine **statische Website** (HTML, CSS, JavaScript ohne Build-Schritt), gehostet auf
+  **GitHub Pages**. Datenbank und Anmeldung über **Supabase** (Bibliothek `supabase-js` v2
+  von jsDelivr).
+- **Plattform vs. Fach:** Was jedes Fach braucht, liegt in `web/plattform/`. Ein Fach setzt
+  `window.LERNDAX_SUBJECT = '<fach>'` und bindet `plattform/avatare.js`, `config.js`,
+  `sync.js` ein.
+
+| Datei | Aufgabe |
+|---|---|
+| `web/index.html` | Startseite (Fächer, Avatar, Entdecken-Kachel, Eltern-Link) |
+| `web/plattform/config.js` | Supabase-Adresse, **öffentlicher** Schlüssel (`sb_publishable_…`), Tabellen-Präfix `lerndax_`, `allowSignup: false`, Kontoname |
+| `web/plattform/sync.js` | Anmeldung, Profile, PIN, Synchronisation, Avatar-Sync (`window.LernDaxSync`, Alias `MathelixSync`) |
+| `web/plattform/avatare.js` | Avatar-Figuren (SVG), Farben, Auswahlfenster (`window.LernDaxAvatare`) |
+| `web/mathe/index.html` | Mathelix-App (Ansichten, Übungsrunde, Player, Elternansicht) |
+| `web/mathe/generatoren/klasse5.js` | Aufgabengeneratoren Klasse 5 (`window.Mathelix.grades[5]`) |
+| `web/mathe/erklaerungen/klasse5.js` | Erklär-Animationen zu den Themen |
+| `web/mathe/erklaerungen/entdecken.js` | Entdecken-Animationen |
+| `web/sw.js` | Service Worker (Offline, Aktualisierung), `VERSION` |
+| `web/manifest.webmanifest` | App-Name, Farben, Icons |
+| `supabase/schema.sql` | Tabellen, Regeln, Rechte (gefahrlos wiederholbar) |
+| `.github/workflows/pages.yml` | lädt `web/` bei jedem Push nach GitHub Pages (nur auf GitHub) |
+
+### Aufgaben-Generatoren
+Jeder Generator liefert bei jedem Aufruf eine neue Aufgabe:
+`{ prompt, figure?, fields:[{answer, type, label, prefix, suffix, fixed}], layout?, choices?/correct?, check?, hint, solution, answerText, ex? }`.
+`ex: {mode, n}` verknüpft eine Aufgabe mit einer Erklär-Animation (Beispiel vorher, Lösung nachher).
+Zahlen werden deutsch formatiert (Komma, schmales Leerzeichen ab 10 000).
+
+### Erklär-Animationen
+Jede Erklärung: `{ title, viewBox, dark?, discover?:{icon, q, tag}, create(api) → { reset(), play() } }`.
+`play()` ist asynchron und nutzt `api.wait`, `api.tw` (Übergänge), `api.say` (Text),
+`api.slider`, `api.chips`. Der Player hat eine **eigene virtuelle Uhr**; dadurch funktionieren
+Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint unter Entdecken
+(Reihenfolge in `DISC_ORDER` in `web/mathe/index.html`).
+
+### Lernstand (pro Gerät im Browser, `localStorage`)
+- `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, ok, …}}, days:[JJJJ-MM-TT], total, seen:{<id>:true}, resetAt }`
+- `lerndax.device` (aktives Profil), `lerndax.auth` (Anmeldung), `lerndax.avatar`
+  (z. B. `fuchs:blau`), `lerndax.avatar.pending` (noch nicht hochgeladen),
+  `lerndax.avatar.asked` (Auswahl wurde schon einmal automatisch gezeigt).
+
+### Synchronisation (Zusammenführen)
+- Pro Thema gewinnt der Stand mit mehr bearbeiteten Aufgaben (`n`).
+- Übungstage (`days`) und angesehene Erklärungen (`seen`) werden vereinigt.
+- `total` = Maximum. `resetAt` (Zeitpunkt von „Fortschritt löschen“) verwirft alles Ältere.
+- Avatar: lokale Änderung wird hochgeladen; sonst gilt der Avatar aus dem Profil; ist das
+  Profil leer, wird der lokale hochgeladen.
+- In der Claude-Vorschau ist Sync abgeschaltet.
+
+### Datenbank (Supabase, Projekt familienkalender)
+- `lerndax_profiles`: `id`, `owner` (= Konto, Standard `auth.uid()`), `name` (1–30 Zeichen),
+  `grade` (1–13), `avatar` (`figur:farbe` oder leer), `created_at`
+- `lerndax_progress`: `profile_id`, `subject` (z. B. `mathe`), `owner`, `state` (JSON wie
+  oben), `updated_at`; Schlüssel (`profile_id`, `subject`)
+- `lerndax_family_settings`: `owner`, `pin_hash`
+- **Row Level Security:** Jedes Konto sieht nur eigene Zeilen. Rechte nur für angemeldete
+  Nutzer (`authenticated`); `anon` hat **keine** Rechte (ausdrücklich entzogen, weil Supabase
+  sie sonst standardmäßig vergibt).
+- Neue Fächer brauchen **keine** Datenbankänderung (`subject` unterscheidet).
+- Kostenlose Supabase-Projekte pausieren nach ca. 1 Woche ohne Nutzung; Kalender und LernDax
+  halten es gegenseitig wach. Sonst im Dashboard „Restore project“.
+
+### Service Worker & Aktualisierung
+- Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
+  auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v6`**) und neue
+  Dateien in die `SHELL`-Liste aufnehmen.
+
+### App-Icons
+- Aktuelle Dateinamen enden auf **`-v4`** (z. B. `apple-touch-icon-v4.png`). Grund: iPhones
+  halten alte Icons hartnäckig im Zwischenspeicher; ein neuer Dateiname erzwingt das neue Bild.
+  Bei einer Icon-Änderung: neue Nummer (`-v5`) und in `index.html`, `mathe/index.html`,
+  `manifest.webmanifest`, `sw.js` eintragen.
+- Größen: Dachs-Kopf 81 % in Apple-/Standard-Icons, 72 % im „maskable“-Icon (Android schneidet
+  rund zu, sichere Zone), 86 % im Favicon. Im Kopfbereich der Seite ist das Logo bewusst etwas
+  kleiner mit Rand.
+- Nach einer Icon-Änderung muss man auf dem iPhone die App vom Home-Bildschirm entfernen und
+  neu hinzufügen.
+
+### Tests
+Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `ui2.py`,
+`sync_test.py` laufen lassen.
+
+## 5. Wichtige Entscheidungen (mit Begründung)
+
+| Entscheidung | Warum |
+|---|---|
+| Prototyp zuerst nur Klasse 5 | Bruno ist in Klasse 5; erst eine Klasse richtig gut machen |
+| Lehrplan Gymnasium Sachsen als Gerüst | Brunos Schule; Reihenfolge später mit dem Schulbuch abgleichen |
+| Animationen im 3Blue1Brown-Stil | Verstehen statt auswendig lernen; Roberto mag diesen Stil |
+| Lösung nach dem Antworten zeigen, ähnliches Beispiel vorher | Wunsch von Roberto: erst selbst denken, dann sehen, wie es geht |
+| Pause und Langsam-Modus | Wunsch von Roberto: Kinder brauchen Zeit zum Mitdenken |
+| Entdecken-Bereich ausgebaut („Paket 1“) | Neugier wecken; Roberto wollte mehr davon |
+| Name Mathelix → Dachprojekt **LernDax** | Später auch Deutsch/Englisch; „Lernfux“ war schon vergeben |
+| Hosting GitHub Pages + Supabase | Kostenlos, überall erreichbar wie der Familienkalender |
+| Supabase-Tabellen **im Projekt familienkalender** statt eigenem Projekt | Kostenloser Supabase-Plan erlaubt nur 2 Projekte, beide belegt; Anmeldung mit demselben Familienkonto ist zudem praktisch |
+| Tabellen-Präfix `lerndax_` | Klare Trennung von den Kalender-Tabellen |
+| Keine Selbst-Registrierung | Nur die Familie nutzt die App; Konten verwaltet der Admin |
+| GitHub-Repository öffentlich | Kostenloses GitHub Pages; im Code steht nur der öffentliche Schlüssel, die Daten schützt die Datenbank (RLS) |
+| Alte Tabellen `mathelix_…` gelöscht | Waren leer, nach der Umbenennung überflüssig (`supabase/2026-11-10_mathelix-tabellen-entfernen.sql`) |
+| Service Worker „erst Netz“ | Sonst sahen Handys alte Versionen (z. B. alte Icons) |
+| Avatare als eigene Figuren | Kinder mögen Personalisierung; keine geschützten Figuren |
+
+## 6. Regeln für die Arbeit an LernDax
+
+1. **Nichts am Familienkalender ändern**: weder Code noch Kalender-Tabellen noch
+   Anmelde-Einstellungen (Site URL, Registrierung, E-Mail-Vorlagen) noch Konten. Der Kalender
+   wird im eigenen Claude-Projekt „Familienkalender“ gepflegt.
+2. Nur den **öffentlichen Schlüssel** (`sb_publishable_…`) verwenden, **nie** den geheimen
+   (`service_role`/`secret`).
+3. **Passwörter tippt Roberto selbst** ein (Supabase, GitHub, App-Anmeldung).
+4. Vor Löschungen oder anderen nicht umkehrbaren Änderungen in der Datenbank **fragen**.
+   Neue Spalten/Tabellen nur additiv und immer auch in `supabase/schema.sql` nachtragen.
+5. `notizen/` bleibt lokal und kommt nicht auf GitHub.
+6. Nach jeder Änderung: Tests laufen lassen → `VERSION` in `web/sw.js` erhöhen → auf GitHub
+   pushen → live prüfen → Dateien in den OneDrive-Ordner kopieren → **diese Datei aktualisieren**.
+7. Kindgerecht und datensparsam: nur Vornamen, keine Werbung, kein Tracking, keine
+   Chat- oder Sozialfunktionen.
+
+## 7. Verbindung zum Familienkalender
+
+- **Gemeinsam:** Supabase-Projekt `familienkalender` und dessen Familienkonten.
+- **Getrennt:** LernDax hat nur seine `lerndax_`-Tabellen; Kalender-Code und -Tabellen fasst
+  LernDax nicht an.
+- **Link im Kalender:** Am 10.11.2026 hat Roberto dem Claude-Projekt „Familienkalender“ einen
+  Auftrag für einen Link zu LernDax (Bezeichnung „📚 LernDax“ bzw. „Lernen“, Ziel
+  https://robertoschiwon-prog.github.io/lerndax/) weitergegeben. Ob und wie er umgesetzt ist,
+  steht im Familienkalender-Projekt (dessen `status.md`).
+- **Empfohlener Hinweis für das Kalender-Projekt** (von Roberto dort einzutragen): Die Tabellen
+  `lerndax_profiles`, `lerndax_progress`, `lerndax_family_settings` gehören LernDax und dürfen
+  nicht verändert oder gelöscht werden; Anmelde-Einstellungen und Konten nicht ohne Rücksprache
+  ändern, weil LernDax davon abhängt.
+- **Ordner nicht gegenseitig freigeben.** Für gemeinsame Funktionen (z. B. „Heute geübt“ im
+  Kalender) liefert LernDax eine Beschreibung, wie der Kalender den Lernstand aus
+  `lerndax_progress` liest (`state.days` enthält die Übungstage).
+
+## 8. Stolpersteine, die schon gelöst sind
+
+- **iPhone zeigte altes, zu kleines Icon:** Ursache war Zwischenspeicher (Service Worker +
+  Browser). Lösung: Service Worker „erst Netz“, Icons mit neuem Namen (`-v4`), App neu zum
+  Home-Bildschirm hinzufügen.
+- **Supabase gab Tabellen keine Rechte bzw. `anon` hatte zu viele:** Rechte in `schema.sql`
+  ausdrücklich gesetzt bzw. entzogen.
+- **GitHub Pages:** musste einmalig in den Repository-Einstellungen auf „GitHub Actions“
+  gestellt werden.
+- **Claude darf manche Dinge nicht selbst:** öffentliche Repositories anlegen, Berechtigungen
+  vergeben, Passwörter eingeben → macht Roberto.
+- **Missverständnis „Dax größer“:** gemeint war der Dachs-Kopf im Icon, nicht der Schriftzug.
+- **Ordner Familienkalender:** Claude hat dort nie geschrieben; der Kalender-Code liegt im
+  Claude-Projekt „Familienkalender“.
+
+## 9. Offene Punkte & Ideen
+
+**Als Nächstes sinnvoll**
+- [ ] Bruno sucht sich seinen Avatar aus und testet (Vorlage: `notizen/feedback.md`, Testrunde 1)
+- [ ] Offene Fragen klären: Welches Mathebuch nutzt die Klasse? Welche Themen sind gerade dran,
+      wann ist die nächste Arbeit?
+- [ ] Reihenfolge der Themen mit dem Schulbuch abgleichen
+- [ ] „Lösung als Animation“ (wie bei Primzahlen) auf weitere Themen übertragen
+- [ ] Hinweis zu den `lerndax_`-Tabellen in der `status.md` des Familienkalenders (Roberto)
+- [ ] Prüfen, ob der LernDax-Link im Familienkalender eingebaut ist
+
+**Später**
+- [ ] Klasse 6 (Gebrochene Zahlen, Zuordnungen, Dreiecke & Vierecke, Prismen, Anteile), dann
+      Klasse 4 und die übrigen Klassen
+- [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …) als Belohnung
+- [ ] Klassenarbeits-Training, verknüpft mit Terminen aus dem Familienkalender
+- [ ] „Heute geübt“ im Familienkalender anzeigen (gemeinsam mit dem Kalender-Projekt)
+- [ ] Elternbereich von Mathelix auf die Startseite verlegen, sobald ein zweites Fach kommt
+- [ ] Fächer Deutsch und Englisch
+
+## 10. Verlauf
+
+**10.11.2026** (alles in einem langen Chat mit Claude)
+- Idee: Mathe-App für Bruno; Lehrplan Gymnasium Sachsen ausgewertet; Prototyp Klasse 5 als
+  „Mathelix“ gebaut (22 Themen, Tipps, Lösungswege).
+- Erklär-Animationen (u. a. π-Rad), Primzahl-Erklärung überarbeitet, Lösung nach dem Antworten,
+  Pause/Langsam-Modus, Entdecken-Paket (14 Staunen-Momente).
+- Synchronisation: GitHub Pages + Supabase im Projekt familienkalender, Anmeldung mit
+  Familienkonto, Eltern-PIN; Repository angelegt, Pages eingeschaltet, Rechte korrigiert.
+- Umbau zum Dachprojekt **LernDax** (Plattform + Fächer), Repository umbenannt, alte
+  `mathelix_`-Tabellen entfernt, Brunos Profil angelegt.
+- Link-Auftrag an das Familienkalender-Projekt übergeben.
+- Dachs-Kopf in App-Icons größer, Zwischenspeicher-Problem auf dem iPhone gelöst, Logo im
+  Kopfbereich mit mehr Rand.
+- **Avatare** eingeführt (Spalte `avatar` in `lerndax_profiles`, Version `lerndax-v6`).
+- Tests ins Projekt übernommen (`tests/`), diese Datei angelegt.

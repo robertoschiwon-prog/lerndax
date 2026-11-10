@@ -8,6 +8,8 @@ Der Name zwinkert LernSax zu, der Schulplattform aller sächsischen Schulen. „
 
 Online: **https://robertoschiwon-prog.github.io/lerndax/**
 
+> Neu hier? Zuerst **`STAND.md`** lesen: Dort steht alles, was bisher besprochen, entschieden und gebaut wurde.
+
 ---
 
 ## Projektsteckbrief
@@ -63,13 +65,15 @@ LernDax
 |---|---|
 | `web/` | Alles, was online geht (wird automatisch veröffentlicht) |
 | `web/index.html` | LernDax-Startseite mit den Fächern |
-| `web/plattform/` | Gemeinsame Teile: Einstellungen (`config.js`), Synchronisation (`sync.js`) |
+| `web/plattform/` | Gemeinsame Teile: Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`) |
 | `web/mathe/` | **Mathelix**: App, `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
 | `web/icons/` | Dachs-Logo und App-Icons |
 | `faecher/mathe/lehrplan/` | Lehrplan-Auswertung Mathe |
 | `supabase/` | Datenbank-Schema (`lerndax_`-Tabellen im Familienkalender-Projekt) |
 | `notizen/` | Feedback und Ideen. Bleibt lokal und kommt nicht auf GitHub |
+| `tests/` | Automatische Tests (siehe `tests/README.md`) |
 | `SETUP.md` | Technik: Webadresse, Datenbank, neue Version veröffentlichen |
+| `STAND.md` | **Projektgedächtnis:** was fertig ist, Entscheidungen, Technik, offene Punkte, Verlauf |
 
 ## Ein neues Fach hinzufügen
 
@@ -94,8 +98,9 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Familienkonto (wie Familienkalender), Kind-Profile, Eltern-PIN, Synchronisation
 - [x] Installierbare App, offline nutzbar
 - [x] LernDax-Startseite mit Fächern
+- [x] Avatare (12 Figuren × 8 Farben), im Profil synchronisiert
 - [ ] Elternbereich von Mathelix auf die Startseite verlegen (sobald ein zweites Fach kommt)
-- [ ] Link „📚 LernDax“ im Familienkalender
+- [ ] Link „📚 LernDax“ im Familienkalender (Auftrag an das Kalender-Projekt übergeben)
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …), Klassenarbeits-Training mit Kalender
 
 **Weitere Fächer**
