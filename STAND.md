@@ -30,6 +30,13 @@ Weitere Dokumente:
   3. Vor dem Antworten ein ähnliches Beispiel, nach dem Antworten die Lösung genau dieser Aufgabe.
   4. „Entdecken“: Staunen-Momente und visuelle Beweise, die neugierig machen.
   5. Fortschritt auf allen Geräten gleich (Handy, Tablet, Computer).
+- **Schulbücher (Klasse 5):**
+  - Mathe: **Lambacher Schweizer 5, Mathematik für Gymnasien, Sachsen** (Klett)
+  - Deutsch: **Deutschbuch 5 Gymnasium** (Cornelsen, Ausgabe „Mit digitalen Medien“)
+  - Englisch: **Green Line 1** (Klett)
+  Aufgaben aus den Büchern werden **nicht** abgeschrieben; LernDax erzeugt eigene Aufgaben zu
+  denselben Themen. Seitenzahlen dienen nur zur Orientierung.
+- **Nächste Klassenarbeit:** **Mathe am 24.11.2026** (Details in Abschnitt 9).
 - **Name:** **LernDax**. Anspielung auf **LernSax** (Schulplattform aller sächsischen Schulen),
   „Dax“ klingt wie **Dachs**, das Maskottchen. Das Mathe-Fach heißt **Mathelix**.
 
@@ -277,10 +284,35 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 
 ## 9. Offene Punkte & Ideen
 
+**Vorrang: Mathe-Klassenarbeit am 24.11.2026**
+
+Themen laut Zettel der Lehrerin (Übungsseiten im Lambacher Schweizer in Klammern):
+1. Vorrangregeln und Rechengesetze: Kommutativ-, Assoziativ-, Distributivgesetz (S. 21–29)
+2. Potenzen (S. 30–31)
+3. Teilbarkeit und Primzahlen (S. 33–37)
+4. Schriftliches Dividieren (S. 40)
+Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53).
+
+Abgleich mit Mathelix (10.11.2026):
+| Thema | Stand in Mathelix | Fehlt |
+|---|---|---|
+| Vorrangregeln & Rechengesetze | „Geschickt rechnen“ **nutzt** die Gesetze nur | Vorrangregeln (Klammer zuerst, Punkt vor Strich, Potenz vor Punkt) fehlen ganz; Gesetze erkennen und benennen fehlt |
+| Potenzen | nur Quadratzahlen bis 20² und Zehnerpotenzen | allgemeine Potenzen (2³, 3⁴ …), Basis/Exponent, „als Potenz schreiben“ |
+| Teilbarkeit & Primzahlen | gut abgedeckt (Regeln, Primzahltest, Primfaktorzerlegung) | evtl. Teilermengen |
+| Schriftliches Dividieren | nur dreistellig durch einstellig, mit Rest | größere Zahlen, Probe; zweistellige Teiler? (im Buch S. 36–40 prüfen) |
+
+Geplante Schritte (Vorschlag vom 10.11., Freigabe durch Roberto offen):
+- [ ] Neues Thema „Vorrangregeln“ mit Animation (Rechenbaum, der von innen nach außen
+      zusammenschrumpft) und Aufgaben „Welches Rechengesetz wurde benutzt?“
+- [ ] Potenzen erweitern (2⁵ = 2·2·2·2·2, Basis/Exponent, Verknüpfung zum Reis-Schachbrett)
+- [ ] Division (größere Zahlen, Probe) und Teilermengen ergänzen
+- [ ] Kachel „Klassenarbeit 24.11.“ in Mathelix: Countdown, tägliche Runde nur aus diesen Themen,
+      schwache Themen häufiger, „wie fit bin ich“ je Thema
+- Symmetrie, Würfelnetze/Quader-Ansichten, unechte Brüche, Fermi-Aufgaben: **nach** der Arbeit
+
 **Als Nächstes sinnvoll**
 - [x] Testrunde 1 mit Bruno (10.11.2026)
-- [ ] Offene Fragen klären: Welches Mathebuch nutzt die Klasse? Welche Themen sind gerade dran,
-      wann ist die nächste Arbeit?
+- [x] Schulbücher und nächste Arbeit geklärt (siehe Abschnitt 1)
 - [ ] Reihenfolge der Themen mit dem Schulbuch abgleichen
 - [ ] „Lösung als Animation“ (wie bei Primzahlen) auf weitere Themen übertragen
 - [ ] Hinweis zu den `lerndax_`-Tabellen in der `status.md` des Familienkalenders (Roberto)
@@ -290,7 +322,7 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 - [ ] Klasse 6 (Gebrochene Zahlen, Zuordnungen, Dreiecke & Vierecke, Prismen, Anteile), dann
       Klasse 4 und die übrigen Klassen
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …) als Belohnung
-- [ ] Klassenarbeits-Training, verknüpft mit Terminen aus dem Familienkalender
+- [ ] Klassenarbeits-Training dauerhaft (für jede Arbeit), später verknüpft mit Terminen aus dem Familienkalender
 - [ ] „Heute geübt“ im Familienkalender anzeigen (gemeinsam mit dem Kalender-Projekt)
 - [ ] Elternbereich von Mathelix auf die Startseite verlegen, sobald ein zweites Fach kommt
 - [ ] Fächer Deutsch und Englisch
@@ -314,3 +346,5 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 - Testrunde mit Bruno erledigt.
 - **Themen-Symbole** neu gezeichnet und größer (44 statt 34 Pixel); orange „×“-Kästchen
   in der Mathelix-Kopfzeile entfernt (Version `lerndax-v7`).
+- Schulbücher und Mathe-Klassenarbeit am 24.11. eingetragen, Abgleich der Arbeitsthemen mit
+  Mathelix, Plan für die zwei Wochen bis zur Arbeit.
