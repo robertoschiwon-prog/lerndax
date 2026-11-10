@@ -18,8 +18,13 @@ Weitere Dokumente:
 
 ## 1. Worum es geht
 
-- **Für wen:** Bruno, Klasse 5, Gymnasium Klotzsche (Dresden, Sachsen). Später Klasse 1–10,
-  eventuell Geschwister oder Freunde.
+- **Für wen:** Bruno, Klasse 5, Gymnasium Klotzsche (Dresden, Sachsen). Mit ihm wächst LernDax
+  bis Klasse 10. **Keine Geschwister.** Später eventuell Klassenkameraden (Trainingsseiten per
+  Link), irgendwann vielleicht öffentlich (siehe Abschnitt 9).
+- **Geräte:** Bruno hat **kein eigenes Handy**. Er übt an **Robertos Handy (iPhone)**, am
+  **Computer** und gelegentlich am **Tablet**. Deshalb muss alles auf allen drei gut aussehen und
+  der Lernstand zwischen den Geräten synchronisiert sein.
+- **Übungsziel:** **eine Runde pro Tag** (Tagesziel, freundlich angezeigt, ohne Druck).
 - **Auftraggeber:** Roberto Schiwon (Vater). Er programmiert nicht selbst; Claude baut, Roberto
   entscheidet und testet. Kommunikation auf Deutsch, verständlich, ohne Fachchinesisch.
 - **Ziel:** Schulstoff **verstehen statt pauken**. Wichtigstes Vorbild: die Videos von
@@ -86,6 +91,10 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   Fitness je Thema = Trefferquote der letzten Aufgaben × min(1, bearbeitete Aufgaben / 8).
   **Neue Arbeit anlegen:** in `trainings.js` einen Eintrag ergänzen (keine Namen von Schule,
   Lehrkraft oder Kind!), `VERSION` erhöhen, Link weitergeben.
+- **Tagesziel** (seit 10.11.2026, Wunsch Roberto): „🎯 Tagesziel: eine Runde“ unter der Begrüßung
+  in Mathelix und auf der Trainingsseite; nach der ersten vollständigen Runde des Tages grün
+  „Tagesziel geschafft ✓“, auf der Ergebnisseite „Tagesziel für heute geschafft!“. Gezählt in
+  `rounds` (Runden pro Tag, letzte 60 Tage) und **mit synchronisiert** (pro Tag gilt der höhere Wert).
 - **Avatare** (seit 10.11.2026): 12 eigene, gezeichnete Figuren (Fuchs, Eule, Pinguin, Katze,
   Hund, Igel, Waschbär, Drache, Roboter, Krake, Faultier, Axolotl) × 8 Hintergrundfarben
   (Orange, Blau, Grün, Lila, Gelb, Pink, Türkis, Nacht). Auswahl öffnet sich beim ersten Besuch
@@ -198,7 +207,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 (Reihenfolge in `DISC_ORDER` in `web/mathe/index.html`).
 
 ### Lernstand (pro Gerät im Browser, `localStorage`)
-- `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, ok, …}}, days:[JJJJ-MM-TT], total, seen:{<id>:true}, resetAt }`
+- `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, ok, …}}, days:[JJJJ-MM-TT], total, seen:{<id>:true}, rounds:{JJJJ-MM-TT: n}, resetAt }`
 - `lerndax.device` (aktives Profil), `lerndax.auth` (Anmeldung), `lerndax.avatar`
   (z. B. `fuchs:blau`), `lerndax.avatar.pending` (noch nicht hochgeladen),
   `lerndax.avatar.asked` (Auswahl wurde schon einmal automatisch gezeigt).
@@ -206,6 +215,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Synchronisation (Zusammenführen)
 - Pro Thema gewinnt der Stand mit mehr bearbeiteten Aufgaben (`n`).
 - Übungstage (`days`) und angesehene Erklärungen (`seen`) werden vereinigt.
+- Runden pro Tag (`rounds`, Tagesziel): je Tag der höhere Wert, letzte 60 Tage.
 - `total` = Maximum. `resetAt` (Zeitpunkt von „Fortschritt löschen“) verwirft alles Ältere.
 - Avatar: lokale Änderung wird hochgeladen; sonst gilt der Avatar aus dem Profil; ist das
   Profil leer, wird der lokale hochgeladen.
@@ -227,7 +237,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v13`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v14`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -385,8 +395,8 @@ Infos zur ersten Arbeit:
 - [ ] Trainingsseite für die **Mathe-Vergleichsarbeit 03.02.2027**, sobald die Themen bekannt sind
 - [ ] Idee: „Lange Nacht der Mathematik“ (online, mathenacht.de, nächste am 20.11.2026) im Entdecken-
       Bereich oder Familienkalender erwähnen?
-- [ ] Nach der Arbeit (24.11.): Eintrag in `trainings.js` stehen lassen oder entfernen? (Die Seite
-      zeigt danach „ist vorbei, Üben lohnt sich trotzdem“.)
+- [x] Nach der Arbeit (24.11.): Trainingsseite **bleibt stehen** (Entscheidung Roberto, 10.11.), auch
+      als Beispiel für spätere Jahrgänge bzw. eine mögliche öffentliche Version.
 - Danach (Lehrplan-Lücken): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, unechte
   Brüche/gemischte Zahlen, Überschlag, Fermi-Aufgaben
 
@@ -401,6 +411,11 @@ Infos zur ersten Arbeit:
 - [ ] Prüfen, ob der LernDax-Link im Familienkalender eingebaut ist
 
 **Später**
+- [ ] Idee Roberto (10.11.2026): **LernDax irgendwann öffentlich machen**, mit den Trainingsseiten
+      als Beispielen. Wäre dann nötig: eigene Datenbank (nicht im Familienkalender-Projekt),
+      Registrierung bzw. Konten für Fremde, Impressum und Datenschutzerklärung, keine Familien-
+      oder Schulnamen mehr in Repository und Doku (`STAND.md`, `README.md` nennen heute Bruno und
+      die Schule), Rechte an Buchseitenangaben prüfen. Nicht beschlossen.
 - [ ] Klasse 6 (Gebrochene Zahlen, Zuordnungen, Dreiecke & Vierecke, Prismen, Anteile), dann
       Klasse 4 und die übrigen Klassen
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …) als Belohnung
@@ -451,6 +466,9 @@ Infos zur ersten Arbeit:
   blieb der Rest der Zeile hochgestellt (leeres `<tspan>` wird vom Browser ignoriert, jetzt mit
   unsichtbarem Zeichen). Markierungs-Kästen werden jetzt nach der gemessenen Textgröße gesetzt
   (`fitBox`, auch bei der Division). Version `lerndax-v13`.
+- Entscheidungen Roberto: keine Geschwister; Bruno übt an Papas iPhone, am Computer und Tablet;
+  Ziel eine Runde pro Tag; Trainingsseite bleibt nach der Arbeit stehen; Idee „später öffentlich“.
+- **Tagesziel** eingebaut und mit synchronisiert (Version `lerndax-v14`).
 - **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
   mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
   (Version `lerndax-v8`). Aufgabenarten:

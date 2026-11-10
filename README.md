@@ -20,8 +20,8 @@ statt beschrieben (Animationen im Stil von 3Blue1Brown), und kleine Staunen-Mome
 neugierig auf mehr.
 
 **Für wen**
-Zuerst Bruno (Klasse 5, Gymnasium Klotzsche, Dresden). Später weitere Klassen, Geschwister
-oder Freunde.
+Zuerst Bruno (Klasse 5, Gymnasium Klotzsche, Dresden), mit ihm bis Klasse 10. Später eventuell
+Klassenkameraden (Trainingsseiten per Link), irgendwann vielleicht öffentlich.
 
 **Grundsätze**
 1. **Lehrplan als Gerüst:** Themen und Reihenfolge nach dem sächsischen Lehrplan,
