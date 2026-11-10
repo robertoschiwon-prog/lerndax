@@ -485,7 +485,7 @@
         place(n <= 24 ? layout(1) : layout(Math.ceil(n / 12)), 1);
       }
       async function playPrime() {
-        api.say(`Eine <b>Primzahl</b> ist eine Zahl, die man <b>nur durch 1 und sich selbst</b> teilen kann.<br>Wir testen das mit <b>${n} Plättchen</b>: Lassen sie sich zu einem Rechteck legen?`);
+        api.say(`Eine <b>Primzahl</b> hat <b>genau zwei Teiler</b>: 1 und sich selbst. (Die 1 ist keine Primzahl, sie hat nur einen Teiler.)<br>Wir testen das mit <b>${n} Plättchen</b>: Lassen sie sich zu einem Rechteck legen?`);
         await api.wait(3600);
         let found = 0, r;
         for (r = 2; r * r <= n; r++) {

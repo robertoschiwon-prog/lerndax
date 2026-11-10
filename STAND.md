@@ -238,7 +238,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v15`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v16`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -387,6 +387,10 @@ Infos zur ersten Arbeit:
       (Teiler), Verdoppeln und Würfel (Potenzen), gleichmäßig verteilen (Teilbarkeit); jede
       Textaufgabe öffnet die passende Animation. Auf der Trainingsseite als Block „Querbeet:
       Textaufgaben“ (S. 45–47). Vorsorglich ergänzt, Abgleich mit dem Buch steht noch aus.
+- [x] **Prüfung aller Aufgaben** (10.11.2026, `lerndax-v16`): je Thema 20 000 Aufgaben erzeugt und
+      durchgesehen, Fehler behoben (siehe Verlauf).
+- [ ] **Entscheidung Roberto:** Das GitHub-Repository ist öffentlich, `README.md` und `STAND.md` nennen
+      Brunos Namen, die Schule, Dresden und die Termine der Arbeiten. Kürzen/neutral formulieren?
 - [ ] Mit Bruno testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler & Vielfache, Textaufgaben
 - [ ] Trainingsseite mit Bruno testen
 - [x] Auftrag an das Familienkalender-Projekt übergeben (10.11.2026, 19:50, mit Robertos OK;
@@ -485,3 +489,19 @@ Infos zur ersten Arbeit:
     „Welche Rechnung ergibt …?“ (Klammer ja/nein)
   - Rechengesetze: Gesetz benennen (Auswahl mit Fach- und deutschem Namen), Lücken füllen,
   „Stimmt das?“ (Kommutativ-/Assoziativgesetz gelten nicht für − und :), ausklammern
+- **Prüfung aller Aufgaben** (Wunsch Roberto, Version `lerndax-v16`). Behoben:
+  - Fahrpläne: Lösungsweg zeigte negative Minuten, wenn die Fahrt vor der vollen Stunde endet;
+    „Wie lange dauert die Fahrt?“ rechnet jetzt wie im Tipp über die volle Stunde.
+  - Geld immer mit zwei Nachkommastellen (5,60 € statt 5,6 €), Preise realistisch (Brezel 0,60–1,50 €).
+  - Dezimalzahlen mal einstellig: Faktor hat immer zwei Nachkommastellen, sonst passte der Lösungsweg nicht.
+  - „Zahlen vergleichen“: nie mehr zwei gleich aussehende Zahlen (gleich große als 0,56 und 0,560).
+  - Tipp bei · 10 / : 10 sagt jetzt wie die Animation: „Die Ziffern rücken, das Komma bleibt.“
+  - Primfaktoren dürfen auch mit Hochzahl eingegeben werden (2^3·5 oder 2³·5); die Lösung zeigt beide Schreibweisen.
+  - Weniger Raten: „Teiler & Vielfache“ nur noch 30 % Ja/Nein (neu: „Welche Zahl ist durch 6 teilbar?“
+    mit 4 Auswahlen), Primzahlen nur noch 25 % Ja/Nein (neu: „Welche Zahl ist eine Primzahl?“).
+  - Texte: „von 72 Kindern“, „ein Siebtel“ statt „ein 7tel“, Potenz-Tipp „kommt 5-mal als Faktor vor“
+    (bei hoch 1 kein „Nicht 7 · 1!“ mehr), Primzahl-Erklärung: „genau zwei Teiler, die 1 ist keine Primzahl“.
+  - Keine echten Namen mehr in Aufgaben (vorher „Bruno“, „5d“, „5b“): Textaufgaben in der Du-Form
+    oder mit neutralen Vornamen, weil die Trainingsseite per Link öffentlich ist.
+  - Schriftliches Dividieren höchstens vierstellig (vorher bis 21 600), wie in der Doku beschrieben.
+  - Doku: README-Fahrplan (Kalender-Knopf erledigt), SETUP (kein eigenes Handy).

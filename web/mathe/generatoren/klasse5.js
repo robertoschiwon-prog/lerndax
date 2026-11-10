@@ -52,6 +52,10 @@
     return f;
   };
   const sup = (n) => `<sup>${n}</sup>`;
+  // Neutrale Vornamen für Textaufgaben (keine echten Namen: Trainingsseiten sind per Link öffentlich)
+  const NAMEN = ['Lina', 'Emil', 'Mia', 'Paul', 'Ida', 'Ben', 'Lea', 'Noah'];
+  // Geld immer mit zwei Stellen nach dem Komma: 5,60 €
+  const euro = (cents) => `${fmt(Math.floor(cents / 100))},${String(cents % 100).padStart(2, '0')} €`;
 
   Object.assign(U, { R, pick, shuffle, gcd, fmt, fr, round6 });
 
@@ -439,7 +443,11 @@
         prompt: `Berechne: <b>${b}${sup(e)}</b>`,
         ex: { mode: 'pow', b, e },
         fields: [{ answer: b ** e }],
-        hint: `Die Basis ${b} wird <b>${e}-mal</b> mit sich selbst malgenommen. Nicht ${b} · ${e}!`,
+        hint: e === 1
+          ? `Hoch 1 heißt: Die ${b} kommt nur <b>einmal</b> als Faktor vor.`
+          : b === 1
+            ? 'Die 1 kommt mehrmals als Faktor vor: 1 · 1 · 1 · …'
+            : `Die Basis ${b} kommt <b>${e}-mal</b> als Faktor vor: ${prod(b, Math.min(e, 3))}${e > 3 ? ' · …' : ''}. Nicht ${b} · ${e}!`,
         solution: `${b}${sup(e)} = ${e > 1 ? prod(b, e) + ' = ' : ''}<b>${fmt(b ** e)}</b>${e === 1 ? ' (hoch 1: die Zahl selbst)' : b === 1 ? ' (1 mal 1 bleibt immer 1)' : ''}`,
       };
     }
@@ -463,7 +471,7 @@
         ex: { mode: 'pow', b, e },
         choices: opts.map(fmt),
         correct: opts.indexOf(b ** e),
-        hint: `Hochzahl heißt: ${b} so oft malnehmen, wie der Exponent sagt.`,
+        hint: `Der Exponent sagt, wie oft die ${b} als Faktor vorkommt.`,
         solution: `${b}${sup(e)} = ${prod(b, e)} = <b>${fmt(b ** e)}</b><br><small>Achtung: ${b} · ${e} = ${b * e} ist ein häufiger Fehler!</small>`,
       };
     }
@@ -526,10 +534,10 @@
       };
     }
     if (v === 2) {
-      // größere Zahl, geht glatt auf (auch mit Null im Ergebnis)
+      // größere Zahl (höchstens vierstellig), geht glatt auf (auch mit Null im Ergebnis)
       const d = R(3, 9);
       let q;
-      do q = R(105, 2400); while (Math.random() < 0.6 && !String(q).slice(1).includes('0'));
+      do q = R(105, Math.floor(9999 / d)); while (Math.random() < 0.6 && !String(q).slice(1).includes('0'));
       const n = d * q;
       return {
         prompt: `Dividiere schriftlich: <b>${fmt(n)} : ${d}</b>`,
@@ -608,9 +616,9 @@
       // Verteilen mit Rest
       const ctx = pick([
         ['Kronkorken', 'sammelt die Klasse', 'in einen Beutel', 'Beutel', 'Kronkorken'],
-        ['Fotos', 'hat Bruno', 'auf eine Albumseite', 'Albumseiten', 'Foto'],
+        ['Fotos', `hat ${pick(NAMEN)}`, 'auf eine Albumseite', 'Albumseiten', 'Foto'],
         ['Murmeln', 'hat die Schule für das Sportfest', 'in ein Säckchen', 'Säckchen', 'Murmel'],
-        ['Kastanien', 'sammelt die 5d', 'in einen Korb', 'Körbe', 'Kastanie'],
+        ['Kastanien', 'sammelt eine fünfte Klasse', 'in einen Korb', 'Körbe', 'Kastanie'],
       ]);
       const d = R(3, 9), n = R(150, 2000), q = Math.floor(n / d), r = n % d;
       return {
@@ -630,14 +638,14 @@
       const pay = Math.ceil(sum / 10) * 10 + (sum % 10 === 0 ? 10 : 0);
       if (Math.random() < 0.5)
         return {
-          prompt: `Bruno kauft <b>${a} ${k[0]}</b> zu je <b>${p} €</b> und dazu <b>${x[0]}</b> für <b>${x[1]} €</b>. Wie viel muss er bezahlen?`,
+          prompt: `Du kaufst <b>${a} ${k[0]}</b> zu je <b>${p} €</b> und dazu <b>${x[0]}</b> für <b>${x[1]} €</b>. Wie viel musst du bezahlen?`,
           fields: [{ answer: sum, suffix: '€' }],
           hint: 'Schreib zuerst eine Rechnung auf. Denk an Punkt vor Strich.',
           solution: `Rechnung: <b>${a} · ${p} + ${x[1]}</b><br>Punkt vor Strich: ${a} · ${p} = ${a * p}, dann ${a * p} + ${x[1]} = <b>${sum} €</b>`,
           ex: { mode: 'tree', e: `${a} · ${p} + ${x[1]}`, via: 'k5-vorrang' },
         };
       return {
-        prompt: `Bruno kauft <b>${a} ${k[0]}</b> zu je <b>${p} €</b> und <b>${x[0]}</b> für <b>${x[1]} €</b>. Er bezahlt mit <b>${pay} €</b>. Wie viel Geld bekommt er zurück?`,
+        prompt: `Du kaufst <b>${a} ${k[0]}</b> zu je <b>${p} €</b> und <b>${x[0]}</b> für <b>${x[1]} €</b>. Du bezahlst mit <b>${pay} €</b>. Wie viel Geld bekommst du zurück?`,
         fields: [{ answer: pay - sum, suffix: '€' }],
         hint: 'Rechne erst aus, was alles zusammen kostet. Achtung: Klammer!',
         solution: `Rechnung: <b>${pay} − (${a} · ${p} + ${x[1]})</b><br>Klammer zuerst: ${a} · ${p} + ${x[1]} = ${sum}, dann ${pay} − ${sum} = <b>${pay - sum} €</b>`,
@@ -736,9 +744,11 @@
     10: 'Eine Zahl ist durch 10 teilbar, wenn ihre letzte Ziffer 0 ist.',
   };
   function teilbarkeit() {
+    // Mischung: Teilermengen 25 %, Vielfache 25 %, „Welche ist teilbar?“ (4 Auswahl) 20 %, Ja/Nein 30 %
     const roll = Math.random();
     if (roll < 0.25) return teiler();
-    if (roll < 0.45) return vielfache();
+    if (roll < 0.5) return vielfache();
+    if (roll < 0.7) return teilbarAuswahl();
     const d = pick([2, 3, 4, 5, 6, 9, 10, 3, 4, 6]);
     const yes = Math.random() < 0.5;
     let n = d * R(Math.ceil(100 / d), Math.floor(99999 / d));
@@ -759,8 +769,48 @@
     };
   }
 
+  // Welche von vier Zahlen ist durch d teilbar? (weniger Raten als Ja/Nein)
+  function teilbarAuswahl() {
+    const d = pick([3, 4, 6, 9, 3, 4, 6, 9, 2, 5]);
+    const right = d * R(Math.ceil(100 / d), Math.floor(9999 / d));
+    const wrong = new Set();
+    while (wrong.size < 3) {
+      const w = d * R(Math.ceil(100 / d), Math.floor(9999 / d)) + R(1, d - 1);
+      if (w % d !== 0 && w <= 9999 && w !== right) wrong.add(w);
+    }
+    const opts = shuffle([right, ...wrong]);
+    const check = (n) => (d === 3 || d === 9) ? `Quersumme ${qs(n)}`
+      : d === 4 ? `letzte zwei Ziffern ${String(n % 100).padStart(2, '0')}`
+        : d === 6 ? `${n % 2 === 0 ? 'gerade' : 'ungerade'}, Quersumme ${qs(n)}`
+          : `letzte Ziffer ${n % 10}`;
+    return {
+      prompt: `Welche Zahl ist durch <b>${d}</b> teilbar?`,
+      ex: { mode: 'teil', n: right, d, via: 'k5-teilbar' },
+      choices: opts.map(fmt),
+      correct: opts.indexOf(right),
+      hint: TEILER_REGELN[d],
+      solution: `${opts.map((n) => `${fmt(n)}: ${check(n)} → ${n === right ? '<b>ja</b>' : 'nein'}`).join('<br>')}<br>→ <b>${fmt(right)}</b> ist durch ${d} teilbar.`,
+    };
+  }
+
   function primzahlen() {
-    if (Math.random() < 0.45) {
+    if (Math.random() < 0.2) {
+      // Welche ist eine Primzahl? (eine Primzahl, drei Nicht-Primzahlen, die nicht sofort auffallen)
+      const primes = []; for (let i = 11; i < 100; i++) if (isPrime(i)) primes.push(i);
+      const tricky = []; for (let i = 21; i < 100; i++) if (!isPrime(i) && i % 2 && i % 5) tricky.push(i); // 21, 27, 33, 39, 49, 51, 57, 63, 69, 77, 81, 87, 91, 93, 99
+      const p = pick(primes);
+      const wrong = shuffle(tricky).slice(0, 3);
+      const opts = shuffle([p, ...wrong]);
+      return {
+        prompt: 'Welche Zahl ist eine <b>Primzahl</b>?',
+        ex: { mode: 'prime', n: p },
+        choices: opts.map(String),
+        correct: opts.indexOf(p),
+        hint: 'Prüfe jede Zahl: Ist sie durch 3 oder 7 teilbar? Gerade Zahlen und Zahlen mit 5 oder 0 am Ende sind hier schon aussortiert.',
+        solution: `${wrong.map((n) => `${n} = ${factorize(n)[0]} · ${n / factorize(n)[0]}`).join('<br>')}<br>→ Nur <b>${p}</b> ist eine Primzahl: Teiler sind nur 1 und ${p}.`,
+      };
+    }
+    if (Math.random() < 0.32) {
       const prime = Math.random() < 0.5;
       let n;
       do n = R(11, 99); while (isPrime(n) !== prime || (!prime && (n % 2 === 0 || n % 5 === 0) && Math.random() < 0.7));
@@ -788,8 +838,13 @@
       prompt: `Zerlege <b>${n}</b> in Primfaktoren.`,
       ex: { mode: 'tree', n },
       fields: [{ answer: f, type: 'factors', placeholder: 'z. B. 2·3·3' }],
-      hint: 'Teile immer wieder durch die kleinste Primzahl, die passt (2, 3, 5, 7 …).',
-      solution: `${steps.join('<br>')}<br>→ ${n} = <b>${f.join(' · ')}</b>`,
+      hint: 'Teile immer wieder durch die kleinste Primzahl, die passt (2, 3, 5, 7 …). Du darfst auch mit Hochzahl schreiben, z. B. 2^3·5.',
+      solution: (() => {
+        const cnt = {}; f.forEach((p) => { cnt[p] = (cnt[p] || 0) + 1; });
+        const pot = Object.keys(cnt).map((p) => (cnt[p] > 1 ? `${p}${sup(cnt[p])}` : p)).join(' · ');
+        const withPow = Object.values(cnt).some((c) => c > 1);
+        return `${steps.join('<br>')}<br>→ ${n} = <b>${f.join(' · ')}</b>${withPow ? `<br>Kürzer mit Hochzahl: ${n} = <b>${pot}</b>` : ''}`;
+      })(),
       answerText: f.join(' · '),
     };
   }
@@ -829,11 +884,13 @@
   function anteile() {
     const d = R(2, 10), z = R(1, d - 1);
     const k = R(2, 12), whole = d * k;
-    const unit = pick(['', '', ' €', ' kg', ' m', ' Kinder']);
+    // [Einheit im Ergebnis, Einheit nach „von“ (Dativ)]
+    const [unit, unitVon] = pick([['', ''], ['', ''], [' €', ' €'], [' kg', ' kg'], [' m', ' m'], [' Kinder', ' Kindern']]);
+    const TEIL = { 2: 'ein Halbes', 3: 'ein Drittel', 4: 'ein Viertel', 5: 'ein Fünftel', 6: 'ein Sechstel', 7: 'ein Siebtel', 8: 'ein Achtel', 9: 'ein Neuntel', 10: 'ein Zehntel' };
     return {
-      prompt: `Berechne ${fr(z, d)} von <b>${whole}${unit}</b>.`,
+      prompt: `Berechne ${fr(z, d)} von <b>${whole}${unitVon}</b>.`,
       fields: [{ answer: z * k, suffix: unit.trim() }],
-      hint: `Erst durch den Nenner teilen (ein ${d}tel), dann mit dem Zähler malnehmen.`,
+      hint: `Erst durch den Nenner teilen (${TEIL[d]}), dann mit dem Zähler malnehmen.`,
       solution: `${whole} : ${d} = ${k}<br>${k} · ${z} = <b>${z * k}${unit}</b>`,
     };
   }
@@ -943,7 +1000,8 @@
       };
     }
     if (v === 3) {
-      const a = R(105, 2500), k = R(2, 9);
+      let a; do a = R(105, 2500); while (a % 10 === 0); // immer zwei Nachkommastellen (z. B. 3,47)
+      const k = R(2, 9);
       return {
         prompt: `Berechne: <b>${fmt(a / 100)} · ${k}</b>`,
         fields: [{ answer: (a * k) / 100 }],
@@ -957,8 +1015,8 @@
     return {
       prompt: `Berechne: <b>${fmt(a)} ${mult ? '·' : ':'} ${fmt(p)}</b>`,
       fields: [{ answer: res }],
-      hint: `Bei ${mult ? '· ' : ': '}${fmt(p)} rückt das Komma um ${e} Stelle${e > 1 ? 'n' : ''} nach ${mult ? 'rechts' : 'links'}.`,
-      solution: `Komma um ${e} Stelle${e > 1 ? 'n' : ''} nach ${mult ? 'rechts' : 'links'}: <b>${fmt(res)}</b>`,
+      hint: `Bei ${mult ? '· ' : ': '}${fmt(p)} rücken alle Ziffern um ${e} Stelle${e > 1 ? 'n' : ''} nach ${mult ? 'links' : 'rechts'}. Das Komma bleibt stehen.`,
+      solution: `Alle Ziffern rücken um ${e} Stelle${e > 1 ? 'n' : ''} nach ${mult ? 'links' : 'rechts'}, das Komma bleibt: <b>${fmt(res)}</b>`,
     };
   }
 
@@ -975,6 +1033,8 @@
       B = round6(pick([base + 0.005, base - 0.005, base * 10 / 10 + 0.01, Math.floor(base * 10) / 10 + 0.09, base]));
       if (B === A && Math.random() < 0.6) B = round6(A - 0.04);
       aTxt = `<b>${fmt(A)}</b>`; bTxt = `<b>${fmt(B)}</b>`;
+      // Gleich große Zahlen nie identisch zeigen, sondern mit angehängter Null: 0,56 und 0,560
+      if (B === A) bTxt = `<b>${fmt(B)}0</b>`;
     }
     if (Math.random() < 0.5) [A, B, aTxt, bTxt] = [B, A, bTxt, aTxt];
     const correct = Math.abs(A - B) < 1e-9 ? 2 : A > B ? 0 : 1;
@@ -1262,7 +1322,12 @@
         layout: 'time',
         fields: [{ answer: Math.floor(end / 60) % 24, label: 'Std.' }, { answer: end % 60, label: 'Min.' }],
         hint: 'Rechne zuerst bis zur nächsten vollen Stunde, dann den Rest dazu.',
-        solution: `${hm(start)} + ${dur} min:<br>bis ${hm(Math.ceil((start + 1) / 60) * 60)} sind es ${Math.ceil((start + 1) / 60) * 60 - start} min, dann noch ${dur - (Math.ceil((start + 1) / 60) * 60 - start)} min.<br>→ Ankunft <b>${hm(end)} Uhr</b>`,
+        solution: (() => {
+          const full = Math.floor(start / 60) * 60 + 60, toFull = full - start;
+          if (dur < toFull) return `${hm(start)} + ${dur} min: Die volle Stunde wird nicht erreicht.<br>${start % 60} + ${dur} = ${end % 60} → Ankunft <b>${hm(end)} Uhr</b>`;
+          if (dur === toFull) return `${hm(start)} + ${dur} min: genau bis zur vollen Stunde.<br>→ Ankunft <b>${hm(end)} Uhr</b>`;
+          return `${hm(start)} + ${dur} min:<br>bis ${hm(full)} sind es ${toFull} min, dann noch ${dur - toFull} min.<br>→ Ankunft <b>${hm(end)} Uhr</b>`;
+        })(),
         check([h, m]) {
           return { ok: h * 60 + m === end % 1440 || (h === 24 && m === end % 60 && end % 1440 < 60) };
         },
@@ -1272,26 +1337,36 @@
       prompt: `${what} nach ${dest} fährt um <b>${hm(start)} Uhr</b> ab und kommt um <b>${hm(end)} Uhr</b> an. Wie lange dauert die Fahrt?`,
       fields: [{ answer: dur, suffix: 'min' }],
       hint: 'Zähle von der Abfahrt bis zur nächsten vollen Stunde, dann weiter bis zur Ankunft.',
-      solution: `Von ${hm(start)} bis ${hm(end)}: ${hm(end)} − ${hm(start)} = <b>${dur} min</b>`,
+      solution: (() => {
+        const full = Math.floor(start / 60) * 60 + 60, toFull = full - start;
+        if (end <= full) return `Von ${hm(start)} bis ${hm(end)}: ${end % 60 || 60} − ${start % 60} = <b>${dur} min</b>`;
+        const hours = Math.floor((end - full) / 60), rest = end - full - hours * 60;
+        return `Von ${hm(start)} bis ${hm(full)}: ${toFull} min${hours ? `<br>von ${hm(full)} bis ${hm(full + hours * 60)}: ${hours * 60} min` : ''}<br>von ${hm(full + hours * 60)} bis ${hm(end)}: ${rest} min<br>zusammen: ${toFull}${hours ? ` + ${hours * 60}` : ''} + ${rest} = <b>${dur} min</b>`;
+      })(),
     };
   }
 
   function sachaufgaben() {
     const v = R(1, 3);
     if (v === 1) {
-      const item = pick([['Heft', 'Hefte'], ['Brezel', 'Brezeln'], ['Kugel Eis', 'Kugeln Eis'], ['Sammelkarte', 'Sammelkarten'], ['Apfel', 'Äpfel']]);
-      const price = R(9, 99) * 5, n = R(2, 9);
+      // [Einzahl, Mehrzahl, Artikel, Preis von … bis in Cent] – Preise ungefähr wie im Laden
+      const item = pick([
+        ['Heft', 'Hefte', 'Ein', 50, 250], ['Brezel', 'Brezeln', 'Eine', 60, 150], ['Kugel Eis', 'Kugeln Eis', 'Eine', 120, 200],
+        ['Sammelkarte', 'Sammelkarten', 'Eine', 40, 150], ['Apfel', 'Äpfel', 'Ein', 30, 90], ['Kinokarte', 'Kinokarten', 'Eine', 550, 950],
+      ]);
+      const price = R(item[3] / 5, item[4] / 5) * 5, n = R(2, 9);
       return {
-        prompt: `Ein${item[0] === 'Brezel' || item[0] === 'Kugel Eis' || item[0] === 'Sammelkarte' ? 'e' : ''} ${item[0]} kostet <b>${fmt(price / 100)} €</b>. Wie viel kosten <b>${n} ${item[1]}</b>?`,
+        prompt: `${item[2]} ${item[0]} kostet <b>${euro(price)}</b>. Wie viel kosten <b>${n} ${item[1]}</b>?`,
         fields: [{ answer: (price * n) / 100, suffix: '€' }],
         hint: 'Rechne in Cent, wenn dir das leichter fällt: Preis in Cent mal Anzahl.',
-        solution: `${price} ct · ${n} = ${price * n} ct = <b>${fmt((price * n) / 100)} €</b>`,
+        solution: `${price} ct · ${n} = ${price * n} ct = <b>${euro(price * n)}</b>`,
+        answerText: euro(price * n),
       };
     }
     if (v === 2) {
       const n = R(12, 28), per = R(8, 45);
       return {
-        prompt: `Die Klasse 5b mit <b>${n} Kindern</b> fährt ins Schullandheim. Die Fahrt kostet zusammen <b>${fmt(n * per)} €</b>. Wie viel zahlt jedes Kind?`,
+        prompt: `Eine Klasse mit <b>${n} Kindern</b> fährt ins Schullandheim. Die Fahrt kostet zusammen <b>${fmt(n * per)} €</b>. Wie viel zahlt jedes Kind?`,
         fields: [{ answer: per, suffix: '€' }],
         hint: 'Gesamtkosten durch die Anzahl der Kinder teilen.',
         solution: `${fmt(n * per)} € : ${n} = <b>${per} €</b>`,
@@ -1300,10 +1375,11 @@
     const pay = pick([5, 10, 20, 50]);
     const cost = R(Math.round(pay * 20 * 0.3), pay * 20 - 1) * 5;
     return {
-      prompt: `Du kaufst für <b>${fmt(cost / 100)} €</b> ein und bezahlst mit einem <b>${pay}-€-Schein</b>. Wie viel Wechselgeld bekommst du?`,
+      prompt: `Du kaufst für <b>${euro(cost)}</b> ein und bezahlst mit einem <b>${pay}-€-Schein</b>. Wie viel Wechselgeld bekommst du?`,
       fields: [{ answer: (pay * 100 - cost) / 100, suffix: '€' }],
       hint: 'Ergänze vom Preis bis zum bezahlten Betrag, oder rechne Schein − Preis.',
-      solution: `${pay},00 € − ${fmt(cost / 100)} € = <b>${fmt((pay * 100 - cost) / 100)} €</b>`,
+      solution: `${euro(pay * 100)} − ${euro(cost)} = <b>${euro(pay * 100 - cost)}</b>`,
+      answerText: euro(pay * 100 - cost),
     };
   }
 

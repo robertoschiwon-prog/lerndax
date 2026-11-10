@@ -101,10 +101,10 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] LernDax-Startseite mit Fächern
 - [x] Avatare (12 Figuren × 8 Farben), im Profil synchronisiert
 - [ ] Elternbereich von Mathelix auf die Startseite verlegen (sobald ein zweites Fach kommt)
-- [ ] Link „📚 LernDax“ im Familienkalender (Auftrag an das Kalender-Projekt übergeben)
+- [ ] Link „📚 LernDax“ im Familienkalender (Auftrag übergeben; ob umgesetzt, im Kalender-Projekt prüfen)
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …)
 - [x] Trainingsseiten für einzelne Klassenarbeiten (nur per Link, getrennt von der allgemeinen App)
-- [ ] Knopf „Jetzt üben“ im Familienkalender (Auftrag an das Kalender-Projekt)
+- [x] Knopf „Jetzt üben“ im Familienkalender (vom Kalender-Projekt umgesetzt, 10.11.2026)
 
 **Weitere Fächer**
 - [ ] Deutsch
