@@ -349,8 +349,12 @@ Infos zur ersten Arbeit:
       „Welche Zahl ist kein Teiler?“
 - [ ] Mit Bruno testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler
 - [ ] Trainingsseite mit Bruno testen
-- [ ] Auftrag „Jetzt üben“-Knopf an das Familienkalender-Projekt geben (Roberto, Text liegt in
-      `notizen/auftrag-familienkalender-training.md`)
+- [x] Auftrag an das Familienkalender-Projekt übergeben (10.11.2026, 19:50, mit Robertos OK;
+      Chat „LernDax Übungs-Knopf und Tabellen“ im Projekt Familienkalender): Knopf „📚 Jetzt üben“,
+      Hinweis zu den `lerndax_`-Tabellen für deren status.md, Rückfrage zum LernDax-Link.
+      Text: `notizen/auftrag-familienkalender-training.md`. Das Kalender-Projekt meldet sich mit
+      einem Vorschlag, bevor es etwas ändert.
+- [ ] Antwort des Familienkalender-Projekts abwarten (Roberto antwortet dort)
 - [ ] Nach der Arbeit (24.11.): Eintrag in `trainings.js` stehen lassen oder entfernen? (Die Seite
       zeigt danach „ist vorbei, Üben lohnt sich trotzdem“.)
 - Danach (Lehrplan-Lücken): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, unechte
