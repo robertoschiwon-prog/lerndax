@@ -29,6 +29,7 @@
   };
   const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
   const round6 = (x) => Math.round(x * 1e6) / 1e6;
+  const near = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(b));
 
   // Deutsche Zahlschreibweise: Komma, schmale Leerzeichen ab 10 000
   function fmt(x) {
@@ -944,29 +945,43 @@
     const dec = round6(p / q), pct = round6((100 * p) / q);
     const v = R(1, 4);
     const toHundred = 100 % q === 0 ? `${fr(p, q)} = ${fr(p * (100 / q), 100)}` : `${p} : ${q}`;
+    const ex = { mode: 'hund', p, q };
+    // Typischer Fehler: Nenner durch Zähler (z. B. 25 : 2 = 12,5 statt 2 : 25)
+    const inv = (want, wrongVal) => ([v]) => {
+      if (Number.isNaN(v)) return { ok: false, note: 'Gib bitte nur eine Zahl ein (Komma ist erlaubt).' };
+      if (near(v, want)) return { ok: true };
+      if ([].concat(wrongVal).some((w) => near(v, w))) return { ok: false, note: `Du hast wohl ${q} : ${p} gerechnet. Es ist umgekehrt: <b>Zähler durch Nenner</b>, also ${p} : ${q}.` };
+      return { ok: false };
+    };
     if (v === 1)
       return {
         prompt: `Schreibe als Dezimalzahl: ${fr(p, q)}`,
+        ex,
         fields: [{ answer: dec }],
+        check: inv(dec, round6(q / p)),
         hint: 'Erweitere auf Zehntel, Hundertstel oder Tausendstel, oder rechne Zähler : Nenner.',
         solution: `${toHundred} = <b>${fmt(dec)}</b>`,
       };
     if (v === 2)
       return {
         prompt: `Schreibe in Prozent: ${fr(p, q)}`,
+        ex,
         fields: [{ answer: pct, suffix: '%' }],
+        check: inv(pct, [round6(q / p), round6((100 * q) / p)]),
         hint: 'Prozent heißt „von Hundert“. Erweitere den Bruch auf den Nenner 100.',
         solution: `${toHundred} = <b>${fmt(pct)} %</b>`,
       };
     if (v === 3)
       return {
         prompt: `Schreibe als Dezimalzahl: <b>${fmt(pct)} %</b>`,
+        ex,
         fields: [{ answer: dec }],
         hint: `${fmt(pct)} % bedeutet ${fmt(pct)} Hundertstel.`,
         solution: `${fmt(pct)} % = ${fr(fmt(pct), 100)} = <b>${fmt(dec)}</b>`,
       };
     return {
       prompt: `Schreibe als gekürzten Bruch: <b>${fmt(dec)}</b>`,
+      ex,
       layout: 'frac',
       fields: [{ answer: p, label: 'Zähler' }, { answer: q, label: 'Nenner' }],
       check([a, b]) {

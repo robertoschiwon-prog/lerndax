@@ -921,27 +921,50 @@
   // =====================================================
   // Bruch · Dezimal · Prozent – Hundertertafel
   // =====================================================
+  //   ctx: { mode:'hund', p, q, ask:'prozent'|'dezimal'|'bruch' }, dazu pre/post
   reg('k5-umwandeln', {
     title: 'Die Hundertertafel',
     viewBox: '0 0 360 200',
-    create(api) {
-      let f = [3, 4], cells;
-      const list = [[1, 2], [1, 4], [3, 4], [1, 5], [2, 5], [3, 10], [1, 20], [7, 20]];
+    create(api, ctx) {
+      ctx = ctx || {};
+      const list = [[1, 2], [1, 4], [3, 4], [1, 5], [2, 5], [3, 10], [1, 20], [7, 20], [2, 25], [1, 8]];
+      let f = [3, 4], cells, half;
+      const isTask = () => ctx.post && f[0] === ctx.p && f[1] === ctx.q;
+      if (ctx.mode === 'hund' && ctx.post) f = [ctx.p, ctx.q];
+      else if (ctx.mode === 'hund' && ctx.pre) {
+        // ähnliches Beispiel: anderer Bruch; bei Achteln wieder ein Achtel (halbes Kästchen)
+        const pool = list.filter(([a, b]) => !(a === ctx.p && b === ctx.q) && ((b === 8) === (ctx.q === 8)));
+        f = pick(pool.length ? pool : [[3, 4]]);
+      }
       api.chips(list.map(([a, b]) => ({ label: `${a}/${b}`, onClick() { f = [a, b]; api.replay(); } })));
       return {
         reset() {
           api.clear(); cells = [];
           for (let i = 0; i < 100; i++) cells.push(el('rect', { x: 90 + (i % 10) * 18, y: 10 + Math.floor(i / 10) * 18, width: 16, height: 16, rx: 3, class: 'hc' }, api.svg));
+          half = null;
+          api.sub(isTask() ? 'Lösung zu deiner Aufgabe' : ctx.pre && ctx.mode === 'hund' ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
         },
         async play() {
-          const [a, b] = f, h = (100 * a) / b;
+          const [a, b] = f, h = (100 * a) / b, k = 100 / b, full = Math.floor(h);
           api.say(`Die Tafel hat 100 Kästchen. Wie viele sind ${fr(a, b)} davon?`);
-          await api.wait(1200);
-          api.say(`100 : ${b} = ${100 / b}, mal ${a} → <b>${h}</b> Kästchen`);
+          await api.wait(1400);
+          api.say(Number.isInteger(k)
+            ? `Ein ${fr(1, b)} der Tafel: 100 : ${b} = <b>${k}</b> Kästchen.`
+            : `Ein ${fr(1, b)} der Tafel: 100 : ${b} = <b>${fmt(k)}</b> Kästchen (also auch halbe Kästchen).`);
+          await api.wait(1600);
+          api.say(`${fr(a, b)} sind ${a}-mal so viel: ${a} · ${fmt(k)} = <b>${fmt(h)}</b> Kästchen`);
           let shown = 0;
-          await api.tw(Math.max(700, h * 22), (t) => { const m = Math.round(t * h); for (; shown < m; shown++) cells[shown].setAttribute('class', 'hc on'); }, (t) => t);
-          await api.wait(800);
-          api.say(`${fr(a, b)} = ${fr(h, 100)}  = <b>${fmt(h / 100)}</b>  = <b>${h} %</b><br><small>„Prozent“ heißt „von Hundert“.</small>`);
+          await api.tw(Math.max(700, h * 22), (t) => { const m = Math.min(full, Math.round(t * h)); for (; shown < m; shown++) cells[shown].setAttribute('class', 'hc on'); }, (t) => t);
+          if (h > full) {
+            const c = cells[full];
+            half = el('rect', { x: +c.getAttribute('x'), y: +c.getAttribute('y'), width: 8, height: 16, rx: 2, class: 'hc on' }, api.svg);
+          }
+          await api.wait(1000);
+          // Zeile 1: auf 100 (bzw. 1000) erweitern, Zeile 2: Dezimalzahl und Prozent
+          let line1 = '', from = fr(a, b);
+          if (Number.isInteger(k) && b !== 100) { line1 = `Erweitern mit ${k}: ${fr(a, b)} = ${fr(`${a} · ${k}`, `${b} · ${k}`)} = ${fr(h, 100)}<br>`; from = fr(h, 100); }
+          else if (!Number.isInteger(k)) { line1 = `Auf 1000 erweitern: ${fr(a, b)} = ${fr(a * (1000 / b), 1000)}<br>`; from = fr(a * (1000 / b), 1000); }
+          api.say(`${line1}${from} = <b>${fmt(h / 100)}</b> = <b>${fmt(h)} %</b><br><small>„Prozent“ heißt „von Hundert“: ${fmt(h)} von 100 Kästchen.</small>`);
         },
       };
     },

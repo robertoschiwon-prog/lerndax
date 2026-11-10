@@ -151,6 +151,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
     Zehnerpotenzen mit markierter Zeile (auch a · 10ⁿ), Quadratzahlen bis zur Zahl der Aufgabe
   - **Schriftliches Dividieren** (seit 10.11.): Stelle für Stelle wie im Heft, mit Nullen im
     Ergebnis, Rest und Probe
+  - **Bruch · Dezimal · Prozent** (seit 10.11., `lerndax-v18`): Hundertertafel mit dem Bruch der Aufgabe,
+    „Erweitern mit k“ auf Hundertstel; bei Achteln auf 1000 erweitert, halbe Kästchen werden gezeigt
   - **Teilbarkeit & Teiler** (seit 10.11.): passende Regel zur Aufgabe (Quersumme, letzte Ziffer,
     letzte zwei Ziffern, durch 6 = durch 2 und 3) bzw. Teiler-Paare
   Technik: Der Generator gibt `ex: { mode, … }` mit; die Erklärung bekommt das als `ctx` mit
@@ -240,7 +242,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v17`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v18`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -514,3 +516,7 @@ Infos zur ersten Arbeit:
   Tests und Code-Kommentare ohne Namen von Kind, Familie, Schule und Stadtteil; Fahrplan-Aufgaben
   ohne den Stadtteil der Schule. Persönliches in `notizen/familie.md` (nur lokal), dort liegt auch die
   vorherige Fassung dieser Datei (`notizen/STAND-vor-v17.md`).
+- Hinweis Auftraggeber (Bildschirmfoto „2/25 in Prozent“, Antwort 12,5): Die Animation zeigte immer 3/4
+  statt der Aufgabe. Jetzt **Lösung als Animation** mit dem Bruch der Aufgabe und ähnliches Beispiel vorher;
+  neue Chips 2/25 und 1/8. Typischer Fehler „Nenner durch Zähler“ (25 : 2 = 12,5) bekommt einen eigenen
+  Hinweis. Version `lerndax-v18`.
