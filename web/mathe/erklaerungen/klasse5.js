@@ -334,56 +334,177 @@
   });
 
   // =====================================================
-  // Quadratzahlen – Punktquadrate
+  // Potenzen – Basis/Exponent, Verdoppeln, Zehnerpotenzen, Sonderfälle, Quadratzahlen
   // =====================================================
   reg('k5-potenz', {
-    title: 'Potenzen: Quadrate und Verdoppeln',
+    title: 'Potenzen: wie oft malnehmen?',
     viewBox: '0 0 360 230',
     create(api) {
-      let mode = 'quadrat';
-      function draw(k, fresh) {
+      // Teile: grund · zwei · zehn · sonder · quad; 'alle' spielt sie nacheinander
+      let mode = 'alle';
+      const T = (x, y, cls, anchor) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': anchor || 'middle' }, api.svg);
+      const sup = (e, size) => `<tspan dy="${-size * 0.45}" font-size="${Math.round(size * 0.6)}">${e}</tspan><tspan dy="${size * 0.45}"></tspan>`;
+      const pw = (b, e, size) => `${b}${sup(e, size)}`;
+      const title = (t) => el('text', { x: 180, y: 18, class: 'ex-s f6', 'text-anchor': 'middle', text: t }, api.svg);
+
+      async function grund() {
         api.clear();
-        const s = Math.min(20, 200 / k), x0 = 180 - (k * s) / 2, y0 = 12;
-        for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) {
-          const isNew = fresh && (i === k - 1 || j === k - 1);
-          el('circle', { cx: x0 + j * s + s / 2, cy: y0 + i * s + s / 2, r: s * 0.36, class: isNew ? 'dotN' : 'dotO' }, api.svg);
+        title('BASIS UND EXPONENT');
+        const big = T(180, 68, 'vexpr potbig');
+        big.innerHTML = pw(2, 5, 46);
+        big.setAttribute('opacity', 0);
+        api.say('Was bedeutet <b>2⁵</b>, gesprochen „2 hoch 5“?');
+        await api.tw(600, (t) => big.setAttribute('opacity', t));
+        await api.wait(1400);
+        const lb = el('g', { opacity: 0 }, api.svg);
+        el('line', { x1: 120, y1: 74, x2: 158, y2: 60, class: 'tk' }, lb);
+        el('text', { x: 116, y: 80, class: 'ex-s f2', 'text-anchor': 'end', text: 'Basis' }, lb);
+        const le = el('g', { opacity: 0 }, api.svg);
+        el('line', { x1: 240, y1: 30, x2: 200, y2: 36, class: 'tk' }, le);
+        el('text', { x: 244, y: 34, class: 'ex-s f1', 'text-anchor': 'start', text: 'Exponent' }, le);
+        api.say('Die <b class="f2">Basis</b> 2 ist die Zahl, die malgenommen wird.');
+        await api.tw(500, (t) => lb.setAttribute('opacity', t));
+        await api.wait(1800);
+        api.say('Der <b class="f1">Exponent</b> 5 sagt, <b>wie oft</b> sie als Faktor vorkommt.');
+        await api.tw(500, (t) => le.setAttribute('opacity', t));
+        await api.wait(1800);
+        const n = 5, w = 40, gap = 58, x0 = 180 - ((n - 1) * gap) / 2;
+        for (let i = 0; i < n; i++) {
+          const g = el('g', { opacity: 0 }, api.svg);
+          el('rect', { x: x0 + i * gap - w / 2, y: 98, width: w, height: w, rx: 9, class: 'vnum' }, g);
+          el('text', { x: x0 + i * gap, y: 125, class: 'ex-b', 'text-anchor': 'middle', text: '2' }, g);
+          el('text', { x: x0 + i * gap, y: 156, class: 'ex-s f1', 'text-anchor': 'middle', text: `${i + 1}.` }, g);
+          if (i > 0) el('text', { x: x0 + i * gap - gap / 2, y: 124, class: 'ex-b', 'text-anchor': 'middle', text: '·' }, g);
+          api.say(`${i + 1}-mal die 2${i === n - 1 ? ': fünf Faktoren!' : ' …'}`);
+          await api.tw(350, (t) => g.setAttribute('opacity', t));
+          await api.wait(450);
         }
-        api.say(`<b>${k}² = ${k} · ${k} = ${k * k}</b>${fresh && k > 1 ? `<br>Neu dazu (orange): ${2 * k - 1} Punkte` : ''}`);
+        await api.wait(700);
+        const run = T(180, 192, 'vexpr');
+        let p = 2;
+        for (let i = 1; i < n; i++) {
+          run.textContent = `${p} · 2 = ${p * 2}`;
+          api.say(`Schritt für Schritt: <b>${p} · 2 = ${p * 2}</b>`);
+          p *= 2;
+          await api.wait(1000);
+        }
+        run.innerHTML = `${pw(2, 5, 22)} = 2 · 2 · 2 · 2 · 2 = <tspan class="f3">32</tspan>`;
+        const no = T(180, 222, 'ex-b fbad');
+        no.textContent = '✗ nicht 2 · 5 = 10';
+        api.say('<b>2⁵ = 32</b>, und <b>nicht</b> 2 · 5 = 10! <small>Der Exponent zählt die Faktoren, er wird nicht malgenommen.</small>');
+        await api.wait(3200);
       }
+
       function drawPow2(k) {
         api.clear();
+        title('2 HOCH n: IMMER VERDOPPELN');
         const rows = 2 ** Math.floor(k / 2), cols = 2 ** Math.ceil(k / 2);
-        const s = Math.min(26, 300 / cols, 196 / rows), x0 = 180 - (cols * s) / 2, y0 = 6 + (196 - rows * s) / 2;
+        const s = Math.min(26, 300 / cols, 168 / rows), x0 = 180 - (cols * s) / 2, y0 = 26 + (168 - rows * s) / 2;
         for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
           const isNew = k > 0 && (k % 2 === 1 ? j >= cols / 2 : i >= rows / 2);
           el('rect', { x: x0 + j * s + 1, y: y0 + i * s + 1, width: s - 2, height: s - 2, rx: Math.min(4, s / 4), class: isNew ? 'blk mv' : 'blk' }, api.svg);
         }
-        el('text', { x: 180, y: 224, class: 'vexpr', 'text-anchor': 'middle', text: k === 0 ? '1' : `2${k > 1 ? '' : ''}` }, api.svg).innerHTML =
-          k <= 1 ? (k === 0 ? 'Start: 1' : '2<tspan dy="-9" font-size="14">1</tspan><tspan dy="9"> = 2</tspan>')
-            : `2<tspan dy="-9" font-size="14">${k}</tspan><tspan dy="9"> = ${k <= 6 ? Array(k).fill(2).join(' · ') + ' = ' : ''}${2 ** k}</tspan>`;
+        const t = T(180, 222, 'vexpr');
+        t.innerHTML = k === 0 ? 'Start: 1 Kästchen' : `${pw(2, k, 22)} = ${k <= 6 ? Array(k).fill(2).join(' · ') + ' = ' : ''}${2 ** k}`;
       }
-      const sl = api.slider({ label: 'Seitenlänge', min: 1, max: 20, value: 1, onInput(v) { draw(v, false); } });
+      async function zwei() {
+        drawPow2(0);
+        api.say('Wir starten mit <b>einem</b> Kästchen und verdoppeln immer wieder, also immer „mal 2“.');
+        await api.wait(1800);
+        for (let k = 1; k <= 8; k++) {
+          drawPow2(k);
+          api.say(`${k}-mal verdoppelt: <b>${2 ** k}</b> Kästchen${k === 1 ? '' : ` <small>(orange: die neue Hälfte)</small>`}`);
+          await api.wait(k < 4 ? 1600 : 1200);
+        }
+        api.say('So schnell wachsen Potenzen: <b>2⁸ = 256</b>. <small>Nach 10-mal Verdoppeln sind es schon 1 024!</small>');
+        await api.wait(2800);
+      }
+
+      async function zehn() {
+        api.clear();
+        title('ZEHNERPOTENZEN');
+        api.say('Bei der Basis <b>10</b> wird es ganz einfach …');
+        await api.wait(1400);
+        for (let k = 1; k <= 6; k++) {
+          const y = 22 + k * 30;
+          const row = el('g', { opacity: 0 }, api.svg);
+          const t = el('text', { x: 40, y, class: 'vexpr', 'text-anchor': 'start' }, row);
+          t.innerHTML = `${pw(10, k, 22)} = 1<tspan class="f1">${'0'.repeat(k)}</tspan>`;
+          el('text', { x: 336, y: y - 2, class: 'ex-s f6', 'text-anchor': 'end', text: `${k} ${k === 1 ? 'Null' : 'Nullen'}` }, row);
+          api.say(`10<sup>${k}</sup> = ${k === 1 ? '10' : Array(k).fill(10).join(' · ')}${k > 1 ? ` = ${fmt(10 ** k)}` : ''}`);
+          await api.tw(400, (tt) => row.setAttribute('opacity', tt));
+          await api.wait(k < 3 ? 1300 : 900);
+        }
+        api.say('Der <b>Exponent</b> sagt, wie viele <b class="f1">Nullen</b> hinter der 1 stehen. <small>10⁶ = 1 000 000, eine Million.</small>');
+        await api.wait(3000);
+      }
+
+      async function sonder() {
+        api.clear();
+        title('ZWEI SONDERFÄLLE');
+        const a = R(3, 9);
+        const l1 = T(180, 80, 'vexpr'), l2 = T(180, 160, 'vexpr');
+        l1.innerHTML = `${pw(a, 1, 22)} = <tspan class="f3">${a}</tspan>`;
+        l1.setAttribute('opacity', 0); l2.setAttribute('opacity', 0);
+        const c1 = el('text', { x: 180, y: 104, class: 'ex-s f6', 'text-anchor': 'middle', text: 'nur ein Faktor: die Zahl selbst' }, api.svg);
+        c1.setAttribute('opacity', 0);
+        api.say(`<b>Hoch 1</b>: Die ${a} kommt nur <b>einmal</b> vor, da gibt es nichts malzunehmen.`);
+        await api.tw(500, (t) => { l1.setAttribute('opacity', t); c1.setAttribute('opacity', t); });
+        await api.wait(2400);
+        l2.innerHTML = `${pw(1, 5, 22)} = 1 · 1 · 1 · 1 · 1 = <tspan class="f3">1</tspan>`;
+        const c2 = el('text', { x: 180, y: 184, class: 'ex-s f6', 'text-anchor': 'middle', text: '1 mal 1 bleibt immer 1' }, api.svg);
+        c2.setAttribute('opacity', 0);
+        api.say('<b>Basis 1</b>: Egal wie oft man 1 mit 1 malnimmt, es bleibt <b>1</b>.');
+        await api.tw(500, (t) => { l2.setAttribute('opacity', t); c2.setAttribute('opacity', t); });
+        await api.wait(2800);
+      }
+
+      function drawSq(k, fresh) {
+        api.clear();
+        title('QUADRATZAHLEN: DER SONDERFALL „HOCH 2“');
+        const s = Math.min(18, 170 / k), x0 = 180 - (k * s) / 2, y0 = 28;
+        for (let i = 0; i < k; i++) for (let j = 0; j < k; j++) {
+          const isNew = fresh && (i === k - 1 || j === k - 1);
+          el('circle', { cx: x0 + j * s + s / 2, cy: y0 + i * s + s / 2, r: s * 0.36, class: isNew ? 'dotN' : 'dotO' }, api.svg);
+        }
+        const t = T(180, 222, 'vexpr');
+        t.innerHTML = `${pw(k, 2, 22)} = ${k} · ${k} = ${k * k}`;
+      }
+      async function quad() {
+        api.say('Bei <b>hoch 2</b> kommt die Zahl zweimal als Faktor vor. Das kann man als <b>Quadrat</b> legen:');
+        for (let k = 1; k <= 8; k++) { sl.value = k; drawSq(k, true); await api.wait(k < 4 ? 1000 : 700); }
+        api.say('<b>n² = n · n</b> ist die Anzahl der Punkte im Quadrat. Darum heißt „hoch 2“ auch „zum Quadrat“. <small>Probier den Regler bis 20!</small>');
+        await api.wait(2400);
+      }
+
+      const sl = api.slider({ label: 'Quadrat: Seitenlänge', min: 1, max: 20, value: 1, onInput(v) { drawSq(v, false); api.say(`<b>${v}² = ${v} · ${v} = ${v * v}</b>`); } });
+      const showSl = (on) => { sl.parentElement.style.display = on ? '' : 'none'; };
+      const go = (m) => { mode = m; showSl(m === 'quad'); api.replay(); };
       api.chips([
-        { label: 'Quadratzahlen', onClick() { mode = 'quadrat'; sl.parentElement.style.display = ''; api.replay(); } },
-        { label: '2 hoch n: verdoppeln', onClick() { mode = 'zwei'; sl.parentElement.style.display = 'none'; api.replay(); } },
+        { label: 'Alles', onClick() { go('alle'); } },
+        { label: 'Basis & Exponent', onClick() { go('grund'); } },
+        { label: '2 hoch n', onClick() { go('zwei'); } },
+        { label: 'Zehnerpotenzen', onClick() { go('zehn'); } },
+        { label: 'hoch 1 · Basis 1', onClick() { go('sonder'); } },
+        { label: 'Quadratzahlen', onClick() { go('quad'); } },
       ]);
+      showSl(false);
       return {
-        reset() { if (mode === 'quadrat') draw(1, false); else drawPow2(0); },
+        reset() {
+          showSl(mode === 'quad');
+          if (mode === 'quad') drawSq(1, false);
+          else if (mode === 'alle' || mode === 'grund') { api.clear(); const b = T(180, 120, 'vexpr potbig'); b.innerHTML = pw(2, 5, 46); }
+          else if (mode === 'zwei') drawPow2(0);
+          else api.clear();
+        },
         async play() {
-          if (mode === 'quadrat') {
-            for (let k = 1; k <= 12; k++) { sl.value = k; draw(k, true); await api.wait(k < 4 ? 900 : 650); }
-            await api.wait(600);
-            api.say('Eine Quadratzahl ist die Anzahl der Punkte in einem Quadrat: <b>n² = n · n</b>. Probier den Regler bis 20!');
+          if (mode === 'alle') {
+            await grund(); await zwei(); await zehn(); await sonder();
+            showSl(true); await quad();
+            api.say('<b>Merke:</b> Der Exponent zählt, <b>wie oft</b> die Basis malgenommen wird. <small>2⁵ = 32 · 10³ = 1 000 · 7¹ = 7 · 1⁵ = 1 · 4² = 16</small>');
             return;
           }
-          api.say('Wir starten mit <b>einem</b> Kästchen und verdoppeln immer wieder.');
-          await api.wait(1600);
-          for (let k = 1; k <= 8; k++) {
-            drawPow2(k);
-            api.say(`${k}-mal verdoppelt: <b>${2 ** k}</b> Kästchen${k === 1 ? '' : ` (orange: die neue Hälfte, ${2 ** (k - 1)} Stück)`}`);
-            await api.wait(k < 4 ? 1700 : 1300);
-          }
-          api.say('Der Exponent zählt, <b>wie oft</b> malgenommen wird: 2⁸ = 256. <small>Darum ist 2⁵ = 32 und nicht 2 · 5 = 10! Nach 10-mal Verdoppeln sind es schon 1 024.</small>');
+          await { grund, zwei, zehn, sonder, quad }[mode]();
         },
       };
     },

@@ -117,7 +117,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
 - **20 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Teilen mit Rest ·
-  Primzahlen · Potenzen: Quadrate und Verdoppeln (2ⁿ) · Anteile berechnen · Erweitern & Kürzen ·
+  Primzahlen · Potenzen: wie oft malnehmen? (Basis/Exponent, 2ⁿ verdoppeln, Zehnerpotenzen,
+  a¹ und 1ⁿ, Quadratzahlen) · Anteile berechnen · Erweitern & Kürzen ·
   Die Hundertertafel · Mal 10 (das Komma bleibt, die Ziffern wandern) · Der Mittelwert macht
   alles gerecht · Erst laufen, dann springen (Koordinaten) · Winkelarten · Winkel an Geraden ·
   Fläche und Umfang · Volumen: Würfel stapeln · Gleichungen sind Waagen · Zeitspannen mit
@@ -209,7 +210,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v10`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v11`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -343,6 +344,12 @@ Infos zur ersten Arbeit:
 - [x] **Potenzen** erweitert (`lerndax-v9`): 2³, 3⁴ … bis 1 024, Basis/Exponent, „als Potenz
       schreiben“, „Was ist 2³? 6, 8 oder 9“, „Was ist größer: 2⁵ oder 5²?“, a · 10ⁿ, Basis gesucht;
       Animation zusätzlich „2 hoch n: verdoppeln“. Thema heißt jetzt „Potenzen“.
+- [x] **Erklärung „Potenzen“ umgebaut** (Wunsch Roberto, `lerndax-v11`): Titel „Potenzen: wie oft
+      malnehmen?“. Reihenfolge: (1) Basis/Exponent an 2⁵ = 2·2·2·2·2 = 32, ausdrücklich „nicht
+      2 · 5 = 10“; (2) 2 hoch n: verdoppeln; (3) Zehnerpotenzen: Exponent = Anzahl der Nullen;
+      (4) a¹ = a und 1ⁿ = 1; (5) Quadratzahlen als Sonderfall „hoch 2“ mit Punktquadraten und
+      Regler. „Alles“ spielt die fünf Teile nacheinander, Chips springen zu einzelnen Teilen.
+      Grund: Vorher startete die Erklärung mit Quadratzahlen, dadurch wirkte „hoch“ wie „Quadrat“.
 - [x] **Division** erweitert (`lerndax-v9`): bis vierstellig durch einstellig, Nullen im Ergebnis,
       „Mach die Probe: Stimmt das?“
 - [x] **Teilermengen** (`lerndax-v9`) im Thema „Teilbarkeit & Teiler“: Anzahl der Teiler,
@@ -406,6 +413,8 @@ Infos zur ersten Arbeit:
 - **Trainingsseite** für die Mathe-Arbeit am 24.11. gebaut (`?t=mathe-2026-11-24`), nur über den Link
   erreichbar, ohne Anmeldung nutzbar, angemeldet synchronisiert; neuer Test `tests/training.py`
   (Version `lerndax-v10`).
+- Erklärung „Potenzen“ neu aufgebaut: erst Basis/Exponent, Verdoppeln, Zehnerpotenzen, Sonderfälle,
+  Quadratzahlen zum Schluss (Version `lerndax-v11`).
 - **Vorrangregeln** und **Rechengesetze** als neue Themen in LB 1 (nach „Runden“, wie im Buch),
   mit eigenen Symbolen und Animationen „Der Rechenbaum“ und „Drei Rechengesetze zum Anschauen“
   (Version `lerndax-v8`). Aufgabenarten:
