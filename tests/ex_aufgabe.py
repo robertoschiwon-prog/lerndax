@@ -10,7 +10,7 @@ from playwright.async_api import async_playwright
 FAST="""const _now = performance.now.bind(performance); const s0=_now(); performance.now = () => s0 + (_now()-s0)*8;
 const _st = window.setTimeout; window.setTimeout = (f,ms,...a)=>_st(f,(ms||0)/8,...a);
 const _raf = window.requestAnimationFrame.bind(window); window.requestAnimationFrame = cb => _raf(()=>cb(performance.now()));
-localStorage.setItem('lerndax.avatar.asked','1');localStorage.setItem('mathelix.v1',JSON.stringify({name:'Bruno',grade:5,stats:{},days:[],total:0,seen:{}}))"""
+localStorage.setItem('lerndax.avatar.asked','1');localStorage.setItem('mathelix.v1',JSON.stringify({name:'Max',grade:5,stats:{},days:[],total:0,seen:{}}))"""
 FILL = """() => { const R = window.__mathelix.round(); const t = R.cur.task;
   if (t.choices) return {choice: t.correct, n: t.choices.length};
   const fmt = window.Mathelix.util.fmt;

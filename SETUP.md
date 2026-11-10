@@ -10,7 +10,7 @@
 
 ## So benutzt ihr es
 
-**Einmalig auf jedem Gerät** (Papas iPhone, Tablet, Computer):
+**Einmalig auf jedem Gerät** (Handy, Tablet, Computer):
 1. https://robertoschiwon-prog.github.io/lerndax/ öffnen → **Mathe** → ganz unten
    **„Für Eltern: Fortschritt ansehen“**. Von der Startseite aus geht es auch direkt über
    **„Für Eltern: Fortschritt & Geräte“**.

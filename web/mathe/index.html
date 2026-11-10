@@ -528,7 +528,7 @@ body.noscroll{overflow:hidden}
   })();
   if (TR && !TR.missing) document.title = `${TR.titel} · Training · Mathelix`;
 
-  // Tagesziel: eine vollständige Runde pro Tag (Wunsch Roberto). S.rounds = { 'JJJJ-MM-TT': Anzahl },
+  // Tagesziel: eine vollständige Runde pro Tag (Wunsch der Eltern). S.rounds = { 'JJJJ-MM-TT': Anzahl },
   // wird mit synchronisiert (geübt wird abwechselnd an Handy, Computer und Tablet).
   const roundsToday = () => ((S.rounds || {})[today()] || 0);
   const goalLine = () => (roundsToday() >= 1

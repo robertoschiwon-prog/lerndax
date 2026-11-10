@@ -1,6 +1,6 @@
 # LernDax 🦡
 
-**Verstehen statt pauken.** LernDax ist die Lern-App der Familie Schiwon: üben, verstehen und
+**Verstehen statt pauken.** LernDax ist eine Lern-App für Schulkinder: üben, verstehen und
 entdecken, Klasse 1 bis 10, nach dem Lehrplan Sachsen (Gymnasium).
 
 Der Name zwinkert LernSax zu, der Schulplattform aller sächsischen Schulen. „Dax“ klingt wie
@@ -20,7 +20,7 @@ statt beschrieben (Animationen im Stil von 3Blue1Brown), und kleine Staunen-Mome
 neugierig auf mehr.
 
 **Für wen**
-Zuerst Bruno (Klasse 5, Gymnasium Klotzsche, Dresden), mit ihm bis Klasse 10. Später eventuell
+Zuerst ein Kind in Klasse 5 (Gymnasium, Sachsen), mit ihm bis Klasse 10. Später eventuell
 Klassenkameraden (Trainingsseiten per Link), irgendwann vielleicht öffentlich.
 
 **Grundsätze**

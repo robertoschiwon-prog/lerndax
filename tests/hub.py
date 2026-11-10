@@ -14,7 +14,7 @@ async def main():
         pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: m.type=='error' and errs.append(m.text))
         await pg.goto(HUB); await pg.wait_for_timeout(500)
         await pg.screenshot(path=f'{SHOTS}/h1_hub_new.png', full_page=True)
-        await pg.goto(MATHE); await pg.fill('#nameI','Bruno'); await pg.click('#nameF button')
+        await pg.goto(MATHE); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
         await pg.click('[data-topic="k5-runden"]')
         for k in range(8):
             a=await pg.evaluate(ANSWER)

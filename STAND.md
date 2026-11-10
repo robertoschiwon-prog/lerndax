@@ -12,21 +12,23 @@ Weitere Dokumente:
 - `SETUP.md`: Kurzanleitung für Eltern (Anmelden, Profil, PIN, App aufs Handy)
 - `tests/README.md`: automatische Tests
 - `faecher/mathe/lehrplan/sachsen-gymnasium.md`: Lehrplan Mathe Gymnasium Sachsen, Klasse 5–10
-- `notizen/feedback.md`: offene Fragen an Bruno und Vorlage für Testrunden (nur lokal, nicht auf GitHub)
+- `notizen/feedback.md`: offene Fragen an das Kind und Vorlage für Testrunden (nur lokal, nicht auf GitHub)
+- `notizen/familie.md`: persönliche Angaben (Kind, Schule, Geräte, Termine, Pfade). **Nur lokal**, weil
+  dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
 
 ## 1. Worum es geht
 
-- **Für wen:** Bruno, Klasse 5, Gymnasium Klotzsche (Dresden, Sachsen). Mit ihm wächst LernDax
-  bis Klasse 10. **Keine Geschwister.** Später eventuell Klassenkameraden (Trainingsseiten per
-  Link), irgendwann vielleicht öffentlich (siehe Abschnitt 9).
-- **Geräte:** Bruno hat **kein eigenes Handy**. Er übt an **Robertos Handy (iPhone)**, am
+- **Für wen:** zuerst ein Kind in Klasse 5 (Gymnasium, Sachsen). Mit ihm wächst LernDax bis
+  Klasse 10. Später eventuell Klassenkameraden (Trainingsseiten per Link), irgendwann vielleicht
+  öffentlich (siehe Abschnitt 9). Persönliches steht in `notizen/familie.md` (nur lokal).
+- **Geräte:** Das Kind hat **kein eigenes Handy**. Geübt wird an einem **Eltern-Handy (iPhone)**, am
   **Computer** und gelegentlich am **Tablet**. Deshalb muss alles auf allen drei gut aussehen und
   der Lernstand zwischen den Geräten synchronisiert sein.
 - **Übungsziel:** **eine Runde pro Tag** (Tagesziel, freundlich angezeigt, ohne Druck).
-- **Auftraggeber:** Roberto Schiwon (Vater). Er programmiert nicht selbst; Claude baut, Roberto
-  entscheidet und testet. Kommunikation auf Deutsch, verständlich, ohne Fachchinesisch.
+- **Auftraggeber:** der Vater („Auftraggeber“ in dieser Datei). Er programmiert nicht selbst;
+  Claude baut, der Auftraggeber entscheidet und testet. Kommunikation auf Deutsch, verständlich, ohne Fachchinesisch.
 - **Ziel:** Schulstoff **verstehen statt pauken**. Wichtigstes Vorbild: die Videos von
   **3Blue1Brown**: anschauliche, animierte Erklärungen, die zeigen *warum* etwas stimmt.
 - **Was die App können soll:**
@@ -41,8 +43,8 @@ Weitere Dokumente:
   - Englisch: **Green Line 1** (Klett)
   Aufgaben aus den Büchern werden **nicht** abgeschrieben; LernDax erzeugt eigene Aufgaben zu
   denselben Themen. Seitenzahlen dienen nur zur Orientierung.
-- **Nächste Klassenarbeit:** **Mathe am 24.11.2026** (Details im Abschnitt 9 unter „Klassen-Bereich“).
-- **Danach bekannt:** **Mathe-Vergleichsarbeit am Mi 03.02.2027** (laut Schulunterlagen „vorher üben“;
+- **Nächste Klassenarbeit:** **Mathe am 24.11.2026** (Themen im Abschnitt 9 unter „Klassen-Bereich“).
+- **Danach bekannt:** **Mathe-Vergleichsarbeit Anfang Februar 2027** (Datum in `notizen/familie.md`;
   Themen noch unbekannt). Weitere Lehrbücher Klasse 5 (für spätere Fächer): Linder 5 (Bio),
   Terra 5 (Geo), Anno 1 (Geschichte).
 - **Name:** **LernDax**. Anspielung auf **LernSax** (Schulplattform aller sächsischen Schulen),
@@ -55,7 +57,7 @@ Weitere Dokumente:
 | Website (live) | **https://robertoschiwon-prog.github.io/lerndax/** |
 | Mathe direkt | https://robertoschiwon-prog.github.io/lerndax/mathe/ |
 | Code (Hauptstand) | GitHub: **robertoschiwon-prog/lerndax** (öffentlich, Branch `main`) |
-| Code (Kopie für Roberto) | OneDrive: `C:\Users\rober\OneDrive\Roberto\20_Projekte\Lerndax` |
+| Code (Kopie für den Auftraggeber) | lokaler OneDrive-Ordner (Pfad in `notizen/familie.md` und in den Anweisungen des Claude-Projekts „LernDax“) |
 | Datenbank | Supabase, Organisation „Familie“, Projekt **familienkalender** (Ref `bpwdmdcnvdolpsxdvblq`), nur Tabellen `lerndax_…` |
 | Anmeldung | dasselbe Familienkonto wie im Familienkalender |
 | Veröffentlichen | automatisch bei jedem Push auf `main` (GitHub Actions „LernDax veröffentlichen“) |
@@ -91,7 +93,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   Fitness je Thema = Trefferquote der letzten Aufgaben × min(1, bearbeitete Aufgaben / 8).
   **Neue Arbeit anlegen:** in `trainings.js` einen Eintrag ergänzen (keine Namen von Schule,
   Lehrkraft oder Kind!), `VERSION` erhöhen, Link weitergeben.
-- **Tagesziel** (seit 10.11.2026, Wunsch Roberto): „🎯 Tagesziel: eine Runde“ unter der Begrüßung
+- **Tagesziel** (seit 10.11.2026, Wunsch Auftraggeber): „🎯 Tagesziel: eine Runde“ unter der Begrüßung
   in Mathelix und auf der Trainingsseite; nach der ersten vollständigen Runde des Tages grün
   „Tagesziel geschafft ✓“, auf der Ergebnisseite „Tagesziel für heute geschafft!“. Gezählt in
   `rounds` (Runden pro Tag, letzte 60 Tage) und **mit synchronisiert** (pro Tag gilt der höhere Wert).
@@ -108,7 +110,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 - **Kopfzeile:** Dachs (zurück zur LernDax-Startseite), Schriftzug „Mathelix“ (zum Mathe-Start),
   Serie 🔥 und Sterne ⭐. Das frühere orange „×“-Kästchen ist seit 10.11.2026 entfernt
   (wirkte doppelt und wie ein Schließen-Knopf).
-- **Startbildschirm:** Avatar + „Hallo Bruno!“, Klassen-Chips 1–10 (nur 5 aktiv; andere zeigen
+- **Startbildschirm:** Avatar + „Hallo <Name>!“, Klassen-Chips 1–10 (nur 5 aktiv; andere zeigen
   die geplanten Lernbereiche laut Lehrplan), „🎲 Gemischt“ (Runde aus allem),
   „🔁 Fehler-Training“ (Themen mit vielen Fehlern), Lernbereiche mit Themen und Sternen
   (Beherrschung), ▶-Knopf für die Erklärung, Entdecken-Bereich, Elternansicht.
@@ -143,7 +145,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   **ähnliches Beispiel** (andere Zahlen, verrät nichts), „▶ Lösung als Animation“ nach dem Antworten
   zeigt **genau die Aufgabe**. Umgesetzt für:
   - **Primzahlen** (Rechteck-Legen) und **Primfaktorzerlegung** (Faktorbaum)
-  - **Vorrangregeln** (seit 10.11.): Rechenbaum aus Brunos Rechnung, auch mit Klammern und ²;
+  - **Vorrangregeln** (seit 10.11.): Rechenbaum aus der Rechnung des Kindes, auch mit Klammern und ²;
     am Ende bleibt der Rechenweg als nummerierte Liste stehen
   - **Potenzen** (seit 10.11.): Basis/Exponent mit den Zahlen der Aufgabe (inkl. „nicht b · e“),
     Zehnerpotenzen mit markierter Zeile (auch a · 10ⁿ), Quadratzahlen bis zur Zahl der Aufgabe
@@ -164,8 +166,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   Anmeldung/Profile/PIN, Fortschritt zurücksetzen.
 
 ### Live geprüft (10.11.2026)
-- Bruno-Profil existiert, PIN gesetzt, Mathe-Fortschritt wird in der Datenbank gespeichert.
-- Avatar-Auswahl öffnet sich live; Bruno hat seinen Avatar noch selbst auszusuchen.
+- Kind-Profil existiert, PIN gesetzt, Mathe-Fortschritt wird in der Datenbank gespeichert.
+- Avatar-Auswahl öffnet sich live; das Kind sucht seinen Avatar noch selbst aus.
 
 ## 4. Technik
 
@@ -238,7 +240,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v16`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v17`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -260,12 +262,12 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 
 | Entscheidung | Warum |
 |---|---|
-| Prototyp zuerst nur Klasse 5 | Bruno ist in Klasse 5; erst eine Klasse richtig gut machen |
-| Lehrplan Gymnasium Sachsen als Gerüst | Brunos Schule; Reihenfolge später mit dem Schulbuch abgleichen |
-| Animationen im 3Blue1Brown-Stil | Verstehen statt auswendig lernen; Roberto mag diesen Stil |
-| Lösung nach dem Antworten zeigen, ähnliches Beispiel vorher | Wunsch von Roberto: erst selbst denken, dann sehen, wie es geht |
-| Pause und Langsam-Modus | Wunsch von Roberto: Kinder brauchen Zeit zum Mitdenken |
-| Entdecken-Bereich ausgebaut („Paket 1“) | Neugier wecken; Roberto wollte mehr davon |
+| Prototyp zuerst nur Klasse 5 | Das Kind ist in Klasse 5; erst eine Klasse richtig gut machen |
+| Lehrplan Gymnasium Sachsen als Gerüst | Schule des Kindes; Reihenfolge später mit dem Schulbuch abgleichen |
+| Animationen im 3Blue1Brown-Stil | Verstehen statt auswendig lernen; der Auftraggeber mag diesen Stil |
+| Lösung nach dem Antworten zeigen, ähnliches Beispiel vorher | Wunsch des Auftraggebers: erst selbst denken, dann sehen, wie es geht |
+| Pause und Langsam-Modus | Wunsch des Auftraggebers: Kinder brauchen Zeit zum Mitdenken |
+| Entdecken-Bereich ausgebaut („Paket 1“) | Neugier wecken; der Auftraggeber wollte mehr davon |
 | Name Mathelix → Dachprojekt **LernDax** | Später auch Deutsch/Englisch; „Lernfux“ war schon vergeben |
 | Hosting GitHub Pages + Supabase | Kostenlos, überall erreichbar wie der Familienkalender |
 | Supabase-Tabellen **im Projekt familienkalender** statt eigenem Projekt | Kostenloser Supabase-Plan erlaubt nur 2 Projekte, beide belegt; Anmeldung mit demselben Familienkonto ist zudem praktisch |
@@ -283,7 +285,7 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
    wird im eigenen Claude-Projekt „Familienkalender“ gepflegt.
 2. Nur den **öffentlichen Schlüssel** (`sb_publishable_…`) verwenden, **nie** den geheimen
    (`service_role`/`secret`).
-3. **Passwörter tippt Roberto selbst** ein (Supabase, GitHub, App-Anmeldung).
+3. **Passwörter tippt der Auftraggeber selbst** ein (Supabase, GitHub, App-Anmeldung).
 4. Vor Löschungen oder anderen nicht umkehrbaren Änderungen in der Datenbank **fragen**.
    Neue Spalten/Tabellen nur additiv und immer auch in `supabase/schema.sql` nachtragen.
 5. `notizen/` bleibt lokal und kommt nicht auf GitHub.
@@ -297,11 +299,11 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 - **Gemeinsam:** Supabase-Projekt `familienkalender` und dessen Familienkonten.
 - **Getrennt:** LernDax hat nur seine `lerndax_`-Tabellen; Kalender-Code und -Tabellen fasst
   LernDax nicht an.
-- **Link im Kalender:** Am 10.11.2026 hat Roberto dem Claude-Projekt „Familienkalender“ einen
+- **Link im Kalender:** Am 10.11.2026 hat der Auftraggeber dem Claude-Projekt „Familienkalender“ einen
   Auftrag für einen Link zu LernDax (Bezeichnung „📚 LernDax“ bzw. „Lernen“, Ziel
   https://robertoschiwon-prog.github.io/lerndax/) weitergegeben. Ob und wie er umgesetzt ist,
   steht im Familienkalender-Projekt (dessen `status.md`).
-- **Empfohlener Hinweis für das Kalender-Projekt** (von Roberto dort einzutragen): Die Tabellen
+- **Empfohlener Hinweis für das Kalender-Projekt** (vom Auftraggeber dort einzutragen): Die Tabellen
   `lerndax_profiles`, `lerndax_progress`, `lerndax_family_settings` gehören LernDax und dürfen
   nicht verändert oder gelöscht werden; Anmelde-Einstellungen und Konten nicht ohne Rücksprache
   ändern, weil LernDax davon abhängt.
@@ -319,23 +321,23 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 - **GitHub Pages:** musste einmalig in den Repository-Einstellungen auf „GitHub Actions“
   gestellt werden.
 - **Claude darf manche Dinge nicht selbst:** öffentliche Repositories anlegen, Berechtigungen
-  vergeben, Passwörter eingeben → macht Roberto.
+  vergeben, Passwörter eingeben → macht der Auftraggeber.
 - **Missverständnis „Dax größer“:** gemeint war der Dachs-Kopf im Icon, nicht der Schriftzug.
 - **Ordner Familienkalender:** Claude hat dort nie geschrieben; der Kalender-Code liegt im
   Claude-Projekt „Familienkalender“.
 
 ## 9. Offene Punkte & Ideen
 
-**Grundsatz (Entscheidung Roberto, 10.11.2026): allgemein vs. Klasse**
-Mathelix bleibt **allgemein** nach dem Lehrplan Sachsen. Alles, was nur Brunos Klasse betrifft
-(Klassenarbeiten, Termine, Buchseiten, Themenauswahl der Lehrerin), kommt **nicht** in die
+**Grundsatz (Entscheidung Auftraggeber, 10.11.2026): allgemein vs. Klasse**
+Mathelix bleibt **allgemein** nach dem Lehrplan Sachsen. Alles, was nur eine bestimmte Klasse betrifft
+(Klassenarbeiten, Termine, Buchseiten, Themenauswahl der Lehrkraft), kommt **nicht** in die
 allgemeine App, sondern später in einen **eigenen Klassen-Bereich**, der gezielt (spezialisiert)
-abrufbar ist. Roberto möchte diesen Bereich als **eigenes Thema** zuschneiden; bis dahin wird dort
+abrufbar ist. Der Auftraggeber möchte diesen Bereich als **eigenes Thema** zuschneiden; bis dahin wird dort
 nichts gebaut.
 
 **Klassen-Bereich: Trainingsseiten für Klassenarbeiten**
 Infos zur ersten Arbeit:
-- Mathe-Klassenarbeit am **24.11.2026**, Themen laut Zettel der Lehrerin (Übungsseiten im
+- Mathe-Klassenarbeit am **24.11.2026**, Themen laut Themenliste der Schule (Übungsseiten im
   Lambacher Schweizer in Klammern):
   1. Vorrangregeln und Rechengesetze: Kommutativ-, Assoziativ-, Distributivgesetz (S. 21–29)
   2. Potenzen (S. 30–31)
@@ -346,23 +348,23 @@ Infos zur ersten Arbeit:
   Abschnitt 3). Ein Klassen-Bereich müsste sie nur auswählen und bündeln, nicht neu bauen.
 - **Gebaut am 10.11.2026 (`lerndax-v10`)**, Link: https://robertoschiwon-prog.github.io/lerndax/mathe/?t=mathe-2026-11-24
   Beschreibung siehe Abschnitt 3 („Trainingsseiten für Klassenarbeiten“).
-- **Konzept (besprochen mit Roberto am 10.11.2026):**
+- **Konzept (besprochen mit dem Auftraggeber am 10.11.2026):**
   - **Trainingsseite je Arbeit:** Eine Arbeit wird in LernDax als kleiner Eintrag beschrieben
     (Titel, Datum, Fach, Themen-IDs, Buchseiten). Daraus entsteht automatisch eine eigene
     Trainingsseite mit eigenem Link. Sie nutzt die allgemeinen Mathelix-Themen, zeigt aber nur
     die ausgewählten. Die allgemeine App bleibt unverändert.
   - Mögliche Bausteine: Countdown bis zur Arbeit, Runde nur aus den Arbeitsthemen, schwache
     Themen häufiger, „wie fit bin ich“ je Thema, Buchseiten als Hinweis.
-  - **Zugang zuerst nur für Bruno:** Die Seite wird in der allgemeinen App **nicht** verlinkt.
-    Bruno erreicht sie über den **Familienkalender** (Knopf „Jetzt üben“ beim Termin der Arbeit
+  - **Zugang zuerst nur für das eigene Kind:** Die Seite wird in der allgemeinen App **nicht** verlinkt.
+    Das Kind erreicht sie über den **Familienkalender** (Knopf „Jetzt üben“ beim Termin der Arbeit
     oder Sektion „Lernen“). Das baut das Kalender-Projekt; LernDax liefert dafür nur Link und
-    Beschreibung (Auftrag über Roberto, wie beim LernDax-Link). Angemeldet wird der Fortschritt
+    Beschreibung (Auftrag über den Auftraggeber, wie beim LernDax-Link). Angemeldet wird der Fortschritt
     wie gewohnt synchronisiert.
   - **Option Klassenkameraden offenhalten:** Die Seite so bauen, dass sie auch **ohne Anmeldung**
     funktioniert (Fortschritt dann nur auf dem Gerät, nichts in der Datenbank). Dann genügt
     später, den Link weiterzugeben (z. B. Eltern-Chat der Klasse). Klassenkameraden bekommen
     **keine** Konten im Familienkalender.
-  - Auf der Seite **keine** Namen von Schule, Lehrerin oder Bruno, weil sie technisch für jeden
+  - Auf der Seite **keine** Namen von Schule, Lehrkraft oder Kind, weil sie technisch für jeden
     mit dem Link erreichbar ist.
 - Offen: Werden im Buch (S. 36–40) auch zweistellige Teiler geübt? Mathelix nutzt bisher nur
   einstellige.
@@ -372,7 +374,7 @@ Infos zur ersten Arbeit:
 - [x] **Potenzen** erweitert (`lerndax-v9`): 2³, 3⁴ … bis 1 024, Basis/Exponent, „als Potenz
       schreiben“, „Was ist 2³? 6, 8 oder 9“, „Was ist größer: 2⁵ oder 5²?“, a · 10ⁿ, Basis gesucht;
       Animation zusätzlich „2 hoch n: verdoppeln“. Thema heißt jetzt „Potenzen“.
-- [x] **Erklärung „Potenzen“ umgebaut** (Wunsch Roberto, `lerndax-v11`): Titel „Potenzen: wie oft
+- [x] **Erklärung „Potenzen“ umgebaut** (Wunsch Auftraggeber, `lerndax-v11`): Titel „Potenzen: wie oft
       malnehmen?“. Reihenfolge: (1) Basis/Exponent an 2⁵ = 2·2·2·2·2 = 32, ausdrücklich „nicht
       2 · 5 = 10“; (2) 2 hoch n: verdoppeln; (3) Zehnerpotenzen: Exponent = Anzahl der Nullen;
       (4) a¹ = a und 1ⁿ = 1; (5) Quadratzahlen als Sonderfall „hoch 2“ mit Punktquadraten und
@@ -389,11 +391,14 @@ Infos zur ersten Arbeit:
       Textaufgaben“ (S. 45–47). Vorsorglich ergänzt, Abgleich mit dem Buch steht noch aus.
 - [x] **Prüfung aller Aufgaben** (10.11.2026, `lerndax-v16`): je Thema 20 000 Aufgaben erzeugt und
       durchgesehen, Fehler behoben (siehe Verlauf).
-- [ ] **Entscheidung Roberto:** Das GitHub-Repository ist öffentlich, `README.md` und `STAND.md` nennen
-      Brunos Namen, die Schule, Dresden und die Termine der Arbeiten. Kürzen/neutral formulieren?
-- [ ] Mit Bruno testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler & Vielfache, Textaufgaben
-- [ ] Trainingsseite mit Bruno testen
-- [x] Auftrag an das Familienkalender-Projekt übergeben (10.11.2026, 19:50, mit Robertos OK;
+- [x] **Doku neutral** (Entscheidung Auftraggeber, 10.11.2026, `lerndax-v17`): `README.md`, `STAND.md`,
+      Tests und Code nennen keine Namen von Kind, Familie oder Schule mehr; Persönliches steht in
+      `notizen/familie.md` (nur lokal). **Achtung:** Ältere Versionen im GitHub-Verlauf enthalten die
+      Angaben noch (das Löschen aus dem Verlauf wäre nicht umkehrbar und ist nicht beschlossen). Der
+      GitHub-Benutzername steckt in der Webadresse und lässt sich nur mit Umzug des Repositorys ändern.
+- [ ] Mit dem Kind testen: Vorrangregeln, Rechengesetze, Potenzen, Division, Teiler & Vielfache, Textaufgaben
+- [ ] Trainingsseite mit dem Kind testen
+- [x] Auftrag an das Familienkalender-Projekt übergeben (10.11.2026, 19:50, mit OK des Auftraggebers;
       Chat „LernDax Übungs-Knopf und Tabellen“ im Projekt Familienkalender): Knopf „📚 Jetzt üben“,
       Hinweis zu den `lerndax_`-Tabellen für deren status.md, Rückfrage zum LernDax-Link.
       Text: `notizen/auftrag-familienkalender-training.md`. Das Kalender-Projekt meldet sich mit
@@ -402,34 +407,34 @@ Infos zur ersten Arbeit:
       und Feld „Übungs-Adresse“ an Arbeiten in der Eltern-App; Mathe-Arbeit 24.11. eingetragen;
       Hinweis zu den `lerndax_`-Tabellen steht dort. Für neue Trainingsseiten: Adresse in der
       Eltern-App an der Arbeit ins Feld „Übungs-Adresse“ eintragen.
-- [ ] Trainingsseite für die **Mathe-Vergleichsarbeit 03.02.2027**, sobald die Themen bekannt sind
+- [ ] Trainingsseite für die **Mathe-Vergleichsarbeit (Februar 2027)**, sobald die Themen bekannt sind
 - [ ] Idee: „Lange Nacht der Mathematik“ (online, mathenacht.de, nächste am 20.11.2026) im Entdecken-
       Bereich oder Familienkalender erwähnen?
-- [x] Nach der Arbeit (24.11.): Trainingsseite **bleibt stehen** (Entscheidung Roberto, 10.11.), auch
+- [x] Nach der Arbeit (24.11.): Trainingsseite **bleibt stehen** (Entscheidung Auftraggeber, 10.11.), auch
       als Beispiel für spätere Jahrgänge bzw. eine mögliche öffentliche Version.
 - Danach (Lehrplan-Lücken): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, unechte
   Brüche/gemischte Zahlen, Überschlag, Fermi-Aufgaben
 
 **Als Nächstes sinnvoll**
-- [x] Testrunde 1 mit Bruno (10.11.2026)
+- [x] Testrunde 1 mit dem Kind (10.11.2026)
 - [x] Schulbücher und nächste Arbeit geklärt (siehe Abschnitt 1)
 - [ ] Reihenfolge der Themen mit dem Schulbuch abgleichen
 - [x] „Lösung als Animation“ für die Arbeitsthemen (Vorrangregeln, Potenzen, Division, Teilbarkeit)
 - [ ] „Lösung als Animation“ auf die übrigen Themen übertragen (einfach: Runden, Anteile, Mittelwert,
       Koordinaten; nicht sinnvoll bei reinen Auswahlfragen wie „Welches Gesetz?“)
-- [ ] Hinweis zu den `lerndax_`-Tabellen in der `status.md` des Familienkalenders (Roberto)
+- [ ] Hinweis zu den `lerndax_`-Tabellen in der `status.md` des Familienkalenders (Auftraggeber)
 - [ ] Prüfen, ob der LernDax-Link im Familienkalender eingebaut ist
 
 **Später**
-- [ ] Idee Roberto (10.11.2026): **LernDax irgendwann öffentlich machen**, mit den Trainingsseiten
+- [ ] Idee Auftraggeber (10.11.2026): **LernDax irgendwann öffentlich machen**, mit den Trainingsseiten
       als Beispielen. Wäre dann nötig: eigene Datenbank (nicht im Familienkalender-Projekt),
       Registrierung bzw. Konten für Fremde, Impressum und Datenschutzerklärung, keine Familien-
-      oder Schulnamen mehr in Repository und Doku (`STAND.md`, `README.md` nennen heute Bruno und
-      die Schule), Rechte an Buchseitenangaben prüfen. Nicht beschlossen.
+      oder Schulnamen in Repository und Doku (seit `lerndax-v17` erledigt, nur der GitHub-Verlauf und der
+      Benutzername in der Webadresse enthalten sie noch), Rechte an Buchseitenangaben prüfen. Nicht beschlossen.
 - [ ] Klasse 6 (Gebrochene Zahlen, Zuordnungen, Dreiecke & Vierecke, Prismen, Anteile), dann
       Klasse 4 und die übrigen Klassen
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …) als Belohnung
-- [ ] Klassen-Bereich für Brunos Klasse (eigenes Thema, siehe oben), evtl. mit Terminen aus dem Familienkalender
+- [ ] Klassen-Bereich für die Klasse des Kindes (eigenes Thema, siehe oben), evtl. mit Terminen aus dem Familienkalender
 - [ ] „Heute geübt“ im Familienkalender anzeigen (gemeinsam mit dem Kalender-Projekt)
 - [ ] Elternbereich von Mathelix auf die Startseite verlegen, sobald ein zweites Fach kommt
 - [ ] Fächer Deutsch und Englisch
@@ -437,30 +442,30 @@ Infos zur ersten Arbeit:
 ## 10. Verlauf
 
 **10.11.2026** (alles in einem langen Chat mit Claude)
-- Idee: Mathe-App für Bruno; Lehrplan Gymnasium Sachsen ausgewertet; Prototyp Klasse 5 als
+- Idee: Mathe-App für das Kind; Lehrplan Gymnasium Sachsen ausgewertet; Prototyp Klasse 5 als
   „Mathelix“ gebaut (22 Themen, Tipps, Lösungswege).
 - Erklär-Animationen (u. a. π-Rad), Primzahl-Erklärung überarbeitet, Lösung nach dem Antworten,
   Pause/Langsam-Modus, Entdecken-Paket (14 Staunen-Momente).
 - Synchronisation: GitHub Pages + Supabase im Projekt familienkalender, Anmeldung mit
   Familienkonto, Eltern-PIN; Repository angelegt, Pages eingeschaltet, Rechte korrigiert.
 - Umbau zum Dachprojekt **LernDax** (Plattform + Fächer), Repository umbenannt, alte
-  `mathelix_`-Tabellen entfernt, Brunos Profil angelegt.
+  `mathelix_`-Tabellen entfernt, Kind-Profil angelegt.
 - Link-Auftrag an das Familienkalender-Projekt übergeben.
 - Dachs-Kopf in App-Icons größer, Zwischenspeicher-Problem auf dem iPhone gelöst, Logo im
   Kopfbereich mit mehr Rand.
 - **Avatare** eingeführt (Spalte `avatar` in `lerndax_profiles`, Version `lerndax-v6`).
 - Tests ins Projekt übernommen (`tests/`), diese Datei angelegt.
-- Testrunde mit Bruno erledigt.
+- Testrunde mit dem Kind erledigt.
 - **Themen-Symbole** neu gezeichnet und größer (44 statt 34 Pixel); orange „×“-Kästchen
   in der Mathelix-Kopfzeile entfernt (Version `lerndax-v7`).
 - Schulbücher und Mathe-Klassenarbeit am 24.11. eingetragen, Abgleich der Arbeitsthemen mit
   Mathelix, Plan für die zwei Wochen bis zur Arbeit.
 - Entscheidung: Klassenarbeiten und Klassenspezifisches **nicht** in die allgemeine App, sondern
   später in einen eigenen Klassen-Bereich. Kachel „Klassenarbeit 24.11.“ daher nicht gebaut.
-- Schulunterlagen gesichtet (Robertos OneDrive-Ordner zu Bruno/Schule, Familienkalender-Status,
-  Schulhandbuch, Brunos LernSax): **keine Fachunterlagen** (Arbeitsblätter) vorhanden, Mathe-
-  Unterlagen kommen auf Papier. Neu: Mathe-Vergleichsarbeit 03.02.2027.
-- Konzept Trainingsseite je Arbeit festgehalten: zuerst nur für Bruno über den Familienkalender,
+- Schulunterlagen gesichtet (Ordner des Auftraggebers zur Schule, Familienkalender-Status,
+  Schulhandbuch, LernSax): **keine Fachunterlagen** (Arbeitsblätter) vorhanden, Mathe-
+  Unterlagen kommen auf Papier. Neu: Mathe-Vergleichsarbeit im Februar 2027.
+- Konzept Trainingsseite je Arbeit festgehalten: zuerst nur für das eigene Kind über den Familienkalender,
   ohne Anmeldung nutzbar gebaut, damit Klassenkameraden später per Link dazukommen können.
 - Potenzen, Division und Teilermengen erweitert (Version `lerndax-v9`).
 - **Trainingsseite** für die Mathe-Arbeit am 24.11. gebaut (`?t=mathe-2026-11-24`), nur über den Link
@@ -472,11 +477,11 @@ Infos zur ersten Arbeit:
   „schriftlich Stelle für Stelle“) und Teilbarkeit (neue Animation); neuer Test
   `tests/ex_aufgabe.py`. Fehler behoben: „Was rechnest du zuerst?“ konnte Rechnungen mit negativem
   Zwischenergebnis erzeugen (z. B. 2 − 4 + 3 · 4). Version `lerndax-v12`.
-- Hinweis Roberto: blaue Markierung bei den Potenzen saß nicht genau. Ursache: Nach einer Hochzahl
+- Hinweis Auftraggeber: blaue Markierung bei den Potenzen saß nicht genau. Ursache: Nach einer Hochzahl
   blieb der Rest der Zeile hochgestellt (leeres `<tspan>` wird vom Browser ignoriert, jetzt mit
   unsichtbarem Zeichen). Markierungs-Kästen werden jetzt nach der gemessenen Textgröße gesetzt
   (`fitBox`, auch bei der Division). Version `lerndax-v13`.
-- Entscheidungen Roberto: keine Geschwister; Bruno übt an Papas iPhone, am Computer und Tablet;
+- Entscheidungen Auftraggeber: ein Kind; geübt wird am iPhone der Eltern, am Computer und Tablet;
   Ziel eine Runde pro Tag; Trainingsseite bleibt nach der Arbeit stehen; Idee „später öffentlich“.
 - **Tagesziel** eingebaut und mit synchronisiert (Version `lerndax-v14`).
 - **Vielfache** und neues Thema **Textaufgaben** (Querbeet zu den Arbeitsthemen), auch auf der
@@ -489,7 +494,7 @@ Infos zur ersten Arbeit:
     „Welche Rechnung ergibt …?“ (Klammer ja/nein)
   - Rechengesetze: Gesetz benennen (Auswahl mit Fach- und deutschem Namen), Lücken füllen,
   „Stimmt das?“ (Kommutativ-/Assoziativgesetz gelten nicht für − und :), ausklammern
-- **Prüfung aller Aufgaben** (Wunsch Roberto, Version `lerndax-v16`). Behoben:
+- **Prüfung aller Aufgaben** (Wunsch Auftraggeber, Version `lerndax-v16`). Behoben:
   - Fahrpläne: Lösungsweg zeigte negative Minuten, wenn die Fahrt vor der vollen Stunde endet;
     „Wie lange dauert die Fahrt?“ rechnet jetzt wie im Tipp über die volle Stunde.
   - Geld immer mit zwei Nachkommastellen (5,60 € statt 5,6 €), Preise realistisch (Brezel 0,60–1,50 €).
@@ -501,7 +506,11 @@ Infos zur ersten Arbeit:
     mit 4 Auswahlen), Primzahlen nur noch 25 % Ja/Nein (neu: „Welche Zahl ist eine Primzahl?“).
   - Texte: „von 72 Kindern“, „ein Siebtel“ statt „ein 7tel“, Potenz-Tipp „kommt 5-mal als Faktor vor“
     (bei hoch 1 kein „Nicht 7 · 1!“ mehr), Primzahl-Erklärung: „genau zwei Teiler, die 1 ist keine Primzahl“.
-  - Keine echten Namen mehr in Aufgaben (vorher „Bruno“, „5d“, „5b“): Textaufgaben in der Du-Form
+  - Keine echten Namen mehr in Aufgaben (vorher Vorname des Kindes und Klassenbezeichnungen): Textaufgaben in der Du-Form
     oder mit neutralen Vornamen, weil die Trainingsseite per Link öffentlich ist.
   - Schriftliches Dividieren höchstens vierstellig (vorher bis 21 600), wie in der Doku beschrieben.
   - Doku: README-Fahrplan (Kalender-Knopf erledigt), SETUP (kein eigenes Handy).
+- **Doku neutral** (Wunsch Auftraggeber, Version `lerndax-v17`): `README.md`, `STAND.md`, `SETUP.md`,
+  Tests und Code-Kommentare ohne Namen von Kind, Familie, Schule und Stadtteil; Fahrplan-Aufgaben
+  ohne den Stadtteil der Schule. Persönliches in `notizen/familie.md` (nur lokal), dort liegt auch die
+  vorherige Fassung dieser Datei (`notizen/STAND-vor-v17.md`).

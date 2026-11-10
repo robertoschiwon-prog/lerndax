@@ -1315,7 +1315,7 @@
     const start = R(6 * 60, 20 * 60 + 30), dur = R(12, 95);
     const end = start + dur;
     const what = pick(['Der Bus', 'Die S-Bahn', 'Die Straßenbahn', 'Der Zug']);
-    const dest = pick(['Klotzsche', 'Neustadt', 'Pirna', 'Meißen', 'Radebeul', 'Freital']);
+    const dest = pick(['Neustadt', 'Pirna', 'Meißen', 'Radebeul', 'Freital', 'Bad Schandau']);
     if (Math.random() < 0.5)
       return {
         prompt: `${what} fährt um <b>${hm(start)} Uhr</b> ab und braucht <b>${dur} Minuten</b> bis ${dest}. Wann kommt ${what.split(' ')[0] === 'Der' ? 'er' : 'sie'} an?`,
