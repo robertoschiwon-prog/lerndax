@@ -11,8 +11,11 @@ create table if not exists public.lerndax_profiles (
   owner       uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name        text not null check (char_length(name) between 1 and 30),
   grade       int  not null default 5 check (grade between 1 and 13),
+  avatar      text check (avatar ~ '^[a-z]{2,20}:[a-z]{2,20}$'),   -- z. B. fuchs:blau
   created_at  timestamptz not null default now()
 );
+-- Für bestehende Datenbanken (Avatar kam am 10.11.2026 dazu):
+alter table public.lerndax_profiles add column if not exists avatar text check (avatar ~ '^[a-z]{2,20}:[a-z]{2,20}$');
 
 create table if not exists public.lerndax_progress (
   profile_id  uuid not null references public.lerndax_profiles(id) on delete cascade,

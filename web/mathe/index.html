@@ -53,7 +53,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn:disabled{opacity:.45}
 
 /* Start */
-.hello{margin:4px 0 14px}
+.hello{margin:4px 0 14px;display:flex;align-items:center;gap:12px}
+.avabtn{border:0;background:none;padding:0;cursor:pointer;line-height:0;flex:0 0 auto}
 .hello h1{font-size:30px;line-height:1.1}
 .hello p{margin:4px 0 0;color:var(--soft);font-weight:700}
 .grades{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 10px;margin:0 -4px 6px;scrollbar-width:none}
@@ -423,7 +424,7 @@ body.noscroll{overflow:hidden}
 .syncerr{background:#ffe9ee;border:2px solid var(--bad);border-radius:10px;padding:8px 10px;font-weight:700}
 .syncmsg{background:#e3f7ee;border:2px solid var(--ok);border-radius:10px;padding:8px 10px}
 .profiles{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
-.profbtn{background:var(--c5)}
+.profbtn{background:var(--c5);display:inline-flex;align-items:center;gap:8px}
 .pindet{margin-top:12px}
 .pindet summary{cursor:pointer;font-weight:800}
 .syncpill{font-size:13px}
@@ -433,6 +434,7 @@ body.noscroll{overflow:hidden}
 <div id="app"></div>
 
 <script>window.LERNDAX_SUBJECT = 'mathe';</script>
+<script src="../plattform/avatare.js"></script>
 <script src="../plattform/config.js"></script>
 <script src="../plattform/sync.js"></script>
 <script src="generatoren/klasse5.js"></script>
@@ -452,6 +454,7 @@ body.noscroll{overflow:hidden}
   try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
   const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
   const SYNC = window.MathelixSync || null;
+  const AVA = window.LernDaxAvatare || null;
   const save = () => { saveLocal(); if (SYNC) SYNC.changed(); };
   let VIEW = 'home';
   let SYS = { enabled: false };
@@ -552,7 +555,7 @@ body.noscroll{overflow:hidden}
         <p>Wie heißt du?</p>
         <form id="nameF"><input id="nameI" maxlength="20" autocomplete="off" placeholder="Dein Vorname"><button class="btn org">Los</button></form>
       </div>`}
-      <div class="hello"><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p></div>
+      <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p></div></div>
       <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
       <div class="quick">
         <button class="btn org" data-mix="all"><span class="ic">🎲</span>Gemischt<small>${TASKS_PER_ROUND} Aufgaben aus allem</small></button>
@@ -1005,7 +1008,7 @@ body.noscroll{overflow:hidden}
       if (SY.profiles === null) { SYNC.listProfiles().then((ps) => { SY.profiles = ps; renderSyncCard(); }).catch((e) => { SY.err = e.message; SY.profiles = []; renderSyncCard(); }); }
       body = `<p>Angemeldet als <b>${esc(SYS.email)}</b>. <b>Wer lernt auf diesem Gerät?</b></p>
         ${note}
-        <div class="profiles">${(SY.profiles || []).map((p) => `<button class="btn profbtn" data-sync="bind" data-id="${esc(p.id)}" data-name="${esc(p.name)}">👤 ${esc(p.name)}</button>`).join('') || (SY.profiles ? '<p class="syncsmall">Noch kein Kind-Profil angelegt.</p>' : '<p>Lade …</p>')}</div>
+        <div class="profiles">${(SY.profiles || []).map((p) => `<button class="btn profbtn" data-sync="bind" data-id="${esc(p.id)}" data-name="${esc(p.name)}" data-avatar="${esc(p.avatar || '')}">${AVA && p.avatar ? AVA.html(p.avatar, 28) : '👤'} ${esc(p.name)}</button>`).join('') || (SY.profiles ? '<p class="syncsmall">Noch kein Kind-Profil angelegt.</p>' : '<p>Lade …</p>')}</div>
         <form class="syncform row" data-syncform="newprofile"><input name="name" maxlength="30" placeholder="Vorname oder Spitzname" value="${esc(S.name || '')}" required><button class="btn" type="submit">+ Profil anlegen</button></form>
         <div class="syncbtns">${SY.switching ? '<button class="btn ghost" data-sync="cancel">Abbrechen</button>' : ''}<button class="btn ghost" data-sync="logout">Abmelden</button></div>`;
     } else {
@@ -1030,7 +1033,7 @@ body.noscroll{overflow:hidden}
       if (act === 'bind') {
         S.name = b.dataset.name; saveLocal();
         SY.switching = false;
-        await SYNC.bindProfile(b.dataset.id, b.dataset.name);
+        await SYNC.bindProfile(b.dataset.id, b.dataset.name, b.dataset.avatar);
         SY.msg = `Fertig! Dieses Gerät lernt jetzt als <b>${esc(b.dataset.name)}</b>. Der bisherige Fortschritt auf diesem Gerät wurde übernommen.`;
         parents(false);
       } else if (act === 'now') { await SYNC.syncNow(); }
@@ -1062,7 +1065,7 @@ body.noscroll{overflow:hidden}
         SY.profiles = null;
         S.name = p.name; saveLocal();
         SY.switching = false;
-        await SYNC.bindProfile(p.id, p.name);
+        await SYNC.bindProfile(p.id, p.name, p.avatar);
         SY.msg = `Profil <b>${esc(p.name)}</b> angelegt. Dieses Gerät lernt jetzt als ${esc(p.name)}.`;
         parents(false); return;
       } else if (kind === 'setpin') {
@@ -1088,6 +1091,7 @@ body.noscroll{overflow:hidden}
     else if (d.mix) { start('mix', d.mix); window.scrollTo(0, 0); }
     else if ('review' in d) { start('review'); window.scrollTo(0, 0); }
     else if (d.grade) { if (+d.grade !== 5) soon(+d.grade); }
+    else if ('ava' in d && AVA) AVA.picker(AVA.get() || AVA.STANDARD, (v) => { if (SYNC && SYS.enabled) SYNC.setAvatar(v); else AVA.set(v); try { localStorage.setItem('lerndax.avatar.asked', '1'); } catch (e) {} home(); });
     else if (d.explain) openExplainer(d.explain, d.when);
     else if ('exclose' in d) closeExplainer();
     else if (d.choice !== undefined) check(+d.choice);
@@ -1123,6 +1127,7 @@ body.noscroll{overflow:hidden}
     try { navigator.serviceWorker.register('../sw.js').catch(() => {}); } catch (e) {}
   }
 
+  if (AVA) AVA.style();
   home();
   // Direkt-Sprünge von der LernDax-Startseite (#eltern, #entdecken)
   function jump() {

@@ -35,7 +35,9 @@ a{color:inherit}
 .pills{margin-left:auto;display:flex;gap:6px}
 .pill{display:flex;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;font-weight:800;font-size:15px}
 .hero{display:flex;align-items:center;gap:14px;margin:6px 0 20px}
-.hero img{width:78px;height:78px;flex:0 0 auto;background:var(--card);border:2px solid var(--ink);border-radius:22px;box-shadow:3px 3px 0 var(--ink);padding:9px 8px 7px}
+.avabtn{position:relative;flex:0 0 auto;border:0;background:none;padding:0;cursor:pointer;line-height:0}
+.avabtn .ldx-ava{box-shadow:3px 3px 0 var(--ink)}
+.avabtn .pen{position:absolute;right:-4px;bottom:-2px;width:28px;height:28px;border-radius:50%;background:var(--card);border:2px solid var(--ink);display:grid;place-items:center;font-size:13px;line-height:1}
 .hero h1{font-size:30px;line-height:1.1}
 .hero p{margin:4px 0 0;color:var(--soft);font-weight:700}
 .subjects{display:grid;gap:12px;margin-bottom:22px}
@@ -62,6 +64,7 @@ a{color:inherit}
 </head>
 <body>
 <div id="app"></div>
+<script src="plattform/avatare.js"></script>
 <script src="plattform/config.js"></script>
 <script src="plattform/sync.js"></script>
 <script>
@@ -77,6 +80,16 @@ a{color:inherit}
   const load = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
   const dayStr = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   let SYS = { enabled: false };
+  const A = window.LernDaxAvatare;
+  function choose(first) {
+    if (!A) return;
+    A.picker(A.get() || A.STANDARD, (v) => {
+      if (window.LernDaxSync && SYS.enabled) window.LernDaxSync.setAvatar(v); else A.set(v);
+      try { localStorage.setItem('lerndax.avatar.asked', '1'); } catch (e) {}
+      render();
+    }, first ? { title: 'Hallo! Such dir deinen Avatar aus!', text: 'Das bist du in LernDax. Du kannst ihn jederzeit wieder ändern.' } : {});
+  }
+  document.addEventListener('click', (e) => { if (e.target.closest('#avaBtn')) choose(false); });
 
   function stats(f) {
     const S = f.key ? load(f.key) : null;
@@ -100,6 +113,7 @@ a{color:inherit}
     const days = [...new Set(all.flatMap((x) => x.s.days))];
     const name = (SYS.profileName || all.map((x) => x.s.name).find(Boolean) || '').trim();
     const today = days.includes(dayStr(new Date()));
+    const avatar = A ? A.get() : '';
     $.innerHTML = `
       <div class="top">
         <div class="brand"><span class="mark"><img src="icons/dachs.svg" alt=""></span><span>Lern<b>Dax</b></span></div>
@@ -109,9 +123,9 @@ a{color:inherit}
         </div>
       </div>
       <div class="hero">
-        <img src="icons/dachs.svg" alt="Der LernDax-Dachs">
+        <button class="avabtn" id="avaBtn" aria-label="Avatar ändern">${A ? A.html(avatar || A.STANDARD, 80) : ''}<span class="pen">✏️</span></button>
         <div><h1>${name ? `Hallo ${esc(name)}!` : 'Hallo!'}</h1>
-        <p>${today ? 'Heute schon gelernt – stark! 💪' : 'Was möchtest du heute lernen?'}</p></div>
+        <p>${!avatar ? 'Tipp auf das Bild und such dir deinen Avatar aus!' : today ? 'Heute schon gelernt – stark! 💪' : 'Was möchtest du heute lernen?'}</p></div>
       </div>
       <div class="subjects">
         ${FAECHER.map((f) => {
@@ -134,7 +148,10 @@ a{color:inherit}
       </div>`;
   }
 
+  if (A) A.style();
   render();
+  let asked = '1'; try { asked = localStorage.getItem('lerndax.avatar.asked') || ''; } catch (e) {}
+  if (A && !A.get() && !asked) setTimeout(() => { if (!A.get()) choose(true); }, 400);
   if (window.LernDaxSync) window.LernDaxSync.init({ getState: () => ({}), applyState() {}, onStatus(st) { SYS = st; render(); } });
   window.addEventListener('pageshow', render);
 

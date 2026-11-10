@@ -28,6 +28,8 @@
   try { dev = JSON.parse(localStorage.getItem(DEV_KEY) || '{}'); } catch (e) {}
   const saveDev = () => { try { localStorage.setItem(DEV_KEY, JSON.stringify(dev)); } catch (e) {} };
 
+  const AV = () => window.LernDaxAvatare;
+  const AVP = 'lerndax.avatar.pending';
   const status = { enabled, loggedIn: false, email: '', userId: '', profileId: dev.profileId || '', profileName: dev.profileName || '', lastSync: dev.lastSync || 0, busy: false, error: '', online: navigator.onLine };
   const emit = () => app && app.onStatus && app.onStatus(Object.assign({}, status));
 
@@ -73,10 +75,10 @@
       emit();
     })();
     await ready;
-    if (status.loggedIn && status.profileId) syncNow();
-    window.addEventListener('online', () => { status.online = true; emit(); syncNow(); });
+    if (status.loggedIn && status.profileId) { syncAvatar(); syncNow(); }
+    window.addEventListener('online', () => { status.online = true; emit(); syncAvatar(); syncNow(); });
     window.addEventListener('offline', () => { status.online = false; emit(); });
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(); });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { syncAvatar(); syncNow(); } });
   }
   function setUser(u) {
     status.loggedIn = !!u; status.email = u ? u.email : ''; status.userId = u ? u.id : '';
@@ -115,21 +117,46 @@
   // ---------- Profile ----------
   async function listProfiles() {
     await ready;
-    const { data, error } = await sb.from(T.profiles).select('id,name,grade').order('created_at');
+    const { data, error } = await sb.from(T.profiles).select('id,name,grade,avatar').order('created_at');
     if (error) throw new Error(msg(error));
     return data || [];
   }
   async function createProfile(name, grade) {
     await ready;
-    const { data, error } = await sb.from(T.profiles).insert({ name: name.slice(0, 30), grade: grade || 5 }).select('id,name').single();
+    const av = AV() && AV().get();
+    const { data, error } = await sb.from(T.profiles).insert({ name: name.slice(0, 30), grade: grade || 5, avatar: av || null }).select('id,name,avatar').single();
     if (error) throw new Error(msg(error));
     return data;
   }
-  async function bindProfile(id, name) {
+  async function bindProfile(id, name, avatar) {
     status.profileId = id; status.profileName = name;
     dev.profileId = id; dev.profileName = name; saveDev();
+    if (avatar && AV()) { AV().set(avatar); try { localStorage.removeItem(AVP); } catch (e) {} }
     emit();
+    await syncAvatar();
     await syncNow();
+  }
+
+  // ---------- Avatar: im Profil gespeichert, auf allen Geräten gleich ----------
+  async function setAvatar(v) {
+    if (AV()) AV().set(v);
+    try { localStorage.setItem(AVP, '1'); } catch (e) {}
+    emit();
+    await syncAvatar();
+  }
+  async function syncAvatar() {
+    if (!enabled || !sb || !status.loggedIn || !status.profileId || !navigator.onLine || !AV()) return;
+    try {
+      let pending = false; try { pending = localStorage.getItem(AVP) === '1'; } catch (e) {}
+      if (pending) {
+        const { error } = await sb.from(T.profiles).update({ avatar: AV().get() }).eq('id', status.profileId);
+        if (!error) { try { localStorage.removeItem(AVP); } catch (e) {} }
+      } else {
+        const { data } = await sb.from(T.profiles).select('avatar').eq('id', status.profileId).maybeSingle();
+        if (data && data.avatar && data.avatar !== AV().get()) { AV().set(data.avatar); emit(); }
+        else if (data && !data.avatar && AV().get()) await sb.from(T.profiles).update({ avatar: AV().get() }).eq('id', status.profileId);
+      }
+    } catch (e) {}
   }
 
   // ---------- Eltern-PIN ----------
@@ -178,5 +205,5 @@
     pushTimer = setTimeout(syncNow, 2500);
   }
 
-  window.LernDaxSync = window.MathelixSync = { init, status: () => Object.assign({}, status), signIn, signUp, signOut, listProfiles, createProfile, bindProfile, syncNow, changed, setPin, checkPin, getPinHash, merge };
+  window.LernDaxSync = window.MathelixSync = { setAvatar, syncAvatar, init, status: () => Object.assign({}, status), signIn, signUp, signOut, listProfiles, createProfile, bindProfile, syncNow, changed, setPin, checkPin, getPinHash, merge };
 })();
