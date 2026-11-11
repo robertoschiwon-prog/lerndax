@@ -25,3 +25,12 @@ Voraussetzung: Python 3 mit `pip install playwright` und `playwright install chr
 Bildschirmfotos landen in `tests/shots/` (nicht auf GitHub). Meldungen wie
 `ERR_TUNNEL_CONNECTION_FAILED` bedeuten nur, dass Schriftarten aus dem Internet nicht geladen
 werden konnten, das ist kein Fehler der App.
+
+## Design-Prüfung
+
+`python3 tests/design_audit.py` geht alle Ansichten auf vier Bildschirmgrößen durch (320, 390, 768, 1280 px) und meldet
+Überlauf über den Rand, abgeschnittenen Text, schwachen Kontrast, zu kleine Schrift und zu kleine Tippflächen.
+Keine Ausgabe außer den Sternen (Deko), dem orangen „Dax“ im Logo und den Klassen-Feldern heißt: alles in Ordnung.
+Bildschirmfotos landen in `tests/shots/audit/`.
+
+Neue Themen prüfen: `python3 tests/loesung.py 12 k5-ueberschlag,k5-schriftlich,k5-dezrunden,k5-gemischt,k5-symmetrie,k5-netze,k5-fermi`

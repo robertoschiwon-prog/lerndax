@@ -19,7 +19,7 @@ TASKINFO="""() => { const t = window.__mathelix.round().cur.task; const fmt = wi
   if (t.fields) t.fields.forEach(f => { if ('fixed' in f) return; if (Array.isArray(f.answer)) want.push(f.answer.join(' · ')); else if (typeof f.answer === 'number') want.push(fmt(f.answer)); });
   if (t.layout === 'time') want = [String(t.fields[0].answer).padStart(2,'0') + ':' + String(t.fields[1].answer).padStart(2,'0')];
   if (t.layout === 'frac') want = t.fields.map(f => String('fixed' in f ? f.fixed : f.answer));
-  if (t.layout === 'coord') want = ['P(' + t.fields[0].answer + ' | ' + t.fields[1].answer + ')'];
+  if (t.layout === 'coord') want = ['(' + t.fields[0].answer + ' | ' + t.fields[1].answer + ')'];
   if (t.choices) { const c = plain(t.choices[t.correct]); want = /^[\\d\\s,]+$/.test(c) && !/Teiler/.test(t.prompt) ? [c] : []; }
   return { p: plain(t.prompt), ex: t.ex || null, want }; }"""
 async def run(topics, n):

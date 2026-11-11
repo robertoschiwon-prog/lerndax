@@ -122,7 +122,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
-- **5 Lernbereiche, 25 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
+- **5 Lernbereiche, 32 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
   - LB 1 Natürliche Zahlen: Runden · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen ·
     Schriftlich dividieren · Teiler & Vielfache · Primzahlen & Primfaktoren · Einfache Gleichungen · **Textaufgaben**
   - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern ·
@@ -132,7 +132,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **Erklär-Animationen** zu allen 25 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
+- **Erklär-Animationen** zu allen 32 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
   Textaufgaben „in vier Schritten“, Zahlen vergleichen und Sachaufgaben „Wechselgeld ergänzen“). Liste der Grund-Animationen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Dividieren: Bonbons in Tüten und
   schriftlich Stelle für Stelle · Teilbarkeit: Regeln und Teiler (Quersumme, Endziffern, durch 6,
@@ -445,9 +445,8 @@ Infos zur ersten Arbeit:
       Bereich oder Familienkalender erwähnen?
 - [x] Nach der Arbeit (24.11.): Trainingsseite **bleibt stehen** (Entscheidung Auftraggeber, 10.11.), auch
       als Beispiel für spätere Jahrgänge bzw. eine mögliche öffentliche Version.
-- Danach (Lehrplan-Lücken Klasse 5): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, gemischte
-  Zahlen (unechte Brüche kommen bisher nur beim Kürzen vor), Überschlag, schriftliches Addieren,
-  Subtrahieren und Multiplizieren natürlicher Zahlen, Dezimalzahlen runden, Fermi-Aufgaben
+- [x] Lehrplan-Lücken Klasse 5 geschlossen (11.11.2026, `lerndax-v34`): sieben neue Themen, siehe Verlauf.
+      Noch nicht abgedeckt: Schrägbilder zeichnen, Drehungen, Quadernetze (nur Würfelnetze).
 
 **Entscheidungen des Auftraggebers zur Komplett-Prüfung (11.11.2026, umgesetzt mit `lerndax-v21`)**
 - Raten: mehr Aufgaben zum Eintippen, Ja/Nein höchstens bei etwa einem Viertel je Thema.
@@ -459,6 +458,7 @@ Infos zur ersten Arbeit:
 - Mehr Abwechslung bei Themen mit wenigen Aufgabenarten.
 - **Noch offen:** Wie rechnet die Schule schriftlich minus (Ergänzen mit „1 merken“ wie in der
   Animation, oder Entbündeln)? Der Auftraggeber fragt nach; bis dahin bleibt die Animation, wie sie ist.
+  Das neue Thema „Schriftlich rechnen“ zeigt bei Minus deshalb nur die Probe mit Plus (passt zu beiden Wegen).
 
 **Als Nächstes sinnvoll**
 - [x] Testrunde 1 mit dem Kind (10.11.2026)
@@ -662,3 +662,21 @@ Infos zur ersten Arbeit:
   weiße Schrift auf Blau, Grün und Lila (Lernbereichs-Marken) und auf Orange („Fertig“ in der Avatar-Wahl) war zu
   kontrastarm; Erklär-Knopf, Farbwahl, Logo und Eltern-Link hatten zu kleine Tippflächen; MaDax-Kachel der
   Startseite nutzt allein die ganze Breite.
+- **Lehrplan-Lücken Klasse 5 geschlossen** (Version `lerndax-v34`): MaDax hat jetzt **32 Themen** (vorher 25).
+  Neu, jeweils mit Aufgaben, Tipp, Lösungsweg, eigenem Symbol und Erklär-Animation (auch „Lösung zu deiner Aufgabe“
+  und „ähnliches Beispiel“):
+  - LB 1: **Überschlagen** (runden und rechnen, „Welches Ergebnis kann stimmen?“, „Reicht das Geld?“) und
+    **Schriftlich rechnen** (plus, minus, mal einstellig und zweistellig)
+  - LB 2: **Gemischte Zahlen** (in beide Richtungen, Einordnen, Sachaufgabe) und **Dezimalzahlen runden**
+  - LB 3: **Symmetrie & Spiegeln** (Symmetrieachsen zählen, Art der Symmetrie, Spiegeln an einer Geraden,
+    Punktspiegelung, Verschiebung ablesen)
+  - LB 4: **Würfelnetze & Baupläne** (Würfelnetz ja/nein, gegenüberliegende Flächen, Würfel zählen, Ansicht von vorn)
+  - LB 5: **Schätzen wie Fermi** (zwölf Fragen, Größenordnung wählen, Lösung in vier Schritten)
+  Neue Dateien: `web/mathe/generatoren/klasse5-luecken.js` und `web/mathe/erklaerungen/klasse5-luecken.js`
+  (eigene Dateien, damit sie Änderungen an `klasse5.js` nicht in die Quere kommen; sie hängen ihre Themen in die
+  Lernbereiche ein). Die Runden-Erklärung in `klasse5.js` kann jetzt auch Dezimalzahlen (`scale`) und berechnet
+  die Nachbarzahlen immer aus der aktuellen Zahl (vorher zeigte der Regler am rechten Rand negative Abstände).
+  Geprüft: je Thema 3000 erzeugte Aufgaben ohne Fehler; alle Würfelnetze durch Falten nachgerechnet; alle 16
+  Figuren auf ihre Symmetrie nachgerechnet; 96 Lösungs-Animationen laufen durch und nennen das richtige Ergebnis;
+  512 Aufgaben über alle 32 Themen in der App gelöst.
+- Neuer Test `tests/design_audit.py` (Design-Prüfung auf vier Bildschirmgrößen), siehe `tests/README.md`.

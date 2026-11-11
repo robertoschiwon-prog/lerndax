@@ -102,9 +102,9 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 übrigen Klassen (Details in `faecher/README.md`).
 
 **Mathe (MaDax)**
-- [x] Klasse 5: alle 5 Lernbereiche, 25 Themen, Tipps und Lösungswege
-- [x] Erklär-Animationen zu allen 25 Themen, Pause und Langsam-Modus
-- [x] Beispiel vorher / Lösung als Animation nachher für alle 25 Themen
+- [x] Klasse 5: alle 5 Lernbereiche, 32 Themen, Tipps und Lösungswege
+- [x] Erklär-Animationen zu allen 32 Themen, Pause und Langsam-Modus
+- [x] Beispiel vorher / Lösung als Animation nachher für alle 32 Themen
 - [x] Entdecken: 14 visuelle Beweise und Staunen-Momente
 - [x] Entscheidungen aus der Prüfung vom 11.11.2026 umgesetzt: weniger Raten, leichtere Zahlen, „Gemischt“ nur aus geübten Themen, breite Darstellung am Tablet und PC
 - [ ] Verfahren beim schriftlichen Minus mit der Schule abgleichen

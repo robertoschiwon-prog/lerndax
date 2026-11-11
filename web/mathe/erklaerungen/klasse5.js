@@ -60,14 +60,18 @@
     create(api, ctx) {
       ctx = ctx || {};
       // Gerechnet wird in „Einheiten“ u = p/10: ein Strich auf dem Zahlenstrahl ist u.
+      // Dezimalzahlen: ctx.scale = 1000 → alle Zahlen sind ganze Tausendstel und werden geteilt angezeigt
+      const sc = ctx.scale || (ctx.dez ? 1000 : 1);
+      const NAME = sc === 1000 ? { 1000: 'Einer', 100: 'Zehntel', 10: 'Hundertstel' } : PLACE;
+      const F = (v) => fmt(v / sc);
       let B, n, u = 1, p = 10, name = 'Zehner';
       const X = (v) => 30 + (v - B) * 10; // v in Einheiten
       const isTask = ctx.mode === 'rund' && ctx.post;
       function setN(num, place) {
-        p = place; u = p / 10; name = PLACE[p] || 'Zehner'; n = num;
+        p = place; u = p / 10; name = ctx.name || NAME[p] || 'Zehner'; n = num;
         B = Math.floor(n / p) * 10 - 10; // linker Rand: ein Block vor dem unteren Nachbarn
       }
-      const pickN = () => setN(10 * R(4, 91) + R(1, 9), 10);
+      const pickN = () => (sc === 1000 ? setN(100 * R(11, 98) + 10 * R(1, 9), 100) : setN(10 * R(4, 91) + R(1, 9), 10));
       if (isTask) setN(ctx.n, ctx.p);
       else if (ctx.mode === 'rund' && ctx.pre) {
         // ähnliches Beispiel: gleiche Stelle, ähnlich große Zahl
@@ -75,7 +79,8 @@
         do m = R(10 ** (len - 1), 10 ** len - 1); while (m === ctx.n || m % ctx.p === 0);
         setN(m, ctx.p);
       } else pickN();
-      const lo = () => (B + 10) * u, hi = () => (B + 20) * u;
+      // Nachbarn immer aus der aktuellen Zahl berechnen (auch wenn der Regler sie in den nächsten Abschnitt schiebt)
+      const lo = () => Math.floor(n / p) * p, hi = () => lo() + p;
       let g;
       function scene() {
         api.clear();
@@ -85,34 +90,34 @@
         for (let v = B; v <= B + 30; v++) {
           const big = v % 10 === 0, mid = v % 5 === 0;
           el('line', { x1: X(v), y1: 100 - (big ? 12 : mid ? 8 : 5), x2: X(v), y2: 100 + (big ? 12 : mid ? 8 : 5), class: 'tk' }, api.svg);
-          if (big) el('text', { x: X(v), y: 132, class: 'ex-t', 'text-anchor': 'middle', text: fmt(v * u) }, api.svg);
+          if (big) el('text', { x: X(v), y: 132, class: 'ex-t', 'text-anchor': 'middle', text: F(v * u) }, api.svg);
         }
-        g.lo = el('circle', { cx: X(B + 10), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
-        g.hi = el('circle', { cx: X(B + 20), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
+        g.lo = el('circle', { cx: X(lo() / u), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
+        g.hi = el('circle', { cx: X(hi() / u), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
         g.mid = el('g', { opacity: 0 }, api.svg);
-        el('line', { x1: X(B + 15), y1: 72, x2: X(B + 15), y2: 116, class: 'dash' }, g.mid);
-        el('text', { x: X(B + 15), y: 150, class: 'ex-s', 'text-anchor': 'middle', text: 'Mitte ' + fmt((B + 15) * u) }, g.mid);
+        el('line', { x1: X(lo() / u + 5), y1: 72, x2: X(lo() / u + 5), y2: 116, class: 'dash' }, g.mid);
+        el('text', { x: X(lo() / u + 5), y: 150, class: 'ex-s', 'text-anchor': 'middle', text: 'Mitte ' + F((lo() + hi()) / 2) }, g.mid);
         g.dist = el('g', {}, api.svg);
         g.m = el('g', { opacity: 0 }, api.svg);
         el('line', { x1: 0, y1: 60, x2: 0, y2: 100, class: 'stem' }, g.m);
         el('circle', { cx: 0, cy: 100, r: 7, class: 'mk' }, g.m);
-        g.ml = el('text', { x: 0, y: 52, class: 'ex-b f1', 'text-anchor': 'middle', text: fmt(n) }, g.m);
+        g.ml = el('text', { x: 0, y: 52, class: 'ex-b f1', 'text-anchor': 'middle', text: F(n) }, g.m);
         g.m.setAttribute('transform', `translate(${X(n / u)},0)`);
       }
       function dist(show) {
         g.dist.innerHTML = '';
         if (!show) return;
         const d1 = n - lo(), d2 = hi() - n, xv = X(n / u);
-        el('path', { d: `M ${X(B + 10)} 88 Q ${(X(B + 10) + xv) / 2} 70 ${xv} 88`, class: d1 < d2 ? 'arcG' : 'arcN' }, g.dist);
-        el('path', { d: `M ${xv} 88 Q ${(xv + X(B + 20)) / 2} 70 ${X(B + 20)} 88`, class: d2 <= d1 ? 'arcG' : 'arcN' }, g.dist);
-        el('text', { x: (X(B + 10) + xv) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: fmt(d1) }, g.dist);
-        el('text', { x: (xv + X(B + 20)) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: fmt(d2) }, g.dist);
+        el('path', { d: `M ${X(lo() / u)} 88 Q ${(X(lo() / u) + xv) / 2} 70 ${xv} 88`, class: d1 < d2 ? 'arcG' : 'arcN' }, g.dist);
+        el('path', { d: `M ${xv} 88 Q ${(xv + X(hi() / u)) / 2} 70 ${X(hi() / u)} 88`, class: d2 <= d1 ? 'arcG' : 'arcN' }, g.dist);
+        el('text', { x: (X(lo() / u) + xv) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: F(d1) }, g.dist);
+        el('text', { x: (xv + X(hi() / u)) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: F(d2) }, g.dist);
       }
       const up = () => n - lo() >= p / 2;
       const digit = () => Math.floor(n / u) % 10;
       function verdict() {
         const t = up() ? hi() : lo();
-        return `<b>${fmt(n)}</b> liegt näher an <b>${fmt(t)}</b>${n - lo() === p / 2 ? ' (genau in der Mitte: dann rundet man <b>auf</b>)' : ''} → ${up() ? 'aufrunden' : 'abrunden'}: ${fmt(n)} ≈ <b>${fmt(t)}</b>`
+        return `<b>${F(n)}</b> liegt näher an <b>${F(t)}</b>${n - lo() === p / 2 ? ' (genau in der Mitte: dann rundet man <b>auf</b>)' : ''} → ${up() ? 'aufrunden' : 'abrunden'}: ${F(n)} ≈ <b>${F(t)}</b>`
           + `<br><small>Kurz: Die Ziffer rechts neben der ${name}stelle ist <b>${digit()}</b> → ${digit() >= 5 ? '5 bis 9: aufrunden' : '0 bis 4: abrunden'}.</small>`;
       }
       const sl = api.slider({ label: 'Zahl verschieben', min: 1, max: 19, value: Math.round(n / u) - B - 10, onInput(val) {
@@ -121,25 +126,25 @@
         dist(true);
         api.say(verdict());
       } });
-      api.chips([{ label: 'Neue Zahl', onClick() { pickN(); sl.value = n - B - 10; api.replay(); } }]);
+      api.chips([{ label: 'Neue Zahl', onClick() { pickN(); sl.value = Math.round(n / u) - B - 10; api.replay(); } }]);
       return {
         reset: scene,
         async play() {
-          api.say(`Runde <b>${fmt(n)}</b> auf ${name}. Wo liegt die Zahl auf dem Zahlenstrahl?${u > 1 ? `<br><small>Ein kleiner Strich bedeutet hier ${fmt(u)}.</small>` : ''}`);
+          api.say(`Runde <b>${F(n)}</b> auf ${name}. Wo liegt die Zahl auf dem Zahlenstrahl?${u > 1 ? `<br><small>Ein kleiner Strich bedeutet hier ${F(u)}.</small>` : ''}`);
           await api.tw(700, (t) => { g.m.setAttribute('opacity', t); g.m.setAttribute('transform', `translate(${X(n / u)},${(1 - t) * -30})`); });
           await api.wait(1200);
-          api.say(`Die beiden Nachbar-${name} sind <b>${fmt(lo())}</b> und <b>${fmt(hi())}</b>.`);
+          api.say(`Die beiden Nachbar-${name} sind <b>${F(lo())}</b> und <b>${F(hi())}</b>.`);
           await api.tw(500, (t) => { g.lo.setAttribute('opacity', t); g.hi.setAttribute('opacity', t); });
           await api.wait(1400);
-          api.say(`Genau in der Mitte liegt <b>${fmt((B + 15) * u)}</b>.`);
+          api.say(`Genau in der Mitte liegt <b>${F((lo() + hi()) / 2)}</b>.`);
           await api.tw(500, (t) => g.mid.setAttribute('opacity', t));
           await api.wait(1200);
-          api.say(`Abstände: zu ${fmt(lo())} sind es ${fmt(n - lo())}, zu ${fmt(hi())} sind es ${fmt(hi() - n)}.`);
+          api.say(`Abstände: zu ${F(lo())} sind es ${F(n - lo())}, zu ${F(hi())} sind es ${F(hi() - n)}.`);
           dist(true);
           await api.wait(1800);
           const target = up() ? hi() : lo();
           api.say(verdict());
-          await api.tw(900, (t) => { g.m.setAttribute('transform', `translate(${lerp(X(n / u), X(target / u), t)},${-Math.sin(t * Math.PI) * 18})`); g.ml.textContent = t < 0.98 ? fmt(n) : '≈ ' + fmt(target); });
+          await api.tw(900, (t) => { g.m.setAttribute('transform', `translate(${lerp(X(n / u), X(target / u), t)},${-Math.sin(t * Math.PI) * 18})`); g.ml.textContent = t < 0.98 ? F(n) : '≈ ' + F(target); });
         },
       };
     },

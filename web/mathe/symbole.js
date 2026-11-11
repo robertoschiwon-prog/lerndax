@@ -16,6 +16,8 @@ window.MathelixIcons = (function () {
     'k5-teilbar': [6.5, 12, 17.5].map(y => `<circle cx="5.5" cy="${y}" r="2.1" ${F}/><circle cx="18.5" cy="${y}" r="2.1" ${F}/>`).join('') + `<path d="M12 3v18" stroke-dasharray="2.2 2.6" stroke-width="1.8"/>`,
     'k5-prim': `<circle cx="12" cy="5" r="2.7"/><circle cx="5.8" cy="18.5" r="2.7"/><circle cx="18.2" cy="18.5" r="2.7"/><path d="M10.7 7.4 7 16.1M13.3 7.4l3.7 8.7"/>`,
     'k5-gleichung': `<path d="M12 3.5V20M7.5 20.5h9M3.5 7h17"/><path d="M3.5 7 1.4 13M3.5 7l2.1 6M20.5 7l-2.1 6M20.5 7l2.1 6"/><path d="M.9 13h5.2a2.6 2.6 0 0 1-5.2 0zM17.9 13h5.2a2.6 2.6 0 0 1-5.2 0z" ${F}/>`,
+    'k5-ueberschlag': `<path d="M3.5 9c2.6-3.2 5.6-3.2 8.5 0s5.9 3.2 8.5 0M3.5 16c2.6-3.2 5.6-3.2 8.5 0s5.9 3.2 8.5 0" stroke-width="2.4"/>`,
+    'k5-schriftlich': `<path d="M10 4.5h10.5M10 9.5h10.5M3 14h17.5M11.5 19h9"/><path d="M3 7h5M5.5 4.5v5" stroke-width="1.8"/>`,
     // LB 2 Brüche & Dezimalzahlen
     'k5-anteil': `<circle cx="12" cy="12" r="8.6"/><path d="M12 12V3.4A8.6 8.6 0 1 1 4.55 16.3z" ${F}/>`,
     'k5-kuerzen': `<rect x="3" y="7" width="18" height="10" rx="1.5"/><rect x="3" y="7" width="9" height="10" rx="1.5" ${F}/>`,
@@ -24,6 +26,8 @@ window.MathelixIcons = (function () {
     'k5-dezimal': `<text x="12" y="16.6" text-anchor="middle" font-size="13.5" font-weight="900" font-family="Nunito, system-ui, sans-serif" ${F}>0,5</text>`,
     'k5-vergleich': `<circle cx="4" cy="12" r="1.9" ${F}/><path d="M13.2 6.5 7.7 12l5.5 5.5"/><circle cx="18.6" cy="12" r="4.2" ${F}/>`,
     'k5-mittel': `<rect x="3" y="14" width="4.6" height="7" rx="1" ${F} opacity=".75"/><rect x="9.7" y="5" width="4.6" height="16" rx="1" ${F} opacity=".75"/><rect x="16.4" y="10" width="4.6" height="11" rx="1" ${F} opacity=".75"/><path d="M1.5 10.7h21" stroke-dasharray="3 2"/>`,
+    'k5-gemischt': `<circle cx="7" cy="12" r="5.2" ${F}/><circle cx="17.3" cy="12" r="5.2"/><path d="M17.3 6.8a5.2 5.2 0 0 1 0 10.4z" ${F}/>`,
+    'k5-dezrunden': `<path d="M3.5 7.5c2.6-3 5.6-3 8.5 0s5.9 3 8.5 0" stroke-width="2.4"/><circle cx="7" cy="16" r="2.2" ${F}/><path d="M12.2 16.5c.2 2-.6 3.4-2 4.300" stroke-width="2.2"/><circle cx="17.5" cy="16" r="2.2" ${F}/>`,
     // LB 3 Geometrie
     'k5-koord': `<path d="M4 2.5V20h17.5"/><path d="M4 9h10.5M14.5 9v11" stroke-dasharray="2 2.2" stroke-width="1.5"/><circle cx="14.5" cy="9" r="2.6" ${F}/>`,
     'k5-winkelart': `<path d="M3.5 19.5H13.0A9.5 9.5 0 0 0 9.79 12.38z" ${F} opacity=".7"/><path d="M3 19.5h18M3.5 19.5 15.5 5.9"/>`,
@@ -35,6 +39,10 @@ window.MathelixIcons = (function () {
     'k5-einheit': `<rect x="1.8" y="7.5" width="20.4" height="9" rx="1.6"/><path d="M6 7.5v3.6M10 7.5v2.2M14 7.5v3.6M18 7.5v2.2" stroke-width="1.7"/>`,
     'k5-fahrplan': `<circle cx="12" cy="13.5" r="8"/><path d="M12 9.3v4.2l3 2"/><path d="M9.8 2.5h4.4M12 2.5v3"/>`,
     'k5-sach': `<circle cx="12" cy="12" r="9.3"/><path d="M15.9 8.4a4.9 4.9 0 1 0 0 7.2"/><path d="M6.6 10.7h6.6M6.6 13.4h6.6" stroke-width="1.8"/>`,
+    // Ergänzte Themen (klasse5-luecken.js)
+    'k5-symmetrie': `<path d="M12 2v20" stroke-dasharray="2.4 2.6" stroke-width="1.6"/><path d="M9 6v12l-6-6z" ${F}/><path d="M15 6v12l6-6z"/>`,
+    'k5-netze': `<path d="M9.3 1.5h5.4v5.4H9.3zM3.9 6.9h16.2v5.4H3.900zM9.3 6.900v5.400M14.700 6.900v5.400M9.300 12.300v10.800h5.400V12.300M9.300 17.700h5.400" stroke-width="1.6"/>`.replace(/(\.\d)00/g, '$1'),
+    'k5-fermi': `<path d="M8.4 8.6a3.700 3.700 0 1 1 5.800 3c-1.300.900-2.200 1.700-2.200 3.400"/><circle cx="12" cy="19" r="1.5" ${F}/><path d="M3 20.500c1-1.200 2.100-1.200 3 0M18 20.500c1-1.200 2.100-1.200 3 0" stroke-width="1.5"/>`.replace(/(\.\d)00/g, '$1'),
   };
   function svg(id) {
     const body = I[id];
