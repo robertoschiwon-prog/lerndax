@@ -633,3 +633,4 @@ Infos zur ersten Arbeit:
 - **Entdecken-Symbole neu** (Version `lerndax-v26`): Die 14 Kacheln zeigen jetzt selbst gezeichnete
   Symbole in einheitlicher Größe und Strichstärke statt Schriftzeichen und Emojis (die je nach Gerät
   unterschiedlich groß und teils kaum erkennbar waren). Definition am Ende von `entdecken.js` (`DI`).
+- Entdecken-Symbole Sieb, Sonnenblume (jetzt mit Blütenblättern) und Pythagoras gröber gezeichnet, alle Symbole etwas größer (Version `lerndax-v27`).
