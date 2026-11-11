@@ -17,7 +17,7 @@ async def main():
         await ctx.add_init_script(FAST)
         pg = await ctx.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
+        await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
         await pg.click('[data-explain="k5-prim"]'); await pg.wait_for_timeout(1500)
         await pg.screenshot(path=f'{SHOTS}/p1_mid.png')
         await finish(pg); await pg.screenshot(path=f'{SHOTS}/p2_12.png')

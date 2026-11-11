@@ -10,7 +10,7 @@ async def main():
         b = await p.chromium.launch(**CHROME, args=['--no-sandbox'])
         pg = await b.new_page(viewport={'width':390,'height':844}, device_scale_factor=2)
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
+        await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
         await pg.click('[data-explain="pi"]'); await pg.wait_for_timeout(3000)
         print('btn while playing:', await pg.inner_text('#exPlay'))
         await pg.click('#exPlay')

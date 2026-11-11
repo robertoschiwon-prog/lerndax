@@ -11,7 +11,7 @@ async def main():
         b = await p.chromium.launch(**CHROME, args=['--no-sandbox'])
         ctx = await b.new_context(viewport={'width':390,'height':844}, device_scale_factor=2); await ctx.add_init_script(FAST)
         pg = await ctx.new_page(); errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
+        await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
         for t in ['gauss','triangle']:
             await pg.click(f'[data-explain="{t}"]')
             for _ in range(300):

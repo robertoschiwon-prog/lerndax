@@ -16,7 +16,7 @@ async def main():
         b = await p.chromium.launch(**CHROME, args=['--no-sandbox'])
         pg = await b.new_page(viewport={'width':390,'height':844}, device_scale_factor=2)
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
+        await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
         bad=0; n=0
         ids = await pg.eval_on_selector_all('[data-topic]', 'els=>els.map(e=>e.dataset.topic)')
         for rnd in range(2):

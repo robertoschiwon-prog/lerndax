@@ -28,7 +28,7 @@ async def run(topics, n):
         pg = await b.new_page(viewport={'width':390,'height':844})
         await pg.add_init_script(FAST)
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto(URL); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
+        await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
         res = []
         for t in topics:
             for i in range(n):

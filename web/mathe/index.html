@@ -118,6 +118,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .namecard h2{font-size:22px;margin-bottom:6px}
 .namecard p{margin:0 0 12px;color:var(--soft)}
 .namecard form{display:flex;gap:8px}
+.gruss{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.gruss .dax{flex:0 0 auto;width:92px;height:92px;border-radius:50%;background:var(--c1);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);overflow:hidden;animation:pop .4s both}
+.gruss .dax img{width:100%;height:100%;display:block}
+.gruss .blase{position:relative;margin:0;background:var(--ink);color:#fff;font-size:19px;line-height:1.25;padding:10px 14px;border-radius:16px;animation:pop .35s .2s both}
+.gruss .blase::after{content:"";position:absolute;left:-9px;top:calc(50% - 9px);border:9px solid transparent;border-right-color:var(--ink);border-left:0}
 .namecard input{flex:1;min-width:0;font:700 19px Nunito,system-ui,sans-serif;border:2px solid var(--ink);border-radius:12px;padding:10px 12px}
 
 /* Üben */
@@ -225,13 +230,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 .dots{display:flex;justify-content:center;gap:6px;margin:12px 0 18px}
 .dots i{width:22px;height:22px;border-radius:7px;border:2px solid var(--ink)}
 .dots i.r1{background:var(--ok)}.dots i.r2{background:var(--c5)}.dots i.r0{background:var(--bad)}
-.res .stars{font-size:34px;letter-spacing:4px;margin-bottom:16px}
+.res .stars{font-size:34px;letter-spacing:4px;margin-bottom:6px;display:block}
+.res .sternhint{font-size:14px;color:var(--soft);font-weight:700;margin:0 0 16px}
+.res .sternhint b{color:var(--ink)}
 .res .btns{display:grid;gap:10px}
 
 /* Eltern */
 .ph{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .ph h1{font-size:26px}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.ptabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.ptab{font:800 16px Nunito,system-ui,sans-serif;padding:10px 8px;border:2px solid var(--ink);border-radius:14px;background:var(--card);color:var(--ink);cursor:pointer}
+.ptab.on{background:var(--ink);color:#fff;box-shadow:3px 3px 0 var(--c1)}
+.pview.aus{display:none}
 .kpi{padding:12px}
 .kpi b{display:block;font:800 26px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
 .kpi span{font-size:13px;color:var(--soft);font-weight:700}
@@ -298,6 +309,11 @@ body.noscroll{overflow:hidden}
 #exSpeed.on{font-size:15px}
 .exstage{position:relative}
 .exstage.live{cursor:pointer}
+.exintro{position:absolute;inset:0;display:grid;place-items:center;background:#141628;border-radius:12px;pointer-events:none;animation:introaus .5s 1.9s forwards}
+.exintro img{height:82%;max-width:70%;animation:staun 1.7s ease-in-out}
+@keyframes staun{0%{transform:scale(.7) rotate(0);opacity:0}18%{transform:scale(1.04) rotate(-7deg);opacity:1}45%{transform:scale(1) rotate(6deg)}70%{transform:scale(1) rotate(-4deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes introaus{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.exintro{animation-delay:1.2s}.exintro img{animation:none}}
 .pausebadge{position:absolute;inset:0;display:none;place-items:center;background:rgba(251,246,238,.6);border-radius:12px;backdrop-filter:blur(1px)}
 .pausebadge span{background:var(--ink);color:#fff;border-radius:14px;padding:10px 16px;font:800 20px "Bricolage Grotesque",Nunito,system-ui,sans-serif;text-align:center;box-shadow:3px 3px 0 var(--c1)}
 .pausebadge small{display:block;font:700 12px Nunito,system-ui,sans-serif;opacity:.8;margin-top:2px}
@@ -531,6 +547,7 @@ body.noscroll{overflow:hidden}
 <div id="app"></div>
 
 <script>window.LERNDAX_SUBJECT = 'mathe';</script>
+<script src="../plattform/symbole.js"></script>
 <script src="../plattform/avatare.js"></script>
 <script src="../plattform/config.js"></script>
 <script src="../plattform/trainings.js"></script>
@@ -689,8 +706,7 @@ body.noscroll{overflow:hidden}
   }
   const nameCard = () => (S.name ? '' : `
       <div class="card namecard" style="margin-bottom:18px">
-        <h2>Willkommen bei MaDax 👋</h2>
-        <p>Wie heißt du?</p>
+        <div class="gruss"><span class="dax"><img src="../icons/madax.svg" alt=""></span><h2 class="blase">Hallo, ich bin MaDax!<br>Wie heißt du?</h2></div>
         <form id="nameF"><input id="nameI" maxlength="20" autocomplete="off" placeholder="Dein Vorname"><button class="btn org">Los</button></form>
       </div>`);
   function bindName() {
@@ -698,7 +714,12 @@ body.noscroll{overflow:hidden}
     if (f) f.addEventListener('submit', (e) => {
       e.preventDefault();
       const v = document.getElementById('nameI').value.trim();
-      if (v) { S.name = v; save(); home(); }
+      if (v) {
+        S.name = v; save(); home();
+        // Beim allerersten Mal gleich den eigenen Avatar aussuchen
+        let asked = ''; try { asked = localStorage.getItem('lerndax.avatar.asked') || ''; } catch (err) {}
+        if (AVA && !AVA.get() && !asked) AVA.picker(AVA.STANDARD, (a) => { if (SYNC && SYS.enabled) SYNC.setAvatar(a); else AVA.set(a); try { localStorage.setItem('lerndax.avatar.asked', '1'); } catch (err) {} home(); }, { title: `Schön, dass du da bist, ${v}!`, text: 'Such dir deinen Avatar aus. Das bist du in LernDax, und du kannst ihn jederzeit ändern.' });
+      }
     });
   }
 
@@ -1008,7 +1029,9 @@ body.noscroll{overflow:hidden}
     let starBlock = firstToday ? '<p class="goaldone">🎯 Tagesziel für heute geschafft!</p>' : '';
     if (R.mode === 'topic') {
       const now = mastery(R.arg).stars;
-      starBlock += `${starHtml(now)}${now > R.before ? '<p style="color:var(--ok)">Neuer Stern! ⭐</p>' : ''}`;
+      const m = mastery(R.arg), ziel = [50, 75, 90][now];
+      const sternTipp = now >= 3 ? 'Alle drei Sterne: Dieses Thema sitzt!' : `Nächster Stern ab <b>${ziel} %</b> richtig in deinen letzten 10 Aufgaben. Du bist bei <b>${Math.round(m.avg * 100)} %</b>.`;
+      starBlock += `${starHtml(now)}${now > R.before ? '<p style="color:var(--ok)">Neuer Stern! ⭐</p>' : ''}<p class="sternhint">${sternTipp}</p>`;
     }
     $app.innerHTML = header() + `
       <div class="card res">
@@ -1053,7 +1076,7 @@ body.noscroll{overflow:hidden}
     ov.innerHTML = `<div class="card exsheet${def.dark ? ' dark' : ''}" role="dialog" aria-label="${title}">
       <div class="exhead"><h2>${title}</h2><button class="x" data-exclose aria-label="Schließen">✕</button></div>
       <div class="exsub"></div>
-      <div class="exstage" title="Antippen zum Anhalten"><svg viewBox="${def.viewBox}" xmlns="http://www.w3.org/2000/svg"></svg><div class="pausebadge"><span>❚❚ Pause<small>Antippen zum Weiterspielen</small></span></div></div>
+      <div class="exstage" title="Antippen zum Anhalten"><svg viewBox="${def.viewBox}" xmlns="http://www.w3.org/2000/svg"></svg>${def.discover ? '<div class="exintro"><img src="../icons/madax-staunt.svg" alt=""></div>' : ''}<div class="pausebadge"><span>❚❚ Pause<small>Antippen zum Weiterspielen</small></span></div></div>
       <div class="excap" aria-live="polite"></div>
       <div class="exctl"></div>
       <div class="exbtns">
@@ -1168,19 +1191,25 @@ body.noscroll{overflow:hidden}
   }
 
   // ---------- Elternansicht ----------
+  let PTAB = 'fort'; // Reiter im Elternbereich: 'fort' (Fortschritt) oder 'konto' (Geräte & Konto)
   function parents(confirmReset) {
     VIEW = 'parents'; $app.dataset.view = VIEW;
+    if (confirmReset) PTAB = 'konto';
     const topics = allTopics();
     const practiced = topics.filter((t) => mastery(t.id).n > 0);
     const avg = practiced.length ? practiced.reduce((s, t) => s + mastery(t.id).avg, 0) / practiced.length : 0;
     $app.innerHTML = `
-      <div class="ph"><button class="x" data-go="home" aria-label="Zurück">←</button><h1>Fortschritt</h1></div>
+      <div class="ph"><button class="x" data-go="home" aria-label="Zurück">←</button><h1>Für Eltern</h1></div>
+      <div class="ptabs" role="tablist">
+        <button class="ptab${PTAB === 'fort' ? ' on' : ''}" data-ptab="fort" role="tab">Fortschritt</button>
+        <button class="ptab${PTAB === 'konto' ? ' on' : ''}" data-ptab="konto" role="tab">Geräte &amp; Konto</button>
+      </div>
+      <div class="pview${PTAB === 'fort' ? '' : ' aus'}">
       <div class="kpis">
         <div class="card kpi"><b>${S.total || 0}</b><span>Aufgaben bearbeitet</span></div>
         <div class="card kpi"><b>${S.days.length}</b><span>Übungstage</span></div>
         <div class="card kpi"><b>${practiced.length ? Math.round(avg * 100) + ' %' : '–'}</b><span>Trefferquote*</span></div>
       </div>
-      <div id="synccard" class="${SYS.enabled && SYS.profileId ? 'syncbottom' : ''}"></div>
       <div class="card tablecard">
         ${grade().lbs.map((lb) => `
           <h3 class="lbt"><span class="tag bg${lb.nr}" style="margin:0 6px 0 0">LB ${lb.nr}</span>${lb.title}</h3>
@@ -1193,9 +1222,13 @@ body.noscroll{overflow:hidden}
           </tbody></table>`).join('')}
       </div>
       <p class="note">* Quote = Durchschnitt der letzten 10 Aufgaben je Thema (erster Versuch richtig = 100 %, zweiter Versuch = 50 %).<br>${SYS.enabled && SYS.profileId ? 'Der Fortschritt wird mit allen Geräten dieses Profils abgeglichen.' : 'Der Fortschritt wird nur auf diesem Gerät gespeichert.'}</p>
+      </div>
+      <div class="pview${PTAB === 'konto' ? '' : ' aus'}">
+      <div id="synccard" class="${SYS.enabled && SYS.profileId ? 'syncbottom' : ''}"></div>
       <div style="text-align:center;margin-top:10px">${SYS.loggedIn && SY.hasPin && !SY.unlocked ? '' : confirmReset
         ? `<p style="font-weight:800;margin-bottom:4px">Wirklich alles zurücksetzen?</p><p style="margin:0 0 10px;color:var(--soft);font-weight:700">Alle Sterne und der ganze Fortschritt sind dann weg. Zur Sicherheit: Tippe das Wort <b>LÖSCHEN</b> ein.</p><p style="margin:0 0 12px"><input id="resetWord" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Das Wort LÖSCHEN eintippen" style="font:800 20px Nunito,system-ui,sans-serif;width:180px;text-align:center;border:2px solid var(--ink);border-radius:12px;padding:8px 10px"></p><button class="btn" data-go="parents">Abbrechen</button> <button class="btn" style="background:var(--bad);color:#fff" data-reset="yes">Ja, zurücksetzen</button>`
-        : `<button class="btn ghost" data-reset="ask">Fortschritt zurücksetzen</button>`}</div>`;
+        : `<button class="btn ghost" data-reset="ask">Fortschritt zurücksetzen</button>`}</div>
+      </div>`;
     renderSyncCard();
   }
 
@@ -1319,7 +1352,8 @@ body.noscroll{overflow:hidden}
     const d = b.dataset;
     if (d.go === 'home' && b.classList.contains('x') && VIEW === 'task' && R && (R.results.length || (R.cur && (R.cur.done || R.cur.attempt > 1)))) quitAsk();
     else if (d.go === 'home') { R = null; home(); window.scrollTo(0, 0); }
-    else if (d.go === 'parents') { parents(false); window.scrollTo(0, 0); }
+    else if (d.go === 'parents') { PTAB = 'fort'; parents(false); window.scrollTo(0, 0); }
+    else if (d.ptab) { PTAB = d.ptab; parents(false); }
     else if (d.reset === 'ask') parents(true);
     else if (d.reset === 'yes' && !/^l(ö|oe)schen$/i.test((document.getElementById('resetWord') || { value: '' }).value.trim())) { const w = document.getElementById('resetWord'); if (w) { w.style.borderColor = 'var(--bad)'; w.focus(); } }
     else if (d.reset === 'yes') { S = { name: S.name, grade: 5, stats: {}, days: [], total: 0, seen: {}, resetAt: Date.now(), exSlow: S.exSlow }; save(); parents(false); }

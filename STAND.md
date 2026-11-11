@@ -645,6 +645,14 @@ Infos zur ersten Arbeit:
   „Gemischt“ und „Fehler-Training“ erscheinen erst als große Kacheln, wenn sie nutzbar sind, vorher als
   lesbarer Hinweis; Klassen-Leiste 1–10 passt am Handy in eine Zeile; Balken „Entdecken“ springt zum
   Entdecken-Bereich; vereinfachter Papierhut für die Kopfzeile (`icons/madax-klein.svg`).
-  Noch offen aus dem Durchgang: Emojis durch eigene Symbole ersetzen, Aufgabenkarte am PC mittig,
-  einzelne Themen-Kachel in der letzten Reihe, leere Bühne beim Start der Entdecken-Animationen,
-  Sterne erklären, Elternbereich (Auswertung vor Anmeldung), Dachs auf der Willkommen-Seite.
+  Die übrigen Punkte des Durchgangs sind mit `lerndax-v32` entschieden (siehe nächster Eintrag).
+- **Design-Durchgang abgeschlossen** (Version `lerndax-v32`), jede Entscheidung vom Auftraggeber:
+  - Eigene Symbole statt Emojis: neue Datei `web/plattform/symbole.js` (23 farbige Zeichnungen). Sie tauscht
+    Emojis auf der ganzen Seite automatisch aus (auch Startseite und Trainingsseite); im Quelltext dürfen
+    weiter Emojis stehen. Animationen (SVG) bleiben unberührt.
+  - Entdecken: Zu Beginn sitzt der staunende MaDax-Dachs etwa zwei Sekunden auf der Bühne (`icons/madax-staunt.svg`).
+  - Lob: Hinweis, was für den nächsten Stern fehlt (50 %, 75 %, 90 % der letzten 10 Aufgaben).
+  - Elternbereich: zwei Reiter „Fortschritt“ und „Geräte & Konto“ (Überschrift „Für Eltern“).
+  - Willkommen: Dachs mit Sprechblase, nach dem Namen einmalig die Avatar-Wahl.
+  - Bewusst unverändert: Aufgabenkarte am PC, einzelne Themen-Kachel in der letzten Reihe.
+  - Tests angepasst: Sie überspringen die Avatar-Frage (`lerndax.avatar.asked`) und öffnen im Elternbereich den Reiter „Geräte & Konto“.

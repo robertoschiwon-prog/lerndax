@@ -75,7 +75,7 @@ geplante unter „Kommt bald“.
 |---|---|
 | `web/` | Alles, was online geht (wird automatisch veröffentlicht) |
 | `web/index.html` | LernDax-Startseite mit den Fächern |
-| `web/plattform/` | Gemeinsame Teile: Fächerliste (`faecher.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
+| `web/plattform/` | Gemeinsame Teile: Fächerliste (`faecher.js`), eigene Symbole statt Emojis (`symbole.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
 | `web/mathe/` | **MaDax**: App, `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
 | `web/icons/` | Dachs-Logo und App-Icons |
 | `faecher/README.md` | **Fächerplan:** alle Fächer, Namen, Klassen, Fahrplan in drei Phasen |

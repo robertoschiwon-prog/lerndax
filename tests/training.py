@@ -33,7 +33,7 @@ async def main():
         # allgemeine App: kein Trainings-Link, keine Trainings-Knöpfe
         assert not await pg.query_selector('[data-tr]'), 'Trainings-Knöpfe in der allgemeinen App'
         await pg.goto(BASE + '?t=mathe-2026-11-24')
-        await pg.fill('#nameI', 'Max'); await pg.click('#nameF button')
+        await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI', 'Max'); await pg.click('#nameF button')
         tr = await pg.evaluate("window.LERNDAX_TRAININGS['mathe-2026-11-24']")
         allowed = {t for g in tr['gruppen'] for t in g['themen']}
         assert await pg.query_selector('.trhero'), 'Trainings-Startseite fehlt'

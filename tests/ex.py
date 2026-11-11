@@ -17,7 +17,7 @@ async def main():
         await ctx.add_init_script(FAST)
         pg = await ctx.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: m.type=='error' and errs.append(m.text))
-        await pg.goto(URL); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
+        await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI','Max'); await pg.click('#nameF button')
         await pg.screenshot(path=f'{SHOTS}/e_home.png', full_page=True)
         ids = await pg.eval_on_selector_all('[data-explain]', 'els=>[...new Set(els.map(e=>e.dataset.explain))]')
         print(ids)

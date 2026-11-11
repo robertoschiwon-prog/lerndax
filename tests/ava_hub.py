@@ -21,7 +21,7 @@ async def main():
         await pg.reload(); await pg.wait_for_timeout(700)
         print('picker again after reload:', await pg.query_selector('.ldx-sheet') is not None)
         await pg.goto(MATHE); await pg.wait_for_timeout(500)
-        await pg.fill('#nameI','Max'); await pg.click('#nameF button'); await pg.wait_for_timeout(200)
+        await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')"); await pg.fill('#nameI','Max'); await pg.click('#nameF button'); await pg.wait_for_timeout(200)
         await pg.screenshot(path=f'{SHOTS}/av4_mathe.png')
         print('errors', errs); await b.close()
 asyncio.run(main())
