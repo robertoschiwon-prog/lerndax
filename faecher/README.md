@@ -31,8 +31,8 @@ Startseite und App-Icon.
 | MaDax | Papierhut aus Karopapier mit + − × ÷ | `madax.svg` ✅ eingebaut |
 | DeDax | aufgeschlagenes Buch als Dach, mit Lesezeichen | `dedax.svg` (liegt bereit) |
 | EnDax | Strickmütze mit Union Jack | `endax.svg` (liegt bereit) |
-| BioDax | Strohhut mit Mohnblume und Marienkäfer | `biodax.svg` (liegt bereit) |
-| GeDax | Römerhelm mit rotem Helmbusch | `gedax.svg` (liegt bereit) |
+| BioDax | Fliegenpilz als Hut | `biodax.svg` (liegt bereit) |
+| GeDax | Pharaonen-Kopftuch | `gedax.svg` (liegt bereit) |
 | GeoDax | Tropenhelm mit Kompass | `geodax.svg` (liegt bereit) |
 | TecDax | Headset mit Mikrofon | `tecdax.svg` (liegt bereit) |
 

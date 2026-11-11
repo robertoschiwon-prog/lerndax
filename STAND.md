@@ -639,3 +639,4 @@ Infos zur ersten Arbeit:
   TecDax (Headset) mit ihren Dachsen. Vier neue Bilder in `web/icons/`.
 - **Entscheidung Auftraggeber (11.11.2026):** Erst MaDax so weit bringen, bis es rund ist (Inhalt, Gestaltung,
   Fehler), dann erst ein neues Fach beginnen.
+- Hüte geändert (Version `lerndax-v29`): BioDax trägt einen Fliegenpilz, GeDax ein Pharaonen-Kopftuch (Wahl des Auftraggebers).
