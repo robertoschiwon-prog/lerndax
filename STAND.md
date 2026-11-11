@@ -630,3 +630,6 @@ Infos zur ersten Arbeit:
   Vier Stufen (ab 90 %, 70 %, 50 %, darunter) mit eigenem Spruch, Symbol und kurzer Bewegung;
   ohne gewählten Avatar steht der Dachs allein. Idee für später: Hut-Tausch beim Tagesziel,
   Spruch zur Serie; für ältere Klassen abschaltbar.
+- **Entdecken-Symbole neu** (Version `lerndax-v26`): Die 14 Kacheln zeigen jetzt selbst gezeichnete
+  Symbole in einheitlicher Größe und Strichstärke statt Schriftzeichen und Emojis (die je nach Gerät
+  unterschiedlich groß und teils kaum erkennbar waren). Definition am Ende von `entdecken.js` (`DI`).
