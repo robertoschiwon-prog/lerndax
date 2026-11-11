@@ -640,4 +640,4 @@ Infos zur ersten Arbeit:
 - **Entscheidung Auftraggeber (11.11.2026):** Erst MaDax so weit bringen, bis es rund ist (Inhalt, Gestaltung,
   Fehler), dann erst ein neues Fach beginnen.
 - Hüte geändert (Version `lerndax-v29`): BioDax trägt einen Fliegenpilz, GeDax ein Pharaonen-Kopftuch (Wahl des Auftraggebers).
-- GeoDax trägt jetzt einen Globus als Mütze (Version `lerndax-v30`, Wahl des Auftraggebers). Hut für TecDax noch offen.
+- GeoDax trägt jetzt einen Globus als Mütze (Version `lerndax-v30`, Wahl des Auftraggebers). TecDax bleibt beim Headset (nach Vergleich mit fünf Alternativen). Damit stehen alle sieben Hüte fest.
