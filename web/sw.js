@@ -1,12 +1,12 @@
 /* LernDax – Service Worker: App läuft auch offline.
  * Eigene Dateien: immer zuerst frisch vom Server, der Speicher ist nur der Offline-Ersatz.
  * So kommen Änderungen sofort an. Bei neuer Version VERSION erhöhen. */
-const VERSION = 'lerndax-v30';
+const VERSION = 'lerndax-v31';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js', './plattform/avatare.js', './plattform/trainings.js', './plattform/faecher.js',
   './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js', './mathe/symbole.js',
   './mathe/erklaerungen/klasse5.js', './mathe/erklaerungen/entdecken.js',
-  './icons/dachs.svg', './icons/madax.svg', './icons/dedax.svg', './icons/endax.svg', './icons/biodax.svg', './icons/gedax.svg', './icons/geodax.svg', './icons/tecdax.svg', './icons/icon-192-v4.png', './icons/icon-512-v4.png',
+  './icons/dachs.svg', './icons/madax.svg', './icons/madax-klein.svg', './icons/dedax.svg', './icons/endax.svg', './icons/biodax.svg', './icons/gedax.svg', './icons/geodax.svg', './icons/tecdax.svg', './icons/icon-192-v4.png', './icons/icon-512-v4.png',
   './icons/apple-touch-icon-v4.png', './icons/favicon-v4.png',
 ];
 self.addEventListener('install', (e) => {

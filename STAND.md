@@ -641,3 +641,10 @@ Infos zur ersten Arbeit:
   Fehler), dann erst ein neues Fach beginnen.
 - Hüte geändert (Version `lerndax-v29`): BioDax trägt einen Fliegenpilz, GeDax ein Pharaonen-Kopftuch (Wahl des Auftraggebers).
 - GeoDax trägt jetzt einen Globus als Mütze (Version `lerndax-v30`, Wahl des Auftraggebers). TecDax bleibt beim Headset (nach Vergleich mit fünf Alternativen). Damit stehen alle sieben Hüte fest.
+- **MaDax-Start aufgeräumt** (Version `lerndax-v31`), nach einem Design-Durchgang durch die ganze Mathe-App:
+  „Gemischt“ und „Fehler-Training“ erscheinen erst als große Kacheln, wenn sie nutzbar sind, vorher als
+  lesbarer Hinweis; Klassen-Leiste 1–10 passt am Handy in eine Zeile; Balken „Entdecken“ springt zum
+  Entdecken-Bereich; vereinfachter Papierhut für die Kopfzeile (`icons/madax-klein.svg`).
+  Noch offen aus dem Durchgang: Emojis durch eigene Symbole ersetzen, Aufgabenkarte am PC mittig,
+  einzelne Themen-Kachel in der letzten Reihe, leere Bühne beim Start der Entdecken-Animationen,
+  Sterne erklären, Elternbereich (Auswertung vor Anmeldung), Dachs auf der Willkommen-Seite.
