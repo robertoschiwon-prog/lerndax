@@ -56,6 +56,14 @@
   // Neutrale Vornamen für Textaufgaben (keine echten Namen: Trainingsseiten sind per Link öffentlich)
   const NAMEN = ['Lina', 'Emil', 'Mia', 'Paul', 'Ida', 'Ben', 'Lea', 'Noah'];
   // Geld immer mit zwei Stellen nach dem Komma: 5,60 €
+  // Wechselgeld ergänzen: vom Preis zum nächsten vollen Euro, zum nächsten Zehner, zum bezahlten Betrag (alles in Cent)
+  U.wechselSchritte = (cost, pay) => {
+    const pts = [cost];
+    let cur = cost;
+    for (const step of [100, 1000]) { const nx = Math.ceil(cur / step) * step; if (nx > cur && nx < pay) { pts.push(nx); cur = nx; } }
+    pts.push(pay);
+    return pts.slice(1).map((p, i) => [pts[i], p]);
+  };
   const euro = (cents) => `${fmt(Math.floor(cents / 100))},${String(cents % 100).padStart(2, '0')} €`;
 
   Object.assign(U, { R, pick, shuffle, gcd, fmt, fr, round6 });
@@ -125,7 +133,7 @@
       return {
         prompt: `Rechne geschickt: <b>${parts.join(' · ')}</b>`,
         fields: [{ answer: 100 * k }],
-        hint: 'Welche zwei Zahlen ergeben zusammen multipliziert eine glatte Zahl?',
+        hint: 'Welche zwei Zahlen ergeben malgenommen eine glatte Zahl?',
         solution: `Erst 25 · 4 = 100 (Vertauschungsgesetz).<br>100 · ${k} = <b>${fmt(100 * k)}</b>`,
         ex: tauschEx(parts, '25', '4', '·', '100'),
       };
@@ -174,7 +182,7 @@
 
   // ---------- Vorrangregeln ----------
   // Klammer zuerst · Potenz vor Punkt · Punkt vor Strich · sonst von links nach rechts
-  const VR_HINT = 'Reihenfolge: <b>Klammer</b> zuerst, dann <b>Hochzahl</b>, dann <b>Punkt</b> (· und :), zuletzt <b>Strich</b> (+ und −). Sonst von links nach rechts.';
+  const VR_HINT = 'Reihenfolge: <b>Klammer</b> zuerst, dann <b>Potenz</b>, dann <b>Punkt</b> (· und :), zuletzt <b>Strich</b> (+ und −). Sonst von links nach rechts.';
   // Gibt jeder Vorrang-Aufgabe den Rechenausdruck für den Rechenbaum mit (ex.e, ² als Zeichen).
   function vorrang() {
     const t = vorrang0();
@@ -271,8 +279,8 @@
         return {
           prompt: `Berechne: <b>${a} + ${b}${sup(2)} · ${c}</b>`,
           fields: [{ answer: a + sq * c }],
-          hint: 'Die Hochzahl kommt noch vor Punkt und Strich.',
-          solution: `Hochzahl zuerst: <b>${b}${sup(2)} = ${sq}</b><br>Punkt vor Strich: <b>${sq} · ${c} = ${sq * c}</b><br>${a} + ${sq * c} = <b>${a + sq * c}</b>`,
+          hint: 'Die Potenz kommt noch vor Punkt und Strich.',
+          solution: `Potenz zuerst: <b>${b}${sup(2)} = ${sq}</b><br>Punkt vor Strich: <b>${sq} · ${c} = ${sq * c}</b><br>${a} + ${sq * c} = <b>${a + sq * c}</b>`,
         };
       }
       const a = R(1, 6), c = R(1, 6), s = a + c;
@@ -303,7 +311,7 @@
         { e: `${a} · (${b} + ${c}) − ${d}`, ch: [`${a} · ${b}`, `${b} + ${c}`, `${c} − ${d}`], k: 1, why: 'Klammer zuerst.' },
         { e: `${a} − ${b} + ${c} · ${d}`, ch: [`${a} − ${b}`, `${b} + ${c}`, `${c} · ${d}`], k: 2, why: 'Punkt vor Strich.' },
         { e: `${a} + ${b} − ${c} + ${d}`, ch: [`${a} + ${b}`, `${b} − ${c}`, `${c} + ${d}`], k: 0, why: 'Nur Strichrechnung: von links nach rechts.' },
-        { e: `${a} + ${b}² · ${c}`, ch: [`${a} + ${b}`, `${b}²`, `${b} · ${c}`], k: 1, why: 'Hochzahl vor Punkt vor Strich.' },
+        { e: `${a} + ${b}² · ${c}`, ch: [`${a} + ${b}`, `${b}²`, `${b} · ${c}`], k: 1, why: 'Potenz vor Punkt vor Strich.' },
       ];
       const f = pick(forms);
       return {
@@ -405,8 +413,8 @@
     if (v === 6) {
       // Gilt das Gesetz auch für Minus und Geteilt?
       const cases = [
-        () => { const a = R(10, 30), b = R(2, 9); return { lv: a - b, rv: 'geht nicht', e: `${a} − ${b} = ${b} − ${a}`, ok: false, why: `${a} − ${b} = ${a - b}, aber ${b} − ${a} geht mit natürlichen Zahlen gar nicht. Bei <b>Minus</b> darf man <b>nicht</b> vertauschen.` }; },
-        () => { const b = R(2, 4), q = R(2, 5), a = b * q * 4; return { lv: a / b, rv: 'keine natürliche Zahl', e: `${a} : ${b} = ${b} : ${a}`, ok: false, why: `${a} : ${b} = ${a / b}, aber ${b} : ${a} ist keine natürliche Zahl. Bei <b>Geteilt</b> darf man <b>nicht</b> vertauschen.` }; },
+        () => { const a = R(10, 30), b = R(2, 9); return { lv: a - b, rv: null, rno: `${b} ist kleiner als ${a}. Das geht mit natürlichen Zahlen nicht.`, e: `${a} − ${b} = ${b} − ${a}`, ok: false, why: `${a} − ${b} = ${a - b}, aber ${b} − ${a} geht mit natürlichen Zahlen gar nicht. Bei <b>Minus</b> darf man <b>nicht</b> vertauschen.` }; },
+        () => { const b = R(2, 4), q = R(2, 5), a = b * q * 4; return { lv: a / b, rv: null, rno: `${b} ist kleiner als ${a}. Es kommt keine natürliche Zahl heraus.`, e: `${a} : ${b} = ${b} : ${a}`, ok: false, why: `${a} : ${b} = ${a / b}, aber ${b} : ${a} ist keine natürliche Zahl. Bei <b>Geteilt</b> darf man <b>nicht</b> vertauschen.` }; },
         () => { const a = R(20, 40), b = R(5, 9), c = R(2, 4); return { lv: a - b - c, rv: a - b + c, e: `(${a} − ${b}) − ${c} = ${a} − (${b} − ${c})`, ok: false, why: `Links: ${a - b} − ${c} = ${a - b - c}. Rechts: ${a} − ${b - c} = ${a - b + c}. Bei <b>Minus</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
         () => { const c = 2, b = 4, a = 8 * R(2, 6); return { lv: a / b / c, rv: a / (b / c), e: `(${a} : ${b}) : ${c} = ${a} : (${b} : ${c})`, ok: false, why: `Links: ${a / b} : ${c} = ${a / b / c}. Rechts: ${a} : ${b / c} = ${a / (b / c)}. Bei <b>Geteilt</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
         () => { const a = R(2, 12), b = R(2, 12); return { lv: a * b, rv: a * b, e: `${a} · ${b} = ${b} · ${a}`, ok: true, why: `Beide Seiten ergeben ${a * b}. Bei <b>Mal</b> darf man vertauschen (Kommutativgesetz).` }; },
@@ -414,7 +422,7 @@
       ];
       const kf = pick(cases), k = kf(), k2 = kf();
       const RULE = 'Kommutativ- und Assoziativgesetz gelten nur für <b>Plus</b> und <b>Mal</b>.';
-      const pr = (c) => { const [left, right] = c.e.split(' = '); return { mode: 'pruef', left, right, lv: c.lv, rv: c.rv, ok: c.ok, rule: RULE }; };
+      const pr = (c) => { const [left, right] = c.e.split(' = '); return { mode: 'pruef', left, right, lv: c.lv, rv: c.rv, rno: c.rno, ok: c.ok, rule: RULE }; };
       return {
         ex: Object.assign(pr(k), { alt: pr(k2) }),
         prompt: `Stimmt das?<br><b>${k.e}</b>`,
@@ -610,7 +618,7 @@
     const back = d * shownQ + r;
     return {
       prompt: `Mach die Probe: Stimmt <b>${shown}</b>?`,
-      ex: { mode: 'div', n, d },
+      ex: { mode: 'probe', n, d, q: shownQ, r, qTrue: q },
       choices: ['Stimmt', 'Stimmt nicht'],
       correct: ok ? 0 : 1,
       hint: `Probe: Ergebnis mal ${d}${r ? ', plus Rest' : ''}. Kommt ${fmt(n)} heraus?`,
@@ -804,7 +812,7 @@
     const ok = n % d === 0;
     let why;
     if (d === 3 || d === 9) why = `Quersumme: ${String(n).split('').join(' + ')} = ${qs(n)}. ${qs(n)} ist ${qs(n) % d === 0 ? '' : '<b>nicht</b> '}durch ${d} teilbar.`;
-    else if (d === 4) why = `Die letzten zwei Ziffern bilden ${n % 100}. ${n % 100} ist ${(n % 100) % 4 === 0 ? '' : '<b>nicht</b> '}durch 4 teilbar.`;
+    else if (d === 4) why = `Die letzten zwei Ziffern sind ${String(n % 100).padStart(2, '0')}. ${n % 100} ist ${(n % 100) % 4 === 0 ? '' : '<b>nicht</b> '}durch 4 teilbar.`;
     else if (d === 6) why = `Durch 2: ${n % 2 === 0 ? 'ja' : 'nein'} (letzte Ziffer ${n % 10}). Durch 3: ${qs(n) % 3 === 0 ? 'ja' : 'nein'} (Quersumme ${qs(n)}).`;
     else why = `Die letzte Ziffer ist ${n % 10}.`;
     return {
@@ -886,12 +894,12 @@
       prompt: `Zerlege <b>${n}</b> in Primfaktoren.`,
       ex: { mode: 'tree', n },
       fields: [{ answer: f, type: 'factors', placeholder: 'z. B. 2·3·3' }],
-      hint: 'Teile immer wieder durch die kleinste Primzahl, die passt (2, 3, 5, 7 …). Du darfst auch mit Hochzahl schreiben, z. B. 2^3·5.',
+      hint: 'Teile immer wieder durch die kleinste Primzahl, die passt (2, 3, 5, 7 …). Du darfst auch als Potenz schreiben, z. B. 2^3·5.',
       solution: (() => {
         const cnt = {}; f.forEach((p) => { cnt[p] = (cnt[p] || 0) + 1; });
         const pot = Object.keys(cnt).map((p) => (cnt[p] > 1 ? `${p}${sup(cnt[p])}` : p)).join(' · ');
         const withPow = Object.values(cnt).some((c) => c > 1);
-        return `${steps.join('<br>')}<br>→ ${n} = <b>${f.join(' · ')}</b>${withPow ? `<br>Kürzer mit Hochzahl: ${n} = <b>${pot}</b>` : ''}`;
+        return `${steps.join('<br>')}<br>→ ${n} = <b>${f.join(' · ')}</b>${withPow ? `<br>Kürzer als Potenz: ${n} = <b>${pot}</b>` : ''}`;
       })(),
       answerText: f.join(' · '),
     };
@@ -979,8 +987,8 @@
         ? [{ answer: p * k, label: 'Zähler' }, { fixed: q * k }]
         : [{ fixed: p * k }, { answer: q * k, label: 'Nenner' }],
       hint: askTop
-        ? `Womit wurde der Nenner ${q} multipliziert, um ${q * k} zu erhalten?`
-        : `Womit wurde der Zähler ${p} multipliziert, um ${p * k} zu erhalten?`,
+        ? `Womit wurde der Nenner ${q} malgenommen, um ${q * k} zu erhalten?`
+        : `Womit wurde der Zähler ${p} malgenommen, um ${p * k} zu erhalten?`,
       solution: `Mit ${k} erweitert: ${fr(p, q)} = ${fr(`${p} · ${k}`, `${q} · ${k}`)} = <b>${fr(p * k, q * k)}</b>`,
       answerText: fr(p * k, q * k),
       ex: { mode: 'erw', p, q, k },
@@ -995,8 +1003,8 @@
     const [p, q] = pick(NICE);
     const dec = round6(p / q), pct = round6((100 * p) / q);
     const v = R(1, 4);
-    const toHundred = 100 % q === 0 ? `${fr(p, q)} = ${fr(p * (100 / q), 100)}` : `${p} : ${q}`;
-    const ex = { mode: 'hund', p, q };
+    const toHundred = 100 % q === 0 ? `${fr(p, q)} = ${fr(p * (100 / q), 100)}` : `${fr(p, q)} = ${fr(p * (1000 / q), 1000)}`; // Achtel: auf Tausendstel erweitern
+    const exFor = (ask) => ({ mode: 'hund', p, q, ask });
     // Typischer Fehler: Nenner durch Zähler (z. B. 25 : 2 = 12,5 statt 2 : 25)
     const inv = (want, wrongVal) => ([v]) => {
       if (Number.isNaN(v)) return { ok: false, note: 'Gib bitte nur eine Zahl ein (Komma ist erlaubt).' };
@@ -1007,7 +1015,7 @@
     if (v === 1)
       return {
         prompt: `Schreibe als Dezimalzahl: ${fr(p, q)}`,
-        ex,
+        ex: exFor('dezimal'),
         fields: [{ answer: dec }],
         check: inv(dec, round6(q / p)),
         hint: 'Erweitere auf Zehntel, Hundertstel oder Tausendstel, oder rechne Zähler : Nenner.',
@@ -1016,28 +1024,28 @@
     if (v === 2)
       return {
         prompt: `Schreibe in Prozent: ${fr(p, q)}`,
-        ex,
+        ex: exFor('prozent'),
         fields: [{ answer: pct, suffix: '%' }],
         check: inv(pct, [round6(q / p), round6((100 * q) / p)]),
-        hint: 'Prozent heißt „von Hundert“. Erweitere den Bruch auf den Nenner 100.',
-        solution: `${toHundred} = <b>${fmt(pct)} %</b>`,
+        hint: 100 % q === 0 ? 'Prozent heißt „von Hundert“. Erweitere den Bruch auf den Nenner 100.' : 'Prozent heißt „von Hundert“. Bei Achteln klappt der Nenner 100 nicht: Erweitere auf Tausendstel (mit 125) und schreibe erst als Dezimalzahl.',
+        solution: 100 % q === 0 ? `${toHundred} = <b>${fmt(pct)} %</b>` : `${toHundred} = ${fmt(dec)} = <b>${fmt(pct)} %</b>`,
       };
     if (v === 3)
       return {
         prompt: `Schreibe als Dezimalzahl: <b>${fmt(pct)} %</b>`,
-        ex,
+        ex: exFor('pd'),
         fields: [{ answer: dec }],
         hint: `${fmt(pct)} % bedeutet ${fmt(pct)} Hundertstel.`,
-        solution: `${fmt(pct)} % = ${fr(fmt(pct), 100)} = <b>${fmt(dec)}</b>`,
+        solution: Number.isInteger(pct) ? `${fmt(pct)} % = ${fr(fmt(pct), 100)} = <b>${fmt(dec)}</b>` : `${fmt(pct)} % = ${fr(fmt(pct), 100)} = ${fr(Math.round(pct * 10), 1000)} = <b>${fmt(dec)}</b>`,
       };
     return {
-      prompt: `Schreibe als gekürzten Bruch: <b>${fmt(dec)}</b>`,
-      ex,
+      prompt: `Schreibe als <b>vollständig gekürzten</b> Bruch: <b>${fmt(dec)}</b>`,
+      ex: exFor('bruch'),
       layout: 'frac',
       fields: [{ answer: p, label: 'Zähler' }, { answer: q, label: 'Nenner' }],
       check([a, b]) {
         if (!b || a * q !== b * p) return { ok: false };
-        if (gcd(a, b) !== 1) return { ok: true, note: `Stimmt! Noch schöner gekürzt: ${fr(p, q)}` };
+        if (gcd(a, b) !== 1) return { ok: false, note: 'Der Bruch ist richtig, aber noch nicht <b>vollständig</b> gekürzt. Da geht noch was!' };
         return { ok: true };
       },
       hint: 'Wie viele Stellen nach dem Komma? 1 Stelle → Zehntel, 2 → Hundertstel, 3 → Tausendstel. Dann kürzen.',
@@ -1105,7 +1113,11 @@
       // Gleich große Zahlen nie identisch zeigen, sondern mit angehängter Null: 0,56 und 0,560
       if (B === A) bTxt = `<b>${fmt(B)}0</b>`;
     }
-    const ex = { mode: 'cmp', A: round6(A), B: round6(B), frac, via: 'k5-dezimal' }; // für die Animation: ggf. der Bruch zuerst
+    const plain = (t) => t.replace(/<[^>]+>/g, '');
+    // für die Animation: die Zahlen so, wie sie in der Aufgabe stehen (sA, sB), ggf. der Bruch zuerst
+    const ex = { mode: 'cmp', A: round6(A), B: round6(B), sA: frac ? fmt(round6(A)) : plain(aTxt), sB: plain(bTxt), frac, via: 'k5-dezimal' };
+    const decs = (s) => (s.split(',')[1] || '').length, nd = Math.max(1, decs(ex.sA), decs(ex.sB));
+    const pad = (x) => { const [i, d = ''] = fmt(round6(x)).split(','); return `${i},${d.padEnd(nd, '0')}`; };
     if (Math.random() < 0.5) [A, B, aTxt, bTxt] = [B, A, bTxt, aTxt];
     const correct = Math.abs(A - B) < 1e-9 ? 2 : A > B ? 0 : 1;
     return {
@@ -1114,7 +1126,7 @@
       correct,
       ex,
       hint: 'Schreibe beide Zahlen als Dezimalzahl mit gleich vielen Nachkommastellen und vergleiche Stelle für Stelle.',
-      solution: `${aTxt} = ${fmt(A)} und ${bTxt} = ${fmt(B)}.<br>→ ${correct === 2 ? '<b>Beide sind gleich groß.</b>' : `<b>${correct === 0 ? aTxt : bTxt}</b> ist größer.`}`,
+      solution: `${[[aTxt, A], [bTxt, B]].filter(([t, x]) => plain(t) !== pad(x)).map(([t, x]) => `${t} = ${pad(x)}`).join(' und ') || 'Beide haben schon gleich viele Nachkommastellen'}.<br>Stelle für Stelle von links: ${pad(A)} ${correct === 2 ? '=' : correct === 0 ? '&gt;' : '&lt;'} ${pad(B)}<br>→ ${correct === 2 ? '<b>Beide sind gleich groß.</b>' : `<b>${correct === 0 ? aTxt : bTxt}</b> ist größer.`}`,
     };
   }
 
@@ -1136,7 +1148,7 @@
     }
     const sum = vals.reduce((a, b) => a + b, 0);
     return {
-      prompt: `${ctx[0]} ${n} ${ctx[1]}: <b>${vals.join(';  ')}</b><br>Berechne das arithmetische Mittel.`,
+      prompt: `${ctx[0]} ${n} ${ctx[1]}: <b>${vals.join(';  ')}</b><br>Berechne das arithmetische Mittel (den Mittelwert).`,
       fields: [{ answer: mean, suffix: ctx[4] }],
       hint: 'Alle Werte addieren und dann durch die Anzahl der Werte teilen.',
       solution: `Summe: ${vals.join(' + ')} = ${sum}<br>${sum} : ${n} = <b>${mean} ${ctx[4]}</b>`,
@@ -1179,7 +1191,7 @@
       ['gestreckter Winkel', () => 180],
       ['überstumpfer Winkel', () => R(195, 340)],
     ];
-    const t = R(0, types.length - 1);
+    const t = pick([0, 0, 0, 0, 1, 2, 2, 2, 2, 3, 4, 4, 4, 4]); // rechter und gestreckter Winkel seltener: da gibt es nur eine Zahl
     const a = types[t][1]();
     const cx = 150, cy = 105, L = 110;
     const p1 = pt(cx, cy, L, 0), p2 = pt(cx, cy, L, a);
@@ -1309,7 +1321,7 @@
       figure: fig,
       fields: [{ answer: A, prefix: 'A =', suffix: 'cm²' }],
       hint: 'Ergänze die Figur zu einem großen Rechteck und ziehe das fehlende Rechteck ab, oder zerlege sie in zwei Rechtecke.',
-      solution: `Großes Rechteck: ${Wd} · ${Hd} = ${Wd * Hd} cm²<br>Fehlendes Stück: ${w} · ${h} = ${w * h} cm²<br>A = ${Wd * Hd} − ${w * h} = <b>${A} cm²</b>`,
+      solution: `Großes Rechteck: ${Wd} · ${Hd} = ${Wd * Hd} cm²<br>Fehlendes Stück: breit ${Wd} − ${Wd - w} = ${w} cm, hoch ${Hd} − ${Hd - h} = ${h} cm, also ${w} · ${h} = ${w * h} cm²<br>A = ${Wd * Hd} − ${w * h} = <b>${A} cm²</b>`,
       ex: { mode: 'rect', kind: 'l', Wd, Hd, w, h },
     };
   }
@@ -1465,9 +1477,13 @@
       prompt: `Du kaufst für <b>${euro(cost)}</b> ein und bezahlst mit einem <b>${pay}-€-Schein</b>. Wie viel Wechselgeld bekommst du?`,
       fields: [{ answer: (pay * 100 - cost) / 100, suffix: '€' }],
       hint: 'Ergänze vom Preis bis zum bezahlten Betrag, oder rechne Schein − Preis.',
-      solution: `${euro(pay * 100)} − ${euro(cost)} = <b>${euro(pay * 100 - cost)}</b>`,
+      solution: (() => {
+        const st = U.wechselSchritte(cost, pay * 100);
+        const erg = st.length > 1 ? `Ergänzen: ${st.map((s) => `${euro(s[0])} + <b>${euro(s[1] - s[0])}</b> = ${euro(s[1])}`).join('<br>')}<br>Zusammen: ${st.map((s) => euro(s[1] - s[0])).join(' + ')} = <b>${euro(pay * 100 - cost)}</b><br>` : '';
+        return `${erg}${st.length > 1 ? 'Oder: ' : ''}${euro(pay * 100)} − ${euro(cost)} = <b>${euro(pay * 100 - cost)}</b>`;
+      })(),
       answerText: euro(pay * 100 - cost),
-      ex: { mode: 'sub', a: pay * 100, b: cost, via: 'k5-dezimal' },
+      ex: { mode: 'wechsel', pay: pay * 100, cost, via: 'k5-dezimal' },
     };
   }
 

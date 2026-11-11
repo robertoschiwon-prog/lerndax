@@ -162,18 +162,59 @@
     }
     return out;
   }
+  // „Mach die Probe“: rückwärts rechnen (Ergebnis mal Teiler, plus Rest) und mit der Ausgangszahl vergleichen
+  //   ctx: { mode:'probe', n, d, q (behauptetes Ergebnis), r, qTrue }
+  function probeErklaerung(api, ctx) {
+    let { n, d, q, r } = ctx;
+    if (ctx.pre) { d = R(3, 9); const qT = R(102, 999); r = ctx.r ? R(1, d - 1) : 0; n = d * qT + r; q = Math.random() < 0.5 ? qT : qT + pick([-10, -1, 1, 10]); }
+    const back = q * d + r, ok = back === n;
+    const T = (y, text, cls) => el('text', { x: 180, y, class: cls || 'ex-b', 'text-anchor': 'middle', text }, api.svg);
+    return {
+      reset() {
+        api.clear();
+        api.sub(ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+        T(40, `${fmt(n)} : ${d} = ${fmt(q)}${r ? ` Rest ${r}` : ''} ?`, 'vexpr');
+      },
+      async play() {
+        api.say(`Die <b>Probe</b> rechnet rückwärts: Ergebnis <b>mal ${d}</b>${r ? ', dann den <b>Rest dazu</b>' : ''}. Kommt wieder ${fmt(n)} heraus, stimmt die Rechnung.`);
+        await api.wait(3400);
+        const ds = String(q).split('').map(Number), parts = ds.map((c, i) => c * 10 ** (ds.length - 1 - i)).filter((v) => v);
+        T(86, `${fmt(q)} · ${d}`);
+        api.say(`${fmt(q)} · ${d} rechnen wir in Teilen: ${parts.map((p) => `${p} · ${d}`).join(' + ')}`);
+        await api.wait(2800);
+        T(116, `= ${parts.map((p) => fmt(p * d)).join(' + ')}`);
+        await api.wait(2200);
+        T(146, `= ${fmt(q * d)}`, 'ex-b f2');
+        api.say(`Zusammen: ${fmt(q)} · ${d} = <b>${fmt(q * d)}</b>`);
+        await api.wait(2200);
+        if (r) {
+          T(182, `${fmt(q * d)} + ${r} = ${fmt(back)}`, 'ex-b f2');
+          api.say(`Jetzt den Rest dazu: ${fmt(q * d)} + ${r} = <b>${fmt(back)}</b>`);
+          await api.wait(2200);
+        }
+        T(r ? 232 : 200, ok ? `${fmt(back)} = ${fmt(n)} ✓` : `${fmt(back)} ≠ ${fmt(n)} ✗`, 'vexpr');
+        api.say(ok
+          ? `Die Probe ergibt genau <b>${fmt(n)}</b>: <b>Stimmt!</b>`
+          : `Die Probe ergibt ${fmt(back)}, es müsste aber ${fmt(n)} sein: <b>Stimmt nicht!</b>${ctx.post && ctx.qTrue ? `<br><small>Richtig ist ${fmt(n)} : ${d} = ${fmt(ctx.qTrue)}${r ? ` Rest ${r}` : ''}.</small>` : ''}`);
+      },
+    };
+  }
   reg('k5-division', {
     title: 'Dividieren: teilen und schriftlich rechnen',
+    titleFor: (ctx) => (ctx && ctx.mode === 'probe' ? 'Die Probe: rückwärts rechnen' : 'Dividieren: teilen und schriftlich rechnen'),
     viewBox: '0 0 360 280',
     create(api, ctx) {
       ctx = ctx || {};
+      if (ctx.mode === 'probe' && (ctx.pre || ctx.post)) return probeErklaerung(api, ctx);
       let task = null;
       if (ctx.mode === 'div' && (ctx.pre || ctx.post)) {
         task = { n: ctx.n, d: ctx.d };
         if (ctx.pre) {
           const len = String(ctx.n).length;
           let n, d;
-          do { d = R(3, 9); n = R(10 ** (len - 1), 10 ** len - 1); } while (n === ctx.n);
+          // zweistelliger Teiler in der Aufgabe → auch im Beispiel zweistellig (und ohne Rest, wie in der Aufgabe)
+          if (ctx.d > 9) do { d = R(11, 25); n = d * R(8, 45); } while (n === ctx.n);
+          else do { d = R(3, 9); n = R(10 ** (len - 1), 10 ** len - 1); } while (n === ctx.n);
           task = { n, d };
         }
       }
@@ -570,8 +611,11 @@
       async function playPrime() {
         api.say(`Eine <b>Primzahl</b> hat <b>genau zwei Teiler</b>: 1 und sich selbst. (Die 1 ist keine Primzahl, sie hat nur einen Teiler.)<br>Wir testen das mit <b>${n} Plättchen</b>: Lassen sie sich zu einem Rechteck legen?`);
         await api.wait(3600);
+        api.say('Als Reihenzahl probieren wir nur die <b>Primzahlen 2, 3, 5 und 7</b>.<br><small>4, 6 oder 8 Reihen brauchen wir nicht: Ginge das auf, dann ginge es auch schon mit 2 Reihen.</small>');
+        await api.wait(3600);
         let found = 0, r;
         for (r = 2; r * r <= n; r++) {
+          if (!isPrime(r)) continue;
           gaps.forEach((g) => g.remove()); gaps = [];
           tiles.forEach((t) => t.setAttribute('class', 'tile'));
           const L = layout(r), from = snap();
@@ -599,7 +643,7 @@
         }
         await api.wait(1200);
         gaps.forEach((g) => g.remove()); gaps = [];
-        api.say(`Mehr als ${r - 1} Reihen brauchen wir nicht zu probieren: Dann hätte das Rechteck weniger Spalten als Reihen, und das hätten wir schon gefunden.`);
+        api.say('Noch mehr Reihen brauchen wir nicht zu probieren: Dann hätte das Rechteck weniger Spalten als Reihen, und das hätten wir schon gefunden.');
         await api.wait(3600);
         const one = { cols: n, size: Math.min(26, 330 / n), pos: (i) => [180 - (n * Math.min(26, 330 / n)) / 2 + i * Math.min(26, 330 / n), 105] };
         const from = snap();
@@ -1068,7 +1112,7 @@
           k = 1;
           api.say(`${fr(n, dd)} = ${fr(`${n} : ${kT}`, `${dd} : ${kT}`)} = <b>${fr(p, q)}</b>: dieselbe Fläche mit weniger, größeren Stücken.`);
           await api.wait(2400);
-          api.say(`Vollständig gekürzt heißt: Zähler und Nenner haben keinen gemeinsamen Teiler mehr (außer 1).<br><small>Am schnellsten geht es mit dem größten gemeinsamen Teiler (ggT), hier ${kT}. Schrittweise geht auch, z. B. erst durch 2, dann weiter.</small>`);
+          api.say(`Vollständig gekürzt heißt: Zähler und Nenner haben keinen gemeinsamen Teiler mehr (außer 1).<br><small>Am schnellsten geht es mit dem größten gemeinsamen Teiler (ggT), hier ${kT}.${[4, 6, 8, 9].includes(kT) ? ` Schrittweise geht auch: erst durch ${kT % 2 ? 3 : 2}, dann durch ${kT / (kT % 2 ? 3 : 2)}.` : ''}</small>`);
         }
         return {
           reset() { k = kind === 'kuerz' ? kT : 1; sl.value = k; scene(); },
@@ -1083,13 +1127,13 @@
   // =====================================================
   // Bruch · Dezimal · Prozent – Hundertertafel
   // =====================================================
-  //   ctx: { mode:'hund', p, q, ask:'prozent'|'dezimal'|'bruch' }, dazu pre/post
+  //   ctx: { mode:'hund', p, q, ask:'prozent'|'dezimal'|'pd' (Prozent → Dezimalzahl)|'bruch' (Dezimalzahl → Bruch) }, dazu pre/post
   reg('k5-umwandeln', {
     title: 'Die Hundertertafel',
     viewBox: '0 0 360 200',
     create(api, ctx) {
       ctx = ctx || {};
-      const list = [[1, 2], [1, 4], [3, 4], [1, 5], [2, 5], [3, 10], [1, 20], [7, 20], [2, 25], [1, 8]];
+      const list = [[1, 2], [1, 4], [3, 4], [1, 5], [2, 5], [3, 10], [1, 20], [7, 20], [2, 25], [1, 8], [3, 8]];
       let f = [3, 4], cells, half;
       const isTask = () => ctx.post && f[0] === ctx.p && f[1] === ctx.q;
       if (ctx.mode === 'hund' && ctx.post) f = [ctx.p, ctx.q];
@@ -1108,25 +1152,46 @@
         },
         async play() {
           const [a, b] = f, h = (100 * a) / b, k = 100 / b, full = Math.floor(h);
+          const fill = async () => {
+            let shown = 0;
+            await api.tw(Math.max(700, h * 22), (t) => { const m = Math.min(full, Math.round(t * h)); for (; shown < m; shown++) cells[shown].setAttribute('class', 'hc on'); }, (t) => t);
+            if (h > full) { const c = cells[full]; half = el('rect', { x: +c.getAttribute('x'), y: +c.getAttribute('y'), width: 8, height: 16, rx: 2, class: 'hc on' }, api.svg); }
+            await api.wait(1000);
+          };
+          const ask = ctx.mode === 'hund' && (ctx.pre || ctx.post) ? ctx.ask : '';
+          if (ask === 'pd') { // Prozent → Dezimalzahl
+            api.say(`<b>${fmt(h)} %</b> heißt: ${fmt(h)} von 100 Kästchen der Tafel.`);
+            await api.wait(1800);
+            await fill();
+            api.say(Number.isInteger(h)
+              ? `${fmt(h)} % = ${fr(h, 100)} = <b>${fmt(h / 100)}</b><br><small>Hundertstel stehen an der zweiten Stelle nach dem Komma.</small>`
+              : `${fmt(h)} % = ${fr(fmt(h), 100)} = ${fr(Math.round(h * 10), 1000)} = <b>${fmt(h / 100)}</b><br><small>Das halbe Kästchen ist ein halbes Hundertstel, also 5 Tausendstel.</small>`);
+            return;
+          }
+          if (ask === 'bruch') { // Dezimalzahl → gekürzter Bruch
+            const dec = round6(a / b), st = (String(dec).split('.')[1] || '').length, den = 10 ** st, num = Math.round(dec * den), g = num / a;
+            api.say(`<b>${fmt(dec)}</b> hat ${st === 1 ? 'eine Stelle' : st + ' Stellen'} nach dem Komma, das sind <b>${['Zehntel', 'Hundertstel', 'Tausendstel'][st - 1]}</b>: ${fmt(dec)} = ${fr(num, den)}`);
+            await api.wait(2800);
+            api.say(`Auf der Tafel sind das ${fmt(h)} von 100 Kästchen.`);
+            await fill();
+            api.say(g === 1
+              ? `${fr(num, den)} lässt sich nicht weiter kürzen: <b>${fr(a, b)}</b>`
+              : `Kürzen mit ${g}: ${fr(num, den)} = ${fr(`${num} : ${g}`, `${den} : ${g}`)} = <b>${fr(a, b)}</b><br><small>Vollständig gekürzt: Zähler und Nenner haben keinen gemeinsamen Teiler mehr.</small>`);
+            return;
+          }
           api.say(`Die Tafel hat 100 Kästchen. Wie viele sind ${fr(a, b)} davon?`);
           await api.wait(1400);
           api.say(Number.isInteger(k)
             ? `Ein ${fr(1, b)} der Tafel: 100 : ${b} = <b>${k}</b> Kästchen.`
             : `Ein ${fr(1, b)} der Tafel: 100 : ${b} = <b>${fmt(k)}</b> Kästchen (also auch halbe Kästchen).`);
           await api.wait(1600);
-          api.say(`${fr(a, b)} sind ${a}-mal so viel: ${a} · ${fmt(k)} = <b>${fmt(h)}</b> Kästchen`);
-          let shown = 0;
-          await api.tw(Math.max(700, h * 22), (t) => { const m = Math.min(full, Math.round(t * h)); for (; shown < m; shown++) cells[shown].setAttribute('class', 'hc on'); }, (t) => t);
-          if (h > full) {
-            const c = cells[full];
-            half = el('rect', { x: +c.getAttribute('x'), y: +c.getAttribute('y'), width: 8, height: 16, rx: 2, class: 'hc on' }, api.svg);
-          }
-          await api.wait(1000);
+          api.say(a === 1 ? `${fr(a, b)} sind also <b>${fmt(h)}</b> Kästchen.` : `${fr(a, b)} sind ${a}-mal so viel: ${a} · ${fmt(k)} = <b>${fmt(h)}</b> Kästchen`);
+          await fill();
           // Zeile 1: auf 100 (bzw. 1000) erweitern, Zeile 2: Dezimalzahl und Prozent
           let line1 = '', from = fr(a, b);
           if (Number.isInteger(k) && b !== 100) { line1 = `Erweitern mit ${k}: ${fr(a, b)} = ${fr(`${a} · ${k}`, `${b} · ${k}`)} = ${fr(h, 100)}<br>`; from = fr(h, 100); }
           else if (!Number.isInteger(k)) { line1 = `Auf 1000 erweitern: ${fr(a, b)} = ${fr(a * (1000 / b), 1000)}<br>`; from = fr(a * (1000 / b), 1000); }
-          api.say(`${line1}${from} = <b>${fmt(h / 100)}</b> = <b>${fmt(h)} %</b><br><small>„Prozent“ heißt „von Hundert“: ${fmt(h)} von 100 Kästchen.</small>`);
+          api.say(`${line1}${from} = ${ask === 'prozent' ? fmt(h / 100) : `<b>${fmt(h / 100)}</b>`} = ${ask === 'dezimal' ? `${fmt(h)} %` : `<b>${fmt(h)} %</b>`}<br><small>„Prozent“ heißt „von Hundert“: ${fmt(h)} von 100 Kästchen.</small>`);
         },
       };
     },
@@ -1136,7 +1201,8 @@
   // Dezimalzahlen · 10 – Stellenwerttafel
   // =====================================================
   //   ctx: { mode:'zehn', a, k (±1…3) } · { mode:'add'|'sub', a, b (in Hundertsteln) } · { mode:'mul', a (Hundertstel), k }
-  //        · { mode:'cmp', A, B, frac:[p,q]|null } (für „Zahlen vergleichen“), dazu pre/post
+  //        · { mode:'cmp', sA, sB (wie in der Aufgabe geschrieben), frac:[p,q]|null } (für „Zahlen vergleichen“)
+  //        · { mode:'wechsel', pay, cost (in Cent) } (Wechselgeld ergänzen), dazu pre/post
   const STELLEN = { 7: 'ZM', 6: 'M', 5: 'HT', 4: 'ZT', 3: 'T', 2: 'H', 1: 'Z', 0: 'E', '-1': 'z', '-2': 'h', '-3': 't', '-4': 'zt', '-5': 'ht' };
   // Ziffern einer Zahl als {Stelle: Ziffer}, z. B. 3,47 → {0:3, -1:4, -2:7}
   function digitsOf(x, minDec) {
@@ -1148,11 +1214,11 @@
   }
   reg('k5-dezimal', {
     title: 'Dezimalzahlen',
-    titleFor: (ctx) => (ctx && /add|sub/.test(ctx.mode) ? 'Komma unter Komma' : ctx && ctx.mode === 'mul' ? 'Mal rechnen mit Komma' : ctx && ctx.mode === 'cmp' ? 'Zahlen vergleichen in der Stellenwerttafel' : 'Mal 10 – das Komma bleibt, die Ziffern wandern'),
+    titleFor: (ctx) => (ctx && /add|sub/.test(ctx.mode) ? 'Komma unter Komma' : ctx && ctx.mode === 'mul' ? 'Mal rechnen mit Komma' : ctx && ctx.mode === 'cmp' ? 'Zahlen vergleichen in der Stellenwerttafel' : ctx && ctx.mode === 'wechsel' ? 'Wechselgeld: ergänzen bis zum Schein' : 'Mal 10 – das Komma bleibt, die Ziffern wandern'),
     viewBox: '0 0 360 150',
     create(api, ctx) {
       ctx = ctx || {};
-      const mode = /^(zehn|add|sub|mul|cmp)$/.test(ctx.mode) ? ctx.mode : 'zehn';
+      const mode = /^(zehn|add|sub|mul|cmp|wechsel)$/.test(ctx.mode) ? ctx.mode : 'zehn';
       const isTask = !!ctx.post && mode === ctx.mode;
       const sub = () => subFor(api, ctx, ctx.mode, isTask);
       // ---------------- Stellenwerttafel: · 10, : 10 ----------------
@@ -1217,49 +1283,94 @@
         };
       }
       // ---------------- Zahlen vergleichen: Stelle für Stelle ----------------
+      if (mode === 'wechsel') {
+        // Wechselgeld: vom Preis in Sprüngen bis zum bezahlten Betrag ergänzen (Beträge in Cent)
+        let pay = ctx.pay, cost = ctx.cost;
+        if (!isTask) { pay = pick([5, 10, 20, 50]) * 100; do cost = R(Math.round((pay * 0.3) / 5), pay / 5 - 1) * 5; while (cost === ctx.cost || U.wechselSchritte(cost, pay).length < 2); } // Beispiel mit mindestens zwei Sprüngen
+        const eu = (c) => `${Math.floor(c / 100)},${String(c % 100).padStart(2, '0')} €`;
+        const st = U.wechselSchritte(cost, pay), pts = [cost].concat(st.map((s) => s[1]));
+        const X = (i) => 50 + i * (260 / (pts.length - 1)), y = 108;
+        const lab = (i, cls) => el('text', { x: X(i), y: y + 26, class: 'ex-s ' + (cls || ''), 'text-anchor': 'middle', text: eu(pts[i]) }, api.svg);
+        return {
+          reset() {
+            api.clear(); sub();
+            el('line', { x1: 20, y1: y, x2: 340, y2: y, class: 'ray' }, api.svg);
+            pts.forEach((_, i) => el('line', { x1: X(i), y1: y - 7, x2: X(i), y2: y + 7, class: 'tk' }, api.svg));
+            lab(0, 'f2'); lab(pts.length - 1, 'f3');
+          },
+          async play() {
+            api.say(`Du kaufst für <b>${eu(cost)}</b> ein und gibst <b>${eu(pay)}</b>. An der Kasse wird <b>ergänzt</b>: vom Preis in Sprüngen bis zum bezahlten Betrag.`);
+            await api.wait(3200);
+            for (let i = 0; i < st.length; i++) {
+              const [a, b] = st[i], d = b - a;
+              api.say(st.length === 1 ? `Ein Sprung reicht: ${eu(a)} + <b>${eu(d)}</b> = ${eu(b)}`
+                : b === pay ? `Und bis zum bezahlten Betrag: ${eu(a)} + <b>${eu(d)}</b> = ${eu(b)}`
+                : b % 1000 === 0 && (i > 0 || a % 100 === 0) ? `${i ? "Weiter bis" : "Bis"} zum nächsten Zehner: ${eu(a)} + <b>${eu(d)}</b> = ${eu(b)}`
+                : `Erst bis zum nächsten vollen Euro: ${eu(a)} + <b>${eu(d)}</b> = ${eu(b)}`);
+              const p = el('path', { d: `M ${X(i)} ${y} Q ${(X(i) + X(i + 1)) / 2} ${y - 78} ${X(i + 1)} ${y}`, class: 'jump' }, api.svg);
+              const L = p.getTotalLength ? p.getTotalLength() : 100;
+              p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+              await api.tw(900, (t) => (p.style.strokeDashoffset = L * (1 - t)));
+              el('text', { x: (X(i) + X(i + 1)) / 2, y: y - 48, class: 'ex-s f1', 'text-anchor': 'middle', style: 'font-weight:800', text: `+${eu(d)}` }, api.svg);
+              if (i < st.length - 1) lab(i + 1);
+              await api.wait(2000);
+            }
+            api.say(`Wechselgeld: ${st.length > 1 ? `${st.map((s) => eu(s[1] - s[0])).join(' + ')} = ` : ''}<b>${eu(pay - cost)}</b><br><small>Probe: ${eu(cost)} + ${eu(pay - cost)} = ${eu(pay)} ✓ · Man kann auch schriftlich rechnen: ${eu(pay)} − ${eu(cost)}.</small>`);
+          },
+        };
+      }
       if (mode === 'cmp') {
-        let A = ctx.A, B = ctx.B, frac = ctx.frac;
+        // sA, sB: die Zahlen so, wie sie in der Aufgabe stehen (z. B. „0,56“ und „0,560“)
+        let sA = ctx.sA || (ctx.A !== undefined ? fmt(ctx.A) : ''), sB = ctx.sB || (ctx.B !== undefined ? fmt(ctx.B) : ''), frac = ctx.frac;
         if (ctx.pre || !ctx.post) { // ähnliches Beispiel
-          const base = R(1, 9) / 10 + R(0, 9) / 100;
-          A = round6(base); B = round6(pick([base + 0.005, base - 0.005, Math.floor(base * 10) / 10 + 0.09, base + 0.01]));
+          const base = R(1, 9) / 10 + R(1, 9) / 100;
+          sA = fmt(round6(base)); sB = fmt(round6(pick([base + 0.005, base - 0.005, Math.floor(base * 10) / 10 + 0.1, base + 0.01])));
           frac = null;
         }
-        const dec = Math.max(1, ...[A, B].map((x) => (String(round6(x)).split('.')[1] || '').length));
-        const dA = digitsOf(A, dec), dB = digitsOf(B, dec);
+        const decOf = (s) => (s.split(',')[1] || '').length, dec = Math.max(1, decOf(sA), decOf(sB));
+        const dig = (s) => { const [i, d = ''] = s.split(','), out = {}; i.split('').reverse().forEach((c, k) => (out[k] = +c)); d.padEnd(dec, '0').split('').forEach((c, k) => (out[-(k + 1)] = +c)); return out; };
+        const dA = dig(sA), dB = dig(sB);
         const EMAX = Math.max(0, ...Object.keys(dA).map(Number), ...Object.keys(dB).map(Number)), EMIN = -dec;
-        const cw = Math.min(44, 280 / (EMAX - EMIN + 1));
-        const colX = (e) => 50 + (EMAX - e) * cw + cw / 2 + (e < 0 ? 6 : 0);
-        let marks = [];
+        const cw = Math.min(44, 300 / (EMAX - EMIN + 1));
+        const colX = (e) => 180 - ((EMAX - EMIN + 1) * cw) / 2 + (EMAX - e) * cw + cw / 2 + (e < 0 ? 6 : 0);
+        let marks = [], padT = [];
         function scene() {
-          api.clear(); sub(); marks = [];
+          api.clear(); sub(); marks = []; padT = [];
           for (let e = EMAX; e >= EMIN; e--) {
             el('rect', { x: colX(e) - cw / 2, y: 6, width: cw, height: 136, class: e >= 0 ? 'col' : 'col dec' }, api.svg);
             el('text', { x: colX(e), y: 24, class: 'ex-s', 'text-anchor': 'middle', text: STELLEN[e] }, api.svg);
             marks[e] = el('rect', { x: colX(e) - cw / 2 + 2, y: 34, width: cw - 4, height: 100, rx: 6, class: 'hl2', opacity: 0 }, api.svg);
           }
-          [[dA, 70, 'A'], [dB, 120, 'B']].forEach(([d, y, n]) => {
-            el('text', { x: 22, y, class: 'ex-b f2', 'text-anchor': 'middle', text: n }, api.svg);
+          [[dA, 70, sA], [dB, 120, sB]].forEach(([d, y, s]) => {
             el('circle', { cx: colX(0) + cw / 2 + 3, cy: y, r: 3.5, class: 'comma' }, api.svg);
-            for (const e in d) el('text', { x: colX(+e), y, class: 'dig', 'text-anchor': 'middle', style: 'font-size:26px', text: d[e] }, api.svg);
+            for (const e in d) {
+              const t = el('text', { x: colX(+e), y, class: 'dig', 'text-anchor': 'middle', style: 'font-size:26px', text: d[e] }, api.svg);
+              if (+e < -decOf(s)) { t.setAttribute('opacity', 0); padT.push(t); } // aufgefüllte Null: erscheint erst in der Erklärung
+            }
           });
         }
         return {
           reset: scene,
           async play() {
             if (frac) {
-              api.say(`Zuerst den Bruch als Dezimalzahl schreiben: ${fr(frac[0], frac[1])} = <b>${fmt(A)}</b>`);
+              api.say(`Zuerst den Bruch als Dezimalzahl schreiben: ${fr(frac[0], frac[1])} = <b>${sA}</b>`);
               await api.wait(2400);
             }
-            api.say(`A = ${fmt(A)}, B = ${fmt(B)}. Wir schreiben beide in die Stellenwerttafel${dec > 1 ? ' und füllen fehlende Stellen mit 0 auf' : ''}.`);
-            await api.wait(2400);
+            api.say(`<b>${sA}</b> (oben) und <b>${sB}</b> (unten) stehen in der Stellenwerttafel: gleiche Stellen genau übereinander.`);
+            await api.wait(2600);
+            if (padT.length) {
+              padT.forEach((t) => { t.setAttribute('opacity', 1); t.setAttribute('class', 'dig f2'); });
+              api.say('Fehlende Stellen füllen wir mit <b>0</b> auf. Das ändert den Wert nicht.');
+              await api.wait(2400);
+            }
             for (let e = EMAX; e >= EMIN; e--) {
               const a = dA[e] || 0, b = dB[e] || 0;
               await api.tw(300, (t) => marks[e].setAttribute('opacity', t));
               if (a === b) { api.say(`${STELLEN[e]}: beide <b>${a}</b> → gleich, weiter zur nächsten Stelle.`); await api.wait(1300); marks[e].setAttribute('opacity', 0.25); continue; }
-              api.say(`${STELLEN[e]}: <b>${a}</b> und <b>${b}</b> → hier entscheidet es sich!<br><b>${fmt(a > b ? A : B)}</b> ist größer.`);
+              api.say(`${STELLEN[e]}: <b>${a}</b> und <b>${b}</b> → hier entscheidet es sich!<br><b>${a > b ? (frac ? `${fr(frac[0], frac[1])} = ${sA}` : sA) : sB}</b> ist größer.`);
               return;
             }
-            api.say(`Alle Stellen gleich: <b>Beide Zahlen sind gleich groß.</b><br><small>Nullen am Ende hinter dem Komma ändern nichts: 0,5 = 0,50.</small>`);
+            api.say(`Alle Stellen gleich: <b>Beide Zahlen sind gleich groß.</b><br><small>Nullen am Ende hinter dem Komma ändern nichts: ${sA.length < sB.length ? `${sA} = ${sB}` : sB.length < sA.length ? `${sB} = ${sA}` : '0,5 = 0,50'}.</small>`);
           },
         };
       }
@@ -1354,7 +1465,7 @@
   // =====================================================
   //   ctx: { mode:'mittel', vals, unit, what ('Tag'|'Kind'|'Spiel') }, dazu pre/post – dann Balken statt Klötze
   reg('k5-mittel', {
-    title: 'Der Mittelwert macht alles gerecht',
+    title: 'Arithmetisches Mittel: alles gerecht verteilen',
     viewBox: '0 0 360 240',
     create(api, ctx) {
       ctx = ctx || {};
@@ -1396,7 +1507,7 @@
           }
           const ln = el('line', { x1: 40, y1: base - m * S, x2: 330, y2: base - m * S, class: 'mean', opacity: 0 }, api.svg);
           await api.tw(400, (t) => ln.setAttribute('opacity', t));
-          api.say(`Jetzt sind alle Türme gleich hoch: <b>${m}</b>. Das ist der Mittelwert!<br>Rechnung: (${vals.join(' + ')}) : 4 = ${m * 4} : 4 = <b>${m}</b>`);
+          api.say(`Jetzt sind alle Türme gleich hoch: <b>${m}</b>. Das ist das <b>arithmetische Mittel</b> (kurz: der Mittelwert).<br>Rechnung: (${vals.join(' + ')}) : 4 = ${m * 4} : 4 = <b>${m}</b>`);
         },
       };
     },
@@ -1428,7 +1539,7 @@
         });
       },
       async play() {
-        api.say(`Die Werte: <b>${vals.join(', ')}</b>${unit ? ' ' + unit : ''}. Der Mittelwert ist die Höhe, auf der <b>alle gleich</b> wären.`);
+        api.say(`Die Werte: <b>${vals.join(', ')}</b>${unit ? ' ' + unit : ''}. Das arithmetische Mittel (der Mittelwert) ist die Höhe, auf der <b>alle gleich</b> wären.`);
         await api.wait(2400);
         api.say(`Erst alles zusammenzählen: ${vals.join(' + ')} = <b>${sum}</b>`);
         await api.wait(2400);
@@ -1602,14 +1713,21 @@
       const SAME = (r) => r === 'Nebenwinkel' || r === 'Scheitelwinkel';
       let mode = t && !SAME(t.rel) ? 'b' : 'a', alpha = t ? t.gv : 60;
       const cx = 180, cy = 115;
-      function sceneA(a) {
+      // tk: Aufgabe (nur der gegebene Winkel und das gesuchte β werden beschriftet), tk.done: β mit Ergebnis
+      function sceneA(a, tk) {
         api.clear();
         const rg = [[0, a], [a, 180], [180, 180 + a], [180 + a, 360]];
-        rg.forEach((r, i) => el('path', { d: arcD(cx, cy, 30, r[0], r[1], true), class: i % 2 ? 'wB' : 'wA' }, api.svg));
+        const bi = tk ? (tk.rel === 'Scheitelwinkel' ? 2 : 1) : -1;
+        rg.forEach((r, i) => { if (!tk || i === 0 || i === bi) el('path', { d: arcD(cx, cy, 30, r[0], r[1], true), class: (tk ? i === bi : i % 2) ? 'wB' : 'wA' }, api.svg); });
         el('line', { x1: 20, y1: cy, x2: 340, y2: cy, class: 'ray' }, api.svg);
         const p0 = pt(cx, cy, 200, a), p1 = pt(cx, cy, 200, a + 180);
         el('line', { x1: p0[0], y1: p0[1], x2: p1[0], y2: p1[1], class: 'ray' }, api.svg);
         const names = ['α', 'β', 'α′', 'β′'];
+        if (tk) {
+          rg.forEach((r, i) => { if (i !== 0 && i !== bi) return; const lp = pt(cx, cy, 56, (r[0] + r[1]) / 2); el('text', { x: lp[0], y: lp[1] + 5, class: i === bi ? 'blbl' : 'albl', 'text-anchor': 'middle', text: i === 0 ? `${a}°` : tk.done ? `β=${tk.av}°` : 'β=?' }, api.svg); });
+          api.say(`Zwei Geraden schneiden sich. Gegeben ist der Winkel <b class="cA">${a}°</b>, gesucht ist <b class="cB">β</b>.`);
+          return;
+        }
         rg.forEach((r, i) => { const lp = pt(cx, cy, 52, (r[0] + r[1]) / 2); el('text', { x: lp[0], y: lp[1] + 5, class: i % 2 ? 'blbl' : 'albl', 'text-anchor': 'middle', text: `${names[i]}=${i % 2 ? 180 - a : a}°` }, api.svg); });
         api.say(`<b class="cA">α</b> und <b class="cB">β</b> sind <b>Nebenwinkel</b>: ${a}° + ${180 - a}° = <b>180°</b><br><b class="cA">α</b> und <b class="cA">α′</b> liegen sich gegenüber: <b>Scheitelwinkel</b>, immer gleich groß.`);
       }
@@ -1636,18 +1754,21 @@
       }
       const sl = api.slider({ label: 'Gerade drehen', min: 20, max: 160, value: alpha, onInput(v) { if (mode !== 'a') return; alpha = v; sceneA(v); } });
       const sliderRow = sl.closest('.exslider');
-      api.chips([
+      if (!t) api.chips([
         { label: 'Neben- & Scheitelwinkel', onClick() { mode = 'a'; sliderRow.style.display = ''; api.replay(); } },
         { label: 'Stufen- & Wechselwinkel', onClick() { mode = 'b'; sliderRow.style.display = 'none'; api.replay(); } },
       ]);
-      if (t) sliderRow.style.display = mode === 'a' ? '' : 'none';
+      if (t) sliderRow.style.display = 'none'; // bei einer Aufgabe bleibt das Bild fest
       return {
-        reset() { if (mode === 'a') { sceneA(alpha); subFor(api, ctx, 'wpaar', isTask); } else sceneB(); },
+        reset() { if (mode === 'a') { sceneA(alpha, t); subFor(api, ctx, 'wpaar', isTask); } else sceneB(); },
         async play() {
           if (mode === 'a' && t) {
             // gleiche Kreuzung: Nebenwinkel oder Scheitelwinkel
-            sceneA(t.gv); subFor(api, ctx, 'wpaar', isTask);
+            sceneA(t.gv, t); subFor(api, ctx, 'wpaar', isTask);
             await api.wait(2600);
+            api.say(`β liegt ${t.rel === 'Scheitelwinkel' ? 'dem gegebenen Winkel genau <b>gegenüber</b>: Das ist der <b>Scheitelwinkel</b>.' : 'direkt <b>neben</b> dem gegebenen Winkel, zusammen ergeben beide eine gerade Linie: Das ist ein <b>Nebenwinkel</b>.'}`);
+            await api.wait(3000);
+            sceneA(t.gv, Object.assign({}, t, { done: true }));
             api.say(`Gegeben ist ${t.gv}°. β ist ${t.rel === 'Scheitelwinkel' ? 'der <b>Scheitelwinkel</b> (gegenüber)' : 'ein <b>Nebenwinkel</b> (daneben, zusammen eine gerade Linie)'}.<br>${t.rel === 'Scheitelwinkel' ? `Scheitelwinkel sind gleich groß: β = <b>${t.av}°</b>` : `Nebenwinkel ergeben 180°: β = 180° − ${t.gv}° = <b>${t.av}°</b>`}`);
             return;
           }
@@ -1707,7 +1828,7 @@
     create(api, ctx) {
       ctx = ctx || {};
       const isTask = ctx.mode === 'rect' && ctx.post;
-      let a, b, unit = 'cm', mode = 'A', L = null;
+      let a, b, unit = 'cm', mode = 'A', L = null, bLab = null;
       const pickN = () => { a = R(4, 8); b = R(2, 4); };
       if (ctx.mode === 'rect') {
         mode = { u: 'U', a: 'A', b: 'B', l: 'L' }[ctx.kind];
@@ -1751,11 +1872,14 @@
             el('polygon', { points: pts.map((q) => q.join(',')).join(' '), class: 'shape' }, api.svg);
             el('text', { x: 180, y: y0 + b * s + 24, class: 'ex-s', 'text-anchor': 'middle', text: `${a} cm` }, api.svg);
             el('text', { x: X - 8, y: y0 + (b * s) / 2 + 5, class: 'ex-s', 'text-anchor': 'end', text: `${b} cm` }, api.svg);
+            // wie in der Aufgabe: oben und rechts stehen die Längen der Figur (nicht die des fehlenden Stücks)
+            el('text', { x: X + ((a - w) * s) / 2, y: y0 - 7, class: 'ex-s', 'text-anchor': 'middle', text: `${a - w} cm` }, api.svg);
+            el('text', { x: X + a * s + 8, y: y0 + h * s + ((b - h) * s) / 2 + 5, class: 'ex-s', text: `${b - h} cm` }, api.svg);
             return;
           }
           el('rect', { x: x0(), y: y0, width: a * s, height: b * s, class: 'shape' }, api.svg);
           el('text', { x: 180, y: y0 + b * s + 24, class: 'ex-s', 'text-anchor': 'middle', text: `a = ${a} ${unit}` }, api.svg);
-          el('text', { x: x0() + a * s + 8, y: y0 + (b * s) / 2 + 5, class: 'ex-s', text: mode === 'B' ? 'b = ?' : `b = ${b} ${unit}` }, api.svg);
+          bLab = el('text', { x: x0() + a * s + 8, y: y0 + (b * s) / 2 + 5, class: 'ex-s', text: mode === 'B' ? 'b = ?' : `b = ${b} ${unit}` }, api.svg);
         },
         async play() {
           if (mode === 'A') {
@@ -1767,13 +1891,16 @@
             api.say(`Der Flächeninhalt ist <b>${a * b} ${unit}²</b>, also ${a * b} Kästchen. In eine Reihe passen <b>${a}</b> (Seite a).`);
             await api.wait(2200);
             await fillRows(b, a, (r) => `${r} Reihe${r > 1 ? 'n' : ''}: ${r * a} Kästchen${r * a === a * b ? ' – genau alle!' : ''}`);
+            if (bLab) { bLab.textContent = `b = ${b} ${unit}`; bLab.setAttribute('class', 'ex-s f1'); }
             api.say(`Es werden <b>${b} Reihen</b>. Das ist die Seite b.<br><b>b = A : a = ${a * b} : ${a} = ${b} ${unit}</b>`);
           } else if (mode === 'L') {
             const { w, h } = L;
             api.say('Die Figur ist kein Rechteck. Trick: Wir ergänzen sie zu einem <b>großen Rechteck</b> …');
             await api.wait(1800);
             await api.tw(600, (k) => L.missing.setAttribute('opacity', k));
+            api.say(`Wie groß ist das fehlende Stück?<br>Breite: ${a} − ${a - w} = <b>${w} cm</b> · Höhe: ${b} − ${b - h} = <b>${h} cm</b>`);
             el('text', { x: x0() + (a - w / 2) * s, y: y0 + (h * s) / 2 + 5, class: 'ex-s', 'text-anchor': 'middle', text: `${w}·${h}` }, api.svg);
+            await api.wait(3400);
             api.say(`Großes Rechteck: ${a} · ${b} = <b>${a * b} cm²</b>. Das blaue Stück gehört nicht dazu: ${w} · ${h} = <b>${w * h} cm²</b>.`);
             await api.wait(2800);
             await api.tw(600, (k) => L.missing.setAttribute('opacity', 1 - 0.7 * k));
@@ -1792,7 +1919,7 @@
               const [fx, fy] = path[i], [tx, ty] = path[i + 1];
               await api.tw(900, (k) => { const x = lerp(fx, tx, k), y = lerp(fy, ty, k); dot.setAttribute('cx', x); dot.setAttribute('cy', y); line.setAttribute('points', done.concat([[x, y]]).map((q) => q.join(',')).join(' ')); });
               done.push([tx, ty]); sum.push(sides[i]);
-              api.say(`${sum.join(` ${unit} + `)} ${unit} = <b>${sum.reduce((q, r) => q + r, 0)} ${unit}</b>`);
+              api.say(i === 0 ? `Erste Seite: <b>${sides[0]} ${unit}</b>` : `${sum.join(` ${unit} + `)} ${unit} = <b>${sum.reduce((q, r) => q + r, 0)} ${unit}</b>`);
               await api.wait(500);
             }
             api.say(`<b>u = 2 · a + 2 · b = 2 · ${a} + 2 · ${b} = ${2 * (a + b)} ${unit}</b>`);
@@ -2069,11 +2196,14 @@
             el('text', { x: (X(a) + X(b2)) / 2, y: y - 42, class: 'ex-b f1', 'text-anchor': 'middle', text: txt }, api.svg);
           };
           const parts = [];
+          // Der Merksatz passt nur, wenn die Fahrt über eine volle Stunde hinausgeht
+          const trick = pts.length > 2 ? '<br>Trick: Immer erst bis zur vollen Stunde springen!' : '<br><small>Geht die Fahrt über eine volle Stunde hinaus, springt man erst bis dorthin.</small>';
           for (let i = 1; i < pts.length; i++) {
             const a = pts[i - 1], b2 = pts[i], d = b2 - a;
             parts.push(d);
             if (i === 1 && b2 === full && full < end) api.say(`Erst bis zur vollen Stunde: ${hm(a)} → ${hm(b2)} sind <b>${d} min</b>.`);
             else if (d === 60) api.say(`Eine ganze Stunde: ${hm(a)} → ${hm(b2)} sind <b>60 min</b>.`);
+            else if (pts.length === 2 && end === full) api.say(`Genau bis zur vollen Stunde: ${hm(a)} → ${hm(b2)} sind <b>${d} min</b>.`);
             else if (pts.length === 2) api.say(`Die volle Stunde wird nicht erreicht: ${hm(a)} → ${hm(b2)} sind <b>${d} min</b>.`);
             else api.say(ask === 'dauer' ? `Dann bis zur Ankunft: ${hm(a)} → ${hm(b2)} sind <b>${d} min</b>.` : `Bleiben noch ${dur} − ${parts.slice(0, -1).reduce((p, q) => p + q, 0)} = <b>${d} min</b>.`);
             await jump(a, b2, `+${d}`);
@@ -2081,8 +2211,8 @@
             await api.wait(1700);
           }
           api.say(ask === 'dauer'
-            ? `Fahrzeit: ${parts.length > 1 ? `${parts.join(' + ')} = ` : ''}<b>${dur} min</b>${dur >= 60 ? ` (= ${Math.floor(dur / 60)} h ${dur % 60} min)` : ''}<br>Trick: Immer erst bis zur vollen Stunde springen!`
-            : `Ankunft: <b>${hm(end)} Uhr</b><br>Trick: Immer erst bis zur vollen Stunde springen!`);
+            ? `Fahrzeit: ${parts.length > 1 ? `${parts.join(' + ')} = ` : ''}<b>${dur} min</b>${dur >= 60 ? ` (= ${Math.floor(dur / 60)} h ${dur % 60} min)` : ''}${trick}`
+            : `Ankunft: <b>${hm(end)} Uhr</b>${trick}`);
         },
       };
     },
@@ -2365,7 +2495,7 @@
       function reason(n) {
         const p = parentOf(n);
         if (p && needPar(n, p.op, p.r === n)) return '<b>Klammer zuerst</b>';
-        if (n.op === '^') return '<b>Hochzahl zuerst</b>';
+        if (n.op === '^') return '<b>Potenz zuerst</b>';
         if (PREC[n.op] === 2 && order().some((m) => m !== n && PREC[m.op] === 1)) return '<b>Punkt vor Strich</b>';
         if (!p) return 'Zum Schluss';
         return 'Von links nach rechts';
@@ -2426,7 +2556,7 @@
           });
           if (mode === 'punkt') api.say(`Ergebnis: <b>${total}</b>. <small>Punkt vor Strich! Wer zuerst ${a} + ${b} rechnet, bekommt ${(a + b) * c}, und das ist falsch.</small>`);
           else if (mode === 'klammer') api.say(`Ergebnis: <b>${total}</b>. <small>Ohne Klammer wäre es ${a} + ${b * c} = ${a + b * c}. Die Klammer ändert, wer zusammengehört!</small>`);
-          else if (mode === 'task') api.say(`Ergebnis: <b>${total}</b>. <small>Reihenfolge: Klammer, Hochzahl, Punkt, Strich. Sonst von links nach rechts.</small>`);
+          else if (mode === 'task') api.say(`Ergebnis: <b>${total}</b>. <small>Reihenfolge: Klammer, Potenz, Punkt, Strich. Sonst von links nach rechts.</small>`);
           else api.say(`Ergebnis: <b>${total}</b>. <small>Klammer zuerst, dann Punkt vor Strich, zum Schluss das Minus.</small>`);
         },
       };
@@ -2541,7 +2671,12 @@
         api.clear(); sub();
         let f, x, y, minus = false, back = false;
         if (ctx.law === 'dis' && isTask) ({ f, x, y } = ctx), (minus = !!ctx.minus), (back = !!ctx.back);
-        else if (ctx.law === 'dis') { f = R(3, 6); x = pick([20, 30]); y = R(2, 6); minus = !!ctx.minus; back = !!ctx.back; }
+        else if (ctx.law === 'dis') { // ähnliches Beispiel, bei dem der Rechenvorteil genauso sichtbar wird wie in der Aufgabe
+          minus = !!ctx.minus; back = !!ctx.back; f = R(3, 6);
+          if (back) { do x = R(11, 89); while (x === ctx.x); y = 100 - x; } // Ausklammern lohnt sich: in der Klammer entsteht 100
+          else if (ctx.x === 100) { x = 100; y = pick([1, 2]); do f = R(3, 19); while (f === ctx.f); } // nah an 100
+          else { x = pick([20, 30]); y = R(2, 6); }
+        }
         else { f = R(3, 6); x = pick([10, 20]); y = R(2, 6); }
         const o = minus ? '−' : '+';
         const W = minus ? x : x + y, u = Math.min(14, 250 / W), h = Math.max(24, Math.min(110, f * u * (W > 40 ? 3 : 1)));
@@ -2610,9 +2745,11 @@
         api.say(`Stimmt <b>${left} = ${right}</b>? Wir rechnen beide Seiten aus.`);
         await api.wait(2200);
         L2.textContent = `= ${lv}`; api.say(`Links: ${left} = <b>${lv}</b>`); await api.wait(2000);
-        R2.textContent = `= ${rv}`; api.say(`Rechts: ${right} = <b>${rv}</b>`); await api.wait(2000);
+        const noR = typeof rv !== 'number'; // rechte Seite lässt sich mit natürlichen Zahlen nicht ausrechnen
+        if (noR) { R2.setAttribute('class', 'ex-b f1'); R2.textContent = 'geht nicht'; api.say(`Rechts: ${right}? ${ctx.rno || 'Das geht mit natürlichen Zahlen nicht.'}`); await api.wait(3000); }
+        else { R2.textContent = `= ${rv}`; api.say(`Rechts: ${right} = <b>${rv}</b>`); await api.wait(2000); }
         mid.textContent = ok ? '=' : '≠';
-        api.say(`${ok ? `Beide Seiten ergeben ${lv}: <b>Stimmt!</b>` : `${lv} und ${rv} sind verschieden: <b>Stimmt nicht!</b>`}<br><small>${rule}</small>`);
+        api.say(`${ok ? `Beide Seiten ergeben ${lv}: <b>Stimmt!</b>` : noR ? `Links kommt ${lv} heraus, rechts lässt sich gar nicht ausrechnen: <b>Stimmt nicht!</b>` : `${lv} und ${rv} sind verschieden: <b>Stimmt nicht!</b>`}<br><small>${rule}</small>`);
       }
       // Vorteilhaft rechnen: Zahlen umstellen und passende Paare bündeln
       async function tausch() {
@@ -2652,6 +2789,54 @@
             api.say(`→ Das ist das <b>${NAME[0]}</b> (${NAME[1]}): ${NAME[2]}.`);
           }
           if (mode === 'alle') api.say('<b>Kommutativ</b>: vertauschen · <b>Assoziativ</b>: Klammer verschieben · <b>Distributiv</b>: verteilen. <small>Die ersten beiden gelten nur für Plus und Mal!</small>');
+        },
+      };
+    },
+  });
+
+  // =====================================================
+  // Kacheln, deren Aufgaben die Erklärungen anderer Themen nutzen: eigene Erklärung für den ▶-Knopf
+  // =====================================================
+  reg('k5-vergleich', {
+    title: 'Zahlen vergleichen in der Stellenwerttafel',
+    viewBox: '0 0 360 150',
+    create: (api, ctx) => EX['k5-dezimal'].create(api, Object.assign({}, ctx, { mode: 'cmp' })),
+  });
+  reg('k5-sach', {
+    title: 'Wechselgeld: ergänzen bis zum Schein',
+    viewBox: '0 0 360 150',
+    create: (api, ctx) => EX['k5-dezimal'].create(api, Object.assign({}, ctx, { mode: 'wechsel' })),
+  });
+  reg('k5-text', {
+    title: 'Textaufgaben: in vier Schritten',
+    viewBox: '0 0 360 200',
+    create(api) {
+      let d, n, g = [];
+      const pickN = () => { d = R(3, 9); n = R(150, 900); };
+      pickN();
+      api.chips([{ label: 'Neues Beispiel', onClick() { pickN(); api.replay(); } }]);
+      const rows = ['Was ist gesucht?', 'Was ist gegeben?', 'Rechnung aufschreiben', 'Rechnen, antworten'];
+      return {
+        reset() {
+          api.clear(); api.sub('');
+          g = rows.map((t, i) => {
+            const grp = el('g', { opacity: 0.3 }, api.svg), y = 12 + i * 46;
+            el('rect', { x: 20, y, width: 320, height: 38, rx: 10, class: 'bag' }, grp);
+            el('text', { x: 40, y: y + 25, class: 'ex-b f2', 'text-anchor': 'middle', text: i + 1 }, grp);
+            el('text', { x: 58, y: y + 25, class: 'ex-s', style: 'font-weight:800', text: t }, grp);
+            grp.out = el('text', { x: 330, y: y + 25, class: 'ex-s f1', 'text-anchor': 'end', style: 'font-weight:800', text: '' }, grp);
+            return grp;
+          });
+        },
+        async play() {
+          const q = Math.floor(n / d), r = n % d;
+          api.say(`Beispiel: <b>${fmt(n)} Fotos</b> kommen in ein Album. Auf jede Seite passen <b>${d}</b>. Wie viele Seiten werden voll, und wie viele Fotos bleiben übrig?`);
+          await api.wait(4600);
+          const step = async (i, out, txt, ms) => { await api.tw(300, (t) => g[i].setAttribute('opacity', 0.3 + 0.7 * t)); g[i].out.textContent = out; api.say(txt); if (ms) await api.wait(ms); };
+          await step(0, 'volle Seiten, Rest', '<b>1. Was ist gesucht?</b> Lies die Frage genau: die Anzahl der vollen Seiten und die Fotos, die übrig bleiben.', 3800);
+          await step(1, `${fmt(n)} und ${d}`, `<b>2. Was ist gegeben?</b> ${fmt(n)} Fotos, immer ${d} auf eine Seite. „Immer ${d}“ heißt: gleich große Gruppen bilden, also <b>teilen</b>.`, 4200);
+          await step(2, `${fmt(n)} : ${d}`, `<b>3. Rechnung aufschreiben:</b> ${fmt(n)} : ${d}<br><small>Signalwörter helfen: „je“, „verteilen“ → teilen · „zusammen“, „insgesamt“ → plus oder mal · „übrig“, „zurück“ → minus oder Rest.</small>`, 5600);
+          await step(3, `${fmt(q)} Rest ${r}`, `<b>4. Rechnen und antworten:</b> ${fmt(n)} : ${d} = ${fmt(q)} Rest ${r}.<br>Antwort: <b>${fmt(q)} Seiten</b> werden voll, <b>${r === 1 ? '1 Foto bleibt' : r + ' Fotos bleiben'}</b> übrig.<br><small>Zum Schluss prüfen: Passt die Antwort zur Frage? Probe: ${fmt(q)} · ${d} + ${r} = ${fmt(n)} ✓</small>`, 0);
         },
       };
     },

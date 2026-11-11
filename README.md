@@ -88,10 +88,11 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 
 **Mathe (Mathelix)**
 - [x] Klasse 5: alle 5 Lernbereiche, 25 Themen, Tipps und Lösungswege
-- [x] 21 Erklär-Animationen, Pause und Langsam-Modus
-- [x] Beispiel vorher / Lösung als Animation nachher: Primzahlen, Vorrangregeln, Potenzen, Division, Teilbarkeit
+- [x] Erklär-Animationen zu allen 25 Themen, Pause und Langsam-Modus
+- [x] Beispiel vorher / Lösung als Animation nachher für alle 25 Themen
 - [x] Entdecken: 14 visuelle Beweise und Staunen-Momente
-- [ ] Lösung-als-Animation auf die übrigen Themen übertragen
+- [ ] Offene Entscheidungen aus der Prüfung vom 11.11.2026 (Raten, Schwierigkeit, „Gemischt“, Darstellung am Tablet), siehe `STAND.md` Abschnitt 9
+- [ ] Lehrplan-Lücken Klasse 5: Symmetrie, Quader-Netze, Überschlag, schriftlich plus/minus/mal, Dezimalzahlen runden
 - [ ] Reihenfolge mit dem Schulbuch abgleichen
 - [ ] Klasse 6, danach Klasse 4 und die übrigen Klassen
 

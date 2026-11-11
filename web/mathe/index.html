@@ -125,6 +125,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .fld{display:flex;flex-direction:column;gap:4px}
 .fld label{font-size:13px;color:var(--soft);font-weight:800}
 .fld .row{display:flex;align-items:center;gap:8px}
+.fld .row.flow{display:block;line-height:2.5;font-size:20px}
+.fld .row.flow input{display:inline-block;width:80px;margin:0 6px;vertical-align:middle}
 .answer input{font:800 26px Nunito,system-ui,sans-serif;width:150px;max-width:100%;border:2px solid var(--ink);border-radius:12px;padding:8px 12px;background:#fff;color:var(--ink);outline:none}
 .answer input:focus{box-shadow:0 0 0 4px rgba(61,123,255,.3)}
 .answer input.w{border-color:var(--bad);background:#fff1f3}
@@ -683,7 +685,7 @@ body.noscroll{overflow:hidden}
       </div>
       <div class="quick">
         <button class="btn org" data-tr="all"><span class="ic">🎯</span>Trainingsrunde<small>${TASKS_PER_ROUND} Aufgaben, Schwaches öfter</small></button>
-        <button class="btn" data-tr="review" ${weak.length ? '' : 'disabled'}><span class="ic">🔁</span>Fehler-Training<small>${weak.length ? weak.length + ' Thema' + (weak.length > 1 ? 's' : '') + ' zum Wiederholen' : 'gerade nichts offen'}</small></button>
+        <button class="btn" data-tr="review" ${weak.length ? '' : 'disabled'}><span class="ic">🔁</span>Fehler-Training<small>${weak.length ? (weak.length === 1 ? '1 Thema' : weak.length + ' Themen') + ' zum Wiederholen' : 'gerade nichts offen'}</small></button>
       </div>
       ${TR.gruppen.map((g, i) => `
         <section class="lb">
@@ -708,7 +710,7 @@ body.noscroll{overflow:hidden}
       <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
       <div class="quick">
         <button class="btn org" data-mix="all"><span class="ic">🎲</span>Gemischt<small>${TASKS_PER_ROUND} Aufgaben aus allem</small></button>
-        <button class="btn" data-review ${weak.length ? '' : 'disabled'}><span class="ic">🔁</span>Fehler-Training<small>${weak.length ? weak.length + ' Thema' + (weak.length > 1 ? 's' : '') + ' zum Wiederholen' : 'gerade nichts offen'}</small></button>
+        <button class="btn" data-review ${weak.length ? '' : 'disabled'}><span class="ic">🔁</span>Fehler-Training<small>${weak.length ? (weak.length === 1 ? '1 Thema' : weak.length + ' Themen') + ' zum Wiederholen' : 'gerade nichts offen'}</small></button>
       </div>
       ${grade().lbs.map((lb) => `
         <section class="lb">
@@ -764,7 +766,11 @@ body.noscroll{overflow:hidden}
     if (R.idx >= R.seq.length) return result();
     const topic = R.seq[R.idx];
     let task;
-    for (let i = 0; i < 5; i++) { try { task = topic.gen(); break; } catch (e) { console.error(e); } }
+    // Dieselbe Aufgabe soll in einer Runde nicht zweimal kommen (bis zu 6 neue Versuche)
+    R.seen = R.seen || [];
+    const sig = (t) => topic.id + '|' + t.prompt + '|' + (t.figure || '') + '|' + (t.pre || '') + '|' + (t.fields || []).map((f) => (f.prefix || '') + ('fixed' in f ? f.fixed : '')).join('|');
+    for (let i = 0; i < 6; i++) { try { task = topic.gen(); if (!R.seen.includes(sig(task))) break; } catch (e) { console.error(e); } }
+    if (task) R.seen.push(sig(task));
     R.cur = { topic, task, attempt: 1, done: false, hintShown: false };
     renderTask();
   }
@@ -791,7 +797,7 @@ body.noscroll{overflow:hidden}
       } else {
         inputs = `<div class="answer">${task.fields.map((f, i) => `
           <div class="fld">${task.fields.length > 1 && f.label ? `<label for="f${i}">${f.label}</label>` : ''}
-            <div class="row">${f.prefix ? `<span>${f.prefix}</span>` : ''}${inp(f, i)}${f.suffix ? `<span>${f.suffix}</span>` : ''}${f.type === 'factors' ? `<button class="factbtn" data-dot="${i}" aria-label="Malpunkt einfügen">·</button>` : ''}</div>
+            <div class="row${f.prefix && f.prefix.replace(/<[^>]+>/g, '').length > 12 ? ' flow' : ''}">${f.prefix ? `<span>${f.prefix}</span>` : ''}${inp(f, i)}${f.suffix ? `<span>${f.suffix}</span>` : ''}${f.type === 'factors' ? `<button class="factbtn" data-dot="${i}" aria-label="Malpunkt einfügen">·</button>` : ''}</div>
           </div>`).join('')}</div>`;
       }
     }

@@ -71,7 +71,7 @@ a{color:inherit}
 (function () {
   // Fächer – neue Fächer werden hier ergänzt
   const FAECHER = [
-    { id: 'mathe', name: 'Mathe', app: 'Mathelix', icon: '×', color: 'var(--c1)', href: 'mathe/', key: 'mathelix.v1', topics: 22 },
+    { id: 'mathe', name: 'Mathe', app: 'Mathelix', icon: '×', color: 'var(--c1)', href: 'mathe/', key: 'mathelix.v1', topics: 25 },
     { id: 'deutsch', name: 'Deutsch', icon: 'Aa', color: 'var(--c2)', soon: true },
     { id: 'englisch', name: 'Englisch', icon: 'En', color: 'var(--c3)', soon: true },
   ];
@@ -93,13 +93,13 @@ a{color:inherit}
 
   function stats(f) {
     const S = f.key ? load(f.key) : null;
-    if (!S) return { name: '', days: [], tasks: 0, stars: 0 };
+    if (!S) return { name: '', days: [], tasks: 0, stars: 0, rounds: 0 };
     let stars = 0;
     for (const id in S.stats || {}) {
       const h = S.stats[id].hist || [];
       if (h.length >= 3) { const a = h.reduce((x, y) => x + y, 0) / h.length; stars += a >= 0.9 && h.length >= 8 ? 3 : a >= 0.75 ? 2 : a >= 0.5 ? 1 : 0; }
     }
-    return { name: S.name || '', days: S.days || [], tasks: S.total || 0, stars };
+    return { name: S.name || '', days: S.days || [], tasks: S.total || 0, stars, rounds: (S.rounds || {})[dayStr(new Date())] || 0 };
   }
   function streak(days) {
     const set = new Set(days), d = new Date();
@@ -113,6 +113,7 @@ a{color:inherit}
     const days = [...new Set(all.flatMap((x) => x.s.days))];
     const name = (SYS.profileName || all.map((x) => x.s.name).find(Boolean) || '').trim();
     const today = days.includes(dayStr(new Date()));
+    const goal = all.some((x) => x.s.rounds >= 1); // Tagesziel: eine ganze Runde
     const avatar = A ? A.get() : '';
     $.innerHTML = `
       <div class="top">
@@ -125,7 +126,7 @@ a{color:inherit}
       <div class="hero">
         <button class="avabtn" id="avaBtn" aria-label="Avatar ändern">${A ? A.html(avatar || A.STANDARD, 80) : ''}<span class="pen">✏️</span></button>
         <div><h1>${name ? `Hallo ${esc(name)}!` : 'Hallo!'}</h1>
-        <p>${!avatar ? 'Tipp auf das Bild und such dir deinen Avatar aus!' : today ? 'Heute schon gelernt – stark! 💪' : 'Was möchtest du heute lernen?'}</p></div>
+        <p>${!avatar ? 'Tipp auf das Bild und such dir deinen Avatar aus!' : goal ? 'Tagesziel geschafft – stark! 💪' : today ? 'Heute schon geübt. Für das Tagesziel fehlt noch eine ganze Runde.' : 'Was möchtest du heute lernen?'}</p></div>
       </div>
       <div class="subjects">
         ${FAECHER.map((f) => {

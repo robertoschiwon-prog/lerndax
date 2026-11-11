@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 10.11.2026** · Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 11.11.2026** · Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -129,14 +129,15 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **Erklär-Animationen** zu allen 25 Themen (Liste der Grund-Animationen): Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
+- **Erklär-Animationen** zu allen 25 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
+  Textaufgaben „in vier Schritten“, Zahlen vergleichen und Sachaufgaben „Wechselgeld ergänzen“). Liste der Grund-Animationen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Dividieren: Bonbons in Tüten und
   schriftlich Stelle für Stelle · Teilbarkeit: Regeln und Teiler (Quersumme, Endziffern, durch 6,
   Teiler-Paare) ·
   Primzahlen · Potenzen: wie oft malnehmen? (Basis/Exponent, 2ⁿ verdoppeln, Zehnerpotenzen,
   a¹ und 1ⁿ, Quadratzahlen) · Anteile berechnen · Erweitern & Kürzen ·
-  Die Hundertertafel · Mal 10 (das Komma bleibt, die Ziffern wandern) · Der Mittelwert macht
-  alles gerecht · Erst laufen, dann springen (Koordinaten) · Winkelarten · Winkel an Geraden ·
+  Die Hundertertafel · Mal 10 (das Komma bleibt, die Ziffern wandern) · Arithmetisches Mittel:
+  alles gerecht verteilen · Erst laufen, dann springen (Koordinaten) · Winkelarten · Winkel an Geraden ·
   Fläche und Umfang · Volumen: Würfel stapeln · Gleichungen sind Waagen · Zeitspannen mit
   Sprüngen · Zoom ins Maßband · Was ist π? Das abrollende Rad.
 - **Erklär-Player:** Abspielen, **Pause**, **Langsam-Modus**, „Nochmal“; viele Animationen
@@ -234,7 +235,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 (Reihenfolge in `DISC_ORDER` in `web/mathe/index.html`).
 
 ### Lernstand (pro Gerät im Browser, `localStorage`)
-- `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, ok, …}}, days:[JJJJ-MM-TT], total, seen:{<id>:true}, rounds:{JJJJ-MM-TT: n}, resetAt }`
+- `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, hist:[letzte Ergebnisse 1 / 0,5 / 0], last}}, exSlow, days:[JJJJ-MM-TT], total, seen:{<id>:true}, rounds:{JJJJ-MM-TT: n}, resetAt }`
 - `lerndax.device` (aktives Profil), `lerndax.auth` (Anmeldung), `lerndax.avatar`
   (z. B. `fuchs:blau`), `lerndax.avatar.pending` (noch nicht hochgeladen),
   `lerndax.avatar.asked` (Auswahl wurde schon einmal automatisch gezeigt).
@@ -264,7 +265,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v19`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v20`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -280,7 +281,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 
 ### Tests
 Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `ui2.py`,
-`sync_test.py` laufen lassen.
+`sync_test.py` laufen lassen, nach Änderungen an Aufgaben oder Animationen auch `loesung.py`.
 
 ## 5. Wichtige Entscheidungen (mit Begründung)
 
@@ -390,8 +391,9 @@ Infos zur ersten Arbeit:
     **keine** Konten im Familienkalender.
   - Auf der Seite **keine** Namen von Schule, Lehrkraft oder Kind, weil sie technisch für jeden
     mit dem Link erreichbar ist.
-- Offen: Werden im Buch (S. 36–40) auch zweistellige Teiler geübt? Mathelix nutzt bisher nur
-  einstellige.
+- Offen: Werden im Buch (S. 36–40) auch zweistellige Teiler geübt? Beim schriftlichen Dividieren
+  nutzt Mathelix nur einstellige Teiler; zweistellige kommen bei „Sachaufgaben mit Geld“
+  (Klassenfahrt, 12 bis 28 Kinder) und bei der fehlenden Rechteckseite vor.
 
 **Allgemeine Lehrplan-Ergänzungen vom 10.11.2026** (aus dem Abgleich mit der Arbeit entstanden)
 - [x] Neue Themen **„Vorrangregeln“** und **„Rechengesetze“** (`lerndax-v8`)
@@ -436,8 +438,21 @@ Infos zur ersten Arbeit:
       Bereich oder Familienkalender erwähnen?
 - [x] Nach der Arbeit (24.11.): Trainingsseite **bleibt stehen** (Entscheidung Auftraggeber, 10.11.), auch
       als Beispiel für spätere Jahrgänge bzw. eine mögliche öffentliche Version.
-- Danach (Lehrplan-Lücken): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, unechte
-  Brüche/gemischte Zahlen, Überschlag, Fermi-Aufgaben
+- Danach (Lehrplan-Lücken Klasse 5): Symmetrie & Abbildungen, Würfelnetze/Quader-Ansichten, gemischte
+  Zahlen (unechte Brüche kommen bisher nur beim Kürzen vor), Überschlag, schriftliches Addieren,
+  Subtrahieren und Multiplizieren natürlicher Zahlen, Dezimalzahlen runden, Fermi-Aufgaben
+
+**Offene Entscheidungen aus der Komplett-Prüfung vom 11.11.2026** (Auftraggeber entscheidet, nichts davon ist umgesetzt)
+- Raten: „Zahlen vergleichen“ hat immer 3 Auswahlen (kein zweiter Versuch), Rechengesetze zu 58 %,
+  Division zu 25 % Ja/Nein. Mehr Aufgaben zum Eintippen?
+- Schwierigkeit: zweistellige Teiler (Klassenfahrt, Rechteckseite) und 4 bis 5 Nachkommastellen bei
+  „· 10 / : 10“ – so lassen oder leichter?
+- „Gemischt“ zieht aus allen 25 Themen, auch aus solchen, die in der Schule noch nicht dran waren.
+- Wenig Abwechslung bei einigen Themen (z. B. Winkelarten, Anteile).
+- Verfahren beim schriftlichen Minus (Ergänzen oder Entbündeln) mit der Schule abgleichen.
+- Darstellung: weiße Schrift auf Gelb/Orange ist schwach lesbar; am Tablet/PC bleibt die App eine
+  schmale Spalte; ✕ beendet die Runde ohne Rückfrage; der Tipp-Knopf bleibt nach dem Tipp stehen.
+- Technik-Hinweise: „0.125“ mit Punkt wird als 125 gelesen; Zurücksetzen geht auch ohne Anmeldung.
 
 **Als Nächstes sinnvoll**
 - [x] Testrunde 1 mit dem Kind (10.11.2026)
@@ -551,3 +566,29 @@ Infos zur ersten Arbeit:
   Textaufgaben realistisch. Neue Techniken: `titleFor(ctx)` für passende Überschriften, `ex.alt` für
   ähnliche Beispiele bei „Stimmt das?“, „Geschickt rechnen“ und „Potenzen vergleichen“.
   Test `tests/prim.py` an die Auswahlaufgabe mit 4 Zahlen angepasst.
+
+**11.11.2026**
+- Die Einträge zu `lerndax-v19` (Prüfung aller Erklär-Animationen) stammen von diesem Tag.
+- **Komplett-Prüfung** von App, Design, Aufgaben und Erklärungen (Wunsch Auftraggeber): 179 000 Aufgaben
+  unabhängig nachgerechnet (0 Rechenfehler), alle Bildschirme in vier Größen, alle Animationen mitgelesen.
+  31 Befunde; die Fehler und Widersprüche sind mit **`lerndax-v20`** behoben, die Geschmacks- und
+  Schwierigkeitsfragen stehen als offene Entscheidungen in Abschnitt 9.
+- Behobene Fehler: Startseite zeigte „22 Themen“ (richtig 25) · „2 Themas“ → „2 Themen“ · „Stimmt das?“
+  schrieb „= geht nicht“ · Winkel an Geraden nannte β erst Nebenwinkel, dann Scheitelwinkel (bei
+  Aufgaben wird jetzt nur der gegebene Winkel und β beschriftet) · Lücken-Aufgaben am Handy: Eingabefeld
+  steht jetzt am Ende der Rechnung · dieselbe Aufgabe kommt in einer Runde nicht mehr doppelt
+  (Winkelarten: 90° und 180° seltener) · Fahrplan-Merksatz nur noch, wenn die Fahrt über die volle Stunde
+  geht · Kürzen: „schrittweise erst durch 2“ nur, wenn es passt · L-Figur: Lösung und Animation zeigen,
+  woher Breite und Höhe des fehlenden Stücks kommen · „letzte zwei Ziffern sind 04“ · Zahlen
+  vergleichen: Lösung mit aufgefüllten Nullen statt „0,29 = 0,29“, Animation mit den Zahlen der Aufgabe
+  statt „A“ und „B“ · Umfang: „Erste Seite: 11 m“, bei der fehlenden Seite steht am Ende b = …
+- Tipp, Lösung und Animation passen jetzt zusammen: „Mach die Probe“ hat eine eigene Animation
+  (rückwärts rechnen) · Wechselgeld wird in Lösung und Animation **ergänzt** (Zahlenstrahl mit Sprüngen,
+  in Euro) · Achtel in Prozent über Tausendstel · Hundertertafel folgt der Richtung der Aufgabe
+  (Prozent → Dezimalzahl, Dezimalzahl → Bruch) · „vollständig gekürzter Bruch“: ungekürzt gilt wie beim
+  Kürzen als „noch nicht fertig“ · Primzahl-Animation probiert nur 2, 3, 5, 7 (wie der Tipp) ·
+  Ausklammern-Beispiel mit Summe 100, Divisions-Beispiel zweistellig, wenn die Aufgabe es ist ·
+  Begriffe einheitlich: „malnehmen“, „Potenz“ statt „Hochzahl“, „arithmetisches Mittel (Mittelwert)“ ·
+  Startseite lobt erst, wenn das Tagesziel (eine ganze Runde) geschafft ist · alle 25 Kacheln haben ▶.
+- Neuer Test `tests/loesung.py` (Lösungs-Animation zu jeder Aufgabenart); Doku berichtigt (README-
+  Fahrplan, Lernstand-Felder, Teiler-Aussage, Lehrplan-Lücken).
