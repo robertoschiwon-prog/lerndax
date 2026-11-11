@@ -621,3 +621,4 @@ Infos zur ersten Arbeit:
   Neue Liste aller 18 Fächer der Klassen 1–10 in `web/plattform/faecher.js`; die Startseite zeigt
   daraus für Klasse 5 MaDax und unter „Kommt bald“ DeDax, EnDax, BioDax, GeDax, GeoDax, TecDax.
   Fächerplan mit drei Phasen in `faecher/README.md`.
+- DeDax-Symbol auf der Startseite zeigt „De“ statt „Aa“ (Version `lerndax-v23`).

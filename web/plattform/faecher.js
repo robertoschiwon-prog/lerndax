@@ -23,7 +23,7 @@
 window.LERNDAX_FAECHER = [
   // Hauptfächer
   { id: 'mathe',    kuerzel: 'Ma',  name: 'MaDax',  fach: 'Mathe',    icon: '×',  farbe: '#ff6b3d', klassen: [1, 10], gruppe: 'kern', status: 'fertig',  fertig: [5], href: 'mathe/', key: 'mathelix.v1', themen: 25 },
-  { id: 'deutsch',  kuerzel: 'De',  name: 'DeDax',  fach: 'Deutsch',  icon: 'Aa', farbe: '#3d7bff', klassen: [1, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
+  { id: 'deutsch',  kuerzel: 'De',  name: 'DeDax',  fach: 'Deutsch',  icon: 'De', farbe: '#3d7bff', klassen: [1, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
   { id: 'englisch', kuerzel: 'En',  name: 'EnDax',  fach: 'Englisch', icon: 'En', farbe: '#14a06c', klassen: [3, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
 
   // Sachfächer
