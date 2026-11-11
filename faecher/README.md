@@ -33,7 +33,7 @@ Startseite und App-Icon.
 | EnDax | Strickmütze mit Union Jack | `endax.svg` (liegt bereit) |
 | BioDax | Fliegenpilz als Hut | `biodax.svg` (liegt bereit) |
 | GeDax | Pharaonen-Kopftuch | `gedax.svg` (liegt bereit) |
-| GeoDax | Tropenhelm mit Kompass | `geodax.svg` (liegt bereit) |
+| GeoDax | Globus als Mütze | `geodax.svg` (liegt bereit) |
 | TecDax | Headset mit Mikrofon | `tecdax.svg` (liegt bereit) |
 
 Alle sieben stehen auf der Startseite (MaDax als große Kachel, die übrigen unter „Kommt bald“).
