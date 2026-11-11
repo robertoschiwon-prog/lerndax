@@ -123,13 +123,13 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
 - **5 Lernbereiche, 32 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
-  - LB 1 Natürliche Zahlen: Runden · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen ·
+  - LB 1 Natürliche Zahlen: Runden · Überschlagen · Schriftlich rechnen · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen ·
     Schriftlich dividieren · Teiler & Vielfache · Primzahlen & Primfaktoren · Einfache Gleichungen · **Textaufgaben**
-  - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern ·
-    Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Zahlen vergleichen · Arithmetisches Mittel
-  - LB 3 Geometrie: Koordinatensystem · Winkelarten · Winkel an Geraden
-  - LB 4 Rechtecke & Quader: Umfang & Fläche · Volumen & Oberfläche
-  - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld
+  - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern · Gemischte Zahlen ·
+    Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Dezimalzahlen runden · Zahlen vergleichen · Arithmetisches Mittel
+  - LB 3 Geometrie: Koordinatensystem · Winkelarten · Winkel an Geraden · Symmetrie & Spiegeln
+  - LB 4 Rechtecke & Quader: Umfang & Fläche · Volumen & Oberfläche · Würfelnetze & Baupläne
+  - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld · Schätzen wie Fermi
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
 - **Erklär-Animationen** zu allen 32 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
