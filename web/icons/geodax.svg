@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -32.75 140 140" role="img" aria-label="GeoDax"><g id="alles">
+  <ellipse cx="21" cy="33" rx="8" ry="9" fill="#5b5566"/><ellipse cx="79" cy="33" rx="8" ry="9" fill="#5b5566"/>
+  <ellipse cx="21" cy="31" rx="4.5" ry="5" fill="#fbf6ee"/><ellipse cx="79" cy="31" rx="4.5" ry="5" fill="#fbf6ee"/>
+  <path d="M50 93 C35 91 17 70 15 47 C13 27 29 12 50 12 C71 12 87 27 85 47 C83 70 65 91 50 93 Z" fill="#a69f94"/>
+  <path d="M50 93 C39 91 25 72 24 50 C23 30 34 15 50 15 C66 15 77 30 76 50 C75 72 61 91 50 93 Z" fill="#fbf6ee"/>
+  <path d="M46.5 76 C41 63 30 50 27 33 C26 24 31 16 38 15 C42 15 44 19 44.5 25 C45.5 42 47.5 58 48 74 Z" fill="#1c1a33"/>
+  <path d="M53.5 76 C59 63 70 50 73 33 C74 24 69 16 62 15 C58 15 56 19 55.5 25 C54.5 42 52.5 58 52 74 Z" fill="#1c1a33"/>
+  <circle cx="38" cy="50" r="4" fill="#fff"/><circle cx="62" cy="50" r="4" fill="#fff"/>
+  <circle cx="38.8" cy="50.6" r="2.3" fill="#1c1a33"/><circle cx="61.2" cy="50.6" r="2.3" fill="#1c1a33"/>
+  <ellipse cx="50" cy="82" rx="7.5" ry="5.2" fill="#1c1a33"/>
+  <ellipse cx="48" cy="80.5" rx="2" ry="1.2" fill="#fff" opacity=".5"/><path d="M5 27 C18 18 82 18 95 27 C82 34 18 34 5 27 Z" fill="#c9a765"/>
+<path d="M20 24 C18 3 33 -9 50 -9 C67 -9 82 3 80 24 C62 28 38 28 20 24 Z" fill="#ecd29a"/>
+<path d="M50 -9 V24" stroke="#d6b877" stroke-width="2"/><path d="M29 8 C34 0 42 -5 49 -6" fill="none" stroke="#f8e7bd" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M20.2 15.5 C40 20 60 20 79.8 15.5 L80 24 C62 28 38 28 20 24 Z" fill="#8a5a2b"/>
+<circle cx="50" cy="-10.5" r="3.4" fill="#c9a765"/>
+<circle cx="50" cy="19" r="5" fill="#0e9fb5" stroke="#fbf6ee" stroke-width="1.6"/><path d="M50 15.8 L51.6 19 L50 22.2 L48.4 19 Z" fill="#fbf6ee"/></g></svg>

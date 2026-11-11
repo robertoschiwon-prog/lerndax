@@ -29,10 +29,10 @@ window.LERNDAX_FAECHER = [
 
   // Sachfächer
   { id: 'sachunterricht', kuerzel: 'Su',  name: 'SuDax',  fach: 'Sachunterricht', icon: 'Su',  farbe: '#e9a800', klassen: [1, 4],  gruppe: 'sach', status: 'geplant', fertig: [] },
-  { id: 'bio',            kuerzel: 'Bio', name: 'BioDax', fach: 'Biologie',       icon: 'Bio', farbe: '#4caf50', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
-  { id: 'geschichte',     kuerzel: 'Ge',  name: 'GeDax',  fach: 'Geschichte',     icon: 'Ge',  farbe: '#a0522d', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
-  { id: 'geografie',      kuerzel: 'Geo', name: 'GeoDax', fach: 'Geografie',      icon: 'Geo', farbe: '#0e9fb5', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
-  { id: 'technik',        kuerzel: 'TC',  name: 'TecDax', fach: 'Technik/Computer', fachAb: { 7: 'Informatik' }, icon: 'Tc', farbe: '#5b6378', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
+  { id: 'bio', dachs: 'icons/biodax.svg',            kuerzel: 'Bio', name: 'BioDax', fach: 'Biologie',       icon: 'Bio', farbe: '#4caf50', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
+  { id: 'geschichte', dachs: 'icons/gedax.svg',     kuerzel: 'Ge',  name: 'GeDax',  fach: 'Geschichte',     icon: 'Ge',  farbe: '#a0522d', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
+  { id: 'geografie', dachs: 'icons/geodax.svg',      kuerzel: 'Geo', name: 'GeoDax', fach: 'Geografie',      icon: 'Geo', farbe: '#0e9fb5', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
+  { id: 'technik', dachs: 'icons/tecdax.svg',        kuerzel: 'TC',  name: 'TecDax', fach: 'Technik/Computer', fachAb: { 7: 'Informatik' }, icon: 'Tc', farbe: '#5b6378', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
   { id: 'physik',         kuerzel: 'Ph',  name: 'PhDax',  fach: 'Physik',         icon: 'Ph',  farbe: '#8b5cf6', klassen: [6, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
   { id: 'chemie',         kuerzel: 'Ch',  name: 'ChDax',  fach: 'Chemie',         icon: 'Ch',  farbe: '#d6336c', klassen: [7, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
   { id: 'grw',            kuerzel: 'GRW', name: 'GrwDax', fach: 'Gemeinschaftskunde/Recht/Wirtschaft', icon: 'GRW', farbe: '#2f4b8f', klassen: [7, 10], gruppe: 'sach', status: 'geplant', fertig: [] },

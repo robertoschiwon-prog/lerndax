@@ -634,3 +634,8 @@ Infos zur ersten Arbeit:
   Symbole in einheitlicher Größe und Strichstärke statt Schriftzeichen und Emojis (die je nach Gerät
   unterschiedlich groß und teils kaum erkennbar waren). Definition am Ende von `entdecken.js` (`DI`).
 - Entdecken-Symbole Sieb, Sonnenblume (jetzt mit Blütenblättern) und Pythagoras gröber gezeichnet, alle Symbole etwas größer (Version `lerndax-v27`).
+- **Fach-Dachse auf der Startseite** (Version `lerndax-v28`): MaDax-Kachel zeigt den Dachs mit Papierhut statt „×“;
+  unter „Kommt bald“ stehen DeDax, EnDax, BioDax (Strohhut), GeDax (Römerhelm), GeoDax (Tropenhelm) und
+  TecDax (Headset) mit ihren Dachsen. Vier neue Bilder in `web/icons/`.
+- **Entscheidung Auftraggeber (11.11.2026):** Erst MaDax so weit bringen, bis es rund ist (Inhalt, Gestaltung,
+  Fehler), dann erst ein neues Fach beginnen.

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -32.75 140 140" role="img" aria-label="TecDax"><g id="alles">
+  <ellipse cx="21" cy="33" rx="8" ry="9" fill="#5b5566"/><ellipse cx="79" cy="33" rx="8" ry="9" fill="#5b5566"/>
+  <ellipse cx="21" cy="31" rx="4.5" ry="5" fill="#fbf6ee"/><ellipse cx="79" cy="31" rx="4.5" ry="5" fill="#fbf6ee"/>
+  <path d="M50 93 C35 91 17 70 15 47 C13 27 29 12 50 12 C71 12 87 27 85 47 C83 70 65 91 50 93 Z" fill="#a69f94"/>
+  <path d="M50 93 C39 91 25 72 24 50 C23 30 34 15 50 15 C66 15 77 30 76 50 C75 72 61 91 50 93 Z" fill="#fbf6ee"/>
+  <path d="M46.5 76 C41 63 30 50 27 33 C26 24 31 16 38 15 C42 15 44 19 44.5 25 C45.5 42 47.5 58 48 74 Z" fill="#1c1a33"/>
+  <path d="M53.5 76 C59 63 70 50 73 33 C74 24 69 16 62 15 C58 15 56 19 55.5 25 C54.5 42 52.5 58 52 74 Z" fill="#1c1a33"/>
+  <circle cx="38" cy="50" r="4" fill="#fff"/><circle cx="62" cy="50" r="4" fill="#fff"/>
+  <circle cx="38.8" cy="50.6" r="2.3" fill="#1c1a33"/><circle cx="61.2" cy="50.6" r="2.3" fill="#1c1a33"/>
+  <ellipse cx="50" cy="82" rx="7.5" ry="5.2" fill="#1c1a33"/>
+  <ellipse cx="48" cy="80.5" rx="2" ry="1.2" fill="#fff" opacity=".5"/><path d="M15 38 C12 15 30 6 50 6 C70 6 88 15 85 38" fill="none" stroke="#ffd166" stroke-width="5.5" stroke-linecap="round"/>
+<path d="M22 18 C30 11 40 8.5 50 8.5" fill="none" stroke="#ffe6a3" stroke-width="1.8" stroke-linecap="round"/>
+<rect x="6.5" y="27" width="15" height="24" rx="6.5" fill="#ff6b3d"/><rect x="78.5" y="27" width="15" height="24" rx="6.5" fill="#ff6b3d"/>
+<rect x="6.5" y="33" width="5.5" height="12" rx="2.7" fill="#c44a22"/><rect x="88" y="33" width="5.5" height="12" rx="2.7" fill="#c44a22"/>
+<path d="M14 50 C14 66 22 74 35 75" fill="none" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/><ellipse cx="38" cy="75" rx="4.6" ry="3.4" fill="#ff6b3d"/></g></svg>

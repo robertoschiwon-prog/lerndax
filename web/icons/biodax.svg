@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -32.75 140 140" role="img" aria-label="BioDax"><g id="alles">
+  <ellipse cx="21" cy="33" rx="8" ry="9" fill="#5b5566"/><ellipse cx="79" cy="33" rx="8" ry="9" fill="#5b5566"/>
+  <ellipse cx="21" cy="31" rx="4.5" ry="5" fill="#fbf6ee"/><ellipse cx="79" cy="31" rx="4.5" ry="5" fill="#fbf6ee"/>
+  <path d="M50 93 C35 91 17 70 15 47 C13 27 29 12 50 12 C71 12 87 27 85 47 C83 70 65 91 50 93 Z" fill="#a69f94"/>
+  <path d="M50 93 C39 91 25 72 24 50 C23 30 34 15 50 15 C66 15 77 30 76 50 C75 72 61 91 50 93 Z" fill="#fbf6ee"/>
+  <path d="M46.5 76 C41 63 30 50 27 33 C26 24 31 16 38 15 C42 15 44 19 44.5 25 C45.5 42 47.5 58 48 74 Z" fill="#1c1a33"/>
+  <path d="M53.5 76 C59 63 70 50 73 33 C74 24 69 16 62 15 C58 15 56 19 55.5 25 C54.5 42 52.5 58 52 74 Z" fill="#1c1a33"/>
+  <circle cx="38" cy="50" r="4" fill="#fff"/><circle cx="62" cy="50" r="4" fill="#fff"/>
+  <circle cx="38.8" cy="50.6" r="2.3" fill="#1c1a33"/><circle cx="61.2" cy="50.6" r="2.3" fill="#1c1a33"/>
+  <ellipse cx="50" cy="82" rx="7.5" ry="5.2" fill="#1c1a33"/>
+  <ellipse cx="48" cy="80.5" rx="2" ry="1.2" fill="#fff" opacity=".5"/><ellipse cx="50" cy="25" rx="44" ry="8.5" fill="#e3b440"/>
+<path d="M22 24 C21 5 36 -5 50 -5 C64 -5 79 5 78 24 C62 28 38 28 22 24 Z" fill="#f4d373"/>
+<path d="M30 8 C35 1 43 -2 50 -2" fill="none" stroke="#fbe6a2" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M22.2 16 C40 20.5 60 20.5 77.8 16 L78 24 C62 28 38 28 22 24 Z" fill="#2e7d32"/>
+<g transform="translate(69 15)"><ellipse cx="0" cy="-5.2" rx="3.4" ry="4.6" fill="#e5383b" transform="rotate(0)"/><ellipse cx="0" cy="-5.2" rx="3.4" ry="4.6" fill="#e5383b" transform="rotate(72)"/><ellipse cx="0" cy="-5.2" rx="3.4" ry="4.6" fill="#e5383b" transform="rotate(144)"/><ellipse cx="0" cy="-5.2" rx="3.4" ry="4.6" fill="#e5383b" transform="rotate(216)"/><ellipse cx="0" cy="-5.2" rx="3.4" ry="4.6" fill="#e5383b" transform="rotate(288)"/><circle r="2.8" fill="#1c1a33"/></g>
+<g transform="translate(36 3) rotate(-25)"><ellipse rx="5.6" ry="4.6" fill="#e5383b"/><path d="M0 -4.6 V4.6" stroke="#1c1a33" stroke-width="1.2"/><circle cx="-5.2" cy="0" r="2.4" fill="#1c1a33"/><circle cx="-1.6" cy="-2" r="1" fill="#1c1a33"/><circle cx="2" cy="1.8" r="1" fill="#1c1a33"/><circle cx="2.4" cy="-2" r=".9" fill="#1c1a33"/></g></g></svg>

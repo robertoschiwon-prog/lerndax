@@ -54,8 +54,9 @@ a{color:inherit}
 .soonbox{border:2px dashed #c9c2b4;border-radius:18px;padding:10px 12px 12px}
 .soonbox>small{display:block;color:var(--soft);font-weight:800;font-size:13px;margin:0 2px 8px}
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.chip{display:flex;align-items:center;gap:8px;opacity:.75}
-.chip i{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font:800 13px "Bricolage Grotesque",Nunito,sans-serif;font-style:normal;color:#fff;filter:saturate(.55)}
+.chip{display:flex;align-items:center;gap:10px;opacity:.8}
+.subj .ic{overflow:hidden}.subj .ic img,.chip i img{width:100%;height:100%;display:block}
+.chip i{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);overflow:hidden;display:grid;place-items:center;font:800 13px "Bricolage Grotesque",Nunito,sans-serif;font-style:normal;color:#fff;}
 .chip span{display:flex;flex-direction:column;line-height:1.15}
 .chip b{font-size:15px}
 .chip em{font-style:normal;font-size:12px;color:var(--soft);font-weight:700}
@@ -143,11 +144,11 @@ a{color:inherit}
       </div>
       <div class="subjects">
         ${all.map(({ f, s }) => `<a class="subj" href="${f.href}">
-            <span class="ic" style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.icon}</span>
+            <span class="ic" style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.dachs ? `<img src="${f.dachs}" alt="">` : f.icon}</span>
             <span class="tx"><small>${esc(fachname(f, k))} · Klasse ${k}</small><h2>${f.name}</h2>
               <span class="meta">${s.tasks ? `${s.tasks} Aufgaben · <span class="stars">★ ${s.stars}</span> von ${f.themen * 3}` : `${f.themen} Themen nach Lehrplan Sachsen`}</span></span>
             <span class="go">→</span></a>`).join('')}
-        ${bald.length ? `<div class="soonbox"><small>Kommt bald</small><div class="chips">${bald.map((f) => `<span class="chip" title="${esc(fachname(f, k))}"><i style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.icon}</i><span><b>${f.name}</b><em>${esc(fachname(f, k))}</em></span></span>`).join('')}</div></div>` : ''}
+        ${bald.length ? `<div class="soonbox"><small>Kommt bald</small><div class="chips">${bald.map((f) => `<span class="chip" title="${esc(fachname(f, k))}"><i style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.dachs ? `<img src="${f.dachs}" alt="">` : f.icon}</i><span><b>${f.name}</b><em>${esc(fachname(f, k))}</em></span></span>`).join('')}</div></div>` : ''}
       </div>
       <a class="disc" href="mathe/#entdecken">
         <span class="ic">✦</span>

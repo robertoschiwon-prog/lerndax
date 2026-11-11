@@ -23,7 +23,7 @@ Diese Datei erklärt, welche Fächer es gibt, wie sie heißen und in welcher Rei
 ## Der Dachs mit Fach-Hut
 
 Jedes Fach bekommt einen eigenen Dachs mit Hut (`web/icons/<name>.svg`). Er steht in der Kopfzeile
-des Fachs und groß beim Lob nach einer Runde. Das LernDax-Logo (`dachs.svg`, ohne Hut) bleibt für
+des Fachs, groß beim Lob nach einer Runde und auf der Kachel der Startseite. Das LernDax-Logo (`dachs.svg`, ohne Hut) bleibt für
 Startseite und App-Icon.
 
 | Fach | Hut | Datei |
@@ -31,9 +31,13 @@ Startseite und App-Icon.
 | MaDax | Papierhut aus Karopapier mit + − × ÷ | `madax.svg` ✅ eingebaut |
 | DeDax | aufgeschlagenes Buch als Dach, mit Lesezeichen | `dedax.svg` (liegt bereit) |
 | EnDax | Strickmütze mit Union Jack | `endax.svg` (liegt bereit) |
+| BioDax | Strohhut mit Mohnblume und Marienkäfer | `biodax.svg` (liegt bereit) |
+| GeDax | Römerhelm mit rotem Helmbusch | `gedax.svg` (liegt bereit) |
+| GeoDax | Tropenhelm mit Kompass | `geodax.svg` (liegt bereit) |
+| TecDax | Headset mit Mikrofon | `tecdax.svg` (liegt bereit) |
 
-Ideen für später: GeoDax Tropenhelm, GeDax Ritter- oder Römerhelm, BioDax Blätterkranz, TecDax
-Kopfhörer, PhDax/ChDax Schutzbrille auf der Stirn.
+Alle sieben stehen auf der Startseite (MaDax als große Kachel, die übrigen unter „Kommt bald“).
+Ideen für später: PhDax/ChDax Schutzbrille auf der Stirn.
 
 Regeln für neue Hüte: gleicher Rahmen `viewBox="-20 -32.75 140 140"`, Kopf unverändert an derselben
 Stelle, Hut bleibt im Bereich x 6…94 und y ab −20, flächig ohne Umrisslinien, der Hut verdeckt den
