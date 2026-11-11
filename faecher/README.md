@@ -20,6 +20,25 @@ Diese Datei erklärt, welche Fächer es gibt, wie sie heißen und in welcher Rei
 - Die Fach-ID (`id` in `faecher.js`) ist zugleich Ordnername und Schlüssel in der Datenbank.
   Sie wird nie mehr geändert, auch wenn sich der Anzeigename ändert.
 
+## Der Dachs mit Fach-Hut
+
+Jedes Fach bekommt einen eigenen Dachs mit Hut (`web/icons/<name>.svg`). Er steht in der Kopfzeile
+des Fachs und groß beim Lob nach einer Runde. Das LernDax-Logo (`dachs.svg`, ohne Hut) bleibt für
+Startseite und App-Icon.
+
+| Fach | Hut | Datei |
+|---|---|---|
+| MaDax | Papierhut aus Karopapier mit + − × ÷ | `madax.svg` ✅ eingebaut |
+| DeDax | aufgeschlagenes Buch als Dach, mit Lesezeichen | `dedax.svg` (liegt bereit) |
+| EnDax | Strickmütze mit Union Jack | `endax.svg` (liegt bereit) |
+
+Ideen für später: GeoDax Tropenhelm, GeDax Ritter- oder Römerhelm, BioDax Blätterkranz, TecDax
+Kopfhörer, PhDax/ChDax Schutzbrille auf der Stirn.
+
+Regeln für neue Hüte: gleicher Rahmen `viewBox="-20 -32.75 140 140"`, Kopf unverändert an derselben
+Stelle, Hut bleibt im Bereich x 6…94 und y ab −20, flächig ohne Umrisslinien, der Hut verdeckt den
+Kopf oberhalb der Stirn vollständig. Für ältere Klassen kann der Hut später entfallen.
+
 ## Alle Fächer
 
 Klassen laut Stundentafel Sachsen (Grundschule Kl. 1–4, Gymnasium Sekundarstufe I Kl. 5–10).

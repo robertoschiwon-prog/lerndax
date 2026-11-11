@@ -33,8 +33,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* Kopfzeile */
 .top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.hubbtn{width:40px;height:40px;flex:0 0 auto;border-radius:12px;border:2px solid var(--ink);background:var(--c1);display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink)}
-.hubbtn img{width:32px;height:32px}
+.hubbtn{width:40px;height:40px;flex:0 0 auto;border-radius:12px;border:2px solid var(--ink);background:var(--c1);display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink);overflow:hidden}
+.hubbtn img{width:100%;height:100%;display:block}
 .hubbtn:active{transform:translate(2px,2px);box-shadow:none}
 .logo{display:flex;align-items:center;gap:8px;font:800 24px "Bricolage Grotesque",sans-serif;background:none;border:0;padding:0}
 .logo b{color:var(--c1)}
@@ -191,6 +191,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* Ergebnis */
 .res{text-align:center;padding:26px 18px}
 .res .big{font-size:64px;line-height:1}
+.res .lob{position:relative;display:inline-block;width:124px;height:124px;background:var(--c1);border:2px solid var(--ink);border-radius:28px;box-shadow:3px 3px 0 var(--ink)}
+.res .lob img{width:100%;height:100%;display:block;border-radius:26px}
+.res .lob span{position:absolute;right:-22px;bottom:-8px;font-size:40px;line-height:1}
 .res h1{font-size:30px;margin:10px 0 4px}
 .res p{margin:0 0 14px;color:var(--soft);font-weight:700}
 .dots{display:flex;justify-content:center;gap:6px;margin:12px 0 18px}
@@ -610,7 +613,7 @@ body.noscroll{overflow:hidden}
   // ---------- Kopfzeile ----------
   const header = () => `
     <div class="top">
-      <a class="hubbtn" href="../" aria-label="Zur LernDax-Startseite" title="Zur LernDax-Startseite"><img src="../icons/dachs.svg" alt=""></a>
+      <a class="hubbtn" href="../" aria-label="Zur LernDax-Startseite" title="Zur LernDax-Startseite"><img src="../icons/madax.svg" alt=""></a>
       <button class="logo" data-go="home" aria-label="MaDax-Start"><span>Ma<b>Dax</b></span></button>
       <div class="pills">
         <span class="pill" title="Tage in Folge geübt">🔥 ${streak()}</span>
@@ -971,7 +974,7 @@ body.noscroll{overflow:hidden}
     }
     $app.innerHTML = header() + `
       <div class="card res">
-        <div class="big">${emoji}</div>
+        <div class="lob"><img src="../icons/madax.svg" alt=""><span>${emoji}</span></div>
         <h1>${head}</h1>
         <p>${first} von ${n} beim ersten Versuch richtig${solved > first ? `, ${solved - first} im zweiten` : ''}</p>
         <div class="dots">${R.results.map((r) => `<i class="r${r === 1 ? 1 : r === 0.5 ? 2 : 0}"></i>`).join('')}</div>

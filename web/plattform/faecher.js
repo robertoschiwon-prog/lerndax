@@ -11,6 +11,7 @@
  *   fach:    ausgeschriebener Fachname
  *   fachAb:  anderer Fachname ab einer Klassenstufe, z. B. { 7: 'Informatik' } (TecDax: TC in 5–6, Informatik ab 7)
  *   icon:    Zeichen auf der Kachel
+ *   dachs:   Dachs mit Fach-Hut (Kopfzeile im Fach, Lob nach der Runde); fehlt, solange der Hut noch nicht gezeichnet ist
  *   farbe:   Kachelfarbe
  *   klassen: [von, bis] laut Stundentafel Sachsen (Grundschule 1–4, Gymnasium 5–10)
  *   gruppe:  'kern' (Hauptfach) | 'sach' (Sachfach) | 'sprache2' (2. Fremdsprache, nur die gewählte) | 'vielleicht'
@@ -22,9 +23,9 @@
  */
 window.LERNDAX_FAECHER = [
   // Hauptfächer
-  { id: 'mathe',    kuerzel: 'Ma',  name: 'MaDax',  fach: 'Mathe',    icon: '×',  farbe: '#ff6b3d', klassen: [1, 10], gruppe: 'kern', status: 'fertig',  fertig: [5], href: 'mathe/', key: 'mathelix.v1', themen: 25 },
-  { id: 'deutsch',  kuerzel: 'De',  name: 'DeDax',  fach: 'Deutsch',  icon: 'De', farbe: '#3d7bff', klassen: [1, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
-  { id: 'englisch', kuerzel: 'En',  name: 'EnDax',  fach: 'Englisch', icon: 'En', farbe: '#14a06c', klassen: [3, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
+  { id: 'mathe', dachs: 'icons/madax.svg',    kuerzel: 'Ma',  name: 'MaDax',  fach: 'Mathe',    icon: '×',  farbe: '#ff6b3d', klassen: [1, 10], gruppe: 'kern', status: 'fertig',  fertig: [5], href: 'mathe/', key: 'mathelix.v1', themen: 25 },
+  { id: 'deutsch', dachs: 'icons/dedax.svg',  kuerzel: 'De',  name: 'DeDax',  fach: 'Deutsch',  icon: 'De', farbe: '#3d7bff', klassen: [1, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
+  { id: 'englisch', dachs: 'icons/endax.svg', kuerzel: 'En',  name: 'EnDax',  fach: 'Englisch', icon: 'En', farbe: '#14a06c', klassen: [3, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
 
   // Sachfächer
   { id: 'sachunterricht', kuerzel: 'Su',  name: 'SuDax',  fach: 'Sachunterricht', icon: 'Su',  farbe: '#e9a800', klassen: [1, 4],  gruppe: 'sach', status: 'geplant', fertig: [] },

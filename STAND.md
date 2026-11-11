@@ -622,3 +622,6 @@ Infos zur ersten Arbeit:
   daraus für Klasse 5 MaDax und unter „Kommt bald“ DeDax, EnDax, BioDax, GeDax, GeoDax, TecDax.
   Fächerplan mit drei Phasen in `faecher/README.md`.
 - DeDax-Symbol auf der Startseite zeigt „De“ statt „Aa“ (Version `lerndax-v23`).
+- **Dachs mit Fach-Hut** (Version `lerndax-v24`): MaDax-Dachs mit Papierhut aus Karopapier in der
+  Mathe-Kopfzeile und beim Lob nach der Runde. Hüte für DeDax (Buch) und EnDax (Union-Jack-Mütze)
+  liegen in `web/icons/` bereit. Regeln und Ideen für weitere Hüte in `faecher/README.md`.
