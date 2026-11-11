@@ -27,8 +27,8 @@ body{font:500 17px/1.45 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antia
 h1,h2,h3{font-family:"Bricolage Grotesque",Nunito,system-ui,sans-serif;letter-spacing:-.01em;margin:0}
 a{color:inherit}
 #app{max-width:560px;margin:0 auto;padding:14px 16px 40px;min-height:100vh}
-@media (min-width:700px){#app{max-width:760px;padding:24px 24px 48px}.subjects{grid-template-columns:1fr 1fr}.hero h1{font-size:36px}}
-@media (min-width:1000px){#app{max-width:980px}.subjects{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:700px){#app{max-width:760px;padding:24px 24px 48px}.subjects{grid-template-columns:1fr 1fr}.soonbox{grid-column:1/-1}.hero h1{font-size:36px}}
+@media (min-width:1000px){#app{max-width:980px}.subjects{grid-template-columns:repeat(3,1fr)}.chips{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .brand{display:flex;align-items:center;gap:10px;font:800 26px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
 .brand .mark{width:44px;height:44px;border-radius:13px;background:var(--c1);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:grid;place-items:center}
@@ -51,8 +51,14 @@ a{color:inherit}
 .subj .tx small{color:var(--soft);font-weight:800;font-size:13px}
 .subj .tx .meta{font-size:14px;font-weight:700}
 .subj .go{flex:0 0 auto;font-weight:800;font-size:22px}
-.subj.soon{opacity:.6;box-shadow:none;border-style:dashed;pointer-events:none}
-.subj.soon .ic{background:var(--tint) !important;color:var(--soft)}
+.soonbox{border:2px dashed #c9c2b4;border-radius:18px;padding:10px 12px 12px}
+.soonbox>small{display:block;color:var(--soft);font-weight:800;font-size:13px;margin:0 2px 8px}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.chip{display:flex;align-items:center;gap:8px;opacity:.75}
+.chip i{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font:800 13px "Bricolage Grotesque",Nunito,sans-serif;font-style:normal;color:#fff;filter:saturate(.55)}
+.chip span{display:flex;flex-direction:column;line-height:1.15}
+.chip b{font-size:15px}
+.chip em{font-style:normal;font-size:12px;color:var(--soft);font-weight:700}
 .tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--tint);color:var(--soft);margin-left:6px;vertical-align:middle}
 .stars{color:var(--c5);letter-spacing:1px}
 .disc{display:flex;align-items:center;gap:14px;text-decoration:none;background:#141628;color:#ece9f7;border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--c1);padding:14px;margin-bottom:22px}
@@ -67,16 +73,17 @@ a{color:inherit}
 <body>
 <div id="app"></div>
 <script src="plattform/avatare.js"></script>
+<script src="plattform/faecher.js"></script>
 <script src="plattform/config.js"></script>
 <script src="plattform/sync.js"></script>
 <script>
 (function () {
-  // Fächer – neue Fächer werden hier ergänzt
-  const FAECHER = [
-    { id: 'mathe', name: 'Mathe', app: 'Mathelix', icon: '×', color: 'var(--c1)', href: 'mathe/', key: 'mathelix.v1', topics: 25 },
-    { id: 'deutsch', name: 'Deutsch', icon: 'Aa', color: 'var(--c2)', soon: true },
-    { id: 'englisch', name: 'Englisch', icon: 'En', color: 'var(--c3)', soon: true },
-  ];
+  // Fächer stehen in plattform/faecher.js (alle Fächer der Klassen 1–10)
+  const ALLE = window.LERNDAX_FAECHER || [];
+  // Auf hellen Farben (Orange, Gelb) dunkle Schrift, sonst zu wenig Kontrast
+  const dunkel = (farbe) => ['#ff6b3d', '#e9a800', '#e67e22'].includes(farbe);
+  const fachname = (f, k) => (window.LERNDAX_FACHNAME ? window.LERNDAX_FACHNAME(f, k) : f.fach);
+  const klasse = () => ((load('mathelix.v1') || {}).grade) || 5;
   const $ = document.getElementById('app');
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const load = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
@@ -111,7 +118,11 @@ a{color:inherit}
   }
 
   function render() {
-    const all = FAECHER.filter((f) => !f.soon).map((f) => ({ f, s: stats(f) }));
+    const k = klasse();
+    const hier = ALLE.filter((f) => k >= f.klassen[0] && k <= f.klassen[1]);
+    const aktiv = hier.filter((f) => f.status === 'fertig' && f.fertig.includes(k));
+    const bald = hier.filter((f) => f.status === 'geplant' && !aktiv.includes(f));
+    const all = aktiv.map((f) => ({ f, s: stats(f) }));
     const days = [...new Set(all.flatMap((x) => x.s.days))];
     const name = (SYS.profileName || all.map((x) => x.s.name).find(Boolean) || '').trim();
     const today = days.includes(dayStr(new Date()));
@@ -131,15 +142,12 @@ a{color:inherit}
         <p>${!avatar ? 'Tipp auf das Bild und such dir deinen Avatar aus!' : goal ? 'Tagesziel geschafft – stark! 💪' : today ? 'Heute schon geübt. Für das Tagesziel fehlt noch eine ganze Runde.' : 'Was möchtest du heute lernen?'}</p></div>
       </div>
       <div class="subjects">
-        ${FAECHER.map((f) => {
-          if (f.soon) return `<div class="subj soon"><span class="ic" style="background:${f.color}">${f.icon}</span><span class="tx"><h2>${f.name}<span class="tag">kommt bald</span></h2></span></div>`;
-          const s = stats(f);
-          return `<a class="subj" href="${f.href}">
-            <span class="ic" style="background:${f.color}${f.color === 'var(--c1)' || f.color === 'var(--c5)' ? ';color:var(--ink)' : ''}">${f.icon}</span>
-            <span class="tx"><small>${f.app} · Klasse 5</small><h2>${f.name}</h2>
-              <span class="meta">${s.tasks ? `${s.tasks} Aufgaben · <span class="stars">★ ${s.stars}</span> von ${f.topics * 3}` : `${f.topics} Themen nach Lehrplan Sachsen`}</span></span>
-            <span class="go">→</span></a>`;
-        }).join('')}
+        ${all.map(({ f, s }) => `<a class="subj" href="${f.href}">
+            <span class="ic" style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.icon}</span>
+            <span class="tx"><small>${esc(fachname(f, k))} · Klasse ${k}</small><h2>${f.name}</h2>
+              <span class="meta">${s.tasks ? `${s.tasks} Aufgaben · <span class="stars">★ ${s.stars}</span> von ${f.themen * 3}` : `${f.themen} Themen nach Lehrplan Sachsen`}</span></span>
+            <span class="go">→</span></a>`).join('')}
+        ${bald.length ? `<div class="soonbox"><small>Kommt bald</small><div class="chips">${bald.map((f) => `<span class="chip" title="${esc(fachname(f, k))}"><i style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.icon}</i><span><b>${f.name}</b><em>${esc(fachname(f, k))}</em></span></span>`).join('')}</div></div>` : ''}
       </div>
       <a class="disc" href="mathe/#entdecken">
         <span class="ic">✦</span>

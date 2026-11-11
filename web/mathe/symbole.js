@@ -1,4 +1,4 @@
-// Themen-Symbole für Mathelix: kleine, selbst gezeichnete Bilder (weiß auf Farbe).
+// Themen-Symbole für MaDax (Mathe): kleine, selbst gezeichnete Bilder (weiß auf Farbe).
 // Schlüssel = Themen-ID aus den Generatoren. Fehlt ein Symbol, zeigt die App das Zeichen aus `icon`.
 // viewBox 0 0 24 24, Linien weiß, runde Enden.
 window.MathelixIcons = (function () {

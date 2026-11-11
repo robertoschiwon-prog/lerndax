@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#fbf6ee">
-<title>Mathelix · LernDax</title>
+<title>MaDax · LernDax</title>
 <link rel="manifest" href="../manifest.webmanifest">
 <link rel="icon" type="image/png" href="../icons/favicon-v4.png">
 <link rel="apple-touch-icon" href="../icons/apple-touch-icon-v4.png">
@@ -554,7 +554,7 @@ body.noscroll{overflow:hidden}
     const gruppen = def.gruppen.map((g) => Object.assign({}, g, { topics: g.themen.map(findTopic).filter(Boolean) }));
     return Object.assign({ id }, def, { gruppen, topics: gruppen.flatMap((g) => g.topics) });
   })();
-  if (TR && !TR.missing) document.title = `${TR.titel} · Training · Mathelix`;
+  if (TR && !TR.missing) document.title = `${TR.titel} · Training · MaDax`;
 
   // Tagesziel: eine vollständige Runde pro Tag (Wunsch der Eltern). S.rounds = { 'JJJJ-MM-TT': Anzahl },
   // wird mit synchronisiert (geübt wird abwechselnd an Handy, Computer und Tablet).
@@ -611,7 +611,7 @@ body.noscroll{overflow:hidden}
   const header = () => `
     <div class="top">
       <a class="hubbtn" href="../" aria-label="Zur LernDax-Startseite" title="Zur LernDax-Startseite"><img src="../icons/dachs.svg" alt=""></a>
-      <button class="logo" data-go="home" aria-label="Mathelix-Start"><span>Mathe<b>lix</b></span></button>
+      <button class="logo" data-go="home" aria-label="MaDax-Start"><span>Ma<b>Dax</b></span></button>
       <div class="pills">
         <span class="pill" title="Tage in Folge geübt">🔥 ${streak()}</span>
         <span class="pill" title="Gesammelte Sterne">⭐ ${totalStars()}</span>
@@ -659,7 +659,7 @@ body.noscroll{overflow:hidden}
   }
   const nameCard = () => (S.name ? '' : `
       <div class="card namecard" style="margin-bottom:18px">
-        <h2>Willkommen bei Mathelix 👋</h2>
+        <h2>Willkommen bei MaDax 👋</h2>
         <p>Wie heißt du?</p>
         <form id="nameF"><input id="nameI" maxlength="20" autocomplete="off" placeholder="Dein Vorname"><button class="btn org">Los</button></form>
       </div>`);
@@ -687,8 +687,8 @@ body.noscroll{overflow:hidden}
     VIEW = 'home'; $app.dataset.view = VIEW;
     if (TR.missing) {
       $app.innerHTML = header() + `<div class="card"><h2>Dieses Training gibt es nicht (mehr)</h2>
-        <p style="color:var(--soft)">Vielleicht ist der Link falsch abgeschrieben. Alle Themen findest du in Mathelix.</p>
-        <a class="btn org" href="./">Zu Mathelix</a></div>`;
+        <p style="color:var(--soft)">Vielleicht ist der Link falsch abgeschrieben. Alle Themen findest du in MaDax.</p>
+        <a class="btn org" href="./">Zu MaDax</a></div>`;
       return;
     }
     const dl = daysUntil(TR.datum);
@@ -1176,7 +1176,7 @@ body.noscroll{overflow:hidden}
     const note = (SY.err ? `<p class="syncerr">${esc(SY.err)}</p>` : '') + (SY.msg ? `<p class="syncmsg">${SY.msg}</p>` : '');
     let body;
     if (!SYS.enabled) {
-      body = `<p>Mathelix speichert den Lernstand gerade nur auf diesem Gerät. Für den Abgleich zwischen Handy und Computer wird Mathelix unter seiner eigenen Adresse eingerichtet.</p>`;
+      body = `<p>MaDax speichert den Lernstand gerade nur auf diesem Gerät. Für den Abgleich zwischen Handy und Computer wird LernDax unter seiner eigenen Adresse eingerichtet.</p>`;
     } else if (!SYS.loggedIn) {
       const CF = window.MATHELIX_CONFIG || {};
       body = `<p>Melde dich mit deinem <b>${esc(CF.accountName || 'Elternkonto')}</b> an. Dann lernt dein Kind auf jedem Gerät mit demselben Stand weiter, und du siehst den Fortschritt auch auf deinem Handy. Die Anmeldung gilt für alle LernDax-Fächer.</p>

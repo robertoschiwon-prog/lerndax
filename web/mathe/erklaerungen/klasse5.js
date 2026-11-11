@@ -1,4 +1,4 @@
-/* Mathelix – Erklär-Animationen
+/* MaDax (Mathe) – Erklär-Animationen
  *
  * Jede Erklärung: { title, titleFor?(ctx), viewBox, create(api, ctx) → { reset(), play() } }
  *   ctx: das ex-Objekt der Aufgabe plus pre:true (ähnliches Beispiel zeigen) oder post:true (genau die Aufgabe);

@@ -6,6 +6,10 @@ entdecken, Klasse 1 bis 10, nach dem Lehrplan Sachsen (Gymnasium).
 Der Name zwinkert LernSax zu, der Schulplattform aller sächsischen Schulen. „Dax“ klingt wie
 **Dachs**, unser Maskottchen: fleißig, gräbt sich tief hinein und gibt nicht auf.
 
+Die Fächer heißen nach ihrem Stundenplan-Kürzel: **MaDax** (Mathe), **DeDax** (Deutsch),
+**EnDax** (Englisch), **BioDax**, **GeDax**, **GeoDax**, **TecDax** … Alle Fächer und der Fahrplan
+stehen in **`faecher/README.md`**.
+
 Online: **https://robertoschiwon-prog.github.io/lerndax/**
 
 > Neu hier? Zuerst **`STAND.md`** lesen: Dort steht alles, was bisher besprochen, entschieden und gebaut wurde.
@@ -51,10 +55,16 @@ LernDax
  │   Familienkonto, Kind-Profile, Eltern-PIN, Synchronisation,
  │   Startseite, Serie 🔥, Erklär-Player, App-Icon, Offline-Betrieb
  │
- ├─ ➗ Mathelix   Mathe   ✅ Klasse 5
- ├─ 📖 Deutsch           später
- └─ 🇬🇧 Englisch          später
+ ├─ MaDax    Mathe      ✅ Klasse 5
+ ├─ DeDax    Deutsch    Phase 1
+ ├─ EnDax    Englisch   Phase 1
+ ├─ BioDax · GeDax · GeoDax · TecDax   Phase 1 (Klasse 5)
+ └─ PhDax · ChDax · GrwDax · 2. Fremdsprache · SuDax   ab Phase 2
 ```
+
+Alle Fächer stehen an **einer** Stelle: `web/plattform/faecher.js` (Name, Kürzel, Klassen, Stand).
+Die Startseite zeigt daraus die Fächer der Klassenstufe des Kindes: fertige als große Kachel,
+geplante unter „Kommt bald“.
 
 **Regel:** Was jedes Fach braucht, gehört zur Plattform. Ins Fach kommt nur der Inhalt
 (Lehrplan, Aufgabengeneratoren, Erklärungen).
@@ -65,9 +75,10 @@ LernDax
 |---|---|
 | `web/` | Alles, was online geht (wird automatisch veröffentlicht) |
 | `web/index.html` | LernDax-Startseite mit den Fächern |
-| `web/plattform/` | Gemeinsame Teile: Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
-| `web/mathe/` | **Mathelix**: App, `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
+| `web/plattform/` | Gemeinsame Teile: Fächerliste (`faecher.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
+| `web/mathe/` | **MaDax**: App, `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
 | `web/icons/` | Dachs-Logo und App-Icons |
+| `faecher/README.md` | **Fächerplan:** alle Fächer, Namen, Klassen, Fahrplan in drei Phasen |
 | `faecher/mathe/lehrplan/` | Lehrplan-Auswertung Mathe |
 | `supabase/` | Datenbank-Schema (`lerndax_`-Tabellen im Familienkalender-Projekt) |
 | `notizen/` | Feedback und Ideen. Bleibt lokal und kommt nicht auf GitHub |
@@ -79,14 +90,18 @@ LernDax
 
 1. Ordner `web/<fach>/` mit `index.html` anlegen, nach dem Vorbild von `web/mathe/`, und
    `window.LERNDAX_SUBJECT = '<fach>'` setzen.
-2. In `web/index.html` beim Fach `soon: true` entfernen und `href` ergänzen.
+2. In `web/plattform/faecher.js` beim Fach `status: 'fertig'`, `fertig: [Klasse]`, `href`, `key`
+   und `themen` setzen (siehe `faecher/README.md`).
 3. Dateien in `web/sw.js` aufnehmen und `VERSION` erhöhen.
 
 Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch je Fach gespeichert.
 
 ## Fahrplan
 
-**Mathe (Mathelix)**
+**Reihenfolge:** erst Klasse 5 in allen Fächern fertig bauen, dann die Klassen 4 und 6, dann alle
+übrigen Klassen (Details in `faecher/README.md`).
+
+**Mathe (MaDax)**
 - [x] Klasse 5: alle 5 Lernbereiche, 25 Themen, Tipps und Lösungswege
 - [x] Erklär-Animationen zu allen 25 Themen, Pause und Langsam-Modus
 - [x] Beispiel vorher / Lösung als Animation nachher für alle 25 Themen
@@ -102,12 +117,15 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Installierbare App, offline nutzbar
 - [x] LernDax-Startseite mit Fächern
 - [x] Avatare (12 Figuren × 8 Farben), im Profil synchronisiert
-- [ ] Elternbereich von Mathelix auf die Startseite verlegen (sobald ein zweites Fach kommt)
+- [ ] Elternbereich von MaDax auf die Startseite verlegen (sobald ein zweites Fach kommt)
+- [x] Fächerliste für alle Fächer (`plattform/faecher.js`), Startseite mit „Kommt bald“
 - [ ] Link „📚 LernDax“ im Familienkalender (Auftrag übergeben; ob umgesetzt, im Kalender-Projekt prüfen)
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …)
 - [x] Trainingsseiten für einzelne Klassenarbeiten (nur per Link, getrennt von der allgemeinen App)
 - [x] Knopf „Jetzt üben“ im Familienkalender (vom Kalender-Projekt umgesetzt, 10.11.2026)
 
-**Weitere Fächer**
-- [ ] Deutsch
-- [ ] Englisch
+**Weitere Fächer** (Phase 1: Klasse 5)
+- [ ] DeDax (Deutsch)
+- [ ] EnDax (Englisch)
+- [ ] BioDax, GeoDax, GeDax
+- [ ] TecDax (Technik/Computer)

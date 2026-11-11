@@ -11,6 +11,7 @@ Weitere Dokumente:
 - `README.md`: Projektsteckbrief, Grundsätze, Ordner, neues Fach hinzufügen, Fahrplan
 - `SETUP.md`: Kurzanleitung für Eltern (Anmelden, Profil, PIN, App aufs Handy)
 - `tests/README.md`: automatische Tests
+- `faecher/README.md`: **Fächerplan** (alle Fächer, Namen, Klassen, Fahrplan in drei Phasen)
 - `faecher/mathe/lehrplan/sachsen-gymnasium.md`: Lehrplan Mathe Gymnasium Sachsen, Klasse 5–10
 - `notizen/feedback.md`: offene Fragen an das Kind und Vorlage für Testrunden (nur lokal, nicht auf GitHub)
 - `notizen/familie.md`: persönliche Angaben (Kind, Schule, Geräte, Termine, Pfade). **Nur lokal**, weil
@@ -48,7 +49,9 @@ Weitere Dokumente:
   Themen noch unbekannt). Weitere Lehrbücher Klasse 5 (für spätere Fächer): Linder 5 (Bio),
   Terra 5 (Geo), Anno 1 (Geschichte).
 - **Name:** **LernDax**. Anspielung auf **LernSax** (Schulplattform aller sächsischen Schulen),
-  „Dax“ klingt wie **Dachs**, das Maskottchen. Das Mathe-Fach heißt **Mathelix**.
+  „Dax“ klingt wie **Dachs**, das Maskottchen. Die Fächer heißen **Kürzel + Dax**: **MaDax** (Mathe,
+  bis 11.11.2026 „Mathelix“), DeDax, EnDax, BioDax, GeDax, GeoDax, TecDax … (siehe `faecher/README.md`).
+- **Reihenfolge:** erst Klasse 5 in allen Fächern, dann die Klassen 4 und 6, dann alle übrigen Klassen.
 
 ## 2. Wo alles liegt
 
@@ -106,8 +109,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 - **Installierbare App (PWA):** Manifest, App-Icons (Dachs-Kopf), offline nutzbar.
 - **Dachs-Logo:** `web/icons/dachs.svg`, App-Icons als PNG in mehreren Größen.
 
-### Mathelix (Mathe), Klasse 5 vollständig
-- **Kopfzeile:** Dachs (zurück zur LernDax-Startseite), Schriftzug „Mathelix“ (zum Mathe-Start),
+### MaDax (Mathe, früher „Mathelix“), Klasse 5 vollständig
+- **Kopfzeile:** Dachs (zurück zur LernDax-Startseite), Schriftzug „MaDax“ (zum Mathe-Start),
   Serie 🔥 und Sterne ⭐. Das frühere orange „×“-Kästchen ist seit 10.11.2026 entfernt
   (wirkte doppelt und wie ein Schließen-Knopf).
 - **Startbildschirm:** Avatar + „Hallo <Name>!“, Klassen-Chips 1–10 (nur 5 aktiv; andere zeigen
@@ -205,12 +208,13 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 
 | Datei | Aufgabe |
 |---|---|
-| `web/index.html` | Startseite (Fächer, Avatar, Entdecken-Kachel, Eltern-Link) |
+| `web/index.html` | Startseite (Fächer aus `faecher.js`, Avatar, Entdecken-Kachel, Eltern-Link) |
+| `web/plattform/faecher.js` | **Alle Fächer** (`window.LERNDAX_FAECHER`): ID, Kürzel, Dax-Name, Fachname, Farbe, Klassen, Stand; Hilfen `LERNDAX_FAECHER_IN(klasse)`, `LERNDAX_FACHNAME(fach, klasse)` |
 | `web/plattform/config.js` | Supabase-Adresse, **öffentlicher** Schlüssel (`sb_publishable_…`), Tabellen-Präfix `lerndax_`, `allowSignup: false`, Kontoname |
 | `web/plattform/sync.js` | Anmeldung, Profile, PIN, Synchronisation, Avatar-Sync (`window.LernDaxSync`, Alias `MathelixSync`) |
 | `web/plattform/avatare.js` | Avatar-Figuren (SVG), Farben, Auswahlfenster (`window.LernDaxAvatare`) |
 | `web/plattform/trainings.js` | Trainings für einzelne Klassenarbeiten (`window.LERNDAX_TRAININGS`), Aufruf `<fach>/?t=<id>` |
-| `web/mathe/index.html` | Mathelix-App (Ansichten, Übungsrunde, Player, Elternansicht) |
+| `web/mathe/index.html` | MaDax-App (Ansichten, Übungsrunde, Player, Elternansicht) |
 | `web/mathe/generatoren/klasse5.js` | Aufgabengeneratoren Klasse 5 (`window.Mathelix.grades[5]`) |
 | `web/mathe/symbole.js` | Themen-Symbole als SVG, Schlüssel = Themen-ID (`window.MathelixIcons`) |
 | `web/mathe/erklaerungen/klasse5.js` | Erklär-Animationen zu den Themen |
@@ -302,6 +306,9 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
 | Alte Tabellen `mathelix_…` gelöscht | Waren leer, nach der Umbenennung überflüssig (`supabase/2026-11-10_mathelix-tabellen-entfernen.sql`) |
 | Service Worker „erst Netz“ | Sonst sahen Handys alte Versionen (z. B. alte Icons) |
 | Avatare als eigene Figuren | Kinder mögen Personalisierung; keine geschützten Figuren |
+| Fächer heißen **Stundenplan-Kürzel + Dax** (MaDax, DeDax, EnDax …), „Mathelix“ → **MaDax** (11.11.2026) | Eine Marke statt zweier Namenswelten (Dax vs. „-ix“); Kinder kennen die Kürzel aus dem Stundenplan; sachlich genug für Klasse 10. Verspieltere Ideen (Dachsbau, Tierfreunde) nur als Gestaltung für jüngere Klassen. Interne Namen (`mathelix.v1` usw.) bleiben, damit kein Lernstand verloren geht |
+| Alle Fächer in `web/plattform/faecher.js` | Eine Stelle für Namen, Klassen und Stand; die Startseite zeigt passend zur Klassenstufe fertige Fächer und „Kommt bald“ |
+| Ausbau: erst Klasse 5 in allen Fächern, dann Kl. 4 und 6, dann alle | Wunsch des Auftraggebers; das Kind ist in Klasse 5 |
 
 ## 6. Regeln für die Arbeit an LernDax
 
@@ -473,8 +480,10 @@ Infos zur ersten Arbeit:
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …) als Belohnung
 - [ ] Klassen-Bereich für die Klasse des Kindes (eigenes Thema, siehe oben), evtl. mit Terminen aus dem Familienkalender
 - [ ] „Heute geübt“ im Familienkalender anzeigen (gemeinsam mit dem Kalender-Projekt)
-- [ ] Elternbereich von Mathelix auf die Startseite verlegen, sobald ein zweites Fach kommt
-- [ ] Fächer Deutsch und Englisch
+- [ ] Elternbereich von MaDax auf die Startseite verlegen, sobald ein zweites Fach kommt
+- [ ] Phase 1 (Klasse 5): DeDax, EnDax, dann BioDax, GeoDax, GeDax, TecDax; vielleicht MuDax, KuDax, EthDax
+      (Fahrplan und offene Fragen in `faecher/README.md`)
+- [ ] Welche 2. Fremdsprache ab Klasse 6? Stundenplan-Kürzel der Schule mit der amtlichen Liste vergleichen
 
 ## 10. Verlauf
 
@@ -607,3 +616,8 @@ Infos zur ersten Arbeit:
   Tipp-Knopf verschwindet, Punkt als Komma, Zurücksetzen mit dem Wort LÖSCHEN, dunkle Schrift und
   dunkle Symbole auf Orange und Gelb, breite Darstellung ab 700 und 1000 Pixel (`data-view` am
   `#app` steuert die Breite je Ansicht). Geprüft: 87 000 neue Aufgaben unabhängig nachgerechnet.
+- **Fächer-Namen und Fächerplan** (Version `lerndax-v22`): Namensschema **Kürzel + Dax** nach den
+  amtlichen sächsischen Fächerkürzeln. „Mathelix“ heißt jetzt sichtbar **MaDax**; interne Namen bleiben.
+  Neue Liste aller 18 Fächer der Klassen 1–10 in `web/plattform/faecher.js`; die Startseite zeigt
+  daraus für Klasse 5 MaDax und unter „Kommt bald“ DeDax, EnDax, BioDax, GeDax, GeoDax, TecDax.
+  Fächerplan mit drei Phasen in `faecher/README.md`.

@@ -1,0 +1,81 @@
+# Fächerplan LernDax
+
+Stand: 11.11.2026 · Die technische Liste aller Fächer steht in `web/plattform/faecher.js`.
+Diese Datei erklärt, welche Fächer es gibt, wie sie heißen und in welcher Reihenfolge sie kommen.
+
+## Namensschema
+
+**Kürzel aus dem Stundenplan + „Dax“**, zum Beispiel MaDax, DeDax und EnDax.
+
+- Die Kürzel folgen den amtlichen Fächerabkürzungen in Sachsen (VwV Stundentafeln, Abkürzungsliste
+  Gymnasium: MA, DE, EN, BIO, GE, GEO, PH, CH, FR, LA, RU, SPA, MU, KU, ETH …). Kinder kennen sie aus dem
+  Stundenplan und müssen nichts entschlüsseln.
+- Auf jeder Kachel steht **groß der Dax-Name und klein der ausgeschriebene Fachname**.
+- Die Namen sind bewusst sachlich, damit sie von Klasse 1 bis 10 passen. Verspieltes (Dachs als
+  Maskottchen, Bilder, Tonfall) gehört zur Gestaltung und kann für jüngere Klassen stärker sein.
+- **Ausnahme TecDax:** Das Fach heißt in Klasse 5–6 „Technik/Computer“ (TC) und ab Klasse 7
+  „Informatik“. Beides ist ein Fach in LernDax, der Name spielt auf den echten TecDAX an.
+- Das Mathe-Fach hieß bis 11.11.2026 „Mathelix“. Intern (Lernstand `mathelix.v1`,
+  `window.Mathelix`, `MATHELIX_CONFIG`) bleibt der alte Name, damit kein Lernstand verloren geht.
+- Die Fach-ID (`id` in `faecher.js`) ist zugleich Ordnername und Schlüssel in der Datenbank.
+  Sie wird nie mehr geändert, auch wenn sich der Anzeigename ändert.
+
+## Alle Fächer
+
+Klassen laut Stundentafel Sachsen (Grundschule Kl. 1–4, Gymnasium Sekundarstufe I Kl. 5–10).
+
+| Name | Fach | Kürzel | Klassen | Gruppe | Stand |
+|---|---|---|---|---|---|
+| **MaDax** | Mathe | Ma | 1–10 | Hauptfach | ✅ Klasse 5 |
+| **DeDax** | Deutsch | De | 1–10 | Hauptfach | geplant |
+| **EnDax** | Englisch | En | 3–10 | Hauptfach | geplant |
+| **SuDax** | Sachunterricht | Su | 1–4 | Sachfach | geplant |
+| **BioDax** | Biologie | Bio | 5–10 | Sachfach | geplant |
+| **GeDax** | Geschichte | Ge | 5–10 | Sachfach | geplant |
+| **GeoDax** | Geografie | Geo | 5–10 | Sachfach | geplant |
+| **TecDax** | Technik/Computer, ab Kl. 7 Informatik | TC / Inf | 5–10 | Sachfach | geplant |
+| **PhDax** | Physik | Ph | 6–10 | Sachfach | geplant |
+| **ChDax** | Chemie | Ch | 7–10 | Sachfach | geplant |
+| **GrwDax** | Gemeinschaftskunde/Rechtserziehung/Wirtschaft | GRW | 7–10 | Sachfach | geplant |
+| **FrDax** / **LaDax** / **RuDax** / **SpaDax** | 2. Fremdsprache (nur die gewählte) | Fr / La / Ru / Spa | 6–10 | 2. Fremdsprache | geplant |
+| MuDax | Musik (Noten, Rhythmus, Instrumente) | Mu | 1–10 | vielleicht | offen |
+| KuDax | Kunst (Farbenlehre, Kunstgeschichte) | Ku | 1–10 | vielleicht | offen |
+| EthDax | Ethik | Eth | 1–10 | vielleicht | offen |
+
+**Nicht vorgesehen:** Sport, Werken, Religion, Profilunterricht (Kl. 8–10) und 3. Fremdsprache.
+Sie lassen sich kaum sinnvoll am Bildschirm üben oder sind von der Schule und der Wahl abhängig.
+Das kann später neu entschieden werden.
+
+## Fahrplan in drei Phasen
+
+**Phase 1: Klasse 5 fertig bauen, alle Fächer**
+1. MaDax ✅ (Lehrplan-Lücken schließen, siehe `STAND.md`)
+2. DeDax (Deutschbuch 5, Cornelsen) und EnDax (Green Line 1, Klett): die Hauptfächer zuerst
+3. BioDax (Linder 5), GeoDax (Terra 5), GeDax (Anno 1)
+4. TecDax (Technik/Computer)
+5. Vielleicht: MuDax, KuDax, EthDax
+
+**Phase 2: die Nachbarklassen 4 und 6 in allen Fächern**
+- Klasse 6: dazu PhDax und die 2. Fremdsprache, die das Kind wählt
+- Klasse 4: MaDax, DeDax, EnDax, SuDax
+
+**Phase 3: alle übrigen Klassen (1–3 und 7–10)**
+- ab Klasse 7 zusätzlich ChDax, GrwDax, TecDax als Informatik
+
+## Für jedes neue Fach
+
+1. Lehrplan Sachsen auswerten, in `faecher/<id>/lehrplan/` ablegen (Vorbild:
+   `faecher/mathe/lehrplan/sachsen-gymnasium.md`; Lehrpläne unter https://www.schulportal.sachsen.de/lplandb/).
+2. Mit dem Schulbuch abgleichen (Reihenfolge, Begriffe). Aufgaben werden nicht abgeschrieben.
+3. Ordner `web/<id>/` anlegen und die Schritte unter „Ein neues Fach hinzufügen“ in der `README.md` befolgen.
+4. In `faecher.js` beim Fach `status: 'fertig'`, `fertig: [Klasse]`, `href`, `key` und `themen` setzen.
+   Dann erscheint es auf der Startseite als große Kachel statt unter „Kommt bald“.
+
+## Offene Fragen
+
+- Welche 2. Fremdsprache wählt das Kind ab Klasse 6? Welche bietet die Schule an?
+- Die Stundenplan-Kürzel der Schule mit der amtlichen Liste vergleichen (zum Beispiel „Geo“ oder „Gg“, „TC“ oder „TeC“).
+- Sollen MuDax, KuDax und EthDax kommen?
+
+Quellen: Stundentafel Gymnasium Sekundarstufe I (Anlage 4a) und Grundschule (Anlage 1a) der
+VwV Stundentafeln, Abkürzungsliste der Fächer (Gymnasium), alle auf https://www.revosax.sachsen.de.

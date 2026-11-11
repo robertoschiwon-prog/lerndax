@@ -1,4 +1,4 @@
-/* Mathelix – Entdecken
+/* MaDax (Mathe) – Entdecken
  * Visuelle Beweise und Staunen-Momente. Dunkle Bühne, leuchtende Farben.
  * Jede Entdeckung: { title, viewBox, dark:true, discover:{icon, q, tag}, create(api) → {reset, play} }
  */

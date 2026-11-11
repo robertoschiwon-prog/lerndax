@@ -10,7 +10,7 @@
  * erreichbar, der den Link kennt.
  *
  * Felder:
- *   fach:    'mathe' (später auch 'deutsch', 'englisch')
+ *   fach:    Fach-ID aus plattform/faecher.js, z. B. 'mathe' (später auch 'deutsch', 'englisch' …)
  *   titel:   kurze Überschrift
  *   datum:   'JJJJ-MM-TT' (Tag der Arbeit)
  *   gruppen: [{ titel, buch?, themen: [Themen-IDs aus dem Fach] }]

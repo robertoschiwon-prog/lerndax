@@ -1,4 +1,4 @@
-/* Mathelix – Aufgabengeneratoren Klasse 5 (Lehrplan Gymnasium Sachsen)
+/* MaDax (Mathe) – Aufgabengeneratoren Klasse 5 (Lehrplan Gymnasium Sachsen)
  *
  * Jeder Generator liefert bei jedem Aufruf eine neue Aufgabe:
  * {

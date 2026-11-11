@@ -1,7 +1,7 @@
 {
   "name": "LernDax – verstehen statt pauken",
   "short_name": "LernDax",
-  "description": "Üben, verstehen und entdecken – Klasse 1 bis 10, nach dem Lehrplan Sachsen. Mit Mathelix für Mathe.",
+  "description": "Üben, verstehen und entdecken – Klasse 1 bis 10, nach dem Lehrplan Sachsen. Fächer: MaDax, DeDax, EnDax und mehr.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",
