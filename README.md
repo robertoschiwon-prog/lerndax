@@ -91,7 +91,8 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Erklär-Animationen zu allen 25 Themen, Pause und Langsam-Modus
 - [x] Beispiel vorher / Lösung als Animation nachher für alle 25 Themen
 - [x] Entdecken: 14 visuelle Beweise und Staunen-Momente
-- [ ] Offene Entscheidungen aus der Prüfung vom 11.11.2026 (Raten, Schwierigkeit, „Gemischt“, Darstellung am Tablet), siehe `STAND.md` Abschnitt 9
+- [x] Entscheidungen aus der Prüfung vom 11.11.2026 umgesetzt: weniger Raten, leichtere Zahlen, „Gemischt“ nur aus geübten Themen, breite Darstellung am Tablet und PC
+- [ ] Verfahren beim schriftlichen Minus mit der Schule abgleichen
 - [ ] Lehrplan-Lücken Klasse 5: Symmetrie, Quader-Netze, Überschlag, schriftlich plus/minus/mal, Dezimalzahlen runden
 - [ ] Reihenfolge mit dem Schulbuch abgleichen
 - [ ] Klasse 6, danach Klasse 4 und die übrigen Klassen

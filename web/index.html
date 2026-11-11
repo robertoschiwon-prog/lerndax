@@ -27,6 +27,8 @@ body{font:500 17px/1.45 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antia
 h1,h2,h3{font-family:"Bricolage Grotesque",Nunito,system-ui,sans-serif;letter-spacing:-.01em;margin:0}
 a{color:inherit}
 #app{max-width:560px;margin:0 auto;padding:14px 16px 40px;min-height:100vh}
+@media (min-width:700px){#app{max-width:760px;padding:24px 24px 48px}.subjects{grid-template-columns:1fr 1fr}.hero h1{font-size:36px}}
+@media (min-width:1000px){#app{max-width:980px}.subjects{grid-template-columns:repeat(3,1fr)}}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .brand{display:flex;align-items:center;gap:10px;font:800 26px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
 .brand .mark{width:44px;height:44px;border-radius:13px;background:var(--c1);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:grid;place-items:center}
@@ -133,7 +135,7 @@ a{color:inherit}
           if (f.soon) return `<div class="subj soon"><span class="ic" style="background:${f.color}">${f.icon}</span><span class="tx"><h2>${f.name}<span class="tag">kommt bald</span></h2></span></div>`;
           const s = stats(f);
           return `<a class="subj" href="${f.href}">
-            <span class="ic" style="background:${f.color}">${f.icon}</span>
+            <span class="ic" style="background:${f.color}${f.color === 'var(--c1)' || f.color === 'var(--c5)' ? ';color:var(--ink)' : ''}">${f.icon}</span>
             <span class="tx"><small>${f.app} · Klasse 5</small><h2>${f.name}</h2>
               <span class="meta">${s.tasks ? `${s.tasks} Aufgaben · <span class="stars">★ ${s.stars}</span> von ${f.topics * 3}` : `${f.topics} Themen nach Lehrplan Sachsen`}</span></span>
             <span class="go">→</span></a>`;

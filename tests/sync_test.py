@@ -132,7 +132,7 @@ async def main():
             await B.fill('form[data-syncform=unlock] input','1234'); await B.click('form[data-syncform=unlock] button'); await B.wait_for_timeout(500)
         # Reset auf B, Abgleich auf A
         await B.click('[data-go="home"]'); await B.click('[data-go="parents"]'); await B.wait_for_timeout(300)
-        await B.click('[data-reset=ask]'); await B.click('[data-reset=yes]'); await B.wait_for_timeout(3300)
+        await B.click('[data-reset=ask]'); await B.click('[data-reset=yes]'); assert await B.query_selector('#resetWord'), 'ohne das Wort darf nichts gelöscht werden'; await B.fill('#resetWord', 'löschen'); await B.click('[data-reset=yes]'); await B.wait_for_timeout(3300)
         await A.click('[data-go="parents"]'); await A.wait_for_timeout(200); await A.click('[data-sync=now]'); await A.wait_for_timeout(800)
         print('A after reset stats:', len((await state(A))['stats']))
         print('errors A', A.errs, 'B', B.errs)

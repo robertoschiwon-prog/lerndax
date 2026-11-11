@@ -346,7 +346,37 @@
   const GESETZ_HINT = '<b>Kommutativ</b>: Zahlen vertauschen. <b>Assoziativ</b>: Klammern verschieben. <b>Distributiv</b>: einen Faktor auf eine Summe verteilen.';
   const GESETZ_KURZ = ['Kommutativgesetz (Vertauschungsgesetz)', 'Assoziativgesetz (Verbindungsgesetz)', 'Distributivgesetz (Verteilungsgesetz)'];
   function gesetze() {
-    const v = R(1, 7);
+    // Mischung: Gesetz benennen (3 Auswahl) 19 %, Lücken 37 %, „Stimmt das?“ 6 %, Ausklammern 13 %,
+    // im Kopf mit dem Distributivgesetz 12,5 %, beide Seiten ausrechnen 12,5 %
+    const v = pick([1, 2, 3, 4, 4, 4, 5, 5, 5, 6, 7, 7, 8, 8, 9, 9]);
+    if (v === 8) {
+      const f = R(3, 9), t = pick([20, 30, 40, 50, 60]), e = R(1, 9);
+      return {
+        prompt: `Rechne im Kopf mit dem Distributivgesetz: <b>${f} · ${t + e}</b>`,
+        fields: [{ answer: f * (t + e) }],
+        hint: `Zerlege ${t + e} in ${t} + ${e} und nimm beide Teile mit ${f} mal.`,
+        solution: `${f} · ${t + e} = ${f} · ${t} + ${f} · ${e} = ${f * t} + ${f * e} = <b>${f * (t + e)}</b>`,
+        ex: { mode: 'ges', law: 'dis', f, x: t, y: e },
+      };
+    }
+    if (v === 9) {
+      // Beide Seiten ausrechnen: Bei Minus und Geteilt ändert die Klammer das Ergebnis
+      const minus = Math.random() < 0.6;
+      const c = minus ? R(2, 4) : 2, b = minus ? R(5, 9) : 4, a = minus ? R(20, 40) : 8 * R(2, 6);
+      const o = minus ? '−' : ':';
+      const lv = minus ? a - b - c : a / b / c, rv = minus ? a - (b - c) : a / (b / c);
+      const left = `(${a} ${o} ${b}) ${o} ${c}`, right = `${a} ${o} (${b} ${o} ${c})`;
+      const RULE = 'Kommutativ- und Assoziativgesetz gelten nur für <b>Plus</b> und <b>Mal</b>.';
+      const alt = (() => { const c2 = R(2, 4), b2 = R(5, 9), a2 = R(20, 40); return { mode: 'pruef', left: `(${a2} − ${b2}) − ${c2}`, right: `${a2} − (${b2} − ${c2})`, lv: a2 - b2 - c2, rv: a2 - b2 + c2, ok: false, rule: RULE }; })();
+      return {
+        prompt: `Rechne beide Seiten aus. Kommt dasselbe heraus?<br><b>${left}</b> &nbsp;und&nbsp; <b>${right}</b>`,
+        fields: [{ answer: lv, label: 'links' }, { answer: rv, label: 'rechts' }],
+        hint: 'Klammer zuerst! Links steht die Klammer vorn, rechts hinten.',
+        solution: `Links: ${minus ? a - b : a / b} ${o} ${c} = <b>${lv}</b><br>Rechts: ${a} ${o} ${minus ? b - c : b / c} = <b>${rv}</b><br>Nicht dasselbe: Bei <b>${minus ? 'Minus' : 'Geteilt'}</b> darf man die Klammer <b>nicht</b> verschieben.`,
+        answerText: `links ${lv}, rechts ${rv}`,
+        ex: Object.assign({ mode: 'pruef', left, right, lv, rv, ok: false, rule: RULE }, { alt }),
+      };
+    }
     if (v <= 3) {
       // Welches Gesetz?
       const which = v - 1;
@@ -573,7 +603,18 @@
   }
 
   function division() {
-    const v = R(1, 4);
+    // Mischung: schriftlich dividieren 67 %, „Mach die Probe“ (Ja/Nein) 11 %, „Welche Zahl wurde geteilt?“ 22 %
+    const v = pick([1, 1, 2, 2, 3, 3, 4, 5, 5]);
+    if (v === 5) {
+      const d = R(3, 9), q = R(102, 999), r = R(0, d - 1), n = d * q + r;
+      return {
+        prompt: `Welche Zahl wurde geteilt?<br><b>? : ${d} = ${fmt(q)}${r ? ` Rest ${r}` : ''}</b>`,
+        fields: [{ answer: n }],
+        hint: `Rechne rückwärts wie bei der Probe: Ergebnis mal ${d}${r ? ', dann den Rest dazu' : ''}.`,
+        solution: `${fmt(q)} · ${d} = ${fmt(q * d)}${r ? `<br>${fmt(q * d)} + ${r} = ${fmt(n)}` : ''}<br>→ <b>${fmt(n)}</b> : ${d} = ${fmt(q)}${r ? ` Rest ${r}` : ''}`,
+        ex: { mode: 'probe', n, d, q, r, find: true },
+      };
+    }
     if (v === 1) {
       const d = R(2, 9), n = R(100, 999), q = Math.floor(n / d), r = n % d;
       return {
@@ -800,11 +841,11 @@
     10: 'Eine Zahl ist durch 10 teilbar, wenn ihre letzte Ziffer 0 ist.',
   };
   function teilbarkeit() {
-    // Mischung: Teilermengen 25 %, Vielfache 25 %, „Welche ist teilbar?“ (4 Auswahl) 20 %, Ja/Nein 30 %
+    // Mischung: Teilermengen 27 %, Vielfache 27 %, „Welche ist teilbar?“ (4 Auswahl) 22 %, Ja/Nein 24 %
     const roll = Math.random();
-    if (roll < 0.25) return teiler();
-    if (roll < 0.5) return vielfache();
-    if (roll < 0.7) return teilbarAuswahl();
+    if (roll < 0.27) return teiler();
+    if (roll < 0.54) return vielfache();
+    if (roll < 0.76) return teilbarAuswahl();
     const d = pick([2, 3, 4, 5, 6, 9, 10, 3, 4, 6]);
     const yes = Math.random() < 0.5;
     let n = d * R(Math.ceil(100 / d), Math.floor(99999 / d));
@@ -943,6 +984,35 @@
     const k = R(2, 12), whole = d * k;
     // [Einheit im Ergebnis, Einheit nach „von“ (Dativ)]
     const [unit, unitVon] = pick([['', ''], ['', ''], [' €', ' €'], [' kg', ' kg'], [' m', ' m'], [' Kinder', ' Kindern']]);
+    const v = R(1, 5); // 1–3: Anteil berechnen · 4: Anteil im Bild ablesen · 5: vom Teil auf das Ganze
+    if (v === 4) {
+      let n, m; do { n = R(3, 10); m = R(1, n - 1); } while (gcd(m, n) !== 1);
+      const w = 260 / n;
+      let fig = '<svg viewBox="0 0 300 70">';
+      for (let i = 0; i < n; i++) fig += `<rect x="${20 + i * w}" y="14" width="${w}" height="42" class="${i < m ? 'cellOn' : 'cellOff'}" stroke="#1d1b3a" stroke-width="2"/>`;
+      fig += '</svg>';
+      return {
+        prompt: 'Welcher <b>Anteil</b> des Streifens ist gefärbt?',
+        figure: fig,
+        layout: 'frac',
+        fields: [{ answer: m, label: 'Zähler' }, { answer: n, label: 'Nenner' }],
+        check([a, b]) { return { ok: !!b && a * n === b * m }; },
+        hint: 'Nenner: In wie viele gleich große Teile ist der Streifen geteilt? Zähler: Wie viele davon sind gefärbt?',
+        solution: `Der Streifen hat <b>${n}</b> gleich große Teile (Nenner), <b>${m}</b> davon ${m === 1 ? 'ist' : 'sind'} gefärbt (Zähler) → <b>${fr(m, n)}</b>`,
+        answerText: fr(m, n),
+        ex: { mode: 'bild', z: m, d: n, via: 'k5-anteil' },
+      };
+    }
+    if (v === 5) {
+      const zz = Math.random() < 0.5 ? 1 : z, kk = R(2, 9);
+      return {
+        prompt: `${fr(zz, d)} einer Zahl ${zz * kk === 1 ? 'ist' : 'sind'} <b>${zz * kk}</b>. Wie groß ist die ganze Zahl?`,
+        fields: [{ answer: d * kk }],
+        hint: zz === 1 ? `Das Ganze hat ${d} solche Teile.` : `Erst einen Teil ausrechnen (durch ${zz} teilen), dann mal ${d}: Das Ganze hat ${d} Teile.`,
+        solution: `${zz === 1 ? `Ein Teil ist ${kk}.` : `${zz} Teile sind ${zz * kk}, ein Teil ist ${zz * kk} : ${zz} = ${kk}.`}<br>Das Ganze hat ${d} Teile: ${d} · ${kk} = <b>${d * kk}</b>`,
+        ex: { mode: 'anteil', z: zz, d, k: kk, unit: '', unitVon: '', back: true },
+      };
+    }
     const TEIL = { 2: 'ein Halbes', 3: 'ein Drittel', 4: 'ein Viertel', 5: 'ein Fünftel', 6: 'ein Sechstel', 7: 'ein Siebtel', 8: 'ein Achtel', 9: 'ein Neuntel', 10: 'ein Zehntel' };
     return {
       prompt: `Berechne ${fr(z, d)} von <b>${whole}${unitVon}</b>.`,
@@ -976,9 +1046,33 @@
 
   function erweitern() {
     let p, q;
-    do { q = R(2, 9); p = R(1, q - 1); } while (gcd(p, q) !== 1);
-    const k = R(2, 9);
+    do { q = R(2, 12); p = R(1, q - 1); } while (gcd(p, q) !== 1);
+    const k = R(2, 10);
     const askTop = Math.random() < 0.6;
+    const v = R(1, 4); // 1, 2: Lücke · 3: mit einer Zahl erweitern · 4: Erweiterungszahl finden
+    if (v === 3)
+      return {
+        prompt: `Erweitere ${fr(p, q)} mit <b>${k}</b>.`,
+        layout: 'frac',
+        fields: [{ answer: p * k, label: 'Zähler' }, { answer: q * k, label: 'Nenner' }],
+        check([a, b]) {
+          if (a === p * k && b === q * k) return { ok: true };
+          if (b && a * q === b * p) return { ok: false, note: `Der Bruch ist gleich groß, aber nicht mit <b>${k}</b> erweitert.` };
+          return { ok: false };
+        },
+        hint: `Zähler <b>und</b> Nenner mit ${k} malnehmen.`,
+        solution: `${fr(p, q)} = ${fr(`${p} · ${k}`, `${q} · ${k}`)} = <b>${fr(p * k, q * k)}</b>`,
+        answerText: fr(p * k, q * k),
+        ex: { mode: 'erw', p, q, k },
+      };
+    if (v === 4)
+      return {
+        prompt: `Mit welcher Zahl wurde erweitert?<br>${fr(p, q)} = ${fr(p * k, q * k)}`,
+        fields: [{ answer: k }],
+        hint: `Womit wurde der Nenner ${q} malgenommen, um ${q * k} zu erhalten?`,
+        solution: `${q} · <b>${k}</b> = ${q * k} und ${p} · <b>${k}</b> = ${p * k} → mit <b>${k}</b> erweitert`,
+        ex: { mode: 'erw', p, q, k },
+      };
     return {
       prompt: `Ergänze, sodass beide Brüche gleich groß sind:`,
       pre: `${fr(p, q)} =`,
@@ -998,11 +1092,12 @@
   const NICE = [
     [1, 2], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [1, 10], [3, 10], [7, 10], [9, 10],
     [1, 20], [3, 20], [1, 25], [2, 25], [1, 50], [1, 8], [3, 8], [1, 100], [7, 20], [11, 20],
+    [9, 20], [13, 20], [17, 20], [19, 20], [3, 25], [4, 25], [6, 25], [3, 50], [7, 50], [9, 50], [5, 8], [7, 8], [3, 100], [9, 100],
   ];
   function umwandeln() {
     const [p, q] = pick(NICE);
     const dec = round6(p / q), pct = round6((100 * p) / q);
-    const v = R(1, 4);
+    const v = R(1, 5);
     const toHundred = 100 % q === 0 ? `${fr(p, q)} = ${fr(p * (100 / q), 100)}` : `${fr(p, q)} = ${fr(p * (1000 / q), 1000)}`; // Achtel: auf Tausendstel erweitern
     const exFor = (ask) => ({ mode: 'hund', p, q, ask });
     // Typischer Fehler: Nenner durch Zähler (z. B. 25 : 2 = 12,5 statt 2 : 25)
@@ -1037,6 +1132,14 @@
         fields: [{ answer: dec }],
         hint: `${fmt(pct)} % bedeutet ${fmt(pct)} Hundertstel.`,
         solution: Number.isInteger(pct) ? `${fmt(pct)} % = ${fr(fmt(pct), 100)} = <b>${fmt(dec)}</b>` : `${fmt(pct)} % = ${fr(fmt(pct), 100)} = ${fr(Math.round(pct * 10), 1000)} = <b>${fmt(dec)}</b>`,
+      };
+    if (v === 5)
+      return {
+        prompt: `Schreibe in Prozent: <b>${fmt(dec)}</b>`,
+        ex: exFor('dp'),
+        fields: [{ answer: pct, suffix: '%' }],
+        hint: 'Prozent heißt Hundertstel. Wie viele Hundertstel sind es? Die Ziffern rücken zwei Stellen nach links.',
+        solution: `${fmt(dec)} = ${fr(fmt(pct), 100)} = <b>${fmt(pct)} %</b>`,
       };
     return {
       prompt: `Schreibe als <b>vollständig gekürzten</b> Bruch: <b>${fmt(dec)}</b>`,
@@ -1085,8 +1188,9 @@
         ex: { mode: 'mul', a, k },
       };
     }
-    const e = R(1, 3), p = 10 ** e, mult = Math.random() < 0.5;
-    const a = R(1, 99999) / 10 ** R(0, 2);
+    // höchstens drei Nachkommastellen, in der Aufgabe und im Ergebnis
+    const mult = Math.random() < 0.5, da = R(0, 2), e = mult ? R(1, 3) : R(1, 3 - da), p = 10 ** e;
+    const a = R(1, 9999) / 10 ** da;
     const res = round6(mult ? a * p : a / p);
     return {
       prompt: `Berechne: <b>${fmt(a)} ${mult ? '·' : ':'} ${fmt(p)}</b>`,
@@ -1098,6 +1202,33 @@
   }
 
   function vergleichen() {
+    // Mischung: ordnen 40 %, größte/kleinste Zahl eintippen 35 %, „Welche ist größer?“ (3 Auswahl) 25 %
+    const roll = Math.random();
+    if (roll < 0.75) {
+      const base = R(1, 8) / 10 + R(1, 9) / 100, z = Math.floor(base * 10) / 10;
+      const cand = shuffle([base, base + 0.005, base - 0.005, z, z + 0.1, base + 0.01, z + 0.09, z + 0.005, base + 0.1].map(round6).filter((x, i, arr) => x > 0 && arr.indexOf(x) === i));
+      const nums = cand.slice(0, 3), sorted = nums.slice().sort((a, b) => a - b);
+      const ex = { mode: 'ord', nums: nums.map((x) => fmt(x)), via: 'k5-dezimal' };
+      const nd = Math.max(...nums.map((x) => (fmt(x).split(',')[1] || '').length));
+      const pad = (x) => { const [i, d = ''] = fmt(x).split(','); return `${i},${d.padEnd(nd, '0')}`; };
+      const weg = `Mit gleich vielen Nachkommastellen: ${nums.map(pad).join(' · ')}<br>Der Größe nach: ${sorted.map((x) => fmt(x)).join(' &lt; ')}`;
+      const hint = 'Schreibe alle Zahlen mit gleich vielen Nachkommastellen (Nullen anhängen) und vergleiche Stelle für Stelle von links.';
+      if (roll < 0.4)
+        return {
+          prompt: `Ordne der Größe nach. Beginne mit der <b>kleinsten</b> Zahl:<br><b>${nums.map((x) => fmt(x)).join(' &nbsp;·&nbsp; ')}</b>`,
+          fields: sorted.map((x, i) => ({ answer: x, label: ['kleinste', 'mittlere', 'größte'][i] })),
+          hint, ex,
+          solution: `${weg}`,
+          answerText: sorted.map((x) => fmt(x)).join(' < '),
+        };
+      const big = Math.random() < 0.5;
+      return {
+        prompt: `Tippe die <b>${big ? 'größte' : 'kleinste'}</b> Zahl ein:<br><b>${nums.map((x) => fmt(x)).join(' &nbsp;·&nbsp; ')}</b>`,
+        fields: [{ answer: big ? sorted[2] : sorted[0] }],
+        hint, ex: Object.assign({ want: big ? 'max' : 'min' }, ex),
+        solution: `${weg}<br>→ Die ${big ? 'größte' : 'kleinste'} Zahl ist <b>${fmt(big ? sorted[2] : sorted[0])}</b>.`,
+      };
+    }
     let A, B, aTxt, bTxt, frac = null;
     if (Math.random() < 0.5) {
       const [p, q] = pick(NICE);
@@ -1159,8 +1290,8 @@
   // =====================================================
   // LB 3 – Lagebeziehungen geometrischer Objekte
   // =====================================================
-  function koordinaten() {
-    const px = R(0, 10), py = R(0, 8);
+  // Koordinatensystem als Bild; pts: [[x, y, Name], …]
+  function koordBild(pts) {
     const s = 24, ox = 34, oy = 222;
     let g = '';
     for (let i = 0; i <= 10; i++) g += `<line class="grid" x1="${ox + i * s}" y1="${oy}" x2="${ox + i * s}" y2="${oy - 8 * s}"/>`;
@@ -1169,11 +1300,46 @@
     for (let i = 0; i <= 10; i++) ax += `<text class="tick" x="${ox + i * s}" y="${oy + 16}" text-anchor="middle">${i}</text>`;
     for (let j = 1; j <= 8; j++) ax += `<text class="tick" x="${ox - 9}" y="${oy - j * s + 4}" text-anchor="end">${j}</text>`;
     ax += `<text class="tick b" x="${ox + 10 * s + 14}" y="${oy + 16}">x</text><text class="tick b" x="${ox + 8}" y="${oy - 8 * s - 4}">y</text>`;
-    const cx = ox + px * s, cy = oy - py * s;
-    const pnt = `<circle class="pt" cx="${cx}" cy="${cy}" r="6"/><text class="ptl" x="${cx + 8}" y="${cy - 8}">P</text>`;
+    const pnt = pts.map(([x, y, name]) => `<circle class="pt" cx="${ox + x * s}" cy="${oy - y * s}" r="6"/><text class="ptl" x="${ox + x * s + 8}" y="${oy - y * s - 8}">${name}</text>`).join('');
+    return `<svg viewBox="0 0 300 245"><defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrh"/></marker></defs>${g}${ax}${pnt}</svg>`;
+  }
+  function koordinaten() {
+    const v = R(1, 5); // 1, 2: ablesen · 3, 4: welcher Punkt? · 5: verschieben
+    if (v === 3 || v === 4) {
+      // Welcher Punkt hat die Koordinaten? Einer der falschen Punkte hat x und y vertauscht.
+      let x, y; do { x = R(1, 8); y = R(1, 8); } while (x === y);
+      const pts = [[x, y], [y, x]];
+      while (pts.length < 4) { const q = [R(0, 9), R(0, 8)]; if (pts.every((p) => Math.abs(p[0] - q[0]) + Math.abs(p[1] - q[1]) >= 2)) pts.push(q); }
+      const order = shuffle([0, 1, 2, 3]), names = ['A', 'B', 'C', 'D'];
+      const named = order.map((idx, i) => [pts[idx][0], pts[idx][1], names[i]]);
+      const correct = order.indexOf(0), swapped = names[order.indexOf(1)];
+      return {
+        prompt: `Welcher Punkt hat die Koordinaten <b>(${x} | ${y})</b>?`,
+        figure: koordBild(named),
+        choices: names,
+        correct,
+        hint: 'Zuerst nach rechts (x-Wert), dann nach oben (y-Wert). Merke: „Erst laufen, dann springen“.',
+        solution: `${x} nach rechts und ${y} nach oben → Punkt <b>${names[correct]}</b>.<br>Punkt ${swapped} liegt bei (${y} | ${x}): Dort sind x und y vertauscht.`,
+        ex: { mode: 'koord', x, y, name: names[correct] },
+      };
+    }
+    if (v === 5) {
+      const x0 = R(0, 6), y0 = R(0, 5), dx = R(1, 10 - x0 - 1), dy = R(1, 8 - y0);
+      return {
+        prompt: `Der Punkt <b>P(${x0} | ${y0})</b> wird um <b>${dx} nach rechts</b> und <b>${dy} nach oben</b> verschoben. Welche Koordinaten hat der neue Punkt?`,
+        figure: koordBild([[x0, y0, 'P']]),
+        layout: 'coord',
+        fields: [{ answer: x0 + dx, label: 'x' }, { answer: y0 + dy, label: 'y' }],
+        hint: 'Nach rechts ändert sich der x-Wert, nach oben der y-Wert.',
+        solution: `x: ${x0} + ${dx} = ${x0 + dx} · y: ${y0} + ${dy} = ${y0 + dy} → <b>P(${x0 + dx} | ${y0 + dy})</b>`,
+        answerText: `P(${x0 + dx} | ${y0 + dy})`,
+        ex: { mode: 'koord', x: x0 + dx, y: y0 + dy, from: [x0, y0] },
+      };
+    }
+    const px = R(0, 10), py = R(0, 8);
     return {
       prompt: 'Welche Koordinaten hat der Punkt <b>P</b>?',
-      figure: `<svg viewBox="0 0 300 245"><defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrh"/></marker></defs>${g}${ax}${pnt}</svg>`,
+      figure: koordBild([[px, py, 'P']]),
       layout: 'coord',
       fields: [{ answer: px, label: 'x' }, { answer: py, label: 'y' }],
       hint: 'Zuerst nach rechts (x-Wert), dann nach oben (y-Wert). Merke: „Erst laufen, dann springen“.',
@@ -1191,8 +1357,25 @@
       ['gestreckter Winkel', () => 180],
       ['überstumpfer Winkel', () => R(195, 340)],
     ];
+    const v = R(1, 5); // 1, 2: Art zur Gradzahl · 3, 4: Art am Bild schätzen (ohne Gradzahl) · 5: Welcher Winkel ist …?
+    if (v === 5) {
+      const t5 = pick([0, 2, 4]);
+      const vals = [R(10, 85), 90, R(95, 170), 180, R(195, 340)];
+      const others = shuffle([0, 1, 2, 3, 4].filter((i) => i !== t5)).slice(0, 3);
+      const opts = shuffle([t5, ...others]);
+      return {
+        prompt: `Welcher Winkel ist ein <b>${types[t5][0].replace('er Winkel', 'er')}</b> Winkel?`,
+        choices: opts.map((i) => `${vals[i]}°`),
+        correct: opts.indexOf(t5),
+        hint: 'spitz: unter 90° · recht: genau 90° · stumpf: zwischen 90° und 180° · gestreckt: genau 180° · überstumpf: zwischen 180° und 360°',
+        solution: `${opts.map((i) => `${vals[i]}°: ${types[i][0]}`).join('<br>')}<br>→ <b>${vals[t5]}°</b>`,
+        ex: { mode: 'wart', a: vals[t5] },
+      };
+    }
+    const guess = v >= 3;
     const t = pick([0, 0, 0, 0, 1, 2, 2, 2, 2, 3, 4, 4, 4, 4]); // rechter und gestreckter Winkel seltener: da gibt es nur eine Zahl
-    const a = types[t][1]();
+    // beim Schätzen deutlich weg von den Grenzen 90°, 180° und 360°
+    const a = guess ? [() => R(20, 70), () => 90, () => R(110, 160), () => 180, () => R(205, 330)][t]() : types[t][1]();
     const cx = 150, cy = 105, L = 110;
     const p1 = pt(cx, cy, L, 0), p2 = pt(cx, cy, L, a);
     let mark;
@@ -1202,12 +1385,12 @@
     } else mark = wedge(cx, cy, 30, 0, a, 'wA');
     const fig = `<svg viewBox="0 0 300 215">${mark}<line class="ray" x1="${cx}" y1="${cy}" x2="${P(p1).split(' ')[0]}" y2="${P(p1).split(' ')[1]}"/><line class="ray" x1="${cx}" y1="${cy}" x2="${P(p2).split(' ')[0]}" y2="${P(p2).split(' ')[1]}"/><circle cx="${cx}" cy="${cy}" r="3.5" class="dot"/>${label(cx, cy, 48, a / 2, 'α', 'albl')}</svg>`;
     return {
-      prompt: `Der Winkel ist <b>α = ${a}°</b> groß. Welche Winkelart ist das?`,
+      prompt: guess ? 'Sieh dir den Winkel <b>α</b> an. Welche Winkelart ist das?' : `Der Winkel ist <b>α = ${a}°</b> groß. Welche Winkelart ist das?`,
       figure: fig,
       choices: types.map((tt) => tt[0]),
       correct: t,
-      hint: 'spitz: unter 90° · recht: genau 90° · stumpf: zwischen 90° und 180° · gestreckt: genau 180° · überstumpf: zwischen 180° und 360°',
-      solution: `${a}° ist ${a < 90 ? 'kleiner als 90°' : a === 90 ? 'genau 90°' : a < 180 ? 'zwischen 90° und 180°' : a === 180 ? 'genau 180°' : 'zwischen 180° und 360°'} → <b>${types[t][0]}</b>`,
+      hint: guess ? 'Vergleiche mit einer Heftecke (90°) und einer geraden Linie (180°): kleiner als die Ecke ist spitz, zwischen Ecke und gerader Linie stumpf, mehr als die gerade Linie überstumpf.' : 'spitz: unter 90° · recht: genau 90° · stumpf: zwischen 90° und 180° · gestreckt: genau 180° · überstumpf: zwischen 180° und 360°',
+      solution: `${guess ? `Der Winkel ist ${a === 90 || a === 180 ? '' : 'etwa '}${a}° groß. ` : ''}${a}° ist ${a < 90 ? 'kleiner als 90°' : a === 90 ? 'genau 90°' : a < 180 ? 'zwischen 90° und 180°' : a === 180 ? 'genau 180°' : 'zwischen 180° und 360°'} → <b>${types[t][0]}</b>`,
       ex: { mode: 'wart', a },
     };
   }
@@ -1273,7 +1456,7 @@
     const v = R(1, 4);
     if (v === 4) return lform();
     const unit = pick(['cm', 'cm', 'm', 'mm']);
-    const a = R(3, 25), b = R(2, 18);
+    const a = v === 3 ? pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 20]) : R(3, 25), b = R(2, 18); // fehlende Seite: nur durch einstellige Zahlen, 10 oder 20 teilen
     const sc = Math.min(180 / a, 120 / b, 14);
     const w = a * sc, h = b * sc, x0 = (300 - w) / 2 - 30, y0 = 20;
     const fig = `<svg viewBox="0 0 300 ${h + 60}"><rect class="shape" x="${x0}" y="${y0}" width="${w}" height="${h}"/><text class="dim" x="${x0 + w / 2}" y="${y0 + h + 22}" text-anchor="middle">a = ${a} ${unit}</text><text class="dim" x="${x0 + w + 8}" y="${y0 + h / 2 + 5}">b = ${b} ${unit}</text></svg>`;
@@ -1462,7 +1645,7 @@
       };
     }
     if (v === 2) {
-      const n = R(12, 28), per = R(8, 45);
+      const n = pick([10, 20, 25]), per = R(8, 45); // glatte Teiler, damit das Teilen machbar bleibt
       return {
         prompt: `Eine Klasse mit <b>${n} Kindern</b> fährt ins Schullandheim. Die Fahrt kostet zusammen <b>${fmt(n * per)} €</b>. Wie viel zahlt jedes Kind?`,
         fields: [{ answer: per, suffix: '€' }],

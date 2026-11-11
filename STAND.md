@@ -265,7 +265,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v20`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v21`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -442,17 +442,16 @@ Infos zur ersten Arbeit:
   Zahlen (unechte Brüche kommen bisher nur beim Kürzen vor), Überschlag, schriftliches Addieren,
   Subtrahieren und Multiplizieren natürlicher Zahlen, Dezimalzahlen runden, Fermi-Aufgaben
 
-**Offene Entscheidungen aus der Komplett-Prüfung vom 11.11.2026** (Auftraggeber entscheidet, nichts davon ist umgesetzt)
-- Raten: „Zahlen vergleichen“ hat immer 3 Auswahlen (kein zweiter Versuch), Rechengesetze zu 58 %,
-  Division zu 25 % Ja/Nein. Mehr Aufgaben zum Eintippen?
-- Schwierigkeit: zweistellige Teiler (Klassenfahrt, Rechteckseite) und 4 bis 5 Nachkommastellen bei
-  „· 10 / : 10“ – so lassen oder leichter?
-- „Gemischt“ zieht aus allen 25 Themen, auch aus solchen, die in der Schule noch nicht dran waren.
-- Wenig Abwechslung bei einigen Themen (z. B. Winkelarten, Anteile).
-- Verfahren beim schriftlichen Minus (Ergänzen oder Entbündeln) mit der Schule abgleichen.
-- Darstellung: weiße Schrift auf Gelb/Orange ist schwach lesbar; am Tablet/PC bleibt die App eine
-  schmale Spalte; ✕ beendet die Runde ohne Rückfrage; der Tipp-Knopf bleibt nach dem Tipp stehen.
-- Technik-Hinweise: „0.125“ mit Punkt wird als 125 gelesen; Zurücksetzen geht auch ohne Anmeldung.
+**Entscheidungen des Auftraggebers zur Komplett-Prüfung (11.11.2026, umgesetzt mit `lerndax-v21`)**
+- Raten: mehr Aufgaben zum Eintippen, Ja/Nein höchstens bei etwa einem Viertel je Thema.
+- Schwierigkeit: Teiler einstellig oder 10/20/25, höchstens drei Nachkommastellen.
+- „Gemischt“ zieht nur aus Themen, die schon einzeln geübt wurden (ab zwei Themen).
+- Tablet und PC: Übersicht in mehreren Spalten, Aufgabe und Erklärung größer; Handy unverändert.
+- Dunkle Schrift auf Orange und Gelb; Rückfrage beim ✕; Tipp-Knopf verschwindet nach dem Tipp;
+  „0.125“ zählt wie „0,125“; Zurücksetzen nur nach Eintippen des Wortes LÖSCHEN.
+- Mehr Abwechslung bei Themen mit wenigen Aufgabenarten.
+- **Noch offen:** Wie rechnet die Schule schriftlich minus (Ergänzen mit „1 merken“ wie in der
+  Animation, oder Entbündeln)? Der Auftraggeber fragt nach; bis dahin bleibt die Animation, wie sie ist.
 
 **Als Nächstes sinnvoll**
 - [x] Testrunde 1 mit dem Kind (10.11.2026)
@@ -592,3 +591,19 @@ Infos zur ersten Arbeit:
   Startseite lobt erst, wenn das Tagesziel (eine ganze Runde) geschafft ist · alle 25 Kacheln haben ▶.
 - Neuer Test `tests/loesung.py` (Lösungs-Animation zu jeder Aufgabenart); Doku berichtigt (README-
   Fahrplan, Lernstand-Felder, Teiler-Aussage, Lehrplan-Lücken).
+- **Entscheidungen zur Prüfung umgesetzt (`lerndax-v21`)**, siehe Abschnitt 9. Neue Aufgabenarten:
+  - Zahlen vergleichen: drei Zahlen ordnen, größte/kleinste Zahl eintippen (Auswahl nur noch 25 %);
+    neue Animation „Zahlen ordnen in der Stellenwerttafel“
+  - Rechengesetze: im Kopf mit dem Distributivgesetz rechnen, beide Seiten ausrechnen (Auswahl von 58 % auf 24 %)
+  - Division: „Welche Zahl wurde geteilt?“ (Ja/Nein von 25 % auf 11 %); Teilbarkeit Ja/Nein 24 %
+  - Erweitern: mit einer Zahl erweitern, Erweiterungszahl finden · Bruch/Dezimal/Prozent: 14 weitere
+    Brüche, Dezimalzahl → Prozent
+  - Anteile: Anteil am Streifen ablesen, vom Teil auf das Ganze schließen (jeweils mit eigener Animation)
+  - Koordinaten: „Welcher Punkt hat die Koordinaten …?“ (ein falscher Punkt mit vertauschten Werten),
+    Punkt verschieben · Winkelarten: Art am Bild schätzen, „Welcher Winkel ist ein stumpfer Winkel?“
+  - Leichter: Klassenfahrt mit 10, 20 oder 25 Kindern; fehlende Rechteckseite nur mit einstelliger
+    Seite, 10 oder 20; „· 10 / : 10“ mit höchstens drei Nachkommastellen
+  App: „Gemischt“ nur aus geübten Themen, Rückfrage beim ✕ (sobald eine Antwort gegeben wurde),
+  Tipp-Knopf verschwindet, Punkt als Komma, Zurücksetzen mit dem Wort LÖSCHEN, dunkle Schrift und
+  dunkle Symbole auf Orange und Gelb, breite Darstellung ab 700 und 1000 Pixel (`data-view` am
+  `#app` steuert die Breite je Ansicht). Geprüft: 87 000 neue Aufgaben unabhängig nachgerechnet.
