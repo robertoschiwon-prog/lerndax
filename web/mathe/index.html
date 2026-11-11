@@ -36,7 +36,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .hubbtn{width:40px;height:40px;flex:0 0 auto;border-radius:12px;border:2px solid var(--ink);background:var(--c1);display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink);overflow:hidden}
 .hubbtn img{width:100%;height:100%;display:block}
 .hubbtn:active{transform:translate(2px,2px);box-shadow:none}
-.logo{display:flex;align-items:center;gap:8px;font:800 24px "Bricolage Grotesque",sans-serif;background:none;border:0;padding:0}
+.logo{display:flex;align-items:center;gap:8px;font:800 24px "Bricolage Grotesque",sans-serif;background:none;border:0;padding:6px 4px;margin:-6px -4px}
 .logo b{color:var(--c1)}
 .pills{margin-left:auto;display:flex;gap:6px}
 .pill{display:flex;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;font-weight:800;font-size:15px}
@@ -93,6 +93,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .bg1{background:var(--c1)}.bg2{background:var(--c2)}.bg3{background:var(--c3)}.bg4{background:var(--c4)}.bg5{background:var(--c5)}
 /* weiße Schrift ist auf Orange und Gelb zu schwach: dort dunkle Schrift */
 .tag.bg1,.tag.bg5,.lbh .nr.bg1,.lbh .nr.bg5,.topic .ti.bg1,.topic .ti.bg5{color:var(--ink)}
+.tag.bg2,.lbh .nr.bg2{background:#2f66e0}
+.tag.bg3,.lbh .nr.bg3{background:#0d8055}
+.tag.bg4,.lbh .nr.bg4{background:#7443e6}
 .foot{text-align:center;margin-top:10px}
 .trhero{margin-bottom:16px;background:#fff8ec}
 .trtop{display:flex;align-items:center;gap:10px}
@@ -205,8 +208,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* Ergebnis */
 .res{text-align:center;padding:26px 18px}
 .res .big{font-size:64px;line-height:1}
-.fest{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:6px}
-.fest .blase{position:relative;align-self:flex-end;max-width:78%;margin:0 4% 0 0;background:var(--ink);color:#fff;font:800 22px/1.2 "Bricolage Grotesque",Nunito,sans-serif;padding:10px 16px;border-radius:16px;animation:pop .35s .15s both}
+.fest{display:flex;flex-direction:column;align-items:center;gap:12px;margin:0 auto 6px;width:fit-content;max-width:100%}
+.fest .blase{position:relative;align-self:flex-end;max-width:min(100%,300px);margin:0 -14px 0 0;background:var(--ink);color:#fff;font:800 22px/1.2 "Bricolage Grotesque",Nunito,sans-serif;padding:10px 16px;border-radius:16px;animation:pop .35s .15s both}
 .fest .blase::after{content:"";position:absolute;right:38px;bottom:-9px;border:10px solid transparent;border-top-color:var(--ink);border-bottom:0}
 .fest.solo .blase{align-self:center;margin:0}.fest.solo .blase::after{right:calc(50% - 10px)}
 .fest .paar{display:flex;align-items:center;justify-content:center;gap:10px}
@@ -251,10 +254,16 @@ th{text-align:left;font-size:12px;color:var(--soft);text-transform:uppercase;let
 td{padding:8px 4px;border-bottom:1px solid var(--tint);vertical-align:middle}
 td small.when{display:block;font-size:12px;color:var(--soft);font-weight:600}
 .tablecard{padding:12px}
+.tablecard table{table-layout:fixed}
+.tablecard th:nth-child(2),.tablecard td:nth-child(2){width:44px}
+.tablecard th:nth-child(3),.tablecard td:nth-child(3){width:64px}
+.tablecard th:nth-child(4),.tablecard td:nth-child(4){width:54px}
+.tablecard td:first-child{hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word}
+@media (max-width:360px){.kpi{padding:10px 8px}.kpi b{font-size:21px}.kpi span{font-size:12px}.kpis{gap:6px}}
 .tablecard .stars{white-space:nowrap;font-size:13px}
 td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
 th.n{text-align:right}
-.qbar{height:8px;border-radius:4px;background:var(--tint);overflow:hidden;min-width:50px}
+.qbar{height:8px;border-radius:4px;background:var(--tint);overflow:hidden;min-width:40px}
 .qbar i{display:block;height:100%}
 .lbt{margin:18px 0 6px;font-size:17px}
 .note{font-size:14px;color:var(--soft);margin-top:18px}
@@ -270,7 +279,7 @@ th.n{text-align:right}
 /* Themenkarten mit Erklär-Knopf */
 .twrap{position:relative;display:flex}
 .twrap .topic{flex:1}
-.explbtn{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:var(--c5);font-size:13px;font-weight:800;display:grid;place-items:center;padding:0 0 0 2px;box-shadow:2px 2px 0 var(--ink)}
+.explbtn{position:absolute;top:6px;right:6px;width:38px;height:38px;border-radius:50%;border:2px solid var(--ink);background:var(--c5);font-size:13px;font-weight:800;display:grid;place-items:center;padding:0 0 0 2px;box-shadow:2px 2px 0 var(--ink)}
 .explbtn:active{transform:translate(2px,2px);box-shadow:none}
 .discover{width:100%;display:flex;align-items:center;gap:14px;text-align:left;font:inherit;cursor:pointer}
 .discover small{color:var(--soft);font-weight:700}
@@ -415,7 +424,7 @@ body.noscroll{overflow:hidden}
 .disc-tx{flex:1;display:flex;flex-direction:column;gap:2px;line-height:1.25}
 .disc-tx b{font-size:15px}
 .disc-tx small{font-size:12px;color:var(--soft);font-weight:800}
-.disc-new{flex:0 0 auto;background:var(--c1);color:#fff;border:2px solid var(--ink);border-radius:99px;font-size:11px;font-weight:800;padding:2px 8px;color:var(--ink)}
+.disc-new{flex:0 0 auto;background:var(--c1);color:#fff;border:2px solid var(--ink);border-radius:99px;font-size:12px;font-weight:800;padding:2px 8px;color:var(--ink)}
 .disc-seen{flex:0 0 auto;color:var(--ok);font-weight:800;font-size:18px}
 
 /* Dunkle Bühne */
@@ -1031,7 +1040,7 @@ body.noscroll{overflow:hidden}
       const now = mastery(R.arg).stars;
       const m = mastery(R.arg), ziel = [50, 75, 90][now];
       const sternTipp = now >= 3 ? 'Alle drei Sterne: Dieses Thema sitzt!' : `Nächster Stern ab <b>${ziel} %</b> richtig in deinen letzten 10 Aufgaben. Du bist bei <b>${Math.round(m.avg * 100)} %</b>.`;
-      starBlock += `${starHtml(now)}${now > R.before ? '<p style="color:var(--ok)">Neuer Stern! ⭐</p>' : ''}<p class="sternhint">${sternTipp}</p>`;
+      starBlock += `${starHtml(now)}${now > R.before ? '<p style="color:#0b7a50">Neuer Stern! ⭐</p>' : ''}<p class="sternhint">${sternTipp}</p>`;
     }
     $app.innerHTML = header() + `
       <div class="card res">

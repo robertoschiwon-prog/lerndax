@@ -55,6 +55,7 @@ a{color:inherit}
 .soonbox>small{display:block;color:var(--soft);font-weight:800;font-size:13px;margin:0 2px 8px}
 .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .chip{display:flex;align-items:center;gap:10px;opacity:.8}
+.subj.solo{grid-column:1/-1}
 .subj .ic{overflow:hidden}.subj .ic img,.chip i img{width:100%;height:100%;display:block}
 .chip i{flex:0 0 auto;width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);overflow:hidden;display:grid;place-items:center;font:800 13px "Bricolage Grotesque",Nunito,sans-serif;font-style:normal;color:#fff;}
 .chip span{display:flex;flex-direction:column;line-height:1.15}
@@ -67,7 +68,7 @@ a{color:inherit}
 .disc b{display:block;font-size:17px}
 .disc small{color:#a9a6c6;font-weight:700}
 .foot{text-align:center;margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:center}
-.foot a{font-weight:800}
+.foot a{font-weight:800;padding:8px 12px}
 .foot p{margin:0;color:var(--soft);font-size:13px}
 </style>
 </head>
@@ -144,7 +145,7 @@ a{color:inherit}
         <p>${!avatar ? 'Tipp auf das Bild und such dir deinen Avatar aus!' : goal ? 'Tagesziel geschafft – stark! 💪' : today ? 'Heute schon geübt. Für das Tagesziel fehlt noch eine ganze Runde.' : 'Was möchtest du heute lernen?'}</p></div>
       </div>
       <div class="subjects">
-        ${all.map(({ f, s }) => `<a class="subj" href="${f.href}">
+        ${all.map(({ f, s }) => `<a class="subj${all.length === 1 ? ' solo' : ''}" href="${f.href}">
             <span class="ic" style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.dachs ? `<img src="${f.dachs}" alt="">` : f.icon}</span>
             <span class="tx"><small>${esc(fachname(f, k))} · Klasse ${k}</small><h2>${f.name}</h2>
               <span class="meta">${s.tasks ? `${s.tasks} Aufgaben · <span class="stars">★ ${s.stars}</span> von ${f.themen * 3}` : `${f.themen} Themen nach Lehrplan Sachsen`}</span></span>

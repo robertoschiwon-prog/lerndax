@@ -656,3 +656,9 @@ Infos zur ersten Arbeit:
   - Willkommen: Dachs mit Sprechblase, nach dem Namen einmalig die Avatar-Wahl.
   - Bewusst unverändert: Aufgabenkarte am PC, einzelne Themen-Kachel in der letzten Reihe.
   - Tests angepasst: Sie überspringen die Avatar-Frage (`lerndax.avatar.asked`) und öffnen im Elternbereich den Reiter „Geräte & Konto“.
+- **Design-Prüfung** (Version `lerndax-v33`): alle Ansichten auf vier Bildschirmgrößen (320, 390, 768, 1280 Pixel)
+  automatisch auf Überlauf, abgeschnittenen Text, Kontrast, Schriftgröße und Tippflächen geprüft und durchgesehen. Behoben:
+  Elternbereich lief auf kleinen Handys (320 px) über den Rand; Sprechblase beim Lob hing auf Tablet und PC nicht am Dachs;
+  weiße Schrift auf Blau, Grün und Lila (Lernbereichs-Marken) und auf Orange („Fertig“ in der Avatar-Wahl) war zu
+  kontrastarm; Erklär-Knopf, Farbwahl, Logo und Eltern-Link hatten zu kleine Tippflächen; MaDax-Kachel der
+  Startseite nutzt allein die ganze Breite.

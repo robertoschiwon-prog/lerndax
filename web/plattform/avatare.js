@@ -152,9 +152,9 @@
 .ldx-fig svg{width:100%;max-width:72px;height:auto}
 .ldx-fig.on{background:#fff1e6;box-shadow:0 0 0 3px #ff6b3d}
 .ldx-cols{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 16px}
-.ldx-col{width:34px;height:34px;border-radius:50%;border:2px solid #1c1a33;cursor:pointer}
+.ldx-col{width:38px;height:38px;border-radius:50%;border:2px solid #1c1a33;cursor:pointer}
 .ldx-col.on{box-shadow:0 0 0 3px #fbf6ee,0 0 0 6px #1c1a33}
-.ldx-done{width:100%;border:2px solid #1c1a33;border-radius:14px;box-shadow:3px 3px 0 #1c1a33;background:#ff6b3d;color:#fff;font:800 18px Nunito,system-ui,sans-serif;padding:13px;cursor:pointer}
+.ldx-done{width:100%;border:2px solid #1c1a33;border-radius:14px;box-shadow:3px 3px 0 #1c1a33;background:#ff6b3d;color:#1c1a33;font:800 18px Nunito,system-ui,sans-serif;padding:13px;cursor:pointer}
 .ldx-done:active{transform:translate(3px,3px);box-shadow:none}
 .ldx-lbl{font-weight:800;font-size:13px;color:#6b6680;margin:0 0 6px}`;
     document.head.appendChild(s);
