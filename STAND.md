@@ -625,3 +625,8 @@ Infos zur ersten Arbeit:
 - **Dachs mit Fach-Hut** (Version `lerndax-v24`): MaDax-Dachs mit Papierhut aus Karopapier in der
   Mathe-Kopfzeile und beim Lob nach der Runde. Hüte für DeDax (Buch) und EnDax (Union-Jack-Mütze)
   liegen in `web/icons/` bereit. Regeln und Ideen für weitere Hüte in `faecher/README.md`.
+- **Lob-Szene** (Version `lerndax-v25`): Nach einer Runde stehen der Avatar des Kindes und der
+  Fach-Dachs nebeneinander, der Dachs spricht in einer Sprechblase mit dem Namen des Kindes.
+  Vier Stufen (ab 90 %, 70 %, 50 %, darunter) mit eigenem Spruch, Symbol und kurzer Bewegung;
+  ohne gewählten Avatar steht der Dachs allein. Idee für später: Hut-Tausch beim Tagesziel,
+  Spruch zur Serie; für ältere Klassen abschaltbar.
