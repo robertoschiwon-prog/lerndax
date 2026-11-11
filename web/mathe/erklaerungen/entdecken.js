@@ -225,7 +225,7 @@
     create(api) {
       let cells;
       const s = 32, x0 = 52, y0 = 6;
-      const big = (k) => (2n ** BigInt(k - 1)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      const big = (k) => (2n ** BigInt(k - 1)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
       return {
         reset() {
           api.clear(); cells = [];
@@ -241,7 +241,7 @@
           api.say('Der König lachte: „So wenig?“ Schauen wir mal …');
           await api.wait(2200);
           const notes = {
-            11: 'Feld 11: <b>1.024</b> Körner – eine Handvoll.',
+            11: 'Feld 11: <b>1 024</b> Körner – eine Handvoll.',
             21: 'Feld 21: über <b>1 Million</b> Körner – ein schwerer Sack, etwa 25 kg!',
             31: 'Feld 31: über <b>1 Milliarde</b> Körner – ein ganzer Lastwagen voll.',
             41: 'Feld 41: über <b>1 Billion</b> Körner – ein riesiges Frachtschiff voll.',

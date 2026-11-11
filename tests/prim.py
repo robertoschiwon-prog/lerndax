@@ -36,8 +36,13 @@ async def main():
                 await pg.screenshot(path=f'{SHOTS}/p5_{kind}_pre.png'); await pg.click('[data-exclose]')
             # falsch beantworten
             if kind=='prime':
+                # Ja/Nein (2 Auswahlen) oder „Welche Zahl ist eine Primzahl?“ (4 Auswahlen): falsch antworten, bis die Lösung kommt
                 c = await pg.evaluate("()=>window.__mathelix.round().cur.task.correct")
-                await pg.click(f'[data-choice="{1-c}"]')
+                for _ in range(2):
+                    if await pg.query_selector('[data-when="post"]'): break
+                    for bt in await pg.query_selector_all('[data-choice]:not([disabled])'):
+                        if await bt.get_attribute('data-choice') != str(c): await bt.click(); break
+                    await pg.wait_for_timeout(100)
             else:
                 for _ in range(2):
                     await pg.fill('.answer input','2*2'); await pg.click('#checkB'); await pg.wait_for_timeout(100)

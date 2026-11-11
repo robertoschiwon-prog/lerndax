@@ -129,7 +129,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **21 Erklär-Animationen** zu den Themen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
+- **Erklär-Animationen** zu allen 25 Themen (Liste der Grund-Animationen): Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Dividieren: Bonbons in Tüten und
   schriftlich Stelle für Stelle · Teilbarkeit: Regeln und Teiler (Quersumme, Endziffern, durch 6,
   Teiler-Paare) ·
@@ -143,7 +143,8 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   haben Regler oder Auswahl-Chips zum Selbst-Ausprobieren.
 - **Beispiel vorher / Lösung als Animation nachher:** „▶ Erklärung“ vor dem Antworten zeigt ein
   **ähnliches Beispiel** (andere Zahlen, verrät nichts), „▶ Lösung als Animation“ nach dem Antworten
-  zeigt **genau die Aufgabe**. Umgesetzt für:
+  zeigt **genau die Aufgabe**. Seit `lerndax-v19` (11.11.2026) für **alle 25 Themen** (geprüft: bei
+  150 falsch beantworteten Aufgaben zeigt die Animation die Zahlen und das Ergebnis der Aufgabe). Im Einzelnen:
   - **Primzahlen** (Rechteck-Legen) und **Primfaktorzerlegung** (Faktorbaum)
   - **Vorrangregeln** (seit 10.11.): Rechenbaum aus der Rechnung des Kindes, auch mit Klammern und ²;
     am Ende bleibt der Rechenweg als nummerierte Liste stehen
@@ -154,7 +155,27 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - **Bruch · Dezimal · Prozent** (seit 10.11., `lerndax-v18`): Hundertertafel mit dem Bruch der Aufgabe,
     „Erweitern mit k“ auf Hundertstel; bei Achteln auf 1000 erweitert, halbe Kästchen werden gezeigt
   - **Teilbarkeit & Teiler** (seit 10.11.): passende Regel zur Aufgabe (Quersumme, letzte Ziffer,
-    letzte zwei Ziffern, durch 6 = durch 2 und 3) bzw. Teiler-Paare
+    letzte zwei Ziffern, durch 6 = durch 2 und 3) bzw. Teiler-Paare; **Vielfache** (v19): Sprünge auf dem
+    Zahlenstrahl (n-tes Vielfaches, kleinstes über g, welche Zahl wird getroffen)
+  - Neu in `lerndax-v19`:
+    - **Runden** auf jede Stelle (Zahlenstrahl in Zehner-, Hunderter-, Tausender-Schritten) + Ziffernregel
+    - **Rechengesetze**: das passende Gesetz mit den Zahlen der Aufgabe (Plus als Streifen, Mal als
+      Punkt-/Kästchenfeld, Distributiv auch mit Minus und rückwärts = ausklammern), „Stimmt das?“ als
+      Nachrechnen beider Seiten; **Geschickt rechnen**: Zahlen umstellen und glatte Paare bündeln
+    - **Potenzen vergleichen** (2⁵ oder 5²): beide als Malaufgabe ausrechnen
+    - **Gleichungen**: Pfeilbild mit Umkehraufgabe für +, −, · und : (Waage bleibt als Einstieg)
+    - **Anteile** (bis 10 Teile mit 12 Bonbons), **Erweitern** und **Kürzen** getrennt (Kürzen: Kästchen
+      zusammenfassen, ggT; unechte Brüche mit mehreren Rechtecken)
+    - **Dezimalzahlen**: Komma unter Komma (+, − mit Übertrag), mal einstellig (erst ohne Komma, dann Komma
+      setzen), · / : Zehnerpotenzen in passend großer Stellenwerttafel; **Zahlen vergleichen** Stelle für Stelle
+    - **Mittelwert** als Balken mit den Werten der Aufgabe
+    - **Koordinaten** (auch x = 0 oder y = 0), **Winkelarten** (Strahl dreht auf den Winkel der Aufgabe),
+      **Winkel an Geraden** (richtiger Teil: Neben/Scheitel oder Stufen/Wechsel mit dem gegebenen Winkel)
+    - **Rechteck**: Fläche, Umfang, fehlende Seite, zusammengesetzte Figur; **Quader**: Volumen (große Quader
+      schichtweise), Oberfläche (je zwei gleiche Flächen), Liter (dm-Würfel)
+    - **Einheiten**: Einheiten-Treppe für Länge, Masse, Zeit (Faktor 60!), Fläche, Volumen, Hohlmaß;
+      **Fahrpläne**: Ankunft und Dauer mit Sprüngen über volle Stunden
+    - **Sachaufgaben** nutzen die passende Rechen-Animation (Preis · Anzahl, Wechselgeld, Teilen)
   Technik: Der Generator gibt `ex: { mode, … }` mit; die Erklärung bekommt das als `ctx` mit
   `pre` (ähnliches Beispiel) oder `post` (genau die Aufgabe). Mit `ex.via: '<Themen-ID>'` nutzt
   eine Aufgabe die Erklärung eines anderen Themas (so bei den Textaufgaben).
@@ -205,7 +226,8 @@ Jeder Generator liefert bei jedem Aufruf eine neue Aufgabe:
 Zahlen werden deutsch formatiert (Komma, schmales Leerzeichen ab 10 000).
 
 ### Erklär-Animationen
-Jede Erklärung: `{ title, viewBox, dark?, discover?:{icon, q, tag}, create(api) → { reset(), play() } }`.
+Jede Erklärung: `{ title, titleFor?(ctx), viewBox, dark?, discover?:{icon, q, tag}, create(api, ctx) → { reset(), play() } }`.
+`ctx` = `ex` der Aufgabe plus `pre: true` (ähnliches Beispiel) oder `post: true` (genau die Aufgabe); ohne Aufgabe ist `ctx` leer.
 `play()` ist asynchron und nutzt `api.wait`, `api.tw` (Übergänge), `api.say` (Text),
 `api.slider`, `api.chips`. Der Player hat eine **eigene virtuelle Uhr**; dadurch funktionieren
 Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint unter Entdecken
@@ -242,7 +264,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v18`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v19`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -422,8 +444,7 @@ Infos zur ersten Arbeit:
 - [x] Schulbücher und nächste Arbeit geklärt (siehe Abschnitt 1)
 - [ ] Reihenfolge der Themen mit dem Schulbuch abgleichen
 - [x] „Lösung als Animation“ für die Arbeitsthemen (Vorrangregeln, Potenzen, Division, Teilbarkeit)
-- [ ] „Lösung als Animation“ auf die übrigen Themen übertragen (einfach: Runden, Anteile, Mittelwert,
-      Koordinaten; nicht sinnvoll bei reinen Auswahlfragen wie „Welches Gesetz?“)
+- [x] „Lösung als Animation“ auf alle übrigen Themen übertragen (`lerndax-v19`, 11.11.2026)
 - [ ] Hinweis zu den `lerndax_`-Tabellen in der `status.md` des Familienkalenders (Auftraggeber)
 - [ ] Prüfen, ob der LernDax-Link im Familienkalender eingebaut ist
 
@@ -520,3 +541,13 @@ Infos zur ersten Arbeit:
   statt der Aufgabe. Jetzt **Lösung als Animation** mit dem Bruch der Aufgabe und ähnliches Beispiel vorher;
   neue Chips 2/25 und 1/8. Typischer Fehler „Nenner durch Zähler“ (25 : 2 = 12,5) bekommt einen eigenen
   Hinweis. Version `lerndax-v18`.
+- **Prüfung aller Erklär-Animationen** (Wunsch Auftraggeber, 11.11.2026, Version `lerndax-v19`): 14 von
+  20 Animationen zeigten nach einer falschen Antwort nur ein festes Beispiel statt der Aufgabe, manche
+  sogar den falschen Teil (Umfang-Aufgabe → Fläche, Stufenwinkel → Nebenwinkel, Vielfache → Quersumme).
+  Jetzt zeigt jede Animation die eigene Aufgabe und vorher ein ähnliches Beispiel (Liste in Abschnitt 3).
+  Außerdem: Einheiten-Satz „jede Stufe 10-mal“ korrigiert (1 km = 1000 m, Zeit Faktor 60), Dezimal-
+  Vorführung ohne „passt nicht in die Tafel“, Grammatik („Es bleibt 1 übrig“, „1 Teil“), Potenz-„Merke“
+  einheitlich („als Faktor vorkommt“), Schachbrett-Zahlen mit Leerzeichen statt Punkten, Preise in
+  Textaufgaben realistisch. Neue Techniken: `titleFor(ctx)` für passende Überschriften, `ex.alt` für
+  ähnliche Beispiele bei „Stimmt das?“, „Geschickt rechnen“ und „Potenzen vergleichen“.
+  Test `tests/prim.py` an die Auswahlaufgabe mit 4 Zahlen angepasst.

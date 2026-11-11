@@ -1,6 +1,8 @@
 /* Mathelix – Erklär-Animationen
  *
- * Jede Erklärung: { title, viewBox, create(api) → { reset(), play() } }
+ * Jede Erklärung: { title, titleFor?(ctx), viewBox, create(api, ctx) → { reset(), play() } }
+ *   ctx: das ex-Objekt der Aufgabe plus pre:true (ähnliches Beispiel zeigen) oder post:true (genau die Aufgabe);
+ *        leer, wenn die Erklärung ohne Aufgabe geöffnet wird
  *   reset(): baut die Startszene neu auf
  *   play():  async – spielt die Animation ab (api.wait / api.tw / api.say)
  * Regler und Auswahl-Chips legt create() über api.slider / api.chips an.
@@ -8,7 +10,7 @@
 (function () {
   const M = (window.Mathelix = window.Mathelix || {});
   const U = M.util;
-  const fr = U.fr, fmt = U.fmt, R = U.R, pick = U.pick;
+  const fr = U.fr, fmt = U.fmt, R = U.R, pick = U.pick, round6 = U.round6;
   const EX = (M.explainers = M.explainers || {});
   const NS = 'http://www.w3.org/2000/svg';
   const rad = (d) => (d * Math.PI) / 180;
@@ -50,74 +52,94 @@
   // =====================================================
   // Runden – Zahlenstrahl
   // =====================================================
+  //   ctx: { mode:'rund', n, p (10, 100, 1000 …), name ('Zehner' …) }, dazu pre/post
+  const PLACE = { 10: 'Zehner', 100: 'Hunderter', 1000: 'Tausender', 10000: 'Zehntausender', 100000: 'Hunderttausender' };
   reg('k5-runden', {
     title: 'Runden am Zahlenstrahl',
     viewBox: '0 0 360 170',
-    create(api) {
-      let B, n;
-      const X = (v) => 30 + (v - B) * 10;
-      const pickN = () => { B = 10 * R(3, 90); n = B + 10 + R(1, 9); };
-      pickN();
+    create(api, ctx) {
+      ctx = ctx || {};
+      // Gerechnet wird in „Einheiten“ u = p/10: ein Strich auf dem Zahlenstrahl ist u.
+      let B, n, u = 1, p = 10, name = 'Zehner';
+      const X = (v) => 30 + (v - B) * 10; // v in Einheiten
+      const isTask = ctx.mode === 'rund' && ctx.post;
+      function setN(num, place) {
+        p = place; u = p / 10; name = PLACE[p] || 'Zehner'; n = num;
+        B = Math.floor(n / p) * 10 - 10; // linker Rand: ein Block vor dem unteren Nachbarn
+      }
+      const pickN = () => setN(10 * R(4, 91) + R(1, 9), 10);
+      if (isTask) setN(ctx.n, ctx.p);
+      else if (ctx.mode === 'rund' && ctx.pre) {
+        // ähnliches Beispiel: gleiche Stelle, ähnlich große Zahl
+        const len = String(ctx.n).length; let m;
+        do m = R(10 ** (len - 1), 10 ** len - 1); while (m === ctx.n || m % ctx.p === 0);
+        setN(m, ctx.p);
+      } else pickN();
+      const lo = () => (B + 10) * u, hi = () => (B + 20) * u;
       let g;
       function scene() {
         api.clear();
         g = {};
+        api.sub(isTask ? 'Lösung zu deiner Aufgabe' : ctx.pre && ctx.mode === 'rund' ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
         el('line', { x1: 24, y1: 100, x2: 340, y2: 100, class: 'ray' }, api.svg);
         for (let v = B; v <= B + 30; v++) {
           const big = v % 10 === 0, mid = v % 5 === 0;
           el('line', { x1: X(v), y1: 100 - (big ? 12 : mid ? 8 : 5), x2: X(v), y2: 100 + (big ? 12 : mid ? 8 : 5), class: 'tk' }, api.svg);
-          if (big) el('text', { x: X(v), y: 132, class: 'ex-t', 'text-anchor': 'middle', text: v }, api.svg);
+          if (big) el('text', { x: X(v), y: 132, class: 'ex-t', 'text-anchor': 'middle', text: fmt(v * u) }, api.svg);
         }
         g.lo = el('circle', { cx: X(B + 10), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
         g.hi = el('circle', { cx: X(B + 20), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
         g.mid = el('g', { opacity: 0 }, api.svg);
         el('line', { x1: X(B + 15), y1: 72, x2: X(B + 15), y2: 116, class: 'dash' }, g.mid);
-        el('text', { x: X(B + 15), y: 150, class: 'ex-s', 'text-anchor': 'middle', text: 'Mitte ' + (B + 15) }, g.mid);
+        el('text', { x: X(B + 15), y: 150, class: 'ex-s', 'text-anchor': 'middle', text: 'Mitte ' + fmt((B + 15) * u) }, g.mid);
         g.dist = el('g', {}, api.svg);
         g.m = el('g', { opacity: 0 }, api.svg);
         el('line', { x1: 0, y1: 60, x2: 0, y2: 100, class: 'stem' }, g.m);
         el('circle', { cx: 0, cy: 100, r: 7, class: 'mk' }, g.m);
-        g.ml = el('text', { x: 0, y: 52, class: 'ex-b f1', 'text-anchor': 'middle', text: n }, g.m);
-        g.m.setAttribute('transform', `translate(${X(n)},0)`);
+        g.ml = el('text', { x: 0, y: 52, class: 'ex-b f1', 'text-anchor': 'middle', text: fmt(n) }, g.m);
+        g.m.setAttribute('transform', `translate(${X(n / u)},0)`);
       }
-      function dist(v, show) {
+      function dist(show) {
         g.dist.innerHTML = '';
         if (!show) return;
-        const d1 = v - (B + 10), d2 = B + 20 - v;
-        el('path', { d: `M ${X(B + 10)} 88 Q ${(X(B + 10) + X(v)) / 2} 70 ${X(v)} 88`, class: d1 < d2 ? 'arcG' : 'arcN' }, g.dist);
-        el('path', { d: `M ${X(v)} 88 Q ${(X(v) + X(B + 20)) / 2} 70 ${X(B + 20)} 88`, class: d2 <= d1 ? 'arcG' : 'arcN' }, g.dist);
-        el('text', { x: (X(B + 10) + X(v)) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: d1 }, g.dist);
-        el('text', { x: (X(v) + X(B + 20)) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: d2 }, g.dist);
+        const d1 = n - lo(), d2 = hi() - n, xv = X(n / u);
+        el('path', { d: `M ${X(B + 10)} 88 Q ${(X(B + 10) + xv) / 2} 70 ${xv} 88`, class: d1 < d2 ? 'arcG' : 'arcN' }, g.dist);
+        el('path', { d: `M ${xv} 88 Q ${(xv + X(B + 20)) / 2} 70 ${X(B + 20)} 88`, class: d2 <= d1 ? 'arcG' : 'arcN' }, g.dist);
+        el('text', { x: (X(B + 10) + xv) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: fmt(d1) }, g.dist);
+        el('text', { x: (xv + X(B + 20)) / 2, y: 74, class: 'ex-s', 'text-anchor': 'middle', text: fmt(d2) }, g.dist);
       }
-      function verdict(v) {
-        const up = v - B - 10 >= 5;
-        return `<b>${v}</b> liegt näher an <b>${up ? B + 20 : B + 10}</b>${v === B + 15 ? ' (genau in der Mitte: dann rundet man <b>auf</b>)' : ''} → ${up ? 'aufrunden' : 'abrunden'}: ${v} ≈ <b>${up ? B + 20 : B + 10}</b>`;
+      const up = () => n - lo() >= p / 2;
+      const digit = () => Math.floor(n / u) % 10;
+      function verdict() {
+        const t = up() ? hi() : lo();
+        return `<b>${fmt(n)}</b> liegt näher an <b>${fmt(t)}</b>${n - lo() === p / 2 ? ' (genau in der Mitte: dann rundet man <b>auf</b>)' : ''} → ${up() ? 'aufrunden' : 'abrunden'}: ${fmt(n)} ≈ <b>${fmt(t)}</b>`
+          + `<br><small>Kurz: Die Ziffer rechts neben der ${name}stelle ist <b>${digit()}</b> → ${digit() >= 5 ? '5 bis 9: aufrunden' : '0 bis 4: abrunden'}.</small>`;
       }
-      const sl = api.slider({ label: 'Zahl verschieben', min: 1, max: 19, value: n - B - 10, onInput(val) {
-        n = B + 10 + val; scene();
+      const sl = api.slider({ label: 'Zahl verschieben', min: 1, max: 19, value: Math.round(n / u) - B - 10, onInput(val) {
+        n = (B + 10 + val) * u; scene();
         g.m.setAttribute('opacity', 1); g.lo.setAttribute('opacity', 1); g.hi.setAttribute('opacity', 1); g.mid.setAttribute('opacity', 1);
-        dist(n, true);
-        api.say(verdict(n));
+        dist(true);
+        api.say(verdict());
       } });
       api.chips([{ label: 'Neue Zahl', onClick() { pickN(); sl.value = n - B - 10; api.replay(); } }]);
       return {
         reset: scene,
         async play() {
-          api.say(`Wo liegt <b>${n}</b> auf dem Zahlenstrahl?`);
-          await api.tw(700, (t) => { g.m.setAttribute('opacity', t); g.m.setAttribute('transform', `translate(${X(n)},${(1 - t) * -30})`); });
-          await api.wait(900);
-          api.say(`Die beiden Nachbar-Zehner sind <b>${B + 10}</b> und <b>${B + 20}</b>.`);
-          await api.tw(500, (t) => { g.lo.setAttribute('opacity', t); g.hi.setAttribute('opacity', t); });
+          api.say(`Runde <b>${fmt(n)}</b> auf ${name}. Wo liegt die Zahl auf dem Zahlenstrahl?${u > 1 ? `<br><small>Ein kleiner Strich bedeutet hier ${fmt(u)}.</small>` : ''}`);
+          await api.tw(700, (t) => { g.m.setAttribute('opacity', t); g.m.setAttribute('transform', `translate(${X(n / u)},${(1 - t) * -30})`); });
           await api.wait(1200);
-          api.say(`Genau in der Mitte liegt <b>${B + 15}</b>.`);
+          api.say(`Die beiden Nachbar-${name} sind <b>${fmt(lo())}</b> und <b>${fmt(hi())}</b>.`);
+          await api.tw(500, (t) => { g.lo.setAttribute('opacity', t); g.hi.setAttribute('opacity', t); });
+          await api.wait(1400);
+          api.say(`Genau in der Mitte liegt <b>${fmt((B + 15) * u)}</b>.`);
           await api.tw(500, (t) => g.mid.setAttribute('opacity', t));
           await api.wait(1200);
-          api.say(`Abstände zählen: zu ${B + 10} sind es ${n - B - 10}, zu ${B + 20} sind es ${B + 20 - n}.`);
-          dist(n, true);
+          api.say(`Abstände: zu ${fmt(lo())} sind es ${fmt(n - lo())}, zu ${fmt(hi())} sind es ${fmt(hi() - n)}.`);
+          dist(true);
           await api.wait(1800);
-          const target = n - B - 10 >= 5 ? B + 20 : B + 10;
-          api.say(verdict(n));
-          await api.tw(900, (t) => { g.m.setAttribute('transform', `translate(${lerp(X(n), X(target), t)},${-Math.sin(t * Math.PI) * 18})`); g.ml.textContent = t < 0.98 ? n : '≈ ' + target; });
+          const target = up() ? hi() : lo();
+          api.say(verdict());
+          await api.tw(900, (t) => { g.m.setAttribute('transform', `translate(${lerp(X(n / u), X(target / u), t)},${-Math.sin(t * Math.PI) * 18})`); g.ml.textContent = t < 0.98 ? fmt(n) : '≈ ' + fmt(target); });
         },
       };
     },
@@ -191,7 +213,7 @@
         const rest = dots.slice(bq * bd);
         const from = rest.map((c) => [+c.getAttribute('cx'), +c.getAttribute('cy')]);
         const yR = 34 + bq * 36 + 10;
-        api.say(`Es bleiben <b>${br}</b> übrig. Für eine volle Tüte reicht das nicht.`);
+        api.say(`Es ${br === 1 ? 'bleibt' : 'bleiben'} <b>${br}</b> übrig. Für eine volle Tüte reicht das nicht.`);
         rest.forEach((c) => c.setAttribute('class', 'candy rest'));
         await api.tw(600, (t) => rest.forEach((c, k) => { c.setAttribute('cx', lerp(from[k][0], 190 + k * 24, t)); c.setAttribute('cy', lerp(from[k][1], yR, t)); }));
         el('text', { x: 190 + br * 24, y: yR + 5, class: 'ex-s f1', text: 'Rest' }, api.svg);
@@ -292,14 +314,75 @@
   });
 
   // =====================================================
+  // Vielfache – gleich große Sprünge auf dem Zahlenstrahl
+  //   ctx: { mode:'vielf', kind:'nte'|'groesser'|'welche', d, k?, g?, opts? }, dazu pre/post
+  // =====================================================
+  function vielfache(api, ctx) {
+    const isTask = !!ctx.post;
+    let { kind, d, k, g, opts } = ctx;
+    if (ctx.pre) { // gleiche Art, andere Zahlen
+      let d2; do d2 = R(3, 12); while (d2 === d); d = d2;
+      if (kind === 'nte') k = R(4, 10);
+      if (kind === 'groesser') g = R(3, 9) * 10 + R(0, 9);
+      if (kind === 'welche') { const right = d * R(5, 12); opts = [right, right + R(1, d - 1), right - R(1, d - 1), right + d + R(1, d - 1)].filter((v, i, a) => a.indexOf(v) === i).sort((x, y) => x - y); }
+    }
+    // wie weit der Zahlenstrahl gehen muss
+    const goal = kind === 'nte' ? k * d : kind === 'groesser' ? (Math.floor(g / d) + 1) * d : Math.max(...opts);
+    const jumps = Math.ceil(goal / d) + (kind === 'welche' ? 0 : 0);
+    const maxV = Math.max(goal, jumps * d), X = (v) => 24 + (v / maxV) * 312, y = 150;
+    let marks;
+    return {
+      reset() {
+        api.clear(); marks = [];
+        api.sub(isTask ? 'Lösung zu deiner Aufgabe' : ctx.pre ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
+        el('line', { x1: 18, y1: y, x2: 342, y2: y, class: 'ray' }, api.svg);
+        el('line', { x1: X(0), y1: y - 8, x2: X(0), y2: y + 8, class: 'tk' }, api.svg);
+        el('text', { x: X(0), y: y + 26, class: 'ex-s', 'text-anchor': 'middle', text: '0' }, api.svg);
+        if (kind === 'groesser') {
+          el('line', { x1: X(g), y1: y - 40, x2: X(g), y2: y + 12, class: 'dash' }, api.svg);
+          el('text', { x: X(g), y: y - 46, class: 'ex-s f1', 'text-anchor': 'middle', text: g }, api.svg);
+        }
+        if (kind === 'welche') opts.forEach((v, i) => marks.push([v, el('text', { x: X(v), y: y + 46 + (i % 2) * 18, class: 'ex-s f6', 'text-anchor': 'middle', text: v }, api.svg), el('line', { x1: X(v), y1: y + 32 + (i % 2) * 18, x2: X(v), y2: y + 4, class: 'dash' }, api.svg)])); // abwechselnd hoch/tief, damit nichts überlappt
+      },
+      async play() {
+        const q = kind === 'nte' ? `Das <b>${k}. Vielfache</b> von ${d}` : kind === 'groesser' ? `Das kleinste Vielfache von ${d}, das <b>größer als ${g}</b> ist` : `Welche Zahl ist ein Vielfaches von ${d}?`;
+        api.say(`${q}${kind === 'welche' ? '' : '?'}<br><small>Vielfache von ${d} erreicht man mit lauter ${d}er-Sprüngen ab 0.</small>`);
+        await api.wait(2200);
+        const fast = jumps > 12;
+        for (let i = 1; i <= jumps; i++) {
+          const a = (i - 1) * d, b = i * d;
+          const pth = el('path', { d: `M ${X(a)} ${y} Q ${(X(a) + X(b)) / 2} ${y - Math.min(50, (X(b) - X(a)) * 0.8)} ${X(b)} ${y}`, class: 'jump' }, api.svg);
+          const L = pth.getTotalLength ? pth.getTotalLength() : 50;
+          pth.style.strokeDasharray = L; pth.style.strokeDashoffset = L;
+          await api.tw(fast ? 160 : 380, (t) => (pth.style.strokeDashoffset = L * (1 - t)));
+          el('line', { x1: X(b), y1: y - 6, x2: X(b), y2: y + 6, class: 'tk' }, api.svg);
+          if (!fast || i % 2 === 0 || i === jumps) el('text', { x: X(b), y: y + 26, class: 'ex-s', 'text-anchor': 'middle', style: jumps > 8 ? 'font-size:10px' : '', text: b }, api.svg);
+          if (kind === 'nte') api.say(`${i}. Sprung: ${i} · ${d} = <b>${b}</b>`);
+          if (kind === 'groesser' && b > g && a <= g) api.say(a === g ? `${a} ist genau ${g}, also <b>nicht</b> größer. Erst <b>${b}</b> ist größer!` : `${a} ist noch nicht größer als ${g}, aber <b>${b}</b> ist es!`);
+        }
+        await api.wait(900);
+        if (kind === 'nte') api.say(`Das ${k}. Vielfache von ${d} ist <b>${k} · ${d} = ${k * d}</b>.`);
+        else if (kind === 'groesser') api.say(`Das kleinste Vielfache von ${d}, das größer als ${g} ist: <b>${goal}</b>.<br><small>Rechnung: ${g} : ${d} = ${Math.floor(g / d)} Rest ${g % d}, also ${Math.floor(g / d) + 1} · ${d} = ${goal}.</small>`);
+        else {
+          const hit = opts.find((v) => v % d === 0);
+          marks.forEach(([v, t, l]) => { const ok = v % d === 0; t.setAttribute('class', 'ex-s ' + (ok ? 'f3' : 'f6')); l.setAttribute('class', ok ? 'stem' : 'dash'); });
+          api.say(`Nur <b>${hit}</b> wird von einem Sprung getroffen: ${hit} = ${hit / d} · ${d}.<br><small>Die anderen liegen zwischen zwei Sprüngen, beim Teilen durch ${d} bleibt ein Rest.</small>`);
+        }
+      },
+    };
+  }
+
+  // =====================================================
   // Teilbarkeit – Regeln sichtbar machen & Teiler-Paare
   //   ctx: { mode:'teil', n, d } | { mode:'teiler', n }, dazu pre/post
   // =====================================================
   reg('k5-teilbar', {
     title: 'Teilbarkeit: Regeln und Teiler',
+    titleFor: (ctx) => (ctx && ctx.mode === 'vielf' ? 'Vielfache: Sprünge auf dem Zahlenstrahl' : 'Teilbarkeit: Regeln und Teiler'),
     viewBox: '0 0 360 240',
     create(api, ctx) {
       ctx = ctx || {};
+      if (ctx.mode === 'vielf') return vielfache(api, ctx);
       const TEILER_N = [12, 16, 18, 20, 24, 28, 30, 32, 36, 40, 42, 45, 48, 50, 54, 56, 60, 64, 72];
       let task = null;
       if ((ctx.mode === 'teil' || ctx.mode === 'teiler') && (ctx.pre || ctx.post)) {
@@ -604,10 +687,41 @@
   // =====================================================
   // Potenzen – Basis/Exponent, Verdoppeln, Zehnerpotenzen, Sonderfälle, Quadratzahlen
   // =====================================================
+  // Zwei Potenzen vergleichen: beide als Malaufgabe schreiben und ausrechnen
+  //   ctx: { mode:'vgl', b1, e1, b2, e2, alt }, dazu pre/post
+  function potVgl(api, ctx) {
+    const { b1, e1, b2, e2 } = ctx, A = b1 ** e1, B = b2 ** e2;
+    const supTxt = (e) => String(e).split('').map((c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('');
+    const prodTxt = (b, e) => (e <= 6 ? Array(e).fill(b).join(' · ') : `${b} · ${b} · … · ${b} (${e}-mal)`);
+    let L, Rr, Lv, Rv, mid;
+    return {
+      reset() {
+        api.clear();
+        api.sub(ctx.post ? 'Lösung zu deiner Aufgabe' : ctx.pre ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
+        const T = (x, y, t, cls) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': 'middle', text: t }, api.svg);
+        T(95, 50, `${b1}${supTxt(e1)}`, 'vexpr'); T(265, 50, `${b2}${supTxt(e2)}`, 'vexpr');
+        el('line', { x1: 180, y1: 30, x2: 180, y2: 200, class: 'dash' }, api.svg);
+        L = T(95, 100, '', 'ex-s'); Rr = T(265, 100, '', 'ex-s');
+        Lv = T(95, 150, '', 'vexpr'); Rv = T(265, 150, '', 'vexpr'); mid = T(180, 156, '', 'vexpr');
+      },
+      async play() {
+        api.say(`Was ist größer: <b>${b1}${supTxt(e1)}</b> oder <b>${b2}${supTxt(e2)}</b>? Die Zahlen sind dieselben, nur vertauscht. Ausrechnen hilft!`);
+        await api.wait(2400);
+        L.textContent = prodTxt(b1, e1); api.say(`${b1}${supTxt(e1)}: Die ${b1} kommt <b>${e1}-mal</b> als Faktor vor.`); await api.wait(2000);
+        Lv.textContent = `= ${fmt(A)}`; await api.wait(1400);
+        Rr.textContent = prodTxt(b2, e2); api.say(`${b2}${supTxt(e2)}: Die ${b2} kommt <b>${e2}-mal</b> als Faktor vor.`); await api.wait(2000);
+        Rv.textContent = `= ${fmt(B)}`; await api.wait(1400);
+        mid.textContent = A > B ? '>' : A < B ? '<' : '=';
+        api.say(A === B ? `Beide ergeben <b>${fmt(A)}</b>: gleich groß! <small>(Das ist ein seltener Zufall.)</small>` : `${fmt(Math.max(A, B))} ist größer als ${fmt(Math.min(A, B))}: <b>${A > B ? `${b1}${supTxt(e1)}` : `${b2}${supTxt(e2)}`}</b> ist größer.<br><small>Vertauschen ist bei Potenzen <b>nicht</b> erlaubt.</small>`);
+      },
+    };
+  }
+
   reg('k5-potenz', {
     title: 'Potenzen: wie oft malnehmen?',
     viewBox: '0 0 360 230',
     create(api, ctx) {
+      if (ctx && ctx.mode === 'vgl') return potVgl(api, ctx.pre && ctx.alt ? Object.assign({}, ctx.alt, { pre: true }) : ctx);
       // Teile: grund · zwei · zehn · sonder · quad; 'alle' spielt sie nacheinander
       //   ctx: { mode:'pow', b, e } | { mode:'zehn', k, a? } | { mode:'quad', n }, dazu pre/post
       ctx = ctx || {};
@@ -811,7 +925,7 @@
           if (mode === 'alle') {
             await grund(); await zwei(); await zehn(); await sonder();
             showSl(true); await quad();
-            api.say('<b>Merke:</b> Der Exponent zählt, <b>wie oft</b> die Basis malgenommen wird. <small>2⁵ = 32 · 10³ = 1 000 · 7¹ = 7 · 1⁵ = 1 · 4² = 16</small>');
+            api.say('<b>Merke:</b> Der Exponent zählt, <b>wie oft</b> die Basis als Faktor vorkommt. <small>2⁵ = 32 · 10³ = 1 000 · 7¹ = 7 · 1⁵ = 1 · 4² = 16</small>');
             return;
           }
           if (task) {
@@ -825,98 +939,146 @@
     },
   });
 
+  // Untertitel für Beispiel vorher / Lösung nachher (gemeinsam für alle Erklärungen)
+  const subFor = (api, ctx, mode, isTask) => api.sub(isTask ? 'Lösung zu deiner Aufgabe' : ctx && ctx.pre && ctx.mode === mode ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
+
   // =====================================================
   // Anteile – Bonbons gerecht aufteilen
+  //   ctx: { mode:'anteil', z, d, k, unit, unitVon }, dazu pre/post
   // =====================================================
   reg('k5-anteil', {
     title: 'Anteile berechnen',
     viewBox: '0 0 360 230',
-    create(api) {
-      let d, k, z, items;
-      const pickN = () => { d = R(3, 5); k = R(2, 5); z = R(1, d - 1); };
-      pickN();
+    create(api, ctx) {
+      ctx = ctx || {};
+      let d, k, z, unit = '', unitVon = '', items;
+      const isTask = ctx.mode === 'anteil' && ctx.post;
+      const pickN = () => { d = R(3, 5); k = R(2, 5); z = R(1, d - 1); unit = unitVon = ''; };
+      if (isTask) ({ d, k, z } = ctx), (unit = ctx.unit || ''), (unitVon = ctx.unitVon || '');
+      else if (ctx.mode === 'anteil' && ctx.pre) {
+        do { d = R(2, 10); z = R(1, d - 1); k = R(2, Math.min(12, Math.max(3, ctx.k))); } while (d === ctx.d && z === ctx.z);
+        unit = ctx.unit || ''; unitVon = ctx.unitVon || '';
+      } else pickN();
       api.chips([{ label: 'Neue Aufgabe', onClick() { pickN(); api.replay(); } }]);
+      // Maße passend zur Anzahl: bis zu 10 Teile mit je bis zu 12 Bonbons
+      const geo = () => {
+        const tot = d * k, perRow = Math.min(tot, Math.ceil(Math.sqrt(tot * 1.8))), sp = Math.min(28, 300 / perRow);
+        const colW = 300 / d, rs = Math.min(26, 170 / k), r = Math.max(3, Math.min(10, sp / 2 - 2, colW / 2 - 4, rs / 2 - 2));
+        return { tot, perRow, sp, colW, rs, r };
+      };
       return {
         reset() {
           api.clear(); items = [];
-          const tot = d * k;
-          for (let i = 0; i < tot; i++) items.push(el('circle', { cx: 40 + (i % 10) * 28, cy: 30 + Math.floor(i / 10) * 28, r: 10, class: 'candy', opacity: 0 }, api.svg));
+          subFor(api, ctx, 'anteil', isTask);
+          const G = geo();
+          for (let i = 0; i < G.tot; i++) items.push(el('circle', { cx: 30 + G.sp / 2 + (i % G.perRow) * G.sp, cy: 30 + Math.floor(i / G.perRow) * G.sp, r: G.r, class: 'candy', opacity: 0 }, api.svg));
         },
         async play() {
-          const tot = d * k, colW = 300 / d;
-          api.say(`Wie viel sind ${fr(z, d)} von <b>${tot}</b>?`);
-          for (const c of items) { c.setAttribute('opacity', 1); await api.wait(35); }
+          const G = geo(), tot = G.tot;
+          api.say(`Wie viel sind ${fr(z, d)} von <b>${tot}${unitVon}</b>?${unit ? `<br><small>Jeder Punkt steht für 1${unit === ' Kinder' ? ' Kind' : unit}.</small>` : ''}`);
+          for (const c of items) { c.setAttribute('opacity', 1); await api.wait(Math.max(8, 35 - tot / 4)); }
           await api.wait(900);
           api.say(`Der Nenner ${d} sagt: in <b>${d} gleich große Teile</b> aufteilen.`);
           const frames = [];
-          for (let gI = 0; gI < d; gI++) frames.push(api.svg.insertBefore(el('rect', { x: 30 + gI * colW + 4, y: 90, width: colW - 8, height: k * 26 + 14, rx: 10, class: 'bag', opacity: 0 }), items[0]));
+          for (let gI = 0; gI < d; gI++) frames.push(api.svg.insertBefore(el('rect', { x: 30 + gI * G.colW + 3, y: 18, width: G.colW - 6, height: k * G.rs + 12, rx: Math.min(10, G.colW / 4), class: 'bag', opacity: 0 }), items[0]));
           await api.tw(400, (t) => frames.forEach((f) => f.setAttribute('opacity', t)));
           const from = items.map((c) => [+c.getAttribute('cx'), +c.getAttribute('cy')]);
           await api.tw(1100, (t) => items.forEach((c, i) => {
             const gI = i % d, row = Math.floor(i / d);
-            c.setAttribute('cx', lerp(from[i][0], 30 + gI * colW + colW / 2, t));
-            c.setAttribute('cy', lerp(from[i][1], 104 + row * 26, t));
+            c.setAttribute('cx', lerp(from[i][0], 30 + gI * G.colW + G.colW / 2, t));
+            c.setAttribute('cy', lerp(from[i][1], 24 + G.rs / 2 + row * G.rs, t));
           }));
-          api.say(`${tot} : ${d} = <b>${k}</b>. Ein Teil (${fr(1, d)}) sind ${k}.`);
+          api.say(`${tot} : ${d} = <b>${k}</b>. Ein Teil (${fr(1, d)}) sind ${k}${unit}.`);
           await api.wait(1800);
-          api.say(`Der Zähler ${z} sagt: <b>${z} Teile</b> davon nehmen.`);
+          api.say(`Der Zähler ${z} sagt: <b>${z} ${z === 1 ? 'Teil' : 'Teile'}</b> davon nehmen.`);
           items.forEach((c, i) => { if (i % d < z) c.setAttribute('class', 'candy take'); });
           frames.forEach((f, gI) => { if (gI < z) f.setAttribute('class', 'bag take'); });
           await api.wait(1500);
-          api.say(`${fr(z, d)} von ${tot} = ${z} · ${k} = <b>${z * k}</b>`);
+          api.say(`${fr(z, d)} von ${tot}${unitVon} = ${z} · ${k}${unit} = <b>${z * k}${unit}</b><br><small>Erst durch den Nenner teilen, dann mit dem Zähler malnehmen.</small>`);
         },
       };
     },
   });
 
   // =====================================================
-  // Erweitern & Kürzen – feiner unterteilen
+  // Erweitern & Kürzen – feiner unterteilen / zusammenfassen
+  //   ctx: { mode:'erw', p, q, k } | { mode:'kuerz', p, q, k } (p/q ist der gekürzte Bruch), dazu pre/post
+  //   Unechte Brüche (z. B. 5/2) werden mit mehreren Rechtecken gezeigt.
   // =====================================================
-  reg(['k5-erweitern', 'k5-kuerzen'], {
-    title: 'Erweitern & Kürzen',
-    viewBox: '0 0 360 190',
-    create(api) {
-      let p, q, k = 1, hl = [];
-      const pickN = () => { q = R(2, 5); p = R(1, q - 1); };
-      pickN();
-      const x0 = 50, y0 = 20, W = 260, H = 130;
-      function scene() {
-        api.clear(); hl = [];
-        for (let i = 0; i < q; i++) el('rect', { x: x0 + (i * W) / q, y: y0, width: W / q, height: H, class: i < p ? 'cellOn' : 'cellOff' }, api.svg);
-        for (let i = 1; i < q; i++) el('line', { x1: x0 + (i * W) / q, y1: y0, x2: x0 + (i * W) / q, y2: y0 + H, class: 'div' }, api.svg);
-        el('rect', { x: x0, y: y0, width: W, height: H, class: 'frame' }, api.svg);
-        for (let j = 1; j < 6; j++) hl.push(el('line', { x1: x0, y1: y0, x2: x0, y2: y0, class: 'div2', opacity: 0 }, api.svg));
-        setK(k, 1);
-      }
-      function setK(kk, t) {
-        hl.forEach((l, j) => {
-          if (j + 1 < kk) { const y = y0 + ((j + 1) * H) / kk; l.setAttribute('y1', y); l.setAttribute('y2', y); l.setAttribute('x2', x0 + W * t); l.setAttribute('opacity', 1); }
-          else l.setAttribute('opacity', 0);
-        });
-      }
-      const say = (kk) => api.say(`${fr(p, q)} = ${fr(p * kk, q * kk)}` + (kk > 1 ? `  → mit <b>${kk}</b> erweitert. Gleiche Fläche, nur feiner unterteilt!` : '  → Ausgangsbruch'));
-      const sl = api.slider({ label: 'Erweitern mit', min: 1, max: 6, value: 1, onInput(v) { k = v; scene(); say(v); } });
-      api.chips([{ label: 'Anderer Bruch', onClick() { pickN(); k = 1; sl.value = 1; api.replay(); } }]);
-      return {
-        reset() { k = 1; sl.value = 1; scene(); },
-        async play() {
-          api.say(`Die blaue Fläche ist ${fr(p, q)} vom Rechteck.`);
-          await api.wait(1600);
-          for (const kk of [2, 3, 4]) {
-            k = kk; sl.value = kk;
-            scene(); setK(kk, 0);
-            await api.tw(700, (t) => setK(kk, t));
-            say(kk);
-            await api.wait(1900);
+  function bruchErklaerung(kind) {
+    return {
+      title: kind === 'kuerz' ? 'Kürzen: Kästchen zusammenfassen' : 'Erweitern: feiner unterteilen',
+      viewBox: '0 0 360 190',
+      create(api, ctx) {
+        ctx = ctx || {};
+        let p, q, kT = 3, k = 1, hl = [];
+        const isTask = ctx.mode === kind && ctx.post;
+        const pickN = () => { q = R(2, 5); p = R(1, q - 1); kT = kind === 'kuerz' ? R(2, 4) : 3; };
+        if (isTask) ({ p, q } = ctx), (kT = ctx.k);
+        else if (ctx.mode === kind && ctx.pre) {
+          do { q = R(2, 6); p = R(1, q - 1); } while (U.gcd(p, q) !== 1 || (p === ctx.p && q === ctx.q));
+          kT = R(2, 5);
+        } else pickN();
+        const m = () => Math.max(1, Math.ceil(p / q)); // Anzahl Rechtecke (unechte Brüche)
+        const y0 = 20, H = 130;
+        const geo = () => { const gap = 10, W = (300 - (m() - 1) * gap) / m(); return { gap, W, x: (i) => 30 + i * (W + gap) }; };
+        function scene() {
+          api.clear(); hl = [];
+          const G = geo();
+          for (let r = 0; r < m(); r++) {
+            for (let i = 0; i < q; i++) el('rect', { x: G.x(r) + (i * G.W) / q, y: y0, width: G.W / q, height: H, class: r * q + i < p ? 'cellOn' : 'cellOff' }, api.svg);
+            for (let i = 1; i < q; i++) el('line', { x1: G.x(r) + (i * G.W) / q, y1: y0, x2: G.x(r) + (i * G.W) / q, y2: y0 + H, class: 'div' }, api.svg);
+            el('rect', { x: G.x(r), y: y0, width: G.W, height: H, class: 'frame' }, api.svg);
           }
-          api.say(`Erweitern: Zähler <b>und</b> Nenner mit derselben Zahl malnehmen.<br>Kürzen ist der Rückweg: Linien weg, durch dieselbe Zahl teilen: ${fr(p * 4, q * 4)} = ${fr(p, q)}`);
-          await api.wait(1200);
-          await api.tw(900, (t) => setK(4, 1 - t));
-          k = 1; sl.value = 1;
-        },
-      };
-    },
-  });
+          for (let j = 1; j < 12; j++) hl.push(Array.from({ length: m() }, (_, r) => el('line', { x1: G.x(r), y1: y0, x2: G.x(r), y2: y0, class: 'div2', opacity: 0 }, api.svg)));
+          setK(k, 1);
+          subFor(api, ctx, kind, isTask);
+        }
+        function setK(kk, t) {
+          const G = geo();
+          hl.forEach((ls, j) => ls.forEach((l, r) => {
+            if (j + 1 < kk) { const y = y0 + ((j + 1) * H) / kk; l.setAttribute('y1', y); l.setAttribute('y2', y); l.setAttribute('x1', G.x(r)); l.setAttribute('x2', G.x(r) + G.W * t); l.setAttribute('opacity', 1); }
+            else l.setAttribute('opacity', 0);
+          }));
+        }
+        const ganz = () => (m() > 1 ? `<br><small>Ein Rechteck ist ein Ganzes. ${fr(p, q)} ist mehr als ein Ganzes, darum ${m()} Rechtecke.</small>` : '');
+        const sl = api.slider({ label: kind === 'kuerz' ? 'Unterteilen in' : 'Erweitern mit', min: 1, max: Math.max(6, kT), value: 1, onInput(v) { k = v; scene(); api.say(`${fr(p, q)} = ${fr(p * v, q * v)}`); } });
+        api.chips([{ label: 'Anderer Bruch', onClick() { pickN(); k = 1; sl.value = 1; api.replay(); } }]);
+        async function playErw() {
+          k = 1; scene();
+          api.say(`Die blaue Fläche ist ${fr(p, q)}.${ganz()}`);
+          await api.wait(1800);
+          const list = isTask ? [kT] : ctx.pre ? [2, kT] : [2, 3, 4];
+          for (const kk of list) {
+            k = kk; sl.value = kk; scene(); setK(kk, 0);
+            await api.tw(800, (t) => setK(kk, t));
+            api.say(`Jedes Stück wird in <b>${kk}</b> Teile geschnitten:<br>${fr(p, q)} = ${fr(`${p} · ${kk}`, `${q} · ${kk}`)} = ${fr(p * kk, q * kk)}`);
+            await api.wait(2200);
+          }
+          api.say(`${fr(p, q)} = <b>${fr(p * k, q * k)}</b>: gleiche Fläche, nur feiner unterteilt.<br><small>Erweitern: Zähler <b>und</b> Nenner mit derselben Zahl malnehmen.</small>`);
+        }
+        async function playKuerz() {
+          k = kT; sl.value = kT; scene();
+          const n = p * kT, dd = q * kT;
+          api.say(p <= q ? `${fr(n, dd)}: ${n} von ${dd} gleich großen Kästchen sind blau.` : `${fr(n, dd)}: Ein Ganzes hat ${dd} Kästchen. Blau sind ${n} Kästchen, also mehr als ein Ganzes.${ganz()}`);
+          await api.wait(2200);
+          api.say(`Zähler und Nenner sind beide durch <b>${kT}</b> teilbar. Je ${kT} Kästchen übereinander fassen wir zusammen …`);
+          await api.wait(1600);
+          await api.tw(1000, (t) => setK(kT, 1 - t));
+          k = 1;
+          api.say(`${fr(n, dd)} = ${fr(`${n} : ${kT}`, `${dd} : ${kT}`)} = <b>${fr(p, q)}</b>: dieselbe Fläche mit weniger, größeren Stücken.`);
+          await api.wait(2400);
+          api.say(`Vollständig gekürzt heißt: Zähler und Nenner haben keinen gemeinsamen Teiler mehr (außer 1).<br><small>Am schnellsten geht es mit dem größten gemeinsamen Teiler (ggT), hier ${kT}. Schrittweise geht auch, z. B. erst durch 2, dann weiter.</small>`);
+        }
+        return {
+          reset() { k = kind === 'kuerz' ? kT : 1; sl.value = k; scene(); },
+          play: () => (kind === 'kuerz' ? playKuerz() : playErw()),
+        };
+      },
+    };
+  }
+  reg('k5-erweitern', bruchErklaerung('erw'));
+  reg('k5-kuerzen', bruchErklaerung('kuerz'));
 
   // =====================================================
   // Bruch · Dezimal · Prozent – Hundertertafel
@@ -973,62 +1135,215 @@
   // =====================================================
   // Dezimalzahlen · 10 – Stellenwerttafel
   // =====================================================
+  //   ctx: { mode:'zehn', a, k (±1…3) } · { mode:'add'|'sub', a, b (in Hundertsteln) } · { mode:'mul', a (Hundertstel), k }
+  //        · { mode:'cmp', A, B, frac:[p,q]|null } (für „Zahlen vergleichen“), dazu pre/post
+  const STELLEN = { 7: 'ZM', 6: 'M', 5: 'HT', 4: 'ZT', 3: 'T', 2: 'H', 1: 'Z', 0: 'E', '-1': 'z', '-2': 'h', '-3': 't', '-4': 'zt', '-5': 'ht' };
+  // Ziffern einer Zahl als {Stelle: Ziffer}, z. B. 3,47 → {0:3, -1:4, -2:7}
+  function digitsOf(x, minDec) {
+    const [i, d = ''] = fmt(x).replace(/\s| /g, '').replace('−', '').split(',');
+    const out = {};
+    i.split('').reverse().forEach((c, k) => (out[k] = +c));
+    d.padEnd(minDec || 0, '0').split('').forEach((c, k) => (out[-(k + 1)] = +c));
+    return out;
+  }
   reg('k5-dezimal', {
-    title: 'Mal 10 – das Komma bleibt, die Ziffern wandern',
+    title: 'Dezimalzahlen',
+    titleFor: (ctx) => (ctx && /add|sub/.test(ctx.mode) ? 'Komma unter Komma' : ctx && ctx.mode === 'mul' ? 'Mal rechnen mit Komma' : ctx && ctx.mode === 'cmp' ? 'Zahlen vergleichen in der Stellenwerttafel' : 'Mal 10 – das Komma bleibt, die Ziffern wandern'),
     viewBox: '0 0 360 150',
-    create(api) {
-      const heads = ['T', 'H', 'Z', 'E', 'z', 'h', 't'];
-      const colX = (e) => 30 + (3 - e) * 44 + 22 + (e < 0 ? 10 : 0); // e: 3..-3
-      let digits; // {e: ziffer}
-      const starts = ['3,47', '12,5', '0,86', '4,06', '25,3', '7,125'];
-      const setNum = (s) => { digits = {}; const [i, d = ''] = s.split(','); i.split('').reverse().forEach((c, k) => (digits[k] = +c)); d.split('').forEach((c, k) => (digits[-(k + 1)] = +c)); };
-      setNum(pick(starts));
-      let texts = {};
-      const val = () => Object.entries(digits).reduce((s, [e, v]) => s + v * 10 ** e, 0);
-      function fill() {
-        const es = Object.keys(digits).map(Number);
-        const lo = Math.min(0, ...es), hi = Math.max(0, ...es);
-        for (let e = lo; e <= hi; e++) if (!(e in digits)) digits[e] = 0;
-        // führende Nullen links vom E und Endnullen rechts vom Komma entfernen
-        for (let e = hi; e > 0 && digits[e] === 0; e--) delete digits[e];
-        for (let e = Math.min(...Object.keys(digits).map(Number)); e < 0 && digits[e] === 0; e++) delete digits[e];
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = /^(zehn|add|sub|mul|cmp)$/.test(ctx.mode) ? ctx.mode : 'zehn';
+      const isTask = !!ctx.post && mode === ctx.mode;
+      const sub = () => subFor(api, ctx, ctx.mode, isTask);
+      // ---------------- Stellenwerttafel: · 10, : 10 ----------------
+      if (mode === 'zehn') {
+        let EMAX = 3, EMIN = -3, digits, texts = {}, num, demoK;
+        const starts = ['3,47', '12,5', '0,86', '4,06', '25,3', '7,15']; // Vorführung · 10, dann : 100 muss in die Tafel passen
+        const setNum = (x) => { num = x; digits = digitsOf(x); };
+        if (ctx.mode === 'zehn' && (ctx.post || ctx.pre)) {
+          let x = ctx.a, k = ctx.k;
+          if (ctx.pre) { // ähnliches Beispiel: andere Zahl, gleiche Rechenart
+            do x = R(1, 9999) / 10 ** R(0, 2); while (x === ctx.a);
+          }
+          setNum(x); demoK = k;
+          const r1 = Object.keys(digitsOf(x)).map(Number), r2 = Object.keys(digitsOf(round6(k > 0 ? x * 10 ** k : x / 10 ** -k))).map(Number);
+          EMAX = Math.max(1, ...r1, ...r2); EMIN = Math.min(-1, ...r1, ...r2);
+        } else setNum(+pick(starts).replace(',', '.'));
+        const cols = () => EMAX - EMIN + 1, cw = () => Math.min(44, 300 / cols());
+        const colX = (e) => 30 + (EMAX - e) * cw() + cw() / 2 + (e < 0 ? 6 : 0);
+        const val = () => round6(Object.entries(digits).reduce((s, [e, v]) => s + v * 10 ** e, 0));
+        function scene() {
+          api.clear(); texts = {}; sub();
+          for (let e = EMAX; e >= EMIN; e--) {
+            el('rect', { x: colX(e) - cw() / 2, y: 10, width: cw(), height: 110, class: e >= 0 ? 'col' : 'col dec' }, api.svg);
+            el('text', { x: colX(e), y: 30, class: 'ex-s', 'text-anchor': 'middle', text: STELLEN[e], style: cw() < 30 ? 'font-size:11px' : '' }, api.svg);
+          }
+          el('circle', { cx: colX(0) + cw() / 2 + 3, cy: 92, r: 4, class: 'comma' }, api.svg);
+          for (const e in digits) texts[e] = el('text', { x: colX(+e), y: 90, class: 'dig', 'text-anchor': 'middle', text: digits[e], style: cw() < 36 ? `font-size:${Math.round(cw() * 0.75)}px` : '' }, api.svg);
+          api.say(`Zahl: <b>${fmt(val())}</b>`);
+        }
+        async function shift(k) {
+          const keys = Object.keys(digits).map(Number);
+          if (keys.some((e) => e + k > EMAX || e + k < EMIN)) { api.say('Das passt nicht mehr in die Tafel. Probier eine andere Richtung!'); return; }
+          const before = fmt(val());
+          await api.tw(800, (t) => keys.forEach((e) => texts[e].setAttribute('x', lerp(colX(e), colX(e + k), t))));
+          digits = digitsOf(round6(k > 0 ? val() * 10 ** k : val() / 10 ** -k));
+          scene();
+          const op = k > 0 ? '·' : ':', pw = 10 ** Math.abs(k);
+          api.say(`${before} ${op} ${fmt(pw)} = <b>${fmt(val())}</b><br>Jede Ziffer rückt ${Math.abs(k)} Stelle${Math.abs(k) > 1 ? 'n' : ''} nach <b>${k > 0 ? 'links' : 'rechts'}</b>, das Komma bleibt stehen.${Object.keys(digits).some((e) => +e < 0) || k < 0 ? '' : '<br><small>Leere Stellen vor dem Komma werden mit 0 gefüllt.</small>'}`);
+        }
+        const run = (k) => { api.stop(); api.run(() => shift(k)); };
+        api.chips([
+          { label: '· 10', onClick: () => run(1) }, { label: '· 100', onClick: () => run(2) },
+          { label: ': 10', onClick: () => run(-1) }, { label: ': 100', onClick: () => run(-2) },
+          { label: 'Neue Zahl', onClick() { EMAX = 3; EMIN = -3; setNum(+pick(starts).replace(',', '.')); api.stop(); scene(); } },
+        ]);
+        return {
+          reset() { if (demoK !== undefined) setNum(num); scene(); },
+          async play() {
+            await api.wait(1400);
+            if (demoK !== undefined) {
+              api.say(`${fmt(num)} ${demoK > 0 ? '·' : ':'} ${fmt(10 ** Math.abs(demoK))}: Die Ziffern rücken um <b>${Math.abs(demoK)}</b> Stelle${Math.abs(demoK) > 1 ? 'n' : ''} nach <b>${demoK > 0 ? 'links' : 'rechts'}</b>.<br><small>So viele Nullen hat ${fmt(10 ** Math.abs(demoK))}.</small>`);
+              await api.wait(2400);
+              await shift(demoK);
+              return;
+            }
+            await shift(1);
+            await api.wait(2400);
+            await shift(-2);
+            await api.wait(2400);
+            api.say('Jetzt du: Tippe unten auf <b>· 10</b>, <b>: 10</b> …');
+          },
+        };
       }
+      // ---------------- Zahlen vergleichen: Stelle für Stelle ----------------
+      if (mode === 'cmp') {
+        let A = ctx.A, B = ctx.B, frac = ctx.frac;
+        if (ctx.pre || !ctx.post) { // ähnliches Beispiel
+          const base = R(1, 9) / 10 + R(0, 9) / 100;
+          A = round6(base); B = round6(pick([base + 0.005, base - 0.005, Math.floor(base * 10) / 10 + 0.09, base + 0.01]));
+          frac = null;
+        }
+        const dec = Math.max(1, ...[A, B].map((x) => (String(round6(x)).split('.')[1] || '').length));
+        const dA = digitsOf(A, dec), dB = digitsOf(B, dec);
+        const EMAX = Math.max(0, ...Object.keys(dA).map(Number), ...Object.keys(dB).map(Number)), EMIN = -dec;
+        const cw = Math.min(44, 280 / (EMAX - EMIN + 1));
+        const colX = (e) => 50 + (EMAX - e) * cw + cw / 2 + (e < 0 ? 6 : 0);
+        let marks = [];
+        function scene() {
+          api.clear(); sub(); marks = [];
+          for (let e = EMAX; e >= EMIN; e--) {
+            el('rect', { x: colX(e) - cw / 2, y: 6, width: cw, height: 136, class: e >= 0 ? 'col' : 'col dec' }, api.svg);
+            el('text', { x: colX(e), y: 24, class: 'ex-s', 'text-anchor': 'middle', text: STELLEN[e] }, api.svg);
+            marks[e] = el('rect', { x: colX(e) - cw / 2 + 2, y: 34, width: cw - 4, height: 100, rx: 6, class: 'hl2', opacity: 0 }, api.svg);
+          }
+          [[dA, 70, 'A'], [dB, 120, 'B']].forEach(([d, y, n]) => {
+            el('text', { x: 22, y, class: 'ex-b f2', 'text-anchor': 'middle', text: n }, api.svg);
+            el('circle', { cx: colX(0) + cw / 2 + 3, cy: y, r: 3.5, class: 'comma' }, api.svg);
+            for (const e in d) el('text', { x: colX(+e), y, class: 'dig', 'text-anchor': 'middle', style: 'font-size:26px', text: d[e] }, api.svg);
+          });
+        }
+        return {
+          reset: scene,
+          async play() {
+            if (frac) {
+              api.say(`Zuerst den Bruch als Dezimalzahl schreiben: ${fr(frac[0], frac[1])} = <b>${fmt(A)}</b>`);
+              await api.wait(2400);
+            }
+            api.say(`A = ${fmt(A)}, B = ${fmt(B)}. Wir schreiben beide in die Stellenwerttafel${dec > 1 ? ' und füllen fehlende Stellen mit 0 auf' : ''}.`);
+            await api.wait(2400);
+            for (let e = EMAX; e >= EMIN; e--) {
+              const a = dA[e] || 0, b = dB[e] || 0;
+              await api.tw(300, (t) => marks[e].setAttribute('opacity', t));
+              if (a === b) { api.say(`${STELLEN[e]}: beide <b>${a}</b> → gleich, weiter zur nächsten Stelle.`); await api.wait(1300); marks[e].setAttribute('opacity', 0.25); continue; }
+              api.say(`${STELLEN[e]}: <b>${a}</b> und <b>${b}</b> → hier entscheidet es sich!<br><b>${fmt(a > b ? A : B)}</b> ist größer.`);
+              return;
+            }
+            api.say(`Alle Stellen gleich: <b>Beide Zahlen sind gleich groß.</b><br><small>Nullen am Ende hinter dem Komma ändern nichts: 0,5 = 0,50.</small>`);
+          },
+        };
+      }
+      // ---------------- Schriftlich: Komma unter Komma (+, −) und mal einstellig ----------------
+      let a, b, k;
+      if (isTask) ({ a, b, k } = ctx);
+      else if (ctx.pre) {
+        if (mode === 'mul') { do a = R(105, 999); while (a % 10 === 0); k = R(2, 9); }
+        else { a = R(105, 9999); b = R(11, 999); if (Math.random() < 0.5) b = Math.round(b / 10) * 10; if (mode === 'sub' && b > a) [a, b] = [b, a]; }
+      }
+      const res = mode === 'add' ? a + b : mode === 'sub' ? a - b : a * k;
+      const f2 = (n) => { const t = fmt(n / 100); return t.includes(',') ? (t.split(',')[1].length < 2 ? t + '0' : t) : t + ',00'; }; // immer zwei Nachkommastellen (Geld)
+      const D = (n) => digitsOf(n / 100, 2); // immer zwei Nachkommastellen
+      const dA = D(a), dB = mode === 'mul' ? null : D(b), dR = D(res);
+      const EMAX = Math.max(0, ...Object.keys(dR).map(Number), ...Object.keys(dA).map(Number)), EMIN = -2;
+      const cw = 30, colX = (e) => 200 - (e - EMIN) * cw + (e < 0 ? 0 : -8);
+      const commaX = colX(0) + cw / 2 - 2;
+      let resT = {}, carryT = {}, padT = [];
       function scene() {
-        api.clear(); texts = {};
-        heads.forEach((h, i) => {
-          const e = 3 - i;
-          el('rect', { x: colX(e) - 22, y: 10, width: 44, height: 110, class: e >= 0 ? 'col' : 'col dec' }, api.svg);
-          el('text', { x: colX(e), y: 30, class: 'ex-s', 'text-anchor': 'middle', text: h }, api.svg);
-        });
-        el('circle', { cx: colX(0) + 27, cy: 92, r: 5, class: 'comma' }, api.svg);
-        for (const e in digits) texts[e] = el('text', { x: colX(+e), y: 90, class: 'dig', 'text-anchor': 'middle', text: digits[e] }, api.svg);
-        api.say(`Zahl: <b>${fmt(val())}</b>`);
+        api.clear(); sub(); resT = {}; carryT = {}; padT = [];
+        const row = (d, y, show) => { for (const e in d) { const t = el('text', { x: colX(+e), y, class: 'ex-b', 'text-anchor': 'middle', style: 'font-size:24px', text: d[e] }, api.svg); if (show && show(+e)) padT.push(t); } };
+        const decA = (String(a / 100).split('.')[1] || '').length;
+        row(dA, 34, (e) => e < 0 && -e > decA);
+        el('circle', { cx: commaX, cy: 34, r: 3, class: 'comma' }, api.svg);
+        if (mode === 'mul') {
+          el('text', { x: colX(EMIN) + 34, y: 34, class: 'ex-b', 'text-anchor': 'start', style: 'font-size:24px', text: `· ${k}` }, api.svg);
+        } else {
+          const decB = (String(b / 100).split('.')[1] || '').length;
+          row(dB, 70, (e) => e < 0 && -e > decB);
+          el('circle', { cx: commaX, cy: 70, r: 3, class: 'comma' }, api.svg);
+          el('text', { x: colX(EMAX) - 26, y: 70, class: 'ex-b', 'text-anchor': 'middle', style: 'font-size:24px', text: mode === 'add' ? '+' : '−' }, api.svg);
+        }
+        const yl = mode === 'mul' ? 52 : 82;
+        el('line', { x1: colX(EMAX) - 36, y1: yl, x2: colX(EMIN) + 18, y2: yl, class: 'ray' }, api.svg);
+        padT.forEach((t) => t.setAttribute('class', 'ex-b f6'));
       }
-      async function shift(k) {
-        const keys = Object.keys(digits).map(Number);
-        if (keys.some((e) => e + k > 3 || e + k < -3)) { api.say('Das passt nicht mehr in die Tafel. Probier eine andere Richtung!'); return; }
-        const before = fmt(val());
-        await api.tw(800, (t) => keys.forEach((e) => texts[e].setAttribute('x', lerp(colX(e), colX(e + k), t))));
-        const nd = {}; keys.forEach((e) => (nd[e + k] = digits[e])); digits = nd;
-        fill(); scene();
-        const op = k > 0 ? '·' : ':', p = 10 ** Math.abs(k);
-        api.say(`${before} ${op} ${fmt(p)} = <b>${fmt(val())}</b><br>Jede Ziffer rückt ${Math.abs(k)} Stelle${Math.abs(k) > 1 ? 'n' : ''} nach <b>${k > 0 ? 'links' : 'rechts'}</b>, das Komma bleibt stehen.`);
-      }
-      const run = (k) => { api.stop(); api.run(() => shift(k)); };
-      api.chips([
-        { label: '· 10', onClick: () => run(1) }, { label: '· 100', onClick: () => run(2) },
-        { label: ': 10', onClick: () => run(-1) }, { label: ': 100', onClick: () => run(-2) },
-        { label: 'Neue Zahl', onClick() { setNum(pick(starts)); api.stop(); scene(); } },
-      ]);
+      // Übertrag klein direkt über dem Strich in der nächsten Spalte (wie im Heft)
+      const yRes = mode === 'mul' ? 84 : 112, yCarry = mode === 'mul' ? 49 : 79;
+      const putRes = (e, v, cls) => (resT[e] = el('text', { x: colX(e), y: yRes, class: 'ex-b ' + (cls || 'f1'), 'text-anchor': 'middle', style: 'font-size:24px', text: v }, api.svg));
+      const putCarry = (e, v) => { if (carryT[e]) carryT[e].remove(); if (v) carryT[e] = el('text', { x: colX(e) + 8, y: yCarry, class: 'ex-s f3', 'text-anchor': 'middle', style: 'font-size:11px', text: v }, api.svg); };
       return {
         reset: scene,
         async play() {
-          await api.wait(1200);
-          await shift(1);
-          await api.wait(2400);
-          await shift(-2);
-          await api.wait(2400);
-          api.say('Jetzt du: Tippe unten auf <b>· 10</b>, <b>: 10</b> …');
+          if (mode === 'mul') {
+            api.say(`${f2(a)} · ${k}: Erst <b>ohne Komma</b> rechnen, also ${a} · ${k}.`);
+            await api.wait(2200);
+            let c = 0; const ds = String(a).split('').reverse().map(Number);
+            for (let i = 0; i < ds.length; i++) {
+              const e = i + EMIN, v = ds[i] * k + c, w = v % 10;
+              api.say(`${ds[i]} · ${k}${c ? ` + ${c}` : ''} = ${v} → <b>${w}</b> hinschreiben${v >= 10 ? `, <b>${Math.floor(v / 10)}</b> merken` : ''}.`);
+              putRes(e, w); c = Math.floor(v / 10); putCarry(e + 1, c || '');
+              await api.wait(1700);
+            }
+            if (c) { putRes(ds.length + EMIN, c); putCarry(ds.length + EMIN, ''); api.say(`Der Übertrag <b>${c}</b> kommt vorne dran: ${a} · ${k} = <b>${a * k}</b>`); await api.wait(1800); }
+            api.say(`Jetzt das Komma: ${f2(a)} hat <b>zwei</b> Stellen nach dem Komma, also auch das Ergebnis.`);
+            await api.wait(1800);
+            el('circle', { cx: commaX, cy: yRes, r: 3, class: 'comma' }, api.svg);
+            if (res < 100) putRes(0, 0);
+            api.say(`${f2(a)} · ${k} = <b>${f2(res)}</b>${a >= 100 ? `<br><small>Überschlag: ungefähr ${Math.round(a / 100)} · ${k} = ${Math.round(a / 100) * k} ✓</small>` : ''}`);
+            return;
+          }
+          api.say(`Komma unter Komma: Die Zahlen werden so untereinander geschrieben, dass gleiche Stellen übereinander stehen.`);
+          await api.wait(2200);
+          if (padT.length) { api.say('Fehlende Stellen hinten füllen wir mit <b>0</b> auf. Das ändert den Wert nicht.'); padT.forEach((t) => t.setAttribute('class', 'ex-b f2')); await api.wait(2000); }
+          let c = 0;
+          for (let e = EMIN; e <= EMAX; e++) {
+            const x = dA[e] || 0, y = dB[e] || 0;
+            if (e > 0 && !(e in dA) && !(e in dB) && !c) break;
+            if (mode === 'add') {
+              const v = x + y + c;
+              api.say(`${STELLEN[e]}: ${x} + ${y}${c ? ` + ${c}` : ''} = ${v} → <b>${v % 10}</b>${v >= 10 ? `, <b>1</b> übertragen` : ''}`);
+              putRes(e, v % 10); c = v >= 10 ? 1 : 0; putCarry(e + 1, c || '');
+            } else {
+              const yy = y + c;
+              if (x >= yy) { api.say(`${STELLEN[e]}: ${x} − ${y}${c ? ` − ${c}` : ''} = <b>${x - yy}</b>`); putRes(e, x - yy); c = 0; }
+              else { api.say(`${STELLEN[e]}: ${x} − ${y}${c ? ` − ${c}` : ''} geht nicht. Wir rechnen ${x + 10} − ${y}${c ? ` − ${c}` : ''} = <b>${x + 10 - yy}</b> und merken uns <b>1</b> für die nächste Stelle.`); putRes(e, x + 10 - yy); c = 1; }
+              putCarry(e + 1, c || '');
+            }
+            await api.wait(1800);
+            if (e === -1) { el('circle', { cx: commaX, cy: yRes, r: 3, class: 'comma' }, api.svg); }
+          }
+          // führende Nullen weg (z. B. 0,57 bleibt 0,57)
+          Object.keys(resT).map(Number).filter((e) => e > 0 && Object.keys(resT).map(Number).every((f) => f <= e) && resT[e].textContent === '0').forEach((e) => resT[e].remove());
+          api.say(`Das Komma steht im Ergebnis genau unter den anderen Kommas:<br>${fmt(a / 100)} ${mode === 'add' ? '+' : '−'} ${fmt(b / 100)} = <b>${fmt(res / 100)}</b>`);
         },
       };
     },
@@ -1037,10 +1352,13 @@
   // =====================================================
   // Arithmetisches Mittel – Türme ausgleichen
   // =====================================================
+  //   ctx: { mode:'mittel', vals, unit, what ('Tag'|'Kind'|'Spiel') }, dazu pre/post – dann Balken statt Klötze
   reg('k5-mittel', {
     title: 'Der Mittelwert macht alles gerecht',
     viewBox: '0 0 360 240',
-    create(api) {
+    create(api, ctx) {
+      ctx = ctx || {};
+      if (ctx.mode === 'mittel') return mittelBalken(api, ctx);
       let vals, m, stacks;
       const S = 22, base = 205;
       const bx = (i) => 60 + i * 72;
@@ -1084,27 +1402,79 @@
     },
   });
 
+  function mittelBalken(api, ctx) {
+    const isTask = !!ctx.post;
+    let vals = ctx.vals.slice();
+    if (ctx.pre) { // ähnliche Werte, gleicher Bereich
+      const lo = Math.min(...vals), hi = Math.max(...vals), n = vals.length;
+      for (;;) {
+        vals = Array.from({ length: n }, () => R(lo, hi));
+        const s = vals.reduce((x, y) => x + y, 0) - vals[n - 1], m0 = Math.round((s + vals[n - 1]) / n), last = m0 * n - s;
+        if (last >= lo && last <= hi && vals.join() !== ctx.vals.join()) { vals[n - 1] = last; break; }
+      }
+    }
+    const n = vals.length, sum = vals.reduce((x, y) => x + y, 0), m = sum / n, unit = ctx.unit || '';
+    const vmax = Math.max(...vals), base = 200, Hmax = 150, sc = Hmax / vmax;
+    const bw = Math.min(40, 260 / n - 12), bx = (i) => 50 + i * (280 / n) + (280 / n - bw) / 2;
+    let bars = [], labs = [];
+    return {
+      reset() {
+        api.clear(); subFor(api, ctx, 'mittel', isTask); bars = []; labs = [];
+        el('line', { x1: 30, y1: base, x2: 340, y2: base, class: 'ray' }, api.svg);
+        vals.forEach((v, i) => {
+          bars.push(el('rect', { x: bx(i), y: base - v * sc, width: bw, height: v * sc, rx: 4, class: 'blk' }, api.svg));
+          labs.push(el('text', { x: bx(i) + bw / 2, y: base - v * sc - 6, class: 'ex-s', 'text-anchor': 'middle', text: v }, api.svg));
+          el('text', { x: bx(i) + bw / 2, y: base + 18, class: 'ex-s', 'text-anchor': 'middle', style: 'font-size:11px', text: `${ctx.what || 'Wert'} ${i + 1}` }, api.svg);
+        });
+      },
+      async play() {
+        api.say(`Die Werte: <b>${vals.join(', ')}</b>${unit ? ' ' + unit : ''}. Der Mittelwert ist die Höhe, auf der <b>alle gleich</b> wären.`);
+        await api.wait(2400);
+        api.say(`Erst alles zusammenzählen: ${vals.join(' + ')} = <b>${sum}</b>`);
+        await api.wait(2400);
+        api.say(`Dann gerecht auf ${n} verteilen: ${sum} : ${n} = <b>${fmt(m)}</b>`);
+        const ln = el('line', { x1: 40, y1: base - m * sc, x2: 330, y2: base - m * sc, class: 'mean', opacity: 0 }, api.svg);
+        await api.tw(500, (t) => ln.setAttribute('opacity', t));
+        await api.wait(1200);
+        api.say('Was über der Linie ist, füllt die Lücken unter der Linie auf …');
+        await api.tw(1400, (t) => vals.forEach((v, i) => {
+          const h = lerp(v, m, t) * sc;
+          bars[i].setAttribute('y', base - h); bars[i].setAttribute('height', h);
+          labs[i].setAttribute('y', base - h - 6); labs[i].textContent = t < 1 ? Math.round(lerp(v, m, t)) : fmt(m);
+        }));
+        api.say(`Alle Balken sind jetzt gleich hoch: <b>${fmt(m)}${unit ? ' ' + unit : ''}</b>. Das ist das arithmetische Mittel.<br><small>Summe aller Werte : Anzahl der Werte</small>`);
+      },
+    };
+  }
+
   // =====================================================
   // Koordinatensystem – erst laufen, dann springen
   // =====================================================
+  //   ctx: { mode:'koord', x, y }, dazu pre/post
   reg('k5-koord', {
     title: 'Erst laufen, dann springen',
     viewBox: '0 0 360 250',
-    create(api) {
+    create(api, ctx) {
+      ctx = ctx || {};
+      const isTask = ctx.mode === 'koord' && ctx.post;
       let px, py, fox, trail;
-      const s = 32, ox = 40, oy = 220;
-      const pickN = () => { px = R(1, 8); py = R(1, 6); };
-      pickN();
+      // mit Aufgabe: Gitter wie in der Aufgabe (x bis 10, y bis 8)
+      const NX = ctx.mode === 'koord' ? 10 : 9, NY = ctx.mode === 'koord' ? 8 : 6;
+      const s = Math.min(32, 290 / NX, 196 / NY), ox = 40, oy = 222;
+      const pickN = () => { px = R(1, NX - 1); py = R(1, NY - 1); };
+      if (isTask) ({ x: px, y: py } = ctx);
+      else if (ctx.mode === 'koord' && ctx.pre) { do pickN(); while (px === ctx.x && py === ctx.y); }
+      else pickN();
       api.chips([{ label: 'Neuer Punkt', onClick() { pickN(); api.replay(); } }]);
       return {
         reset() {
-          api.clear();
-          for (let i = 0; i <= 9; i++) el('line', { x1: ox + i * s, y1: oy, x2: ox + i * s, y2: oy - 6 * s, class: 'grid' }, api.svg);
-          for (let j = 0; j <= 6; j++) el('line', { x1: ox, y1: oy - j * s, x2: ox + 9 * s, y2: oy - j * s, class: 'grid' }, api.svg);
-          el('line', { x1: ox, y1: oy, x2: ox + 9 * s + 8, y2: oy, class: 'axis' }, api.svg);
-          el('line', { x1: ox, y1: oy, x2: ox, y2: oy - 6 * s - 8, class: 'axis' }, api.svg);
-          for (let i = 0; i <= 9; i++) el('text', { x: ox + i * s, y: oy + 16, class: 'tick', 'text-anchor': 'middle', text: i }, api.svg);
-          for (let j = 1; j <= 6; j++) el('text', { x: ox - 9, y: oy - j * s + 4, class: 'tick', 'text-anchor': 'end', text: j }, api.svg);
+          api.clear(); subFor(api, ctx, 'koord', isTask);
+          for (let i = 0; i <= NX; i++) el('line', { x1: ox + i * s, y1: oy, x2: ox + i * s, y2: oy - NY * s, class: 'grid' }, api.svg);
+          for (let j = 0; j <= NY; j++) el('line', { x1: ox, y1: oy - j * s, x2: ox + NX * s, y2: oy - j * s, class: 'grid' }, api.svg);
+          el('line', { x1: ox, y1: oy, x2: ox + NX * s + 8, y2: oy, class: 'axis' }, api.svg);
+          el('line', { x1: ox, y1: oy, x2: ox, y2: oy - NY * s - 8, class: 'axis' }, api.svg);
+          for (let i = 0; i <= NX; i++) el('text', { x: ox + i * s, y: oy + 16, class: 'tick', 'text-anchor': 'middle', text: i }, api.svg);
+          for (let j = 1; j <= NY; j++) el('text', { x: ox - 9, y: oy - j * s + 4, class: 'tick', 'text-anchor': 'end', text: j }, api.svg);
           trail = el('polyline', { points: `${ox},${oy}`, class: 'trail' }, api.svg);
           fox = el('text', { x: ox, y: oy, 'text-anchor': 'middle', class: 'fox', text: '🦊' }, api.svg);
         },
@@ -1114,6 +1484,7 @@
           put(ox, oy);
           api.say('Der Fuchs startet im Ursprung <b>(0 | 0)</b>.');
           await api.wait(1200);
+          if (!px) { api.say('x = 0: <b>kein</b> Schritt nach rechts, der Fuchs bleibt auf der y-Achse.'); await api.wait(1600); }
           for (let i = 1; i <= px; i++) {
             api.say(`Erst <b>laufen</b> nach rechts: ${i}`);
             const x0 = ox + (i - 1) * s;
@@ -1121,6 +1492,7 @@
             pts.push([ox + i * s, oy]);
           }
           await api.wait(500);
+          if (!py) { api.say('y = 0: <b>kein</b> Sprung nach oben, der Punkt liegt auf der x-Achse.'); await api.wait(1600); }
           for (let j = 1; j <= py; j++) {
             api.say(`… dann <b>springen</b> nach oben: ${j}`);
             const y0 = oy - (j - 1) * s, X = ox + px * s;
@@ -1143,10 +1515,19 @@
   const TYPES = (a) =>
     a === 0 ? ['Nullwinkel', 'f6'] : a < 90 ? ['spitzer Winkel', 'f2'] : a === 90 ? ['rechter Winkel', 'f3'] : a < 180 ? ['stumpfer Winkel', 'f4'] :
     a === 180 ? ['gestreckter Winkel', 'f5'] : a < 360 ? ['überstumpfer Winkel', 'f1'] : ['Vollwinkel', 'f3'];
+  //   ctx: { mode:'wart', a }, dazu pre/post
   reg('k5-winkelart', {
     title: 'Winkelarten',
     viewBox: '0 0 360 250',
-    create(api) {
+    create(api, ctx) {
+      ctx = ctx || {};
+      const isTask = ctx.mode === 'wart' && ctx.post;
+      let target = null;
+      if (isTask) target = ctx.a;
+      else if (ctx.mode === 'wart' && ctx.pre) { // ein Winkel einer anderen Art
+        const pool = [R(10, 85), 90, R(95, 170), 180, R(195, 340)].filter((v) => TYPES(v)[0] !== TYPES(ctx.a)[0]);
+        target = pick(pool);
+      }
       const cx = 180, cy = 128, L = 110;
       let w, ray, lab, sq;
       function scene() {
@@ -1174,9 +1555,23 @@
       }
       const sl = api.slider({ label: 'Winkel drehen', min: 0, max: 360, value: 0, onInput(v) { draw(v); } });
       return {
-        reset: scene,
+        reset() { scene(); subFor(api, ctx, 'wart', isTask); },
         async play() {
           const seg = async (a0, a1, ms) => api.tw(ms, (t) => { const a = lerp(a0, a1, t); sl.value = Math.round(a); draw(a); }, (t) => t);
+          if (target !== null) {
+            // Grenzen nacheinander zeigen, dann auf den Winkel der Aufgabe drehen
+            api.say(`Wir drehen den Strahl auf <b>${target}°</b> …`);
+            await api.wait(1000);
+            const stops = [90, 180, 360].filter((v) => v < target);
+            let cur = 0;
+            for (const v of stops) { await seg(cur, v, 700); cur = v; await api.wait(900); }
+            await seg(cur, target, 900);
+            await api.wait(600);
+            const [name] = TYPES(target);
+            const lo = target < 90 ? 'kleiner als 90°' : target === 90 ? 'genau 90°' : target < 180 ? 'größer als 90°, aber kleiner als 180°' : target === 180 ? 'genau 180°' : 'größer als 180°, aber kleiner als 360°';
+            api.say(`<span class="exbig ${TYPES(target)[1]}">${name}</span><br>${target}° ist ${lo}.<br><small>Merke die Grenzen: 90° (rechter Winkel) und 180° (gestreckter Winkel).</small>`);
+            return;
+          }
           await seg(0, 60, 1400); await api.wait(1000);
           await seg(60, 90, 700); await api.wait(1500);
           await seg(90, 140, 1000); await api.wait(1000);
@@ -1192,11 +1587,20 @@
   // =====================================================
   // Winkel an Geraden – Neben-, Scheitel-, Stufen-, Wechselwinkel
   // =====================================================
+  //   ctx: { mode:'wpaar', parallel, rel, gv, av }, dazu pre/post
   reg('k5-winkelpaar', {
     title: 'Winkel an Geraden',
     viewBox: '0 0 360 230',
-    create(api) {
-      let mode = 'a', alpha = 60;
+    create(api, ctx) {
+      ctx = ctx || {};
+      const isTask = ctx.mode === 'wpaar' && ctx.post;
+      let t = null; // Aufgabe (oder ähnliches Beispiel)
+      if (ctx.mode === 'wpaar' && (ctx.post || ctx.pre)) {
+        t = Object.assign({}, ctx);
+        if (ctx.pre) { let g; do g = R(35, 145); while ((g > 80 && g < 100) || g === ctx.gv); t.gv = g; t.av = /Scheitel|^Stufen|^Wechsel/.test(t.rel) ? g : 180 - g; }
+      }
+      const SAME = (r) => r === 'Nebenwinkel' || r === 'Scheitelwinkel';
+      let mode = t && !SAME(t.rel) ? 'b' : 'a', alpha = t ? t.gv : 60;
       const cx = 180, cy = 115;
       function sceneA(a) {
         api.clear();
@@ -1212,8 +1616,8 @@
       const yT = 70, yB = 165;
       let copy;
       function sceneB() {
-        api.clear();
-        const a = 62, cot = 1 / Math.tan(rad(a));
+        api.clear(); subFor(api, ctx, 'wpaar', isTask);
+        const a = t ? t.gv : 62, cot = 1 / Math.tan(rad(a));
         const xT = 180 + ((yB - yT) / 2) * cot, xB = 180 - ((yB - yT) / 2) * cot;
         el('line', { x1: 20, y1: yT, x2: 340, y2: yT, class: 'ray' }, api.svg);
         el('line', { x1: 20, y1: yB, x2: 340, y2: yB, class: 'ray' }, api.svg);
@@ -1223,11 +1627,11 @@
         el('line', { x1: p0[0], y1: p0[1], x2: p1[0], y2: p1[1], class: 'ray' }, api.svg);
         el('path', { d: arcD(xT, yT, 30, 0, a, true), class: 'wA' }, api.svg);
         const lp = pt(xT, yT, 48, a / 2);
-        el('text', { x: lp[0], y: lp[1] + 5, class: 'albl', 'text-anchor': 'middle', text: 'α' }, api.svg);
+        el('text', { x: lp[0], y: lp[1] + 5, class: 'albl', 'text-anchor': 'middle', text: t ? `${a}°` : 'α' }, api.svg);
         copy = el('g', { opacity: 0 }, api.svg);
         el('path', { d: arcD(xT, yT, 30, 0, a, true), class: 'wB' }, copy);
         const lp2 = pt(xT, yT, 48, a / 2);
-        copy.lab = el('text', { x: lp2[0], y: lp2[1] + 5, class: 'blbl', 'text-anchor': 'middle', text: 'α' }, copy);
+        copy.lab = el('text', { x: lp2[0], y: lp2[1] + 5, class: 'blbl', 'text-anchor': 'middle', text: t ? `${a}°` : 'α' }, copy);
         return { xT, xB, a };
       }
       const sl = api.slider({ label: 'Gerade drehen', min: 20, max: 160, value: alpha, onInput(v) { if (mode !== 'a') return; alpha = v; sceneA(v); } });
@@ -1236,9 +1640,17 @@
         { label: 'Neben- & Scheitelwinkel', onClick() { mode = 'a'; sliderRow.style.display = ''; api.replay(); } },
         { label: 'Stufen- & Wechselwinkel', onClick() { mode = 'b'; sliderRow.style.display = 'none'; api.replay(); } },
       ]);
+      if (t) sliderRow.style.display = mode === 'a' ? '' : 'none';
       return {
-        reset() { mode === 'a' ? sceneA(alpha) : sceneB(); },
+        reset() { if (mode === 'a') { sceneA(alpha); subFor(api, ctx, 'wpaar', isTask); } else sceneB(); },
         async play() {
+          if (mode === 'a' && t) {
+            // gleiche Kreuzung: Nebenwinkel oder Scheitelwinkel
+            sceneA(t.gv); subFor(api, ctx, 'wpaar', isTask);
+            await api.wait(2600);
+            api.say(`Gegeben ist ${t.gv}°. β ist ${t.rel === 'Scheitelwinkel' ? 'der <b>Scheitelwinkel</b> (gegenüber)' : 'ein <b>Nebenwinkel</b> (daneben, zusammen eine gerade Linie)'}.<br>${t.rel === 'Scheitelwinkel' ? `Scheitelwinkel sind gleich groß: β = <b>${t.av}°</b>` : `Nebenwinkel ergeben 180°: β = 180° − ${t.gv}° = <b>${t.av}°</b>`}`);
+            return;
+          }
           if (mode === 'a') {
             await api.wait(2500);
             const seg = (a0, a1, ms) => api.tw(ms, (t) => { alpha = Math.round(lerp(a0, a1, t)); sl.value = alpha; sceneA(alpha); });
@@ -1248,6 +1660,26 @@
             return;
           }
           const { xT, xB } = sceneB();
+          if (t) {
+            api.say(`g und h sind parallel. Oben ist der Winkel <b class="cA">${t.gv}°</b> gegeben.`);
+            await api.wait(1800);
+            api.say('Wir schieben eine Kopie an der schrägen Geraden entlang nach unten …');
+            copy.setAttribute('opacity', 1);
+            await api.tw(1600, (k) => copy.setAttribute('transform', `translate(${(xB - xT) * k},${(yB - yT) * k})`));
+            api.say(`… sie passt genau: Der <b>Stufenwinkel</b> unten ist auch ${t.gv}°.`);
+            await api.wait(2400);
+            if (t.rel === 'Wechselwinkel') {
+              api.say('Jetzt drehen wir die Kopie um 180° um den Schnittpunkt …');
+              await api.tw(1500, (k) => copy.setAttribute('transform', `translate(${xB - xT},${yB - yT}) rotate(${180 * k} ${xT} ${yT})`));
+              copy.lab.setAttribute('transform', `rotate(180 ${copy.lab.getAttribute('x')} ${+copy.lab.getAttribute('y') - 5})`);
+              api.say(`β ist der <b>Wechselwinkel</b>: auch er ist genau so groß, β = <b>${t.av}°</b>.`);
+            } else if (t.rel === 'Stufenwinkel') {
+              api.say(`β ist dieser <b>Stufenwinkel</b>: β = <b>${t.av}°</b>.<br><small>Stufenwinkel an Parallelen sind gleich groß.</small>`);
+            } else {
+              api.say(`β liegt direkt <b>neben</b> diesem Stufenwinkel, zusammen ergeben sie eine gerade Linie.<br>β = 180° − ${t.gv}° = <b>${t.av}°</b>`);
+            }
+            return;
+          }
           api.say('g und h sind parallel. Oben siehst du den Winkel <b class="cA">α</b>.');
           await api.wait(1800);
           api.say('Wir schieben eine Kopie an der schrägen Geraden entlang nach unten …');
@@ -1266,46 +1698,86 @@
 
   // =====================================================
   // Rechteck – Fläche auslegen, Umfang ablaufen
+  //   ctx: { mode:'rect', kind:'u'|'a'|'b', a, b, unit } · { mode:'rect', kind:'l', Wd, Hd, w, h }, dazu pre/post
   // =====================================================
   reg('k5-rechteck', {
     title: 'Fläche und Umfang',
+    titleFor: (ctx) => (ctx && ctx.mode === 'rect' ? { u: 'Umfang: einmal außen herum', a: 'Flächeninhalt: Kästchen auslegen', b: 'Fehlende Seite: rückwärts rechnen', l: 'Zusammengesetzte Fläche' }[ctx.kind] : 'Fläche und Umfang'),
     viewBox: '0 0 360 200',
-    create(api) {
-      let a, b, mode = 'A';
-      const s = 34;
+    create(api, ctx) {
+      ctx = ctx || {};
+      const isTask = ctx.mode === 'rect' && ctx.post;
+      let a, b, unit = 'cm', mode = 'A', L = null;
       const pickN = () => { a = R(4, 8); b = R(2, 4); };
-      pickN();
-      const x0 = () => 180 - (a * s) / 2, y0 = 26;
-      api.chips([
+      if (ctx.mode === 'rect') {
+        mode = { u: 'U', a: 'A', b: 'B', l: 'L' }[ctx.kind];
+        if (isTask) { a = ctx.a; b = ctx.b; unit = ctx.unit || 'cm'; if (ctx.kind === 'l') L = ctx; }
+        else { // ähnliches Beispiel
+          unit = ctx.unit || 'cm';
+          do { a = R(3, 12); b = R(2, 8); } while (a === ctx.a && b === ctx.b);
+          if (ctx.kind === 'l') { const Wd = R(6, 12), Hd = R(5, 10); L = { Wd, Hd, w: R(2, Wd - 3), h: R(2, Hd - 3) }; }
+        }
+        if (L) { a = L.Wd; b = L.Hd; unit = 'cm'; }
+      } else pickN();
+      const s = Math.min(34, 240 / a, 140 / b);
+      const x0 = () => 165 - (a * s) / 2, y0 = 26; // rechts Platz für die Beschriftung b = …
+      const u1 = `1-${unit}²`;
+      if (ctx.mode !== 'rect') api.chips([
         { label: 'Flächeninhalt', onClick() { mode = 'A'; api.replay(); } },
         { label: 'Umfang', onClick() { mode = 'U'; api.replay(); } },
         { label: 'Neues Rechteck', onClick() { pickN(); api.replay(); } },
       ]);
+      async function fillRows(rows, cols, label) {
+        // Kästchen auslegen: kleine Rechtecke einzeln, große Reihe für Reihe
+        const single = rows * cols <= 60;
+        for (let r = 0; r < rows; r++) {
+          for (let k = 0; k < cols; k++) {
+            el('rect', { x: x0() + k * s + 1.5, y: y0 + r * s + 1.5, width: s - 3, height: s - 3, rx: Math.min(4, s / 5), class: 'unit' }, api.svg);
+            if (single && s > 20) el('text', { x: x0() + k * s + s / 2, y: y0 + r * s + s / 2 + 5, class: 'ex-s', 'text-anchor': 'middle', text: r * cols + k + 1 }, api.svg);
+            if (single || r === 0) await api.wait(single ? (r === 0 ? 240 : 80) : 40);
+          }
+          if (single || r === 0 || r === rows - 1) api.say(label(r + 1));
+          await api.wait(single ? 600 : r === 0 ? 1200 : 160);
+        }
+      }
       return {
         reset() {
-          api.clear();
+          api.clear(); subFor(api, ctx, 'rect', isTask);
           api.svg.setAttribute('viewBox', `0 0 360 ${y0 + b * s + 50}`);
+          if (mode === 'L') {
+            const { w, h } = L, X = x0();
+            const pts = [[X, y0], [X + (a - w) * s, y0], [X + (a - w) * s, y0 + h * s], [X + a * s, y0 + h * s], [X + a * s, y0 + b * s], [X, y0 + b * s]];
+            L.missing = el('rect', { x: X + (a - w) * s, y: y0, width: w * s, height: h * s, class: 'unit', opacity: 0 }, api.svg);
+            el('polygon', { points: pts.map((q) => q.join(',')).join(' '), class: 'shape' }, api.svg);
+            el('text', { x: 180, y: y0 + b * s + 24, class: 'ex-s', 'text-anchor': 'middle', text: `${a} cm` }, api.svg);
+            el('text', { x: X - 8, y: y0 + (b * s) / 2 + 5, class: 'ex-s', 'text-anchor': 'end', text: `${b} cm` }, api.svg);
+            return;
+          }
           el('rect', { x: x0(), y: y0, width: a * s, height: b * s, class: 'shape' }, api.svg);
-          el('text', { x: 180, y: y0 + b * s + 24, class: 'ex-s', 'text-anchor': 'middle', text: `a = ${a} cm` }, api.svg);
-          el('text', { x: x0() + a * s + 8, y: y0 + (b * s) / 2 + 5, class: 'ex-s', text: `b = ${b} cm` }, api.svg);
+          el('text', { x: 180, y: y0 + b * s + 24, class: 'ex-s', 'text-anchor': 'middle', text: `a = ${a} ${unit}` }, api.svg);
+          el('text', { x: x0() + a * s + 8, y: y0 + (b * s) / 2 + 5, class: 'ex-s', text: mode === 'B' ? 'b = ?' : `b = ${b} ${unit}` }, api.svg);
         },
         async play() {
           if (mode === 'A') {
-            api.say(`Wie viele <b>1-cm²-Kästchen</b> passen hinein?`);
+            api.say(`Wie viele <b>${u1}-Kästchen</b> passen hinein?`);
             await api.wait(1000);
-            let c = 0;
-            for (let r = 0; r < b; r++) {
-              for (let k = 0; k < a; k++) {
-                c++;
-                const sq = el('rect', { x: x0() + k * s + 2, y: y0 + r * s + 2, width: s - 4, height: s - 4, rx: 4, class: 'unit' }, api.svg);
-                el('text', { x: x0() + k * s + s / 2, y: y0 + r * s + s / 2 + 5, class: 'ex-s', 'text-anchor': 'middle', text: c }, api.svg);
-                sq.setAttribute('opacity', 1);
-                await api.wait(r === 0 ? 260 : 90);
-              }
-              api.say(`${r + 1} Reihe${r ? 'n' : ''} mit je ${a} Kästchen = ${(r + 1) * a}`);
-              await api.wait(700);
-            }
-            api.say(`${b} Reihen · ${a} Kästchen: <b>A = a · b = ${a} · ${b} = ${a * b} cm²</b>`);
+            await fillRows(b, a, (r) => `${r} Reihe${r > 1 ? 'n' : ''} mit je ${a} Kästchen = ${r * a}`);
+            api.say(`${b} Reihen · ${a} Kästchen: <b>A = a · b = ${a} · ${b} = ${a * b} ${unit}²</b>`);
+          } else if (mode === 'B') {
+            api.say(`Der Flächeninhalt ist <b>${a * b} ${unit}²</b>, also ${a * b} Kästchen. In eine Reihe passen <b>${a}</b> (Seite a).`);
+            await api.wait(2200);
+            await fillRows(b, a, (r) => `${r} Reihe${r > 1 ? 'n' : ''}: ${r * a} Kästchen${r * a === a * b ? ' – genau alle!' : ''}`);
+            api.say(`Es werden <b>${b} Reihen</b>. Das ist die Seite b.<br><b>b = A : a = ${a * b} : ${a} = ${b} ${unit}</b>`);
+          } else if (mode === 'L') {
+            const { w, h } = L;
+            api.say('Die Figur ist kein Rechteck. Trick: Wir ergänzen sie zu einem <b>großen Rechteck</b> …');
+            await api.wait(1800);
+            await api.tw(600, (k) => L.missing.setAttribute('opacity', k));
+            el('text', { x: x0() + (a - w / 2) * s, y: y0 + (h * s) / 2 + 5, class: 'ex-s', 'text-anchor': 'middle', text: `${w}·${h}` }, api.svg);
+            api.say(`Großes Rechteck: ${a} · ${b} = <b>${a * b} cm²</b>. Das blaue Stück gehört nicht dazu: ${w} · ${h} = <b>${w * h} cm²</b>.`);
+            await api.wait(2800);
+            await api.tw(600, (k) => L.missing.setAttribute('opacity', 1 - 0.7 * k));
+            api.say(`A = ${a * b} cm² − ${w * h} cm² = <b>${a * b - w * h} cm²</b><br><small>Man kann die Figur auch in zwei Rechtecke zerlegen und addieren.</small>`);
           } else {
             const X = x0(), Y = y0, W = a * s, H = b * s;
             const path = [[X, Y], [X + W, Y], [X + W, Y + H], [X, Y + H], [X, Y]];
@@ -1313,17 +1785,17 @@
             const dot = el('circle', { cx: X, cy: Y, r: 8, class: 'mk' }, api.svg);
             const line = el('polyline', { points: `${X},${Y}`, class: 'trail2' }, api.svg);
             const done = [[X, Y]];
-            let sum = [];
+            const sum = [];
             api.say('Der Umfang ist der Weg einmal ganz außen herum.');
             await api.wait(1200);
             for (let i = 0; i < 4; i++) {
               const [fx, fy] = path[i], [tx, ty] = path[i + 1];
-              await api.tw(900, (t) => { const x = lerp(fx, tx, t), y = lerp(fy, ty, t); dot.setAttribute('cx', x); dot.setAttribute('cy', y); line.setAttribute('points', done.concat([[x, y]]).map((p) => p.join(',')).join(' ')); });
+              await api.tw(900, (k) => { const x = lerp(fx, tx, k), y = lerp(fy, ty, k); dot.setAttribute('cx', x); dot.setAttribute('cy', y); line.setAttribute('points', done.concat([[x, y]]).map((q) => q.join(',')).join(' ')); });
               done.push([tx, ty]); sum.push(sides[i]);
-              api.say(`${sum.join(' cm + ')} cm = <b>${sum.reduce((p, q) => p + q, 0)} cm</b>`);
+              api.say(`${sum.join(` ${unit} + `)} ${unit} = <b>${sum.reduce((q, r) => q + r, 0)} ${unit}</b>`);
               await api.wait(500);
             }
-            api.say(`<b>u = 2 · a + 2 · b = 2 · ${a} + 2 · ${b} = ${2 * (a + b)} cm</b>`);
+            api.say(`<b>u = 2 · a + 2 · b = 2 · ${a} + 2 · ${b} = ${2 * (a + b)} ${unit}</b>`);
           }
         },
       };
@@ -1332,49 +1804,103 @@
 
   // =====================================================
   // Quader – Würfel stapeln
+  //   ctx: { mode:'quader', kind:'v'|'o'|'l', a, b, c (bei 'l' in cm, Vielfache von 10) }, dazu pre/post
   // =====================================================
   reg('k5-quader', {
     title: 'Volumen: Würfel stapeln',
+    titleFor: (ctx) => (ctx && ctx.mode === 'quader' ? { v: 'Volumen: Würfel stapeln', o: 'Oberfläche: sechs Flächen', l: 'Liter: Würfel mit 1 dm Kantenlänge' }[ctx.kind] : 'Volumen: Würfel stapeln'),
     viewBox: '0 0 360 230',
-    create(api) {
-      let a, b, c;
+    create(api, ctx) {
+      ctx = ctx || {};
+      const isTask = ctx.mode === 'quader' && ctx.post;
+      const kind = ctx.mode === 'quader' ? ctx.kind : 'v';
+      let a, b, c, cm = null; // cm: Originalmaße bei Litern
       const pickN = () => { a = R(2, 4); b = R(2, 3); c = R(2, 3); };
-      pickN();
-      const s = 26, cs = Math.cos(rad(30)) * s, sn = 0.5 * s;
-      const P = (x, y, z) => [180 + (x - y) * cs, 120 + (x + y) * sn - z * s - 10];
-      const poly = (pts, cls, g) => el('polygon', { points: pts.map((p) => P(...p).map((v) => v.toFixed(1)).join(',')).join(' '), class: cls }, g);
-      function cube(i, j, k, g) {
-        const cg = el('g', { opacity: 0 }, g);
-        poly([[i, j, k + 1], [i + 1, j, k + 1], [i + 1, j + 1, k + 1], [i, j + 1, k + 1]], 'cT', cg);
-        poly([[i + 1, j, k], [i + 1, j + 1, k], [i + 1, j + 1, k + 1], [i + 1, j, k + 1]], 'cR', cg);
-        poly([[i, j + 1, k], [i + 1, j + 1, k], [i + 1, j + 1, k + 1], [i, j + 1, k + 1]], 'cL', cg);
-        return cg;
+      if (ctx.mode === 'quader' && (isTask || ctx.pre)) {
+        if (isTask) ({ a, b, c } = ctx);
+        else if (kind === 'l') { a = R(2, 8) * 10; b = R(2, 6) * 10; c = R(2, 5) * 10; }
+        else { do { a = R(2, 6); b = R(2, 4); c = R(2, 4); } while (a === ctx.a && b === ctx.b && c === ctx.c); }
+        if (kind === 'l') { cm = [a, b, c]; a /= 10; b /= 10; c /= 10; }
+      } else pickN();
+      const s = Math.min(26, 300 / ((a + b) * Math.cos(rad(30))), 185 / ((a + b) * 0.5 + c));
+      const cs = Math.cos(rad(30)) * s, sn = 0.5 * s;
+      const cx = 180 + ((b - a) / 2) * cs, cy = 212 - (a + b) * sn;
+      const P = (x, y, z) => [cx + (x - y) * cs, cy + (x + y) * sn - z * s];
+      const poly = (pts, cls, g) => el('polygon', { points: pts.map((q) => P(...q).map((v) => v.toFixed(1)).join(',')).join(' '), class: cls }, g);
+      function box(x0, y0, z0, x1, y1, z1, g) {
+        const bg = el('g', { opacity: 0 }, g);
+        poly([[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], 'cT', bg);
+        poly([[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]], 'cR', bg);
+        poly([[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], 'cL', bg);
+        return bg;
       }
-      api.chips([{ label: 'Neuer Quader', onClick() { pickN(); api.replay(); } }]);
-      return {
-        reset() { api.clear(); },
-        async play() {
-          api.say(`Ein Quader: ${a} cm lang, ${b} cm breit, ${c} cm hoch. Jeder Würfel ist <b>1 cm³</b>.`);
-          await api.wait(1500);
-          let n = 0;
-          for (let k = 0; k < c; k++) {
+      const grid = (g, z) => { // Würfelgitter auf einer Schicht (sichtbare Seiten)
+        for (let i = 1; i < a; i++) { el('line', { x1: P(i, 0, z)[0], y1: P(i, 0, z)[1], x2: P(i, b, z)[0], y2: P(i, b, z)[1], class: 'tk', style: 'stroke-width:.8' }, g); el('line', { x1: P(i, b, z)[0], y1: P(i, b, z)[1], x2: P(i, b, z - 1)[0], y2: P(i, b, z - 1)[1], class: 'tk', style: 'stroke-width:.8' }, g); }
+        for (let j = 1; j < b; j++) { el('line', { x1: P(0, j, z)[0], y1: P(0, j, z)[1], x2: P(a, j, z)[0], y2: P(a, j, z)[1], class: 'tk', style: 'stroke-width:.8' }, g); el('line', { x1: P(a, j, z)[0], y1: P(a, j, z)[1], x2: P(a, j, z - 1)[0], y2: P(a, j, z - 1)[1], class: 'tk', style: 'stroke-width:.8' }, g); }
+      };
+      const U = kind === 'l' ? 'dm' : 'cm';
+      if (ctx.mode !== 'quader') api.chips([{ label: 'Neuer Quader', onClick() { pickN(); api.replay(); } }]);
+      const labels = () => {
+        const la = P(a / 2, b, 0), lb = P(a, b / 2, 0), lc = P(a, 0, c / 2);
+        el('text', { x: la[0] - 18, y: la[1] + 20, class: 'ex-s', 'text-anchor': 'middle', text: `a = ${a}${kind !== 'v' || isTask ? ' ' + U : ''}` }, api.svg);
+        el('text', { x: lb[0] + 16, y: lb[1] + 18, class: 'ex-s', text: `b = ${b}${kind !== 'v' || isTask ? ' ' + U : ''}` }, api.svg);
+        el('text', { x: lc[0] + 12, y: lc[1], class: 'ex-s', text: `c = ${c}${kind !== 'v' || isTask ? ' ' + U : ''}` }, api.svg);
+      };
+      async function stack() {
+        let n = 0;
+        const single = a * b * c <= 48;
+        for (let k = 0; k < c; k++) {
+          if (single) {
             const order = [];
             for (let i = 0; i < a; i++) for (let j = 0; j < b; j++) order.push([i, j]);
             order.sort((p, q) => p[0] + p[1] - (q[0] + q[1]));
             for (const [i, j] of order) {
-              const cg = cube(i, j, k, api.svg);
+              const cg = box(i, j, k, i + 1, j + 1, k + 1, api.svg);
               n++;
-              await api.tw(k === 0 ? 220 : 90, (t) => { cg.setAttribute('opacity', t); cg.setAttribute('transform', `translate(0,${(1 - t) * -14})`); });
+              await api.tw(k === 0 ? 200 : 80, (t) => { cg.setAttribute('opacity', t); cg.setAttribute('transform', `translate(0,${(1 - t) * -14})`); });
             }
-            api.say(k === 0
-              ? `1. Schicht: ${a} · ${b} = <b>${a * b} Würfel</b>`
-              : `${k + 1} Schichten · ${a * b} Würfel = <b>${n} Würfel</b>`);
-            await api.wait(1300);
+          } else { // ganze Schicht auf einmal, mit Würfelgitter
+            const lg = box(0, 0, k, a, b, k + 1, api.svg); grid(lg, k + 1);
+            n += a * b;
+            await api.tw(k === 0 ? 700 : 260, (t) => { lg.setAttribute('opacity', t); lg.setAttribute('transform', `translate(0,${(1 - t) * -14})`); });
           }
-          const la = P(a / 2, b, 0), lb = P(a, b / 2, 0), lc = P(a, 0, c / 2);
-          el('text', { x: la[0] - 18, y: la[1] + 20, class: 'ex-s', 'text-anchor': 'middle', text: `a = ${a}` }, api.svg);
-          el('text', { x: lb[0] + 20, y: lb[1] + 18, class: 'ex-s', text: `b = ${b}` }, api.svg);
-          el('text', { x: lc[0] + 14, y: lc[1], class: 'ex-s', text: `c = ${c}` }, api.svg);
+          if (k === 0 || k === c - 1 || single) api.say(k === 0 ? `1. Schicht: ${a} · ${b} = <b>${a * b} Würfel</b>` : `${k + 1} Schichten · ${a * b} Würfel = <b>${n} Würfel</b>`);
+          await api.wait(k === 0 ? 1500 : single ? 1000 : 200);
+        }
+      }
+      return {
+        reset() { api.clear(); subFor(api, ctx, 'quader', isTask); },
+        async play() {
+          if (kind === 'l') {
+            api.say(`${cm[0]} cm = ${a} dm, ${cm[1]} cm = ${b} dm, ${cm[2]} cm = ${c} dm.<br><small>10 cm = 1 dm. Ein Würfel mit 1 dm Kantenlänge fasst genau <b>1 Liter</b>.</small>`);
+            await api.wait(2800);
+            await stack(); labels();
+            api.say(`V = ${a} dm · ${b} dm · ${c} dm = <b>${a * b * c} dm³ = ${a * b * c} Liter</b><br><small>1 dm³ = 1 l</small>`);
+            return;
+          }
+          if (kind === 'o') {
+            const g = box(0, 0, 0, a, b, c, api.svg); g.setAttribute('opacity', 1); labels();
+            const faces = [
+              [[[0, 0, c], [a, 0, c], [a, b, c], [0, b, c]], `oben und unten: je ${a} · ${b} = <b>${a * b} cm²</b>`, a * b],
+              [[[0, b, 0], [a, b, 0], [a, b, c], [0, b, c]], `vorne und hinten: je ${a} · ${c} = <b>${a * c} cm²</b>`, a * c],
+              [[[a, 0, 0], [a, b, 0], [a, b, c], [a, 0, c]], `rechts und links: je ${b} · ${c} = <b>${b * c} cm²</b>`, b * c],
+            ];
+            api.say('Ein Quader hat <b>6 Flächen</b>. Je zwei gegenüberliegende sind gleich groß.');
+            await api.wait(2400);
+            const hl = [];
+            for (const [pts, txt] of faces) {
+              const f = poly(pts, 'zoom', api.svg); f.setAttribute('opacity', 0); hl.push(f);
+              await api.tw(400, (t) => f.setAttribute('opacity', t));
+              api.say(txt); await api.wait(2200);
+              f.setAttribute('opacity', 0.25);
+            }
+            const sum = a * b + a * c + b * c;
+            api.say(`A<sub>O</sub> = 2 · (${a * b} + ${a * c} + ${b * c}) = 2 · ${sum} = <b>${2 * sum} cm²</b><br><small>Jede Fläche gibt es zweimal, darum „2 ·“.</small>`);
+            return;
+          }
+          api.say(`Ein Quader: ${a} cm lang, ${b} cm breit, ${c} cm hoch. Jeder Würfel ist <b>1 cm³</b>.`);
+          await api.wait(1500);
+          await stack(); labels();
           api.say(`<b>V = a · b · c = ${a} · ${b} · ${c} = ${a * b * c} cm³</b><br>Länge mal Breite gibt die Schicht, mal Höhe die Anzahl Schichten.`);
         },
       };
@@ -1384,10 +1910,78 @@
   // =====================================================
   // Gleichungen – die Waage
   // =====================================================
+  //   ctx: { mode:'gl', op:'+'|'−'|'·'|':', a, c (rechte Seite), ans }, dazu pre/post
+  //   Ohne Aufgabe: Waage (x + a = b). Mit Aufgabe: Pfeilbild mit Umkehraufgabe – das klappt auch mit großen Zahlen.
+  const INV = { '+': '−', '−': '+', '·': ':', ':': '·' };
+  const calcGl = (u, op, v) => (op === '+' ? u + v : op === '−' ? u - v : op === '·' ? u * v : u / v);
   reg('k5-gleichung', {
     title: 'Gleichungen sind Waagen',
+    titleFor: (ctx) => (ctx && ctx.mode === 'gl' ? 'Gleichungen: rückwärts rechnen' : 'Gleichungen sind Waagen'),
     viewBox: '0 0 360 230',
-    create(api) {
+    create(api, ctx) {
+      ctx = ctx || {};
+      if (ctx.mode === 'gl') return pfeilbild(api, ctx);
+      return waage(api);
+    },
+  });
+  function pfeilbild(api, ctx) {
+    const isTask = !!ctx.post;
+    let op = ctx.op, a = ctx.a, ans = ctx.ans;
+    if (ctx.pre) { // gleiche Rechenart, andere Zahlen
+      do {
+        if (op === '+') { ans = R(5, 95); a = R(5, 95); }
+        else if (op === '−') { ans = R(20, 150); a = R(5, ans - 1); }
+        else if (op === '·') { ans = R(2, 15); a = R(2, 12); }
+        else { a = R(2, 9); ans = a * R(2, 12); }
+      } while (ans === ctx.ans);
+    }
+    const c = calcGl(ans, op, a);
+    const eq = op === '·' ? `${a} · x = ${c}` : `x ${op} ${a} = ${c}`;
+    const L = [80, 110], Rr = [280, 110];
+    let boxL, valL;
+    function arrow(top, cls, label) {
+      const y = top ? 84 : 136, cy = top ? 30 : 190;
+      const path = el('path', { d: `M ${L[0] + 30} ${y} Q 180 ${cy} ${Rr[0] - 30} ${y}`, class: cls }, api.svg);
+      if (!top) path.setAttribute('d', `M ${Rr[0] - 30} ${y} Q 180 ${cy} ${L[0] + 30} ${y}`);
+      const len = path.getTotalLength ? path.getTotalLength() : 300;
+      path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+      const end = top ? [Rr[0] - 30, y] : [L[0] + 30, y];
+      const head = el('path', { d: top ? `M ${end[0]} ${end[1]} l -12 -2 l 6 -9 z` : `M ${end[0]} ${end[1]} l 12 2 l -6 9 z`, class: top ? 'arrowhead1' : 'arrowhead2', opacity: 0 }, api.svg);
+      const lab = el('text', { x: 180, y: top ? 50 : 182, class: 'ex-b ' + (top ? 'f1' : 'f2'), 'text-anchor': 'middle', text: label, opacity: 0 }, api.svg);
+      return { path, len, head, lab };
+    }
+    async function draw(ar) {
+      await api.tw(900, (t) => (ar.path.style.strokeDashoffset = ar.len * (1 - t)));
+      ar.head.setAttribute('opacity', 1); ar.lab.setAttribute('opacity', 1);
+    }
+    return {
+      reset() {
+        api.clear(); subFor(api, ctx, 'gl', isTask);
+        boxL = el('rect', { x: L[0] - 30, y: L[1] - 26, width: 60, height: 52, rx: 12, class: 'xbox' }, api.svg);
+        valL = el('text', { x: L[0], y: L[1] + 9, class: 'ex-b', 'text-anchor': 'middle', fill: '#fff', style: 'font-size:24px', text: 'x' }, api.svg);
+        el('rect', { x: Rr[0] - 34, y: Rr[1] - 26, width: 68, height: 52, rx: 12, class: 'bag' }, api.svg);
+        el('text', { x: Rr[0], y: Rr[1] + 9, class: 'ex-b', 'text-anchor': 'middle', style: 'font-size:24px', text: fmt(c) }, api.svg);
+      },
+      async play() {
+        api.say(`<b>${eq}</b><br>Gesucht ist die Zahl x.`);
+        await api.wait(1800);
+        const opTxt = op === '·' ? `· ${a}` : `${op} ${a}`;
+        api.say(`Die Gleichung als Pfeilbild: Mit x wird <b>${opTxt}</b> gerechnet, heraus kommt <b>${fmt(c)}</b>.${op === '·' ? `<br><small>${a} · x ist dasselbe wie x · ${a}.</small>` : ''}`);
+        await draw(arrow(true, 'jump', opTxt));
+        await api.wait(2000);
+        const back = `${INV[op]} ${a}`;
+        api.say(`Rückwärts rechnen mit der <b>Umkehraufgabe</b>: Aus ${op === '+' ? 'Plus wird Minus' : op === '−' ? 'Minus wird Plus' : op === '·' ? 'Mal wird Geteilt' : 'Geteilt wird Mal'}.`);
+        await draw(arrow(false, 'jump2', back));
+        await api.wait(1600);
+        api.say(`x = ${fmt(c)} ${INV[op]} ${a} = <b>${fmt(ans)}</b>`);
+        valL.textContent = fmt(ans);
+        await api.tw(500, (t) => boxL.setAttribute('opacity', 0.6 + 0.4 * t));
+        await api.wait(1800);
+        api.say(`x = <b>${fmt(ans)}</b><br>Probe: ${op === '·' ? `${a} · ${fmt(ans)}` : `${fmt(ans)} ${op} ${a}`} = ${fmt(c)} ✓`);
+      },
+    };
+  }
+  function waage(api) {
       let a, xv, beam, L, Rr;
       const pickN = () => { a = R(2, 4); xv = R(2, 5); };
       pickN();
@@ -1429,46 +2023,66 @@
           api.say(`Wieder im Gleichgewicht: <b>x = ${a + xv} − ${a} = ${xv}</b><br>Was du auf einer Seite machst, machst du auch auf der anderen.`);
         },
       };
-    },
-  });
+  }
 
   // =====================================================
   // Fahrplan – Zeitstrahl mit Sprüngen
   // =====================================================
+  //   ctx: { mode:'fahr', start (min), dur, ask:'an'|'dauer' }, dazu pre/post
   reg('k5-fahrplan', {
     title: 'Zeitspannen mit Sprüngen',
     viewBox: '0 0 360 170',
-    create(api) {
+    create(api, ctx) {
+      ctx = ctx || {};
+      const isTask = ctx.mode === 'fahr' && ctx.post;
+      const ask = ctx.mode === 'fahr' ? ctx.ask : 'an';
       let t0, dur;
       const pickN = () => { t0 = R(6, 19) * 60 + R(31, 55); dur = R(20, 60); };
-      pickN();
+      if (isTask) { t0 = ctx.start; dur = ctx.dur; }
+      else if (ctx.mode === 'fahr' && ctx.pre) { do { t0 = R(6 * 60, 20 * 60 + 30); dur = R(12, 95); } while (t0 === ctx.start); }
+      else pickN();
       const hm = (t) => `${String(Math.floor(t / 60) % 24).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
-      api.chips([{ label: 'Neue Fahrt', onClick() { pickN(); api.replay(); } }]);
+      if (ctx.mode !== 'fahr') api.chips([{ label: 'Neue Fahrt', onClick() { pickN(); api.replay(); } }]);
       return {
-        reset() { api.clear(); },
+        reset() { api.clear(); subFor(api, ctx, 'fahr', isTask); },
         async play() {
-          const full = Math.ceil(t0 / 60) * 60, j1 = full - t0, j2 = dur - j1, end = t0 + dur;
+          const end = t0 + dur;
+          // Sprünge: bis zur vollen Stunde, ganze Stunden, Rest
+          const pts = [t0];
+          let cur = t0;
+          const full = Math.floor(t0 / 60) * 60 + 60;
+          if (full < end) { pts.push(full); cur = full; while (cur + 60 <= end) { cur += 60; pts.push(cur); } }
+          if (cur < end) pts.push(end);
           const k = 290 / dur, X = (t) => 35 + (t - t0) * k, y = 110;
           el('line', { x1: 25, y1: y, x2: 340, y2: y, class: 'ray' }, api.svg);
           for (let t = Math.ceil(t0 / 5) * 5; t <= end; t += 5) el('line', { x1: X(t), y1: y - (t % 60 ? 4 : 10), x2: X(t), y2: y + (t % 60 ? 4 : 10), class: 'tk' }, api.svg);
           const lab = (t, c) => el('text', { x: X(t), y: y + 30, class: 'ex-s ' + (c || ''), 'text-anchor': 'middle', text: hm(t) }, api.svg);
           lab(t0, 'f2');
-          api.say(`Abfahrt um <b>${hm(t0)} Uhr</b>, Fahrzeit <b>${dur} min</b>.`);
-          await api.wait(1500);
-          const jump = async (a, b, txt) => {
-            const p = el('path', { d: `M ${X(a)} ${y} Q ${(X(a) + X(b)) / 2} ${y - 70} ${X(b)} ${y}`, class: 'jump' }, api.svg);
-            const L = p.getTotalLength();
+          if (ask === 'dauer') lab(end, 'f3');
+          api.say(ask === 'dauer' ? `Abfahrt <b>${hm(t0)} Uhr</b>, Ankunft <b>${hm(end)} Uhr</b>. Wie lange dauert die Fahrt?` : `Abfahrt um <b>${hm(t0)} Uhr</b>, Fahrzeit <b>${dur} min</b>. Wann ist die Ankunft?`);
+          await api.wait(1800);
+          const jump = async (a, b2, txt) => {
+            const p = el('path', { d: `M ${X(a)} ${y} Q ${(X(a) + X(b2)) / 2} ${y - 70} ${X(b2)} ${y}`, class: 'jump' }, api.svg);
+            const L = p.getTotalLength ? p.getTotalLength() : 100;
             p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
             await api.tw(900, (t) => (p.style.strokeDashoffset = L * (1 - t)));
-            el('text', { x: (X(a) + X(b)) / 2, y: y - 42, class: 'ex-b f1', 'text-anchor': 'middle', text: txt }, api.svg);
+            el('text', { x: (X(a) + X(b2)) / 2, y: y - 42, class: 'ex-b f1', 'text-anchor': 'middle', text: txt }, api.svg);
           };
-          api.say(`Erst bis zur vollen Stunde: ${hm(t0)} → ${hm(full)} sind <b>${j1} min</b>.`);
-          await jump(t0, full, `+${j1}`); lab(full);
-          await api.wait(1700);
-          api.say(`Bleiben noch ${dur} − ${j1} = <b>${j2} min</b>.`);
-          await jump(full, end, `+${j2}`); lab(end, 'f3');
-          await api.wait(1200);
-          api.say(`Ankunft: <b>${hm(end)} Uhr</b><br>Trick: Immer erst bis zur vollen Stunde springen!`);
+          const parts = [];
+          for (let i = 1; i < pts.length; i++) {
+            const a = pts[i - 1], b2 = pts[i], d = b2 - a;
+            parts.push(d);
+            if (i === 1 && b2 === full && full < end) api.say(`Erst bis zur vollen Stunde: ${hm(a)} → ${hm(b2)} sind <b>${d} min</b>.`);
+            else if (d === 60) api.say(`Eine ganze Stunde: ${hm(a)} → ${hm(b2)} sind <b>60 min</b>.`);
+            else if (pts.length === 2) api.say(`Die volle Stunde wird nicht erreicht: ${hm(a)} → ${hm(b2)} sind <b>${d} min</b>.`);
+            else api.say(ask === 'dauer' ? `Dann bis zur Ankunft: ${hm(a)} → ${hm(b2)} sind <b>${d} min</b>.` : `Bleiben noch ${dur} − ${parts.slice(0, -1).reduce((p, q) => p + q, 0)} = <b>${d} min</b>.`);
+            await jump(a, b2, `+${d}`);
+            if (b2 !== end || ask !== 'dauer') lab(b2, b2 === end ? 'f3' : '');
+            await api.wait(1700);
+          }
+          api.say(ask === 'dauer'
+            ? `Fahrzeit: ${parts.length > 1 ? `${parts.join(' + ')} = ` : ''}<b>${dur} min</b>${dur >= 60 ? ` (= ${Math.floor(dur / 60)} h ${dur % 60} min)` : ''}<br>Trick: Immer erst bis zur vollen Stunde springen!`
+            : `Ankunft: <b>${hm(end)} Uhr</b><br>Trick: Immer erst bis zur vollen Stunde springen!`);
         },
       };
     },
@@ -1477,14 +2091,55 @@
   // =====================================================
   // Einheiten – Zoom ins Lineal
   // =====================================================
+  //   ctx: { mode:'einh', lad:[[Einheit, Faktor] … klein→groß], i (kleine Einheit), toSmall, from, to }, dazu pre/post
+  //   Ohne Aufgabe: Zoom ins Maßband und Chips für die Einheiten-Treppen.
+  const TREPPEN = {
+    'Länge': [['mm', 1], ['cm', 10], ['dm', 100], ['m', 1000], ['km', 1e6]],
+    'Masse': [['g', 1], ['kg', 1000], ['t', 1e6]],
+    'Zeit': [['s', 1], ['min', 60], ['h', 3600]],
+    'Fläche': [['mm²', 1], ['cm²', 100], ['dm²', 1e4], ['m²', 1e6]],
+    'Volumen': [['cm³', 1], ['dm³', 1000], ['m³', 1e6]],
+    'Hohlmaß': [['ml', 1], ['l', 1000]],
+  };
   reg('k5-einheit', {
     title: 'Zoom ins Maßband',
-    viewBox: '0 0 360 150',
-    create(api) {
+    titleFor: (ctx) => (ctx && ctx.mode === 'einh' ? 'Die Einheiten-Treppe' : 'Zoom ins Maßband'),
+    viewBox: '0 0 360 170',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const isTask = ctx.mode === 'einh' && ctx.post;
+      let lad = null, conv = null, show = 'zoom';
+      if (ctx.mode === 'einh') {
+        lad = ctx.lad; show = 'treppe';
+        if (isTask) conv = ctx;
+        else { // ähnliches Beispiel: gleiche Treppe, andere Zahl
+          const i = R(0, lad.length - 2), ratio = lad[i + 1][1] / lad[i][1];
+          const B = ratio === 60 ? R(2, 12) : Math.random() < 0.55 ? R(2, 99) : R(12, 999) / 10, S = round6(B * ratio);
+          const toSmall = Math.random() < 0.55;
+          conv = { i, toSmall, from: toSmall ? B : S, to: toSmall ? S : B };
+        }
+      }
+      // Treppe: große Einheit oben links, kleine unten rechts
+      function treppe(L) {
+        api.clear(); subFor(api, ctx, 'einh', isTask);
+        const units = L.slice().reverse(), n = units.length, w = Math.min(80, 300 / n), h = Math.min(30, 100 / n);
+        const pos = units.map((u, k) => [30 + k * w, 22 + k * h]);
+        units.forEach((u, k) => {
+          const [x, y] = pos[k];
+          el('rect', { x, y, width: w - 4, height: 26, rx: 6, class: 'bag' }, api.svg);
+          el('text', { x: x + (w - 4) / 2, y: y + 18, class: 'ex-b', 'text-anchor': 'middle', style: 'font-size:15px', text: u[0] }, api.svg);
+          if (k < n - 1) {
+            const f = units[k][1] / units[k + 1][1];
+            el('text', { x: x + w + 2, y: y + h - 2, class: 'ex-s f1', 'text-anchor': 'start', style: 'font-size:11px', text: `↘ · ${fmt(f)}` }, api.svg);
+          }
+        });
+        el('text', { x: 30, y: 22 + n * h + 40, class: 'ex-s f6', 'text-anchor': 'start', style: 'font-size:11px', text: 'runter (kleinere Einheit): mal · rauf (größere Einheit): geteilt' }, api.svg);
+        return { units, pos, w };
+      }
+      if (!ctx.mode) api.chips(Object.keys(TREPPEN).map((k) => ({ label: k, onClick() { api.stop(); lad = TREPPEN[k]; show = 'treppe'; conv = null; treppe(lad); api.say(`Die Treppe für <b>${k}</b>: Von einer Stufe zur nächsten ${k === 'Zeit' ? 'ist der Faktor 60' : k === 'Länge' ? 'ist der Faktor 10, nur zwischen m und km 1000' : k === 'Fläche' ? 'ist der Faktor 100' : 'ist der Faktor 1000'}.`); } })));
       const steps = [['1 m', 'dm'], ['1 dm', 'cm'], ['1 cm', 'mm']];
-      let g;
       function bar(big, small) {
-        g = el('g', {}, api.svg);
+        const g = el('g', {}, api.svg);
         el('rect', { x: 30, y: 50, width: 300, height: 34, rx: 4, class: 'rul' }, g);
         for (let i = 0; i <= 10; i++) el('line', { x1: 30 + i * 30, y1: 50, x2: 30 + i * 30, y2: i % 5 ? 64 : 72, class: 'tk' }, g);
         for (let i = 0; i < 10; i++) el('text', { x: 45 + i * 30, y: 100, class: 'ex-xs', 'text-anchor': 'middle', text: `1 ${small}` }, g);
@@ -1492,22 +2147,41 @@
         return g;
       }
       return {
-        reset() { api.clear(); },
+        reset() { if (show === 'treppe' && lad) treppe(lad); else { api.clear(); api.sub(''); } },
         async play() {
-          for (let s = 0; s < 3; s++) {
+          if (show === 'treppe' && conv) {
+            const { units, pos, w } = treppe(lad);
+            const big = lad[conv.i + 1], small = lad[conv.i], ratio = big[1] / small[1];
+            const kBig = units.indexOf(big), kSmall = units.indexOf(small);
+            const [fromK, toK] = conv.toSmall ? [kBig, kSmall] : [kSmall, kBig];
+            const fromU = units[fromK][0], toU = units[toK][0];
+            api.say(`Rechne um: <b>${fmt(conv.from)} ${fromU}</b> in <b>${toU}</b>.`);
+            const ball = el('circle', { cx: pos[fromK][0] + (w - 4) / 2, cy: pos[fromK][1] - 8, r: 7, class: 'mk' }, api.svg);
+            await api.wait(1800);
+            api.say(conv.toSmall
+              ? `Von ${fromU} nach ${toU} geht es eine Stufe <b>runter</b>: 1 ${big[0]} = ${fmt(ratio)} ${small[0]}. Also <b>mal ${fmt(ratio)}</b>.`
+              : `Von ${fromU} nach ${toU} geht es eine Stufe <b>rauf</b>: 1 ${big[0]} = ${fmt(ratio)} ${small[0]}. Also <b>geteilt durch ${fmt(ratio)}</b>.`);
+            const [x0, y0] = [pos[fromK][0] + (w - 4) / 2, pos[fromK][1] - 8], [x1, y1] = [pos[toK][0] + (w - 4) / 2, pos[toK][1] - 8];
+            await api.tw(1100, (t) => { ball.setAttribute('cx', lerp(x0, x1, t)); ball.setAttribute('cy', lerp(y0, y1, t) - Math.sin(t * Math.PI) * 24); });
+            await api.wait(1600);
+            api.say(`${fmt(conv.from)} ${conv.toSmall ? '·' : ':'} ${fmt(ratio)} = <b>${fmt(conv.to)}</b><br><b>${fmt(conv.from)} ${fromU} = ${fmt(conv.to)} ${toU}</b>${ratio === 60 ? '<br><small>Achtung: Bei der Zeit ist der Faktor 60, nicht 10 oder 100!</small>' : ratio === 10 || ratio === 100 || ratio === 1000 ? `<br><small>${conv.toSmall ? 'Mal' : 'Geteilt durch'} ${fmt(ratio)}: Die Ziffern rücken ${String(ratio).length - 1} Stelle${ratio > 10 ? 'n' : ''} nach ${conv.toSmall ? 'links' : 'rechts'}.</small>` : ''}`);
+            return;
+          }
+          if (show === 'treppe') { treppe(lad); return; }
+          for (let st = 0; st < 3; st++) {
             api.clear();
-            const gg = bar(...steps[s]);
+            const gg = bar(...steps[st]);
             await api.tw(500, (t) => gg.setAttribute('opacity', t));
-            api.say(`<b>${steps[s][0]} = 10 ${steps[s][1]}</b>`);
+            api.say(`<b>${steps[st][0]} = 10 ${steps[st][1]}</b>`);
             await api.wait(1700);
-            if (s < 2) {
-              api.say(`Wir zoomen in <b>1 ${steps[s][1]}</b> hinein …`);
+            if (st < 2) {
+              api.say(`Wir zoomen in <b>1 ${steps[st][1]}</b> hinein …`);
               const hl = el('rect', { x: 60, y: 46, width: 30, height: 42, rx: 4, class: 'zoom' }, api.svg);
               await api.wait(500);
               await api.tw(1100, (t) => { hl.setAttribute('x', lerp(60, 30, t)); hl.setAttribute('width', lerp(30, 300, t)); gg.setAttribute('opacity', 1 - t); });
             }
           }
-          api.say('<b>1 m = 10 dm = 100 cm = 1000 mm</b><br>Bei Längen ist jede Stufe <b>10-mal</b> so klein. (Bei Flächen 100-mal, bei Volumen 1000-mal!)');
+          api.say('<b>1 m = 10 dm = 100 cm = 1000 mm</b><br>Zwischen m, dm, cm und mm ist jede Stufe <b>10-mal</b> so klein. Aber: <b>1 km = 1000 m</b>.<br><small>Tippe unten auf eine Größe, um ihre Einheiten-Treppe zu sehen.</small>');
         },
       };
     },
@@ -1761,41 +2435,88 @@
 
   // =====================================================
   // Rechengesetze – Punkte drehen, Streifen umklammern, Rechteck teilen
+  //   ctx: { mode:'ges', law:'kom'|'ass'|'dis', op, nums:[…] }        Gesetz an den Zahlen der Aufgabe
+  //        { mode:'ges', law:'dis', f, x, y, minus, back }           back: ausklammern (rückwärts)
+  //        { mode:'pruef', left, right, lv, rv, ok, rule }           „Stimmt das?“ – beide Seiten ausrechnen
+  //        { mode:'tausch', tokens, order, pair, steps }             Vorteilhaft rechnen: umstellen und bündeln
   // =====================================================
-  reg('k5-gesetze', {
+  reg(['k5-gesetze', 'k5-vorteil'], {
     title: 'Drei Rechengesetze zum Anschauen',
+    titleFor: (ctx) => (!ctx || !ctx.mode ? 'Drei Rechengesetze zum Anschauen' : ctx.mode === 'pruef' ? 'Nachrechnen: Stimmt das?' : ctx.mode === 'tausch' ? 'Geschickt rechnen' : { kom: 'Kommutativgesetz', ass: 'Assoziativgesetz', dis: 'Distributivgesetz' }[ctx.law] || 'Rechengesetze'),
     viewBox: '0 0 360 250',
-    create(api) {
-      let mode = 'alle';
+    create(api, ctx) {
+      ctx = ctx || {};
+      // Beispiel vorher: Bei „Stimmt das?“ und „Geschickt rechnen“ bringt die Aufgabe ein ähnliches Beispiel mit (alt)
+      if (ctx.pre && ctx.alt) ctx = Object.assign({}, ctx.alt, { pre: true });
+      const isTask = !!ctx.post;
+      const task = ctx.mode === 'ges' || ctx.mode === 'pruef' || ctx.mode === 'tausch';
+      let mode = ctx.mode === 'ges' ? ctx.law : task ? ctx.mode : 'alle';
+      const sub = () => (task ? api.sub(isTask ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst') : api.sub(''));
+      // Beispiel vorher: gleiche Aufgabenart, kleine andere Zahlen
+      const N = (i, lo, hi) => (task && isTask && ctx.nums ? ctx.nums[i] : R(lo, hi));
       const T = (x, y, text, cls, parent) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': 'middle', text }, parent || api.svg);
+      const head = (t) => el('text', { x: 180, y: 26, class: 'ex-s f6', 'text-anchor': 'middle', text: t }, api.svg);
+
       async function kommutativ() {
-        api.clear();
-        const r = R(2, 4), c = R(r + 1, 6), s = 24, cx = 180, cy = 112;
-        el('text', { x: 180, y: 26, class: 'ex-s f6', 'text-anchor': 'middle', text: 'KOMMUTATIVGESETZ (Vertauschungsgesetz)' }, api.svg);
+        api.clear(); sub();
+        const op = ctx.law === 'kom' && ctx.op ? ctx.op : '·';
+        head('KOMMUTATIVGESETZ (Vertauschungsgesetz)');
+        if (op === '+') {
+          const a = N(0, 3, 9), b = N(1, 3, 9), u = Math.min(26, 280 / (a + b)), x0 = 180 - ((a + b) * u) / 2, y = 96;
+          const gA = el('g', {}, api.svg), gB = el('g', {}, api.svg);
+          el('rect', { x: x0, y, width: a * u, height: 36, rx: 4, class: 'blk' }, gA); T(x0 + (a * u) / 2, y + 24, a, 'ex-b wtxt', gA);
+          el('rect', { x: x0 + a * u, y, width: b * u, height: 36, rx: 4, class: 'blk mv' }, gB); T(x0 + a * u + (b * u) / 2, y + 24, b, 'ex-b wtxt', gB);
+          const lab = T(180, 200, `${a} + ${b} = ${a + b}`, 'vexpr');
+          api.say(`Ein Streifen aus <b>${a}</b> und <b>${b}</b>: zusammen ${a + b} lang.`);
+          await api.wait(2000);
+          api.say('Jetzt tauschen die beiden Teile die Plätze …');
+          await api.tw(1200, (t) => { gA.setAttribute('transform', `translate(${b * u * t},${-30 * Math.sin(t * Math.PI)})`); gB.setAttribute('transform', `translate(${-a * u * t},${30 * Math.sin(t * Math.PI)})`); });
+          lab.textContent = `${b} + ${a} = ${a + b}`;
+          api.say(`Der Streifen ist gleich lang geblieben: <b>${a} + ${b} = ${b} + ${a}</b><br><small>Beim Plus (und beim Mal) darf man die Zahlen vertauschen.</small>`);
+          await api.wait(3200);
+          return;
+        }
+        const r = N(0, 2, 4), c = N(1, r + 1, 6), cx = 180, cy = 112;
+        const s = Math.min(24, 150 / Math.max(r, c)), dots = r * c <= 150;
         const g = el('g', { opacity: 0 }, api.svg);
-        for (let i = 0; i < r; i++) for (let j = 0; j < c; j++)
-          el('circle', { cx: cx + (j - (c - 1) / 2) * s, cy: cy + (i - (r - 1) / 2) * s, r: 8, class: 'dotO' }, g);
+        if (dots) for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) el('circle', { cx: cx + (j - (c - 1) / 2) * s, cy: cy + (i - (r - 1) / 2) * s, r: Math.min(8, s / 2 - 2), class: 'dotO' }, g);
+        else el('rect', { x: cx - (c * s) / 2, y: cy - (r * s) / 2, width: c * s, height: r * s, class: 'blk' }, g);
         const lab = T(180, 232, '', 'vexpr');
-        api.say(`<b>${r}</b> Reihen mit je <b>${c}</b> Punkten.`);
+        api.say(`<b>${r}</b> Reihen mit je <b>${c}</b> ${dots ? 'Punkten' : 'Kästchen'}.`);
         await api.tw(600, (t) => g.setAttribute('opacity', t));
         lab.textContent = `${r} · ${c} = ${r * c}`;
         await api.wait(1800);
         api.say('Jetzt drehen wir das Bild um eine Vierteldrehung …');
         await api.tw(1400, (t) => g.setAttribute('transform', `rotate(${90 * t} ${cx} ${cy})`));
         lab.textContent = `${c} · ${r} = ${r * c}`;
-        api.say(`… jetzt sind es <b>${c}</b> Reihen mit je <b>${r}</b> Punkten. Aber es sind <b>dieselben</b> Punkte! <small>Beim Mal (und beim Plus) darf man die Zahlen vertauschen.</small>`);
+        api.say(`… jetzt sind es <b>${c}</b> Reihen mit je <b>${r}</b>. Aber es ist <b>dasselbe</b> Bild! <small>Beim Mal (und beim Plus) darf man die Zahlen vertauschen.</small>`);
         await api.wait(3200);
       }
       async function assoziativ() {
-        api.clear();
-        const a = R(2, 5), b = R(2, 6), c = R(2, 5), u = Math.min(26, 260 / (a + b + c));
+        api.clear(); sub();
+        const op = ctx.law === 'ass' && ctx.op ? ctx.op : '+';
+        head('ASSOZIATIVGESETZ (Verbindungsgesetz)');
+        const a = N(0, 2, 5), b = N(1, 2, 6), c = N(2, 2, 5);
+        if (op === '·') {
+          const ex = T(180, 70, `(${a} · ${b}) · ${c}`, 'vexpr'), l1 = T(180, 110, '', 'ex-b'), ex2 = T(180, 160, '', 'vexpr'), l2 = T(180, 200, '', 'ex-b');
+          api.say(`Links zuerst die Klammer: ${a} · ${b} = ${a * b}.`);
+          l1.textContent = `= ${a * b} · ${c} = ${a * b * c}`;
+          await api.wait(2400);
+          ex2.textContent = `${a} · (${b} · ${c})`;
+          api.say(`Jetzt die Klammer verschoben: ${b} · ${c} = ${b * c}.`);
+          l2.textContent = `= ${a} · ${b * c} = ${a * b * c}`;
+          await api.wait(2400);
+          api.say(`Beide Male <b>${a * b * c}</b>. <small>Bei Plus und Mal darf man die Klammer verschieben.</small>`);
+          await api.wait(3000);
+          return;
+        }
+        const u = Math.min(26, 280 / (a + b + c));
         const x0 = 180 - ((a + b + c) * u) / 2, y = 92, h = 34;
-        el('text', { x: 180, y: 26, class: 'ex-s f6', 'text-anchor': 'middle', text: 'ASSOZIATIVGESETZ (Verbindungsgesetz)' }, api.svg);
         const ex = T(180, 66, `(${a} + ${b}) + ${c}`, 'vexpr');
         const xs = [x0, x0 + a * u, x0 + (a + b) * u, x0 + (a + b + c) * u];
         [a, b, c].forEach((v, i) => {
           el('rect', { x: xs[i], y, width: v * u, height: h, rx: 4, class: ['blk', 'blk mv', 'blk g3'][i] }, api.svg);
-          T((xs[i] + xs[i + 1]) / 2, y + 23, v, 'ex-b wtxt');
+          if (v * u > 14) T((xs[i] + xs[i + 1]) / 2, y + 23, v, 'ex-b wtxt');
         });
         const br = el('path', { d: '', class: 'brk' }, api.svg);
         const bl = T(0, 168, '', 'ex-b');
@@ -1817,45 +2538,119 @@
         await api.wait(3200);
       }
       async function distributiv() {
-        api.clear();
-        const f = R(3, 6), x = pick([10, 20]), y = R(2, 6), u = x === 20 ? 10 : 14;
-        const w1 = x * u, w2 = y * u, h = f * u, x0 = 180 - (w1 + w2 + 20) / 2, y0 = 104;
-        el('text', { x: 180, y: 26, class: 'ex-s f6', 'text-anchor': 'middle', text: 'DISTRIBUTIVGESETZ (Verteilungsgesetz)' }, api.svg);
-        const ex = T(180, 62, `${f} · (${x} + ${y})`, 'vexpr');
-        const L = el('rect', { x: x0, y: y0, width: w1, height: h, class: 'blk' }, api.svg);
+        api.clear(); sub();
+        let f, x, y, minus = false, back = false;
+        if (ctx.law === 'dis' && isTask) ({ f, x, y } = ctx), (minus = !!ctx.minus), (back = !!ctx.back);
+        else if (ctx.law === 'dis') { f = R(3, 6); x = pick([20, 30]); y = R(2, 6); minus = !!ctx.minus; back = !!ctx.back; }
+        else { f = R(3, 6); x = pick([10, 20]); y = R(2, 6); }
+        const o = minus ? '−' : '+';
+        const W = minus ? x : x + y, u = Math.min(14, 250 / W), h = Math.max(24, Math.min(110, f * u * (W > 40 ? 3 : 1)));
+        const w1 = (minus ? x - y : x) * u, w2 = y * u, x0 = 180 - (W * u + (minus ? 0 : 20)) / 2, y0 = 100;
+        head('DISTRIBUTIVGESETZ (Verteilungsgesetz)');
+        const sumTxt = `${f} · (${x} ${o} ${y})`, splitTxt = `${f} · ${x} ${o} ${f} · ${y}`;
+        const ex = T(180, 62, back ? splitTxt : sumTxt, 'vexpr');
+        el('rect', { x: x0, y: y0, width: w1, height: h, class: 'blk' }, api.svg);
         const Rg = el('g', {}, api.svg);
-        const Rr = el('rect', { x: x0 + w1, y: y0, width: w2, height: h, class: 'blk' }, Rg);
+        const Rr = el('rect', { x: x0 + w1, y: y0, width: w2, height: h, class: minus ? 'blk mv' : 'blk' }, Rg);
         T(x0 - 14, y0 + h / 2 + 6, f, 'ex-b');
-        T(x0 + w1 / 2, y0 - 8, x, 'ex-s');
-        const ty = T(x0 + w1 + w2 / 2, y0 - 8, y, 'ex-s', Rg);
-        const l1 = T(x0 + w1 / 2, y0 + h + 24, '', 'ex-s'), l2 = T(x0 + w1 + 20 + w2 / 2, y0 + h + 24, '', 'ex-s');
-        const tot = T(180, 236, '', 'vexpr');
-        api.say(`Ein Rechteck: <b>${f}</b> hoch und <b>${x} + ${y}</b> breit. Fläche: ${f} · (${x} + ${y}).`);
+        T(x0 + (minus ? (w1 + w2) / 2 : w1 / 2), y0 - 8, minus ? x : x, 'ex-s');
+        T(x0 + w1 + w2 / 2, y0 + h + 18, y, 'ex-s', Rg);
+        const l1 = T(x0 + w1 / 2, y0 + h + 40, '', 'ex-s'), l2 = T(x0 + w1 + 20 + w2 / 2, y0 + h + 40, '', 'ex-s');
+        const tot = T(180, 240, '', 'vexpr');
+        if (minus) {
+          api.say(`Ein Rechteck: <b>${f}</b> hoch und <b>${x}</b> breit. Davon schneiden wir ein Stück der Breite <b>${y}</b> ab.`);
+          await api.wait(2600);
+          await api.tw(900, (t) => { Rg.setAttribute('transform', `translate(${24 * t},0)`); Rr.setAttribute('opacity', 1 - 0.6 * t); });
+          ex.textContent = back ? sumTxt : splitTxt;
+          api.say(`Übrig bleibt ${f} · (${x} − ${y}). Das ist das ganze Rechteck ${f} · ${x} <b>minus</b> das Stück ${f} · ${y}.`);
+          await api.wait(2600);
+          tot.textContent = `${f * x} − ${f * y} = ${f * (x - y)}`;
+          api.say(`<b>${f} · (${x} − ${y}) = ${f} · ${x} − ${f} · ${y}</b> = ${f * x} − ${f * y} = <b>${f * (x - y)}</b><br><small>Der Faktor ${f} wird auf beide Zahlen verteilt, auch bei Minus.</small>`);
+          await api.wait(3000);
+          return;
+        }
+        if (back) {
+          Rg.setAttribute('transform', 'translate(20,0)');
+          l1.textContent = `${f} · ${x}`; l2.textContent = `${f} · ${y}`;
+          api.say(`Zwei Rechtecke, beide <b>${f}</b> hoch: ${f} · ${x} und ${f} · ${y}.`);
+          await api.wait(2400);
+          api.say('Gleich hoch? Dann schieben wir sie zu einem Rechteck zusammen …');
+          await api.tw(900, (t) => Rg.setAttribute('transform', `translate(${20 * (1 - t)},0)`));
+          l1.textContent = ''; l2.textContent = '';
+          ex.textContent = sumTxt;
+          api.say(`Ein Rechteck: ${f} hoch, ${x} + ${y} = <b>${x + y}</b> breit. Den Faktor ${f} haben wir <b>ausgeklammert</b>.`);
+          await api.wait(2400);
+          tot.textContent = `${f} · ${x + y} = ${fmt(f * (x + y))}`;
+          api.say(`<b>${splitTxt} = ${sumTxt} = ${fmt(f * (x + y))}</b><br><small>Ausklammern lohnt sich, wenn in der Klammer eine glatte Zahl entsteht.</small>`);
+          await api.wait(3000);
+          return;
+        }
+        api.say(`Ein Rechteck: <b>${f}</b> hoch und <b>${x} + ${y}</b> breit. Fläche: ${sumTxt}.`);
         await api.wait(2400);
         api.say('Wir schneiden es an der Stelle ' + x + ' durch …');
         Rr.setAttribute('class', 'blk mv');
         await api.tw(900, (t) => Rg.setAttribute('transform', `translate(${20 * t},0)`));
         l1.textContent = `${f} · ${x} = ${f * x}`; l2.textContent = `${f} · ${y} = ${f * y}`;
-        ex.textContent = `${f} · ${x} + ${f} · ${y}`;
+        ex.textContent = splitTxt;
         api.say(`Zwei Rechtecke: ${f} · ${x} und ${f} · ${y}. Die <b>${f}</b> wird auf beide Teile <b>verteilt</b>.`);
         await api.wait(2200);
         tot.textContent = `${f * x} + ${f * y} = ${f * (x + y)}`;
         api.say(`Zusammen <b>${f * (x + y)}</b>, genauso viel wie ${f} · ${x + y}. <small>So rechnet man z. B. ${f} · ${x + y} im Kopf!</small>`);
-        void ty; void L;
         await api.wait(3200);
       }
-      api.chips([
+      // „Stimmt das?“: beide Seiten ausrechnen
+      async function pruef() {
+        api.clear(); sub();
+        let { left, right, lv, rv, ok, rule } = ctx;
+        T(180, 40, 'Beide Seiten ausrechnen', 'ex-s f6');
+        const L1 = T(95, 90, left, 'ex-b'), R1 = T(265, 90, right, 'ex-b');
+        el('line', { x1: 180, y1: 60, x2: 180, y2: 200, class: 'dash' }, api.svg);
+        const L2 = T(95, 140, '', 'vexpr'), R2 = T(265, 140, '', 'vexpr'), mid = T(180, 146, '', 'vexpr');
+        void L1; void R1;
+        api.say(`Stimmt <b>${left} = ${right}</b>? Wir rechnen beide Seiten aus.`);
+        await api.wait(2200);
+        L2.textContent = `= ${lv}`; api.say(`Links: ${left} = <b>${lv}</b>`); await api.wait(2000);
+        R2.textContent = `= ${rv}`; api.say(`Rechts: ${right} = <b>${rv}</b>`); await api.wait(2000);
+        mid.textContent = ok ? '=' : '≠';
+        api.say(`${ok ? `Beide Seiten ergeben ${lv}: <b>Stimmt!</b>` : `${lv} und ${rv} sind verschieden: <b>Stimmt nicht!</b>`}<br><small>${rule}</small>`);
+      }
+      // Vorteilhaft rechnen: Zahlen umstellen und passende Paare bündeln
+      async function tausch() {
+        api.clear(); sub();
+        const { tokens, order } = ctx, steps = ctx.steps.slice();
+        const n = tokens.length, gap = Math.min(52, 300 / n), xs = (i) => 180 + (i - (n - 1) / 2) * gap;
+        const els = tokens.map((t, i) => T(xs(i), 100, t, 'vexpr'));
+        api.say(`<b>${tokens.join(' ')}</b><br>Gibt es Zahlen, die zusammen eine glatte Zahl ergeben?`);
+        await api.wait(2400);
+        const moved = order && order.some((src, dst) => src !== dst);
+        if (!moved) steps[0] = Object.assign({}, steps[0], { say: `<b>${tokens[0]} ${tokens[1]} ${tokens[2]}</b> stehen schon nebeneinander. Die rechnen wir zuerst.` });
+        if (moved) {
+          api.say('Bei nur Plus oder nur Mal darf man die Zahlen <b>vertauschen</b>. Wir stellen sie günstig um …');
+          const from = tokens.map((_, i) => xs(i));
+          await api.tw(1200, (t) => order.forEach((src, dst) => els[src].setAttribute('x', lerp(from[src], xs(dst), t))));
+          await api.wait(1200);
+        }
+        const out = T(180, 170, '', 'vexpr');
+        for (const st of steps) { out.textContent = st.line; api.say(st.say); await api.wait(2400); }
+      }
+      api.chips(task ? [] : [
         { label: 'Alle drei', onClick() { mode = 'alle'; api.replay(); } },
         { label: 'Kommutativ', onClick() { mode = 'kom'; api.replay(); } },
         { label: 'Assoziativ', onClick() { mode = 'ass'; api.replay(); } },
         { label: 'Distributiv', onClick() { mode = 'dis'; api.replay(); } },
       ]);
       return {
-        reset() { api.clear(); },
+        reset() { api.clear(); sub(); },
         async play() {
+          if (mode === 'pruef') return pruef();
+          if (mode === 'tausch') return tausch();
           if (mode === 'alle' || mode === 'kom') await kommutativ();
           if (mode === 'alle' || mode === 'ass') await assoziativ();
           if (mode === 'alle' || mode === 'dis') await distributiv();
+          if (ctx.mode === 'ges') {
+            const NAME = { kom: ['Kommutativgesetz', 'Vertauschungsgesetz', 'Zahlen vertauschen'], ass: ['Assoziativgesetz', 'Verbindungsgesetz', 'Klammer verschieben'], dis: ['Distributivgesetz', 'Verteilungsgesetz', 'einen Faktor auf eine Summe verteilen (oder ausklammern)'] }[ctx.law];
+            api.say(`→ Das ist das <b>${NAME[0]}</b> (${NAME[1]}): ${NAME[2]}.`);
+          }
           if (mode === 'alle') api.say('<b>Kommutativ</b>: vertauschen · <b>Assoziativ</b>: Klammer verschieben · <b>Distributiv</b>: verteilen. <small>Die ersten beiden gelten nur für Plus und Mal!</small>');
         },
       };

@@ -90,11 +90,35 @@
       fields: [{ answer: ans }],
       hint: `Schau auf die Ziffer <b>rechts neben</b> der ${name}stelle: 0–4 → abrunden, 5–9 → aufrunden.`,
       solution: `Die Ziffer rechts neben der ${name}stelle ist <b>${digit}</b> → ${digit >= 5 ? 'aufrunden' : 'abrunden'}.<br>${fmt(n)} ≈ <b>${fmt(ans)}</b>`,
+      ex: { mode: 'rund', n, p },
     };
   }
 
+  // Animation „Geschickt rechnen“: Zahlen umstellen und bündeln (tausch) bzw. Distributivgesetz
+  function tauschEx(parts, first, second, op, glatt) {
+    const tokens = []; parts.forEach((p, i) => { if (i) tokens.push(op); tokens.push(p); });
+    // Indizes statt Werte merken (dieselbe Zahl kann zweimal vorkommen, z. B. 25 · 25 · 4)
+    const used = [], idxOf = (p) => { const i = parts.findIndex((q, j) => q === p && !used.includes(j)); used.push(i); return i; };
+    const idx = [idxOf(first), idxOf(second)]; parts.forEach((_, j) => { if (!idx.includes(j)) idx.push(j); });
+    const nums = idx.map((j) => parts[j]);
+    const order = []; idx.forEach((j, i) => { order[2 * i] = 2 * j; if (i) order[2 * i - 1] = 2 * i - 1; });
+    const rest = nums.slice(2).join(` ${op} `);
+    const val = op === '·' ? +glatt * +rest : +glatt + +rest;
+    return {
+      mode: 'tausch', tokens, order,
+      steps: [
+        { line: `${nums.join(` ${op} `)}`, say: `Umgestellt: <b>${first} ${op} ${second}</b> stehen jetzt nebeneinander.` },
+        { line: `= ${glatt} ${op} ${rest}`, say: `${first} ${op} ${second} = <b>${glatt}</b>. Das ist eine glatte Zahl!` },
+        { line: `= ${fmt(val)}`, say: `${glatt} ${op} ${rest} = <b>${fmt(val)}</b><br><small>Erst die glatten Paare suchen, dann ist der Rest ganz leicht.</small>` },
+      ],
+    };
+  }
   function vorteilhaft() {
-    const v = R(1, 5);
+    const v = R(1, 5), t = vorteilFor(v), alt = vorteilFor(v);
+    if (t.ex && alt.ex) t.ex.alt = alt.ex;
+    return t;
+  }
+  function vorteilFor(v) {
     if (v === 1) {
       const k = R(12, 99);
       const parts = shuffle(['25', String(k), '4']);
@@ -103,6 +127,7 @@
         fields: [{ answer: 100 * k }],
         hint: 'Welche zwei Zahlen ergeben zusammen multipliziert eine glatte Zahl?',
         solution: `Erst 25 · 4 = 100 (Vertauschungsgesetz).<br>100 · ${k} = <b>${fmt(100 * k)}</b>`,
+        ex: tauschEx(parts, '25', '4', '·', '100'),
       };
     }
     if (v === 2) {
@@ -112,6 +137,7 @@
         fields: [{ answer: 100 + b }],
         hint: 'Suche zwei Zahlen, die zusammen 100 ergeben.',
         solution: `${a} + ${c} = 100, dann 100 + ${b} = <b>${100 + b}</b>`,
+        ex: tauschEx([String(a), String(b), String(c)], String(a), String(c), '+', '100'),
       };
     }
     if (v === 3) {
@@ -122,6 +148,7 @@
         fields: [{ answer: k * m }],
         hint: `${m} liegt ganz nah an 100. Rechne mit 100 und korrigiere.`,
         solution: `${k} · ${m} = ${k} · 100 ${d < 0 ? '−' : '+'} ${k} · ${Math.abs(d)} = ${100 * k} ${d < 0 ? '−' : '+'} ${k * Math.abs(d)} = <b>${fmt(k * m)}</b>`,
+        ex: { mode: 'ges', law: 'dis', f: k, x: 100, y: Math.abs(d), minus: d < 0 },
       };
     }
     if (v === 4) {
@@ -131,6 +158,7 @@
         fields: [{ answer: 100 * a }],
         hint: 'Beide Produkte haben einen gemeinsamen Faktor. Klammere ihn aus.',
         solution: `${a} · ${b} + ${a} · ${c} = ${a} · (${b} + ${c}) = ${a} · 100 = <b>${fmt(100 * a)}</b> (Verteilungsgesetz)`,
+        ex: { mode: 'ges', law: 'dis', f: a, x: b, y: c, back: true },
       };
     }
     const k = R(3, 49);
@@ -140,6 +168,7 @@
       fields: [{ answer: 1000 * k }],
       hint: '125 · 8 ergibt eine sehr glatte Zahl.',
       solution: `125 · 8 = 1000, dann 1000 · ${k} = <b>${fmt(1000 * k)}</b>`,
+      ex: tauschEx(parts, '125', '8', '·', '1000'),
     };
   }
 
@@ -315,18 +344,22 @@
       const which = v - 1;
       const a = R(2, 40), b = R(2, 40), c = R(2, 20), op = pick(['+', '·']);
       const s = op === '·' ? [R(2, 12), R(2, 12), R(2, 12)] : [a, b, c];
-      let eq, why;
+      let eq, why, ex;
       if (which === 0) {
+        ex = { mode: 'ges', law: 'kom', op, nums: [s[0], s[1]] };
         eq = `${s[0]} ${op} ${s[1]} = ${s[1]} ${op} ${s[0]}`;
         why = 'Die beiden Zahlen wurden <b>vertauscht</b>, das Ergebnis bleibt gleich.';
       } else if (which === 1) {
+        ex = { mode: 'ges', law: 'ass', op, nums: s };
         eq = `(${s[0]} ${op} ${s[1]}) ${op} ${s[2]} = ${s[0]} ${op} (${s[1]} ${op} ${s[2]})`;
         why = 'Die Zahlen bleiben an ihrem Platz, nur die <b>Klammer wurde verschoben</b>.';
       } else {
         const f = R(2, 9), x = R(10, 40), y = R(2, 9), minus = Math.random() < 0.3, o = minus ? '−' : '+';
-        eq = Math.random() < 0.5
+        const back = Math.random() < 0.5;
+        eq = !back
           ? `${f} · (${x} ${o} ${y}) = ${f} · ${x} ${o} ${f} · ${y}`
           : `${f} · ${x} ${o} ${f} · ${y} = ${f} · (${x} ${o} ${y})`;
+        ex = { mode: 'ges', law: 'dis', f, x, y, minus, back };
         why = `Der Faktor <b>${f}</b> wird auf beide Zahlen in der Klammer <b>verteilt</b> (oder umgekehrt ausgeklammert).`;
       }
       return {
@@ -336,6 +369,7 @@
         hint: GESETZ_HINT,
         solution: `${why}<br>→ <b>${GESETZ_KURZ[which]}</b>`,
         answerText: GESETZ_KURZ[which],
+        ex,
       };
     }
     if (v === 4) {
@@ -346,6 +380,7 @@
         fields: [{ answer: e, prefix: `${f} · ${n} = ${f} · ${t} + ${f} ·` }],
         hint: `Zerlege ${n} in ${t} + ?`,
         solution: `${n} = ${t} + ${e}, also ${f} · ${n} = ${f} · ${t} + ${f} · <b>${e}</b> = ${f * t} + ${f * e} = ${f * n}`,
+        ex: { mode: 'ges', law: 'dis', f, x: t, y: e },
       };
     }
     if (v === 5) {
@@ -357,26 +392,31 @@
           fields: [{ answer: c, prefix: `(${a} + ${b}) + ${c} = ${a} + (${b} +`, suffix: ')' }],
           hint: 'Beim Assoziativgesetz bleiben alle Zahlen gleich, nur die Klammer wandert.',
           solution: `(${a} + ${b}) + ${c} = ${a} + (${b} + <b>${c}</b>)`,
+          ex: { mode: 'ges', law: 'ass', op: '+', nums: [a, b, c] },
         };
       return {
         prompt: `Ergänze so, dass das <b>Kommutativgesetz</b> passt:`,
         fields: [{ answer: a, prefix: `${a} · ${b} = ${b} ·` }],
         hint: 'Beim Kommutativgesetz werden die Zahlen vertauscht.',
         solution: `${a} · ${b} = ${b} · <b>${a}</b>`,
+        ex: { mode: 'ges', law: 'kom', op: '·', nums: [a, b] },
       };
     }
     if (v === 6) {
       // Gilt das Gesetz auch für Minus und Geteilt?
       const cases = [
-        () => { const a = R(10, 30), b = R(2, 9); return { e: `${a} − ${b} = ${b} − ${a}`, ok: false, why: `${a} − ${b} = ${a - b}, aber ${b} − ${a} geht mit natürlichen Zahlen gar nicht. Bei <b>Minus</b> darf man <b>nicht</b> vertauschen.` }; },
-        () => { const b = R(2, 4), q = R(2, 5), a = b * q * 4; return { e: `${a} : ${b} = ${b} : ${a}`, ok: false, why: `${a} : ${b} = ${a / b}, aber ${b} : ${a} ist keine natürliche Zahl. Bei <b>Geteilt</b> darf man <b>nicht</b> vertauschen.` }; },
-        () => { const a = R(20, 40), b = R(5, 9), c = R(2, 4); return { e: `(${a} − ${b}) − ${c} = ${a} − (${b} − ${c})`, ok: false, why: `Links: ${a - b} − ${c} = ${a - b - c}. Rechts: ${a} − ${b - c} = ${a - b + c}. Bei <b>Minus</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
-        () => { const c = 2, b = 4, a = 8 * R(2, 6); return { e: `(${a} : ${b}) : ${c} = ${a} : (${b} : ${c})`, ok: false, why: `Links: ${a / b} : ${c} = ${a / b / c}. Rechts: ${a} : ${b / c} = ${a / (b / c)}. Bei <b>Geteilt</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
-        () => { const a = R(2, 12), b = R(2, 12); return { e: `${a} · ${b} = ${b} · ${a}`, ok: true, why: `Beide Seiten ergeben ${a * b}. Bei <b>Mal</b> darf man vertauschen (Kommutativgesetz).` }; },
-        () => { const a = R(2, 30), b = R(2, 30), c = R(2, 30); return { e: `(${a} + ${b}) + ${c} = ${a} + (${b} + ${c})`, ok: true, why: `Beide Seiten ergeben ${a + b + c}. Bei <b>Plus</b> darf man die Klammer verschieben (Assoziativgesetz).` }; },
+        () => { const a = R(10, 30), b = R(2, 9); return { lv: a - b, rv: 'geht nicht', e: `${a} − ${b} = ${b} − ${a}`, ok: false, why: `${a} − ${b} = ${a - b}, aber ${b} − ${a} geht mit natürlichen Zahlen gar nicht. Bei <b>Minus</b> darf man <b>nicht</b> vertauschen.` }; },
+        () => { const b = R(2, 4), q = R(2, 5), a = b * q * 4; return { lv: a / b, rv: 'keine natürliche Zahl', e: `${a} : ${b} = ${b} : ${a}`, ok: false, why: `${a} : ${b} = ${a / b}, aber ${b} : ${a} ist keine natürliche Zahl. Bei <b>Geteilt</b> darf man <b>nicht</b> vertauschen.` }; },
+        () => { const a = R(20, 40), b = R(5, 9), c = R(2, 4); return { lv: a - b - c, rv: a - b + c, e: `(${a} − ${b}) − ${c} = ${a} − (${b} − ${c})`, ok: false, why: `Links: ${a - b} − ${c} = ${a - b - c}. Rechts: ${a} − ${b - c} = ${a - b + c}. Bei <b>Minus</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
+        () => { const c = 2, b = 4, a = 8 * R(2, 6); return { lv: a / b / c, rv: a / (b / c), e: `(${a} : ${b}) : ${c} = ${a} : (${b} : ${c})`, ok: false, why: `Links: ${a / b} : ${c} = ${a / b / c}. Rechts: ${a} : ${b / c} = ${a / (b / c)}. Bei <b>Geteilt</b> darf man die Klammer <b>nicht</b> verschieben.` }; },
+        () => { const a = R(2, 12), b = R(2, 12); return { lv: a * b, rv: a * b, e: `${a} · ${b} = ${b} · ${a}`, ok: true, why: `Beide Seiten ergeben ${a * b}. Bei <b>Mal</b> darf man vertauschen (Kommutativgesetz).` }; },
+        () => { const a = R(2, 30), b = R(2, 30), c = R(2, 30); return { lv: a + b + c, rv: a + b + c, e: `(${a} + ${b}) + ${c} = ${a} + (${b} + ${c})`, ok: true, why: `Beide Seiten ergeben ${a + b + c}. Bei <b>Plus</b> darf man die Klammer verschieben (Assoziativgesetz).` }; },
       ];
-      const k = pick(cases)();
+      const kf = pick(cases), k = kf(), k2 = kf();
+      const RULE = 'Kommutativ- und Assoziativgesetz gelten nur für <b>Plus</b> und <b>Mal</b>.';
+      const pr = (c) => { const [left, right] = c.e.split(' = '); return { mode: 'pruef', left, right, lv: c.lv, rv: c.rv, ok: c.ok, rule: RULE }; };
       return {
+        ex: Object.assign(pr(k), { alt: pr(k2) }),
         prompt: `Stimmt das?<br><b>${k.e}</b>`,
         choices: ['Stimmt', 'Stimmt nicht'],
         correct: k.ok ? 0 : 1,
@@ -391,6 +431,7 @@
       fields: [{ answer: f * 100 }],
       hint: `Beide Produkte haben den Faktor ${f}. Schreibe ${f} · (… + …).`,
       solution: `Distributivgesetz: ${f} · ${x} + ${f} · ${y} = ${f} · (${x} + ${y}) = ${f} · 100 = <b>${f * 100}</b>`,
+      ex: { mode: 'ges', law: 'dis', f, x, y, back: true },
     };
   }
 
@@ -480,6 +521,7 @@
       // Vergleichen
       const pairs = [[2, 5, 5, 2], [2, 4, 4, 2], [3, 4, 4, 3], [2, 6, 6, 2], [2, 3, 3, 2], [3, 2, 2, 3], [5, 3, 3, 5], [2, 10, 10, 2], [4, 3, 3, 4]];
       const [b1, e1, b2, e2] = pick(pairs);
+      let alt; do alt = pick(pairs); while (alt[0] === b1 && alt[1] === e1);
       const A = b1 ** e1, B = b2 ** e2;
       const opts = [`${b1}${sup(e1)}`, `${b2}${sup(e2)}`, 'Beide gleich'];
       const k = A > B ? 0 : A < B ? 1 : 2;
@@ -489,6 +531,7 @@
         correct: k,
         hint: 'Rechne beide Potenzen aus.',
         solution: `${b1}${sup(e1)} = ${fmt(A)} und ${b2}${sup(e2)} = ${fmt(B)} → <b>${opts[k]}</b>`,
+        ex: { mode: 'vgl', b1, e1, b2, e2, alt: { mode: 'vgl', b1: alt[0], e1: alt[1], b2: alt[2], e2: alt[3] } },
       };
     }
     // v === 10: Zahl mal Zehnerpotenz oder Basis gesucht
@@ -587,6 +630,7 @@
         fields: [{ answer: d * k }],
         hint: `Die Vielfachen von ${d} sind ${d}, ${2 * d}, ${3 * d}, … Das ${k}. ist ${k} · ${d}.`,
         solution: `${list}<br>Das ${k}. Vielfache ist ${k} · ${d} = <b>${d * k}</b>`,
+        ex: { mode: 'vielf', kind: 'nte', d, k, via: 'k5-teilbar' },
       };
     }
     if (v === 2) {
@@ -596,6 +640,7 @@
         fields: [{ answer: ans }],
         hint: `Wie oft passt ${d} in ${g}? Dann einmal mehr.`,
         solution: `${g} : ${d} = ${Math.floor(g / d)} Rest ${g % d}, also ist ${Math.floor(g / d)} · ${d} = ${Math.floor(g / d) * d} noch zu klein.<br>${Math.floor(g / d) + 1} · ${d} = <b>${ans}</b>`,
+        ex: { mode: 'vielf', kind: 'groesser', d, g, via: 'k5-teilbar' },
       };
     }
     const right = d * R(5, 12);
@@ -607,6 +652,7 @@
       correct: opts.indexOf(right),
       hint: `Ein Vielfaches von ${d} lässt sich ohne Rest durch ${d} teilen.`,
       solution: `${right} = ${right / d} · ${d} → <b>${right}</b> ist ein Vielfaches von ${d}.${wrong.length ? `<br><small>Die anderen haben beim Teilen durch ${d} einen Rest.</small>` : ''}`,
+      ex: { mode: 'vielf', kind: 'welche', d, opts: [...opts].sort((p, q) => p - q), via: 'k5-teilbar' },
     };
   }
 
@@ -633,8 +679,9 @@
     }
     if (v === 2) {
       // Rechnung aufstellen: Punkt vor Strich
-      const k = pick([['Hefte', 'Heft'], ['Brezeln', 'Brezel'], ['Sticker-Packungen', 'Packung'], ['Kugeln Eis', 'Kugel']]);
-      const a = R(2, 6), p = R(2, 4), x = pick([['einen Stift', R(2, 5)], ['ein Getränk', R(2, 3)], ['einen Block', R(3, 6)]]);
+      // [Mehrzahl, Einzahl, Preis von … bis in €] – ganze Euro, ungefähr wie im Laden
+      const k = pick([['Hefte', 'Heft', 1, 2], ['Comichefte', 'Comicheft', 3, 5], ['Sticker-Packungen', 'Packung', 2, 4], ['Kugeln Eis', 'Kugel', 2, 2]]);
+      const a = R(2, 6), p = R(k[2], k[3]), x = pick([['einen Stift', R(2, 5)], ['ein Getränk', R(2, 3)], ['einen Block', R(3, 6)]]);
       const sum = a * p + x[1];
       const pay = Math.ceil(sum / 10) * 10 + (sum % 10 === 0 ? 10 : 0);
       if (Math.random() < 0.5)
@@ -852,21 +899,21 @@
 
   function gleichungen() {
     const v = R(1, 4);
-    let prompt, ans, sol;
+    let prompt, ans, sol, a, op;
     if (v === 1) {
-      ans = R(5, 95); const a = R(5, 95);
+      ans = R(5, 95); a = R(5, 95); op = '+';
       prompt = `${x} + ${a} = ${ans + a}`;
       sol = `Umkehraufgabe: ${x} = ${ans + a} − ${a} = <b>${ans}</b>`;
     } else if (v === 2) {
-      ans = R(20, 150); const a = R(5, ans - 1);
+      ans = R(20, 150); a = R(5, ans - 1); op = '−';
       prompt = `${x} − ${a} = ${ans - a}`;
       sol = `Umkehraufgabe: ${x} = ${ans - a} + ${a} = <b>${ans}</b>`;
     } else if (v === 3) {
-      ans = R(2, 15); const a = R(2, 12);
+      ans = R(2, 15); a = R(2, 12); op = '·';
       prompt = `${a} · ${x} = ${a * ans}`;
       sol = `Umkehraufgabe: ${x} = ${a * ans} : ${a} = <b>${ans}</b>`;
     } else {
-      const a = R(2, 9), b = R(2, 12); ans = a * b;
+      a = R(2, 9); const b = R(2, 12); ans = a * b; op = ':';
       prompt = `${x} : ${a} = ${b}`;
       sol = `Umkehraufgabe: ${x} = ${b} · ${a} = <b>${ans}</b>`;
     }
@@ -876,6 +923,7 @@
       hint: 'Welche Zahl musst du für x einsetzen? Denk an die Umkehraufgabe.',
       solution: `${sol}<br>Probe: setze ${ans} für ${x} ein ✓`,
       answerText: `x = ${ans}`,
+      ex: { mode: 'gl', op, a, ans },
     };
   }
 
@@ -893,6 +941,7 @@
       fields: [{ answer: z * k, suffix: unit.trim() }],
       hint: `Erst durch den Nenner teilen (${TEIL[d]}), dann mit dem Zähler malnehmen.`,
       solution: `${whole} : ${d} = ${k}<br>${k} · ${z} = <b>${z * k}${unit}</b>`,
+      ex: { mode: 'anteil', z, d, k, unit, unitVon },
     };
   }
 
@@ -913,6 +962,7 @@
       hint: `Suche den größten gemeinsamen Teiler von ${n} und ${d}.`,
       solution: `ggT(${n}, ${d}) = ${k}<br>${fr(n, d)} = ${fr(`${n} : ${k}`, `${d} : ${k}`)} = <b>${fr(p, q)}</b>`,
       answerText: fr(p, q),
+      ex: { mode: 'kuerz', p, q, k },
     };
   }
 
@@ -933,6 +983,7 @@
         : `Womit wurde der Zähler ${p} multipliziert, um ${p * k} zu erhalten?`,
       solution: `Mit ${k} erweitert: ${fr(p, q)} = ${fr(`${p} · ${k}`, `${q} · ${k}`)} = <b>${fr(p * k, q * k)}</b>`,
       answerText: fr(p * k, q * k),
+      ex: { mode: 'erw', p, q, k },
     };
   }
 
@@ -1012,6 +1063,7 @@
         fields: [{ answer: res }],
         hint: 'Schreibe die Zahlen so untereinander, dass Komma unter Komma steht. Fehlende Stellen mit 0 auffüllen.',
         solution: `Komma unter Komma:<br><span class="mono">${fmt(A)} ${op} ${fmt(B)} = <b>${fmt(res)}</b></span>`,
+        ex: { mode: v === 1 ? 'add' : 'sub', a, b },
       };
     }
     if (v === 3) {
@@ -1022,6 +1074,7 @@
         fields: [{ answer: (a * k) / 100 }],
         hint: 'Rechne erst ohne Komma, dann setze das Komma: so viele Nachkommastellen wie im Faktor.',
         solution: `${a} · ${k} = ${a * k}, zwei Nachkommastellen → <b>${fmt((a * k) / 100)}</b>`,
+        ex: { mode: 'mul', a, k },
       };
     }
     const e = R(1, 3), p = 10 ** e, mult = Math.random() < 0.5;
@@ -1032,14 +1085,15 @@
       fields: [{ answer: res }],
       hint: `Bei ${mult ? '· ' : ': '}${fmt(p)} rücken alle Ziffern um ${e} Stelle${e > 1 ? 'n' : ''} nach ${mult ? 'links' : 'rechts'}. Das Komma bleibt stehen.`,
       solution: `Alle Ziffern rücken um ${e} Stelle${e > 1 ? 'n' : ''} nach ${mult ? 'links' : 'rechts'}, das Komma bleibt: <b>${fmt(res)}</b>`,
+      ex: { mode: 'zehn', a, k: mult ? e : -e },
     };
   }
 
   function vergleichen() {
-    let A, B, aTxt, bTxt;
+    let A, B, aTxt, bTxt, frac = null;
     if (Math.random() < 0.5) {
       const [p, q] = pick(NICE);
-      A = p / q; aTxt = fr(p, q);
+      A = p / q; aTxt = fr(p, q); frac = [p, q];
       const delta = pick([0, -0.05, 0.05, -0.1, 0.1, -0.01, 0.01, 0.15]);
       B = round6(Math.max(0.01, A + delta)); bTxt = `<b>${fmt(B)}</b>`;
     } else {
@@ -1051,12 +1105,14 @@
       // Gleich große Zahlen nie identisch zeigen, sondern mit angehängter Null: 0,56 und 0,560
       if (B === A) bTxt = `<b>${fmt(B)}0</b>`;
     }
+    const ex = { mode: 'cmp', A: round6(A), B: round6(B), frac, via: 'k5-dezimal' }; // für die Animation: ggf. der Bruch zuerst
     if (Math.random() < 0.5) [A, B, aTxt, bTxt] = [B, A, bTxt, aTxt];
     const correct = Math.abs(A - B) < 1e-9 ? 2 : A > B ? 0 : 1;
     return {
       prompt: `Welche Zahl ist größer?`,
       choices: [aTxt, bTxt, 'Beide gleich groß'],
       correct,
+      ex,
       hint: 'Schreibe beide Zahlen als Dezimalzahl mit gleich vielen Nachkommastellen und vergleiche Stelle für Stelle.',
       solution: `${aTxt} = ${fmt(A)} und ${bTxt} = ${fmt(B)}.<br>→ ${correct === 2 ? '<b>Beide sind gleich groß.</b>' : `<b>${correct === 0 ? aTxt : bTxt}</b> ist größer.`}`,
     };
@@ -1084,6 +1140,7 @@
       fields: [{ answer: mean, suffix: ctx[4] }],
       hint: 'Alle Werte addieren und dann durch die Anzahl der Werte teilen.',
       solution: `Summe: ${vals.join(' + ')} = ${sum}<br>${sum} : ${n} = <b>${mean} ${ctx[4]}</b>`,
+      ex: { mode: 'mittel', vals, unit: ctx[4], what: { Tagen: 'Tag', Kindern: 'Kind', Spielen: 'Spiel' }[ctx[1]] },
     };
   }
 
@@ -1110,6 +1167,7 @@
       hint: 'Zuerst nach rechts (x-Wert), dann nach oben (y-Wert). Merke: „Erst laufen, dann springen“.',
       solution: `P liegt ${px} nach rechts und ${py} nach oben → <b>P(${px} | ${py})</b>`,
       answerText: `P(${px} | ${py})`,
+      ex: { mode: 'koord', x: px, y: py },
     };
   }
 
@@ -1138,6 +1196,7 @@
       correct: t,
       hint: 'spitz: unter 90° · recht: genau 90° · stumpf: zwischen 90° und 180° · gestreckt: genau 180° · überstumpf: zwischen 180° und 360°',
       solution: `${a}° ist ${a < 90 ? 'kleiner als 90°' : a === 90 ? 'genau 90°' : a < 180 ? 'zwischen 90° und 180°' : a === 180 ? 'genau 180°' : 'zwischen 180° und 360°'} → <b>${types[t][0]}</b>`,
+      ex: { mode: 'wart', a },
     };
   }
 
@@ -1191,6 +1250,7 @@
         : 'Scheitelwinkel sind gleich groß. Nebenwinkel ergeben zusammen 180°.',
       solution: `β ist ${rel === 'Nebenwinkel des Stufenwinkels' ? 'der' : 'ein'} <b>${rel}</b> zum ${gv}°-Winkel.<br>${eq ? `→ gleich groß: β = <b>${av}°</b>` : `→ β = 180° − ${gv}° = <b>${av}°</b>`}`,
       answerText: `β = ${av}°`,
+      ex: { mode: 'wpaar', parallel, rel, gv, av },
     };
   }
 
@@ -1212,6 +1272,7 @@
         fields: [{ answer: 2 * (a + b), prefix: 'u =', suffix: unit }],
         hint: 'Der Umfang ist die Länge aller vier Seiten zusammen: u = 2 · a + 2 · b',
         solution: `u = 2 · ${a} ${unit} + 2 · ${b} ${unit} = ${2 * a} ${unit} + ${2 * b} ${unit} = <b>${2 * (a + b)} ${unit}</b>`,
+        ex: { mode: 'rect', kind: 'u', a, b, unit },
       };
     if (v === 2)
       return {
@@ -1220,12 +1281,14 @@
         fields: [{ answer: a * b, prefix: 'A =', suffix: unit + '²' }],
         hint: 'Flächeninhalt = Länge mal Breite: A = a · b',
         solution: `A = ${a} ${unit} · ${b} ${unit} = <b>${a * b} ${unit}²</b>`,
+        ex: { mode: 'rect', kind: 'a', a, b, unit },
       };
     return {
       prompt: `Ein Rechteck hat den Flächeninhalt <b>A = ${a * b} ${unit}²</b> und die Seite <b>a = ${a} ${unit}</b>. Wie lang ist die Seite b?`,
       fields: [{ answer: b, prefix: 'b =', suffix: unit }],
       hint: 'A = a · b. Welche Zahl mal a ergibt A? Teile A durch a.',
       solution: `b = A : a = ${a * b} : ${a} = <b>${b} ${unit}</b>`,
+      ex: { mode: 'rect', kind: 'b', a, b, unit },
     };
   }
 
@@ -1247,6 +1310,7 @@
       fields: [{ answer: A, prefix: 'A =', suffix: 'cm²' }],
       hint: 'Ergänze die Figur zu einem großen Rechteck und ziehe das fehlende Rechteck ab, oder zerlege sie in zwei Rechtecke.',
       solution: `Großes Rechteck: ${Wd} · ${Hd} = ${Wd * Hd} cm²<br>Fehlendes Stück: ${w} · ${h} = ${w * h} cm²<br>A = ${Wd * Hd} − ${w * h} = <b>${A} cm²</b>`,
+      ex: { mode: 'rect', kind: 'l', Wd, Hd, w, h },
     };
   }
 
@@ -1276,6 +1340,7 @@
         fields: [{ answer: V, prefix: 'V =', suffix: 'cm³' }],
         hint: 'V = a · b · c (Länge · Breite · Höhe)',
         solution: `V = ${a} cm · ${b} cm · ${c} cm = <b>${V} cm³</b>`,
+        ex: { mode: 'quader', kind: 'v', a, b, c },
       };
     if (v === 2)
       return {
@@ -1284,6 +1349,7 @@
         fields: [{ answer: O, prefix: 'A<sub>O</sub> =', suffix: 'cm²' }],
         hint: 'Ein Quader hat 6 Flächen, je 2 gleich große: A<sub>O</sub> = 2 · (a·b + a·c + b·c)',
         solution: `A<sub>O</sub> = 2 · (${a}·${b} + ${a}·${c} + ${b}·${c}) = 2 · (${a * b} + ${a * c} + ${b * c}) = 2 · ${a * b + a * c + b * c} = <b>${O} cm²</b>`,
+        ex: { mode: 'quader', kind: 'o', a, b, c },
       };
     const A = R(2, 8) * 10, B2 = R(2, 6) * 10, C2 = R(2, 5) * 10;
     const l = (A * B2 * C2) / 1000;
@@ -1292,6 +1358,7 @@
       fields: [{ answer: l, suffix: 'l' }],
       hint: 'Rechne in Dezimeter um (10 cm = 1 dm). 1 dm³ = 1 Liter.',
       solution: `${A} cm = ${A / 10} dm, ${B2} cm = ${B2 / 10} dm, ${C2} cm = ${C2 / 10} dm<br>V = ${A / 10} · ${B2 / 10} · ${C2 / 10} = ${fmt(l)} dm³ = <b>${fmt(l)} l</b>`,
+      ex: { mode: 'quader', kind: 'l', a: A, b: B2, c: C2 },
     };
   }
 
@@ -1322,6 +1389,7 @@
       fields: [{ answer: toV, suffix: toU }],
       hint: `1 ${big[0]} = ${fmt(ratio)} ${small[0]}. ${toSmall ? 'In die kleinere Einheit: malnehmen.' : 'In die größere Einheit: teilen.'}`,
       solution: `1 ${big[0]} = ${fmt(ratio)} ${small[0]}<br>${fmt(fromV)} ${toSmall ? '·' : ':'} ${fmt(ratio)} = <b>${fmt(toV)} ${toU}</b>`,
+      ex: { mode: 'einh', lad, i, toSmall, from: fromV, to: toV },
     };
   }
 
@@ -1347,6 +1415,7 @@
           return { ok: h * 60 + m === end % 1440 || (h === 24 && m === end % 60 && end % 1440 < 60) };
         },
         answerText: `${hm(end)} Uhr`,
+        ex: { mode: 'fahr', start, dur, ask: 'an' },
       };
     return {
       prompt: `${what} nach ${dest} fährt um <b>${hm(start)} Uhr</b> ab und kommt um <b>${hm(end)} Uhr</b> an. Wie lange dauert die Fahrt?`,
@@ -1358,6 +1427,7 @@
         const hours = Math.floor((end - full) / 60), rest = end - full - hours * 60;
         return `Von ${hm(start)} bis ${hm(full)}: ${toFull} min${hours ? `<br>von ${hm(full)} bis ${hm(full + hours * 60)}: ${hours * 60} min` : ''}<br>von ${hm(full + hours * 60)} bis ${hm(end)}: ${rest} min<br>zusammen: ${toFull}${hours ? ` + ${hours * 60}` : ''} + ${rest} = <b>${dur} min</b>`;
       })(),
+      ex: { mode: 'fahr', start, dur, ask: 'dauer' },
     };
   }
 
@@ -1376,6 +1446,7 @@
         hint: 'Rechne in Cent, wenn dir das leichter fällt: Preis in Cent mal Anzahl.',
         solution: `${price} ct · ${n} = ${price * n} ct = <b>${euro(price * n)}</b>`,
         answerText: euro(price * n),
+        ex: { mode: 'mul', a: price, k: n, via: 'k5-dezimal' },
       };
     }
     if (v === 2) {
@@ -1385,6 +1456,7 @@
         fields: [{ answer: per, suffix: '€' }],
         hint: 'Gesamtkosten durch die Anzahl der Kinder teilen.',
         solution: `${fmt(n * per)} € : ${n} = <b>${per} €</b>`,
+        ex: { mode: 'div', n: n * per, d: n, via: 'k5-division' },
       };
     }
     const pay = pick([5, 10, 20, 50]);
@@ -1395,6 +1467,7 @@
       hint: 'Ergänze vom Preis bis zum bezahlten Betrag, oder rechne Schein − Preis.',
       solution: `${euro(pay * 100)} − ${euro(cost)} = <b>${euro(pay * 100 - cost)}</b>`,
       answerText: euro(pay * 100 - cost),
+      ex: { mode: 'sub', a: pay * 100, b: cost, via: 'k5-dezimal' },
     };
   }
 
