@@ -71,8 +71,9 @@
         el('line', { x1: 14, y1: y, x2: 344, y2: y, class: 'axis' }, api.svg);
         el('path', { d: `M344 ${y - 4} l8 4 l-8 4z`, class: 'arrh' }, api.svg);
         for (let i = 0; i <= 10; i++) el('line', { x1: X(i), y1: y - (i % 5 === 0 ? 10 : 6), x2: X(i), y2: y + (i % 5 === 0 ? 10 : 6), class: 'axis' }, api.svg);
-        el('text', { x: X(0), y: y + 28, class: 'ex-s', 'text-anchor': 'middle', text: fmt(c.a) }, api.svg);
-        el('text', { x: X(10), y: y + 28, class: 'ex-s', 'text-anchor': 'middle', text: fmt(c.a + 10 * c.step) }, api.svg);
+        const lang = fmt(c.a + 10 * c.step).length > 6; // lange Zahlen bündig zum Rand
+        el('text', { x: lang ? 8 : X(0), y: y + 28, class: 'ex-s', 'text-anchor': lang ? 'start' : 'middle', text: fmt(c.a) }, api.svg);
+        el('text', { x: lang ? 352 : X(10), y: y + 28, class: 'ex-s', 'text-anchor': lang ? 'end' : 'middle', text: fmt(c.a + 10 * c.step) }, api.svg);
         el('path', { d: `M${X(c.k)} ${y - 40} v24`, class: 'strahlpf' }, api.svg);
         el('text', { x: X(c.k), y: y - 46, class: 'ex-b f1', 'text-anchor': 'middle', text: '?' }, api.svg).id = 'zsFrage';
         punkt = el('circle', { cx: X(0), cy: y, r: 7, class: 'pt', opacity: 0 }, api.svg);
@@ -320,24 +321,29 @@
       let c = wahl('k5-lage', ctx, () => frei(), (e) => (ctx.mode !== 'paar' || e.art === ctx.art) && (ctx.mode !== 'abstand' || !!e.zwei === !!ctx.zwei) && (ctx.mode !== 'figur' || e.frage === ctx.frage));
       let g;
       const FARBE = ['var(--c2)', 'var(--c1)'];
+      // Namen werden gesammelt und am Ende von reset() so gesetzt, dass sie im Bild bleiben und nichts sie verdeckt
+      let namen = [];
       const strich = (s, i, name) => {
         el('line', { x1: gx(s[0]), y1: gy(s[1]), x2: gx(s[2]), y2: gy(s[3]), style: `stroke:${FARBE[i]};stroke-width:3.5;stroke-linecap:round` }, api.svg);
-        el('text', { x: gx(s[2]) + 6, y: Math.max(16, gy(s[3]) - 5), class: 'ex-b', style: `fill:${FARBE[i]}`, text: name }, api.svg);
+        namen.push({ seg: [gx(s[0]), gy(s[1]), gx(s[2]), gy(s[3])], name, farbe: FARBE[i] });
       };
+      const punktName = (px, py, name) => namen.push({ p: [gx(px), gy(py)], name });
+      const setzeNamen = () => { const pos = M.lagePlatz(namen); namen.forEach((it, i) => el('text', { x: pos[i][0], y: pos[i][1], class: it.seg ? 'ex-b' : 'ptl', style: `${it.farbe ? `fill:${it.farbe};` : ''}paint-order:stroke;stroke:#fffdf9;stroke-width:4px;stroke-linejoin:round`, text: it.name }, api.svg)); namen = []; };
       // Schritt-Dreieck: von (x, y) erst dx nach rechts, dann dy nach oben/unten
       function treppe(s, d, i) {
         const [x, y] = [s[0], s[1]];
         const grp = el('g', { opacity: 0 }, api.svg);
         if (d[0]) el('line', { x1: gx(x), y1: gy(y), x2: gx(x + d[0]), y2: gy(y), style: `stroke:${FARBE[i]};stroke-width:2;stroke-dasharray:4 3` }, grp);
         if (d[1]) el('line', { x1: gx(x + d[0]), y1: gy(y), x2: gx(x + d[0]), y2: gy(y + d[1]), style: `stroke:${FARBE[i]};stroke-width:2;stroke-dasharray:4 3` }, grp);
-        if (d[0]) el('text', { x: gx(x + d[0] / 2), y: gy(y) + (d[1] > 0 ? 14 : -5), class: 'ex-s', 'text-anchor': 'middle', style: `fill:${FARBE[i]}`, text: d[0] }, grp);
-        if (d[1]) el('text', { x: gx(x + d[0]) + 5, y: gy(y + d[1] / 2) + 4, class: 'ex-s', style: `fill:${FARBE[i]}`, text: Math.abs(d[1]) }, grp);
+        const halo = ';paint-order:stroke;stroke:#fffdf9;stroke-width:3px;stroke-linejoin:round'; // Zahlen bleiben im Bild und lesbar
+        if (d[0]) el('text', { x: gx(x + d[0] / 2), y: Math.min(214, Math.max(13, gy(y) + (d[1] > 0 ? 14 : -5))), class: 'ex-s', 'text-anchor': 'middle', style: `fill:${FARBE[i]}${halo}`, text: d[0] }, grp);
+        if (d[1]) el('text', { x: Math.min(270, gx(x + d[0]) + 5), y: gy(y + d[1] / 2) + 4, class: 'ex-s', style: `fill:${FARBE[i]}${halo}`, text: Math.abs(d[1]) }, grp);
         return grp;
       }
       if (!ctx.mode) api.chips([['parallel', 'parallel'], ['senkrecht', 'senkrecht'], ['weder', 'weder noch']].map(([art, label]) => ({ label, onClick() { c = frei(art); api.replay(); } })));
       return {
         reset() {
-          api.clear(); api.sub(subText(ctx)); g = {};
+          api.clear(); api.sub(subText(ctx)); g = {}; namen = [];
           for (let i = 0; i <= 10; i++) el('line', { x1: gx(i), y1: gy(0), x2: gx(i), y2: gy(8), class: 'grid' }, api.svg);
           for (let j = 0; j <= 8; j++) el('line', { x1: gx(0), y1: gy(j), x2: gx(10), y2: gy(j), class: 'grid' }, api.svg);
           if (c.mode === 'figur') {
@@ -361,11 +367,13 @@
             const q = 9, sx = c.waag ? 1 : Math.sign(c.px - c.k), sy = c.waag ? Math.sign(c.py - c.k) : 1;
             g.winkel = el('path', { d: `M${gx(fuss[0]) + q * sx} ${gy(fuss[1])} v${-q * sy} h${-q * sx}`, style: 'fill:none;stroke:var(--ink);stroke-width:1.6', opacity: 0 }, api.svg);
             el('circle', { cx: gx(c.px), cy: gy(c.py), r: 6, class: 'pt' }, api.svg);
-            if (c.zwei === undefined) el('text', { x: gx(c.px) + 8, y: gy(c.py) - 8, class: 'ptl', text: 'P' }, api.svg);
+            if (c.zwei === undefined) punktName(c.px, c.py, 'P');
+            setzeNamen();
             return;
           }
           strich(c.s1, 0, 'g'); strich(c.s2, 1, 'h');
           g.t1 = treppe(c.s1, c.d1, 0); g.t2 = treppe(c.s2, c.d2, 1);
+          setzeNamen();
         },
         async play() {
           if (c.mode === 'figur') {

@@ -90,7 +90,7 @@
         for (let v = B; v <= B + 30; v++) {
           const big = v % 10 === 0, mid = v % 5 === 0;
           el('line', { x1: X(v), y1: 100 - (big ? 12 : mid ? 8 : 5), x2: X(v), y2: 100 + (big ? 12 : mid ? 8 : 5), class: 'tk' }, api.svg);
-          if (big) el('text', { x: X(v), y: 132, class: 'ex-t', 'text-anchor': 'middle', text: F(v * u) }, api.svg);
+          if (big) { const tx = F(v * u), hw = tx.length * 3.9 + 2; el('text', { x: Math.min(Math.max(X(v), hw), 360 - hw), y: 132, class: 'ex-t', 'text-anchor': 'middle', text: tx }, api.svg); } // lange Zahlen bleiben im Bild
         }
         g.lo = el('circle', { cx: X(lo() / u), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
         g.hi = el('circle', { cx: X(hi() / u), cy: 100, r: 16, class: 'hl2', opacity: 0 }, api.svg);
@@ -550,6 +550,8 @@
         el('text', { x: 180, y: 222, class: 'ex-b', 'text-anchor': 'middle' }, api.svg).innerHTML = `T<tspan dy="5" font-size="12">${n}</tspan><tspan dy="-5"> = {${all.join(', ')}}</tspan>`;
         api.say(`<b>${n}</b> hat <b>${all.length} Teiler</b>. <small>Man kann aufhören, sobald die linke Zahl größer wäre als die rechte.</small>`);
         await api.wait(3000);
+        // Sachaufgabe „gleich große Gruppen“: 1 und die Zahl selbst zählen nicht mit
+        if (ctx.ohneRand && ctx.post) api.say(`Für die Gruppen fallen zwei Teiler weg: <b>1</b> (jede Gruppe soll mindestens 2 Kinder haben) und <b>${n}</b> (es soll mehr als eine Gruppe geben).<br>${all.length} − 2 = <b>${all.length - 2}</b> mögliche Gruppengrößen: ${all.slice(1, -1).join(', ')}`);
       }
       api.chips([
         { label: 'Quersumme (3, 9)', onClick() { task = null; mode = 'teil'; newDemo(pick([3, 9])); api.replay(); } },
@@ -2098,7 +2100,7 @@
         const la = P(a / 2, b, 0), lb = P(a, b / 2, 0), lc = P(a, 0, c / 2);
         el('text', { x: la[0] - 18, y: la[1] + 20, class: 'ex-s', 'text-anchor': 'middle', text: `a = ${a}${kind !== 'v' || isTask ? ' ' + U : ''}` }, api.svg);
         el('text', { x: lb[0] + 16, y: lb[1] + 18, class: 'ex-s', text: `b = ${b}${kind !== 'v' || isTask ? ' ' + U : ''}` }, api.svg);
-        el('text', { x: lc[0] + 12, y: lc[1], class: 'ex-s', text: `c = ${c}${kind !== 'v' || isTask ? ' ' + U : ''}` }, api.svg);
+        { const tc = `c = ${c}${kind !== 'v' || isTask ? ' ' + U : ''}`; el('text', { x: Math.min(lc[0] + 12, 356 - tc.length * 7.4), y: lc[1], class: 'ex-s', style: 'paint-order:stroke;stroke:#fffdf9;stroke-width:3px', text: tc }, api.svg); }
       };
       async function stack() {
         let n = 0;

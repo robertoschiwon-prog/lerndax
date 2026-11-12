@@ -759,7 +759,7 @@
         fields: [{ answer: inner.length }],
         hint: `Gesucht sind die Teiler von ${n}, ohne 1 und ohne ${n}.`,
         solution: `T<sub>${n}</sub> = {${T.join(', ')}}. Ohne 1 und ${n} bleiben ${inner.join(', ')} → <b>${inner.length}</b> Möglichkeiten.`,
-        ex: { mode: 'teiler', n, via: 'k5-teilbar' },
+        ex: { mode: 'teiler', n, via: 'k5-teilbar', ohneRand: true },
       };
     }
     if (v === 4) {
@@ -1300,7 +1300,7 @@
     for (let i = 0; i <= 10; i++) ax += `<text class="tick" x="${ox + i * s}" y="${oy + 16}" text-anchor="middle">${i}</text>`;
     for (let j = 1; j <= 8; j++) ax += `<text class="tick" x="${ox - 9}" y="${oy - j * s + 4}" text-anchor="end">${j}</text>`;
     ax += `<text class="tick b" x="${ox + 10 * s + 14}" y="${oy + 16}">x</text><text class="tick b" x="${ox + 8}" y="${oy - 8 * s - 4}">y</text>`;
-    const pnt = pts.map(([x, y, name]) => `<circle class="pt" cx="${ox + x * s}" cy="${oy - y * s}" r="6"/><text class="ptl" x="${ox + x * s + 8}" y="${oy - y * s - 8}">${name}</text>`).join('');
+    const pnt = pts.map(([x, y, name]) => `<circle class="pt" cx="${ox + x * s}" cy="${oy - y * s}" r="6"/><text class="ptl" x="${ox + x * s + 8}" y="${oy - y * s + (x === 0 && y >= 7 ? 20 : -8)}">${name}</text>`).join(''); // oben links steht schon das y der Achse
     return `<svg viewBox="0 0 300 245"><defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrh"/></marker></defs>${g}${ax}${pnt}</svg>`;
   }
   function koordinaten() {
@@ -1489,7 +1489,7 @@
 
   function lform() {
     const Wd = R(6, 12), Hd = R(5, 10), w = R(2, Wd - 3), h = R(2, Hd - 3);
-    const s = Math.min(200 / Wd, 150 / Hd), x0 = (300 - Wd * s) / 2 - 10, y0 = 20;
+    const s = Math.min(190 / Wd, 150 / Hd), x0 = (300 - Wd * s) / 2, y0 = 20; // links und rechts je rund 50 Platz für die Maße
     const pts = [
       [x0, y0], [x0 + (Wd - w) * s, y0], [x0 + (Wd - w) * s, y0 + h * s], [x0 + Wd * s, y0 + h * s], [x0 + Wd * s, y0 + Hd * s], [x0, y0 + Hd * s],
     ].map((p) => p.join(',')).join(' ');

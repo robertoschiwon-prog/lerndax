@@ -46,7 +46,9 @@
     const X = (i) => 22 + i * 25.6, y = 60;
     let g = `<line class="axis" x1="10" y1="${y}" x2="292" y2="${y}"/><path class="arrh" d="M292 ${y - 4} l8 4 l-8 4z"/>`;
     for (let i = 0; i <= 10; i++) g += `<line class="axis" x1="${X(i)}" y1="${y - (i % 5 === 0 ? 9 : 6)}" x2="${X(i)}" y2="${y + (i % 5 === 0 ? 9 : 6)}"/>`;
-    g += `<text class="tick b" x="${X(0)}" y="${y + 26}" text-anchor="middle">${fmt(a)}</text><text class="tick b" x="${X(10)}" y="${y + 26}" text-anchor="middle">${fmt(a + 10 * step)}</text>`;
+    // lange Zahlen bündig zum Rand, damit sie nicht aus dem Bild ragen
+    const lang = fmt(a + 10 * step).length > 6;
+    g += `<text class="tick b" x="${lang ? 6 : X(0)}" y="${y + 26}" text-anchor="${lang ? 'start' : 'middle'}">${fmt(a)}</text><text class="tick b" x="${lang ? 298 : X(10)}" y="${y + 26}" text-anchor="${lang ? 'end' : 'middle'}">${fmt(a + 10 * step)}</text>`;
     g += `<path class="strahlpf" d="M${X(k)} ${y - 34} v20"/><path class="arrh" style="fill:var(--c1)" d="M${X(k) - 5} ${y - 16} h10 l-5 8z"/><text class="tick b" x="${X(k)}" y="${y - 40}" text-anchor="middle" style="fill:var(--c1)">?</text>`;
     return `<svg viewBox="0 0 304 96">${g}</svg>`;
   }
@@ -311,11 +313,44 @@
   const GS = 24, GOX = 22, GOY = 206;
   const gx = (x) => GOX + x * GS, gy = (y) => GOY - y * GS;
   M.lageGitter = { gx, gy, GS, GOX, GOY };
+  // Beschriftungen (Namen von Geraden und Punkten) werden gesammelt und am Ende so gesetzt, dass sie im Bild bleiben,
+  // sich nicht gegenseitig verdecken und nicht auf einer anderen Linie liegen.
+  let LBL = [];
+  const abstandStrecke = (p, s) => { // Abstand Punkt p (Pixel) zur Strecke s (Pixel)
+    const vx = s[2] - s[0], vy = s[3] - s[1], l2 = vx * vx + vy * vy;
+    const t = l2 ? Math.max(0, Math.min(1, ((p[0] - s[0]) * vx + (p[1] - s[1]) * vy) / l2)) : 0;
+    return Math.hypot(p[0] - s[0] - t * vx, p[1] - s[1] - t * vy);
+  };
+  function platziere(items) {
+    const segs = items.filter((it) => it.seg).map((it) => it.seg), pts = items.filter((it) => !it.seg).map((it) => it.p);
+    const gesetzt = [];
+    return items.map((it) => {
+      let kand;
+      if (it.seg) {
+        const [x1, y1, x2, y2] = it.seg, mx = (x1 + x2) / 2, my = (y1 + y2) / 2, l = Math.hypot(x2 - x1, y2 - y1) || 1, nx = -(y2 - y1) / l, ny = (x2 - x1) / l;
+        kand = [[x2 + 7, y2 - 5], [x2 + 7, y2 + 15], [x2 - 16, y2 - 6], [x1 - 16, y1 - 5], [x1 - 16, y1 + 15], [x1 + 7, y1 - 6], [mx + nx * 13 - 5, my + ny * 13 + 5], [mx - nx * 13 - 5, my - ny * 13 + 5],
+          [x1 + (x2 - x1) * 0.25 + nx * 13 - 5, y1 + (y2 - y1) * 0.25 + ny * 13 + 5], [x1 + (x2 - x1) * 0.75 - nx * 13 - 5, y1 + (y2 - y1) * 0.75 - ny * 13 + 5]];
+      } else kand = [[it.p[0] + 8, it.p[1] - 8], [it.p[0] - 18, it.p[1] - 8], [it.p[0] + 8, it.p[1] + 19], [it.p[0] - 18, it.p[1] + 19], [it.p[0] - 5, it.p[1] - 12], [it.p[0] - 5, it.p[1] + 23], [it.p[0] + 11, it.p[1] + 6], [it.p[0] - 21, it.p[1] + 6], [it.p[0] + 15, it.p[1] - 14], [it.p[0] - 25, it.p[1] - 14], [it.p[0] + 15, it.p[1] + 26], [it.p[0] - 25, it.p[1] + 26], [it.p[0] - 5, it.p[1] - 22], [it.p[0] - 5, it.p[1] + 33]];
+      const innen = (k) => k[0] >= 3 && k[0] <= 270 && k[1] >= 15 && k[1] <= 215;
+      const mitte = (k) => [k[0] + 5, k[1] - 5];
+      const frei = (k) => innen(k) && gesetzt.every((g) => Math.abs(g[0] - k[0]) >= 14 || Math.abs(g[1] - k[1]) >= 15)
+        && segs.every((sg) => sg === it.seg ? abstandStrecke(mitte(k), sg) >= 6 : abstandStrecke(mitte(k), sg) >= 10)
+        && pts.every((q) => q === it.p || Math.hypot(q[0] - mitte(k)[0], q[1] - mitte(k)[1]) >= 13);
+      const weit = (c) => Math.min(...gesetzt.map((g) => Math.hypot(g[0] - c[0], g[1] - c[1])), 999);
+      const k = kand.find(frei) || kand.find((c) => innen(c) && gesetzt.every((g) => Math.abs(g[0] - c[0]) >= 14 || Math.abs(g[1] - c[1]) >= 15)) || kand.filter(innen).sort((u, v) => weit(v) - weit(u))[0] || kand[0]; // Notfall: so weit weg von den anderen Namen wie möglich
+      gesetzt.push(k);
+      return k;
+    });
+  }
+  M.lagePlatz = platziere;
   function kaestchen(extra) {
     let g = '';
     for (let i = 0; i <= 10; i++) g += `<line class="grid" x1="${gx(i)}" y1="${gy(0)}" x2="${gx(i)}" y2="${gy(8)}"/>`;
     for (let j = 0; j <= 8; j++) g += `<line class="grid" x1="${gx(0)}" y1="${gy(j)}" x2="${gx(10)}" y2="${gy(j)}"/>`;
-    return `<svg viewBox="0 0 284 220">${g}${extra}</svg>`;
+    const items = LBL; LBL = [];
+    const pos = platziere(items);
+    const namen = items.map((it, i) => `<text class="${it.seg ? 'tick b' : 'ptl'}" x="${pos[i][0].toFixed(1)}" y="${pos[i][1].toFixed(1)}" style="${it.farbe ? `fill:${it.farbe};` : ''}font-size:16px;paint-order:stroke;stroke:#fffdf9;stroke-width:4px;stroke-linejoin:round">${it.name}</text>`).join('');
+    return `<svg viewBox="0 0 284 220">${g}${extra}${namen}</svg>`;
   }
   const RICHT = [[1, 0], [0, 1], [1, 1], [1, -1], [2, 1], [1, 2], [2, -1], [1, -2], [3, 1], [1, 3]];
   const senk = ([a, b]) => (b > 0 || (b === 0 && a < 0) ? [b, -a] : [-b, a]); // Vierteldrehung, so normiert, dass dx ≥ 0
@@ -331,7 +366,7 @@
   }
   const aufLinie = (s, p) => (p[0] - s[0]) * (s[3] - s[1]) === (p[1] - s[1]) * (s[2] - s[0]);
   const FARBE = ['var(--c2)', 'var(--c1)', 'var(--c3)', 'var(--c4)'];
-  const linie = (s, name, i) => `<line x1="${gx(s[0])}" y1="${gy(s[1])}" x2="${gx(s[2])}" y2="${gy(s[3])}" style="stroke:${FARBE[i]};stroke-width:3.5;stroke-linecap:round"/><text class="tick b" x="${gx(s[2]) + 6}" y="${Math.max(15, gy(s[3]) - 5)}" style="fill:${FARBE[i]};font-size:15px">${name}</text>`;
+  const linie = (s, name, i) => { LBL.push({ seg: [gx(s[0]), gy(s[1]), gx(s[2]), gy(s[3])], name, farbe: FARBE[i] }); return `<line x1="${gx(s[0])}" y1="${gy(s[1])}" x2="${gx(s[2])}" y2="${gy(s[3])}" style="stroke:${FARBE[i]};stroke-width:3.5;stroke-linecap:round"/>`; };
   const lage = (d1, d2) => (d1[0] * d2[1] === d1[1] * d2[0] ? 'parallel' : d1[0] * d2[0] + d1[1] * d2[1] === 0 ? 'senkrecht' : 'weder');
   const muster = ([a, b]) => (a === 0 ? `${Math.abs(b)} nach oben` : b === 0 ? `${a} nach rechts` : `${a} nach rechts und ${Math.abs(b)} nach ${b > 0 ? 'oben' : 'unten'}`);
   M.lageMuster = muster; M.lageSenk = senk; M.lageArt = lage;
@@ -345,7 +380,7 @@
     }
     return null;
   }
-  const punktBild = (p, name, cls) => `<circle class="pt${cls || ''}" cx="${gx(p[0])}" cy="${gy(p[1])}" r="5.5"/><text class="ptl" x="${gx(p[0]) + 7}" y="${gy(p[1]) - 7}">${name}</text>`;
+  const punktBild = (p, name, cls) => { LBL.push({ p: [gx(p[0]), gy(p[1])], name }); return `<circle class="pt${cls || ''}" cx="${gx(p[0])}" cy="${gy(p[1])}" r="5.5"/>`; };
   const imGitter = (p) => p[0] >= 0 && p[0] <= 10 && p[1] >= 0 && p[1] <= 8;
   // Figuren für „parallele Seiten“ und „rechte Winkel“
   const FIGUREN = [
@@ -355,9 +390,9 @@
     ['Parallelogramm', [[1, 1], [6, 1], [9, 5], [4, 5]]],
     ['Trapez', [[1, 1], [9, 1], [7, 5], [3, 5]]],
     ['Trapez', [[1, 1], [8, 1], [5, 5], [1, 5]]],
-    ['Dreieck', [[1, 1], [9, 1], [4, 6]]],
+    ['Dreieck', [[1, 1], [9, 1], [5, 7]]],
     ['Dreieck', [[1, 1], [8, 1], [1, 6]]],
-    ['Drachenviereck', [[5, 0], [8, 5], [5, 7], [2, 5]]],
+    ['Drachenviereck', [[5, 0], [7, 5], [5, 8], [3, 5]]], // keine Ecke in der Nähe von 90° (sonst sieht es nach rechtem Winkel aus)
     ['Sechseck', [[3, 1], [7, 1], [9, 4], [7, 7], [3, 7], [1, 4]]],
   ];
   // Seiten als Richtungen; Paare paralleler Seiten; Ecken mit rechtem Winkel
@@ -470,7 +505,7 @@
     if (v === 6) {
       return {
         prompt: 'Wie groß ist der <b>Abstand</b> des Punktes <b>P</b> von der Geraden <b style="color:var(--c2)">g</b>? (in Kästchen)',
-        figure: kaestchen(linie(s, 'g', 0) + `<circle class="pt" cx="${gx(px)}" cy="${gy(py)}" r="6"/><text class="ptl" x="${gx(px) + 8}" y="${gy(py) - 8}">P</text>`),
+        figure: kaestchen(linie(s, 'g', 0) + punktBild([px, py], 'P')),
         fields: [{ answer: ab, suffix: 'Kästchen' }],
         hint: 'Der Abstand ist der kürzeste Weg von P zur Geraden. Der kürzeste Weg trifft die Gerade immer senkrecht.',
         solution: `Der kürzeste Weg von P zu g verläuft <b>senkrecht</b> zu g. Er ist <b>${ab} Kästchen</b> lang.<br><small>Jeder schräge Weg wäre länger.</small>`,
@@ -672,7 +707,7 @@
     g += `<line class="axis" x1="${ox}" y1="${oy}" x2="${ox + 10 * sz + 12}" y2="${oy}"/><path class="arrh" d="M${ox + 10 * sz + 10} ${oy - 4} l8 4 l-8 4z"/><line class="axis" x1="${ox}" y1="${oy}" x2="${ox}" y2="${oy - 8 * sz - 12}"/><path class="arrh" d="M${ox - 4} ${oy - 8 * sz - 10} l4 -8 l4 8z"/>`;
     for (let i = 0; i <= 10; i++) g += `<text class="tick" x="${ox + i * sz}" y="${oy + 16}" text-anchor="middle">${i}</text>`;
     for (let j = 1; j <= 8; j++) g += `<text class="tick" x="${ox - 9}" y="${oy - j * sz + 4}" text-anchor="end">${j}</text>`;
-    g += `<text class="tick b" x="${ox + 10 * sz + 4}" y="${oy + 18}">x</text><text class="tick b" x="${ox + 9}" y="${oy - 8 * sz - 8}">y</text>`;
+    g += `<text class="tick b" x="${ox + 10 * sz + 15}" y="${oy + 16}">x</text><text class="tick b" x="${ox + 9}" y="${oy - 8 * sz - 8}">y</text>`;
     g += `<circle class="pt" cx="${ox + x * sz}" cy="${oy - y * sz}" r="6"/><text class="ptl" x="${ox + x * sz + 8}" y="${oy - y * sz - 8}">P</text>`;
     return `<svg viewBox="0 0 300 245">${g}</svg>`;
   }

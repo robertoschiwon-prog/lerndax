@@ -57,6 +57,14 @@ async def run(topics, n):
                 if not done: probs.append('läuft nicht zu Ende')
                 if not any('Lösung zu deiner Aufgabe' in c for c in caps): probs.append('kein Aufgabenbezug')
                 norm = lambda s: re.sub(r'\s+', ' ', s.replace(' ',' ')).strip()
+                # Beschriftungen im Bild der Animation: nichts darf über den Rand ragen
+                drau = await pg.evaluate("""() => { const svg = document.querySelector('.exstage svg'); if (!svg) return []; const vb = svg.viewBox.baseVal, out = [];
+                  for (const x of svg.querySelectorAll('text')) { if (!x.textContent.trim() || +getComputedStyle(x).opacity === 0 || x.getAttribute('opacity') === '0' || (x.closest('[opacity="0"]'))) continue;
+                    const b = x.getBBox(), m = x.getCTM(), s0 = svg.getCTM(); const f = (px, py) => { const p = svg.createSVGPoint(); p.x = px; p.y = py; return p.matrixTransform(s0.inverse().multiply(m)); };
+                    const p1 = f(b.x, b.y), p2 = f(b.x + b.width, b.y + b.height);
+                    if (Math.min(p1.x, p2.x) < vb.x - 2 || Math.min(p1.y, p2.y) < vb.y - 2 || Math.max(p1.x, p2.x) > vb.x + vb.width + 2 || Math.max(p1.y, p2.y) > vb.y + vb.height + 2) out.push(x.textContent.trim().slice(0, 20)); }
+                  return out; }""")
+                if drau: probs.append('Text ragt aus dem Bild: ' + ' / '.join(drau[:3]))
                 for w_ in info['want']:
                     if norm(w_) not in norm(txt): probs.append(f'Ergebnis „{w_}“ fehlt')
                 res.append({'t': t, 'p': info['p'][:110], 'title': title, 'problem': '; '.join(probs), 'last': caps[-1][:200] if caps else ''})

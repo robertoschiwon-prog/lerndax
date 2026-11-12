@@ -293,7 +293,7 @@
     for (let i = 0; i <= 10; i++) ax += `<text class="tick" x="${kx(i)}" y="${KOY + 16}" text-anchor="middle">${i}</text>`;
     for (let j = 1; j <= 8; j++) ax += `<text class="tick" x="${KOX - 9}" y="${ky(j) + 4}" text-anchor="end">${j}</text>`;
     ax += `<text class="tick b" x="${kx(10) + 14}" y="${KOY + 16}">x</text><text class="tick b" x="${KOX + 8}" y="${ky(8) - 4}">y</text>`;
-    const pnt = pts.map(([x, y, name, cls]) => `<circle class="pt${cls ? ' ' + cls : ''}" cx="${kx(x)}" cy="${ky(y)}" r="6"/><text class="ptl" x="${kx(x) + 8}" y="${ky(y) - 8}">${name}</text>`).join('');
+    const pnt = pts.map(([x, y, name, cls]) => `<circle class="pt${cls ? ' ' + cls : ''}" cx="${kx(x)}" cy="${ky(y)}" r="6"/><text class="ptl" x="${kx(x) + 8}" y="${ky(y) + (x === 0 && y >= 7 ? 20 : -8)}">${name}</text>`).join(''); // oben links steht schon das y der Achse
     return `<svg viewBox="0 0 300 245">${g}${ax}${extra || ''}${pnt}</svg>`;
   }
   const spiegelLinie = (achse, k) => (achse === 'v'
@@ -509,7 +509,9 @@
   function schraegBild(a, b, c, text) {
     const s = Math.min(22, 150 / (a + c * 0.36), 120 / (b + c * 0.36));
     const dx = c * s * 0.5 * Math.SQRT1_2, dy = dx;
-    const x0 = (300 - (a * s + dx)) / 2, y0 = (190 + (b * s + dy)) / 2 - 4;
+    // die Beschriftung rechts („2,5 cm gezeichnet“) muss ins Bild passen: notfalls rückt der Quader nach links
+    const rechts = text ? String(text[2]).length * 7.2 + 14 : 0;
+    const x0 = Math.max(text ? String(text[1]).length * 7.2 + 10 : 4, Math.min((300 - (a * s + dx)) / 2, 300 - (a * s + dx / 2 + 8) - rechts)), y0 = (190 + (b * s + dy)) / 2 - 4;
     const P = (x, y, z) => `${(x0 + x * s + (z ? dx : 0)).toFixed(1)},${(y0 - y * s - (z ? dy : 0)).toFixed(1)}`;
     const L = (p, q, cls) => { const [x1, y1] = p.split(','), [x2, y2] = q.split(','); return `<line class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`; };
     let g = `<polygon class="wt" points="${P(0, b, 0)} ${P(a, b, 0)} ${P(a, b, 1)} ${P(0, b, 1)}"/><polygon class="ws" points="${P(a, 0, 0)} ${P(a, 0, 1)} ${P(a, b, 1)} ${P(a, b, 0)}"/><polygon class="wf" points="${P(0, 0, 0)} ${P(a, 0, 0)} ${P(a, b, 0)} ${P(0, b, 0)}"/>`;

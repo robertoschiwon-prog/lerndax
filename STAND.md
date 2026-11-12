@@ -760,3 +760,16 @@ Infos zur ersten Arbeit:
   **Fehler behoben:** Bei Aufgaben wie „2250 : 1000“ sagte die Stellenwerttafel-Animation „Das passt nicht mehr in die
   Tafel“, weil die Endnull beim Verschieben keinen Platz hatte (`klasse5.js`, Tafel wird jetzt breit genug angelegt).
   Das war die einzelne Test-Meldung aus v40. `tests/loesung.py` prüft Koordinaten jetzt mit Komma-Schreibweise.
+- **Beschriftungen in Bildern** (Version `lerndax-v43`, Rückmeldung Auftraggeber: Name einer Geraden von einer Linie
+  verdeckt, Punktnamen außerhalb des Bildes, Drachenviereck sah rechtwinklig aus):
+  In „Senkrecht & parallel“ werden die Namen von Geraden und Punkten jetzt automatisch gesetzt (`platziere()` in
+  `generatoren/klasse5-buch.js`, auch von der Animation benutzt): im Bild, nicht übereinander, nicht auf einer Linie,
+  mit hellem Rand. Drachenviereck und Dreieck bei „rechte Winkel zählen“ haben keine Ecke mehr in der Nähe von 90°.
+  Neuer Test **`tests/bild_audit.py`** prüft die Bilder aller Themen; `tests/loesung.py` prüft die Animationen auf
+  Texte außerhalb des Bildes. Damit gefunden und behoben: Zahlenstrahl mit Millionen (Zahlen ragten rechts hinaus),
+  L-Figur bei Umfang & Fläche (Maß links abgeschnitten), Schrägbild („2,5 cm gezeichnet“ rechts abgeschnitten),
+  Punktname auf dem y der Achse (Koordinatensystem, Spiegeln), Achsen-Beschriftung bei halben Koordinaten,
+  Runden-Animation mit siebenstelligen Zahlen, Quader-Animation („c = 2 cm“), Schrittzahlen der Geraden-Animation.
+  Außerdem: Die Lösungs-Animation zur Sachaufgabe „gleich große Gruppen“ nannte nur die Zahl der Teiler, nicht die
+  Antwort; sie erklärt jetzt, warum 1 und die Zahl selbst wegfallen.
+  Stand der Prüfung: 300 Bilder je Thema ohne Auffälligkeit, 632 Lösungs-Animationen und 156 freie Erklärungen ohne Meldung.
