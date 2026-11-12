@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 11.11.2026** · Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v43`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -13,9 +13,66 @@ Weitere Dokumente:
 - `tests/README.md`: automatische Tests
 - `faecher/README.md`: **Fächerplan** (alle Fächer, Namen, Klassen, Fahrplan in drei Phasen)
 - `faecher/mathe/lehrplan/sachsen-gymnasium.md`: Lehrplan Mathe Gymnasium Sachsen, Klasse 5–10
+- `faecher/mathe/lehrplan/schulbuch-abgleich.md`: Abgleich MaDax ↔ Schulbuch (Lambacher Schweizer 5 Sachsen)
+- `faecher/deutsch/README.md`: **Startpunkt für DeDax** (Deutsch), Vorgehen und offene Fragen
 - `notizen/feedback.md`: offene Fragen an das Kind und Vorlage für Testrunden (nur lokal, nicht auf GitHub)
 - `notizen/familie.md`: persönliche Angaben (Kind, Schule, Geräte, Termine, Pfade). **Nur lokal**, weil
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
+
+---
+
+## 0. Übergabe vom 12.11.2026: Stand und nächster Schritt (DeDax)
+
+**Wo wir stehen**
+- **MaDax Klasse 5 ist inhaltlich fertig** (Version `lerndax-v43`, live). 36 Themen in 5 Lernbereichen, in der
+  Reihenfolge des Schulbuchs (Lambacher Schweizer 5 Sachsen). Abgeglichen mit dem Schulbuch
+  (`faecher/mathe/lehrplan/schulbuch-abgleich.md`) und mit dem Originaltext des Lehrplans
+  (`faecher/mathe/lehrplan/sachsen-gymnasium.md`, Abschnitt „Abgleich mit dem Lehrplantext“).
+- Jedes Thema hat: Aufgaben mit Tipp und Lösungsweg, eigenes Symbol, Erklär-Animation (frei, „ähnliches Beispiel“,
+  „Lösung zu deiner Aufgabe“) und **Knobel-Aufgaben** (schwerer, freiwillig, zählen nicht für die Sterne).
+- „Entdecken“ hat 16 Staunen-Momente (neu: Römische Zahlen, Zählen wie ein Computer).
+- Startseite von MaDax: „Weiter üben“, Entdecken/Knobeln nebeneinander, Fortschritt je Lernbereich, fertige
+  Lernbereiche eingeklappt. Sterne mit dunklem Rand, Geodreieck als vergrößerter Ausschnitt.
+- Noch **nicht abgenommen**: Der erste Test mit dem Kind ist für **Freitag, 13.11.2026** geplant.
+
+**Entscheidungen des Auftraggebers in dieser Runde (12.11.2026)**
+- Fächernamen: Stundenplan-Kürzel + „Dax“ (MaDax, DeDax, EnDax …), Dachs mit Fach-Hut (siehe `faecher/README.md`).
+- MaDax bleibt genau am sächsischen Lehrplan; alles darüber hinaus gehört in „Entdecken“.
+- Reihenfolge: erst MaDax rund, dann ein neues Fach. **Jetzt beginnt DeDax (Deutsch, Klasse 5)** in einem neuen Chat.
+- Knobel-Stufe: gebaut, für alle Themen. Klassen-Leiste 1–10 bleibt, wie sie ist.
+
+**Offen bei MaDax (wartet auf den Auftraggeber oder den Test)**
+1. Rückmeldungen aus dem Test mit dem Kind einarbeiten (Schwierigkeit, Verständlichkeit, Lesbarkeit des Geodreiecks,
+   findet es sich auf der Startseite zurecht, bleibt eine Animation hängen).
+2. Schriftliches Minus: Rechnet die Klasse mit **Ergänzen** oder **Entbündeln**? Danach die passende Animation bauen
+   (bisher zeigt die Lösung nur die Probe mit Plus).
+3. Schrägbild: Annahme „Kanten nach hinten unter 45°, halb so lang“ mit dem Buch abgleichen.
+4. Prüfen, ob das Schulbuch die ISBN 978-3-12-733150-9 hat (Grundlage des Buch-Abgleichs).
+5. Oberflächeninhalt zusammengesetzter Körper (bisher nur Volumen).
+6. Danach „MaDax Klasse 5 abnehmen“.
+Die Trainingsseite für die Arbeit am 24.11.2026 ist unverändert (8 Themen aus der Themenliste der Schule).
+
+**Nächster Schritt: DeDax**
+Startpunkt und Vorgehen stehen in **`faecher/deutsch/README.md`**. Kurz: erst Lehrplan Deutsch Klasse 5 auswerten und
+mit dem Schulbuch abgleichen, dem Auftraggeber einen Themenplan mit Optionen vorlegen, dann bauen. Vor dem Bauen
+klären, wie die gemeinsamen Teile aus `web/mathe/index.html` (Übungsrunde, Sterne, Knobeln, Player, Elternbereich)
+für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
+
+**So wird hier gearbeitet (hat sich bewährt)**
+- Der Auftraggeber programmiert nicht. Antworten auf Deutsch, kurz, ohne Fachwörter. Er entscheidet gern anhand von
+  **Optionen**; Fragen einzeln stellen (mehrere auf einmal gingen schief). Bilder zeigen statt beschreiben.
+- Es kann eine **parallele Sitzung** am selben Projekt geben: vor jedem Hochladen `git fetch` und nur vorspulen
+  (fast-forward); vor dem Schreiben in den OneDrive-Ordner prüfen, dass dort nichts Fremdes geändert wurde
+  (Dateigrößen mit dem letzten eigenen Stand vergleichen).
+- Nach jeder Änderung: `VERSION` in `web/sw.js` erhöhen, auf GitHub hochladen, `STAND.md` ergänzen, geänderte Dateien
+  in den OneDrive-Ordner kopieren. Kopieren und Zurückschreiben nie im selben Schritt (sonst landet ein alter Stand dort).
+- Tests vor dem Hochladen (alle in `tests/`, Beschreibung in `tests/README.md`): `ui2.py` (jede Aufgabe wird in der
+  App gelöst), `loesung.py` (Lösungs-Animationen, auch Texte außerhalb des Bildes), `knobel.py`, `bild_audit.py`
+  (Beschriftungen in Bildern), `design_audit.py`, `sync_test.py`, `training.py`, `hub.py`.
+- Lehren aus MaDax: (1) Lehrplan **und** Schulbuch **am Originaltext** abgleichen, nicht aus dem Gedächtnis.
+  (2) Jede neue Aufgabenart braucht eine passende Animation für „Lösung zu deiner Aufgabe“, sonst zeigt der Player
+  etwas Unpassendes. (3) Bilder immer mit `bild_audit.py` prüfen; Figuren dürfen nicht „fast“ wie etwas anderes
+  aussehen (Drachenviereck mit 87°). (4) Zusatz-Aufgaben nicht in Themen legen, die in einer Trainingsseite stecken.
 
 ---
 
@@ -113,10 +170,14 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 - **Kopfzeile:** Dachs (zurück zur LernDax-Startseite), Schriftzug „MaDax“ (zum Mathe-Start),
   Serie 🔥 und Sterne ⭐. Das frühere orange „×“-Kästchen ist seit 10.11.2026 entfernt
   (wirkte doppelt und wie ein Schließen-Knopf).
-- **Startbildschirm:** Avatar + „Hallo <Name>!“, Klassen-Chips 1–10 (nur 5 aktiv; andere zeigen
-  die geplanten Lernbereiche laut Lehrplan), „🎲 Gemischt“ (Runde aus allem),
-  „🔁 Fehler-Training“ (Themen mit vielen Fehlern), Lernbereiche mit Themen und Sternen
-  (Beherrschung), ▶-Knopf für die Erklärung, Entdecken-Bereich, Elternansicht.
+- **Startbildschirm** (Stand v43): Avatar + „Hallo <Name>!“, Tagesziel, Klassen-Leiste 1–10 (nur 5 aktiv),
+  **„Weiter üben“** (zuletzt geübtes Thema), „Entdecken“ und (ab zwei Sternen in einem Thema) **„Knobeln“** nebeneinander,
+  „🎲 Gemischt“ (nur aus schon geübten Themen), „🔁 Fehler-Training“, dann die Lernbereiche mit Fortschrittszeile
+  („6 von 13 geübt“), Themen-Kacheln mit Sternen und ▶-Knopf; Lernbereiche mit lauter Drei-Sterne-Themen sind
+  eingeklappt. Darunter der Entdecken-Bereich und der Link „Für Eltern“.
+- **Knobel-Stufe** (seit v39): je Thema `topic.knobel()` in `generatoren/klasse5-knobel.js`, 5 Aufgaben je Runde,
+  zählt nicht für Sterne und Fehler-Training, Zähler `S.knobel` (wird synchronisiert). Zugang: Balken auf der
+  Startseite/Trainingsseite ab zwei Sternen, Knopf „Jetzt knobeln“ nach einer Runde mit mindestens 75 %.
 - **Themen-Symbole** (seit 10.11.2026): Jedes Thema hat ein selbst gezeichnetes Bildchen
   (z. B. Waage für Gleichungen, Faktorbaum für Primzahlen, Stoppuhr für Zeit) in einem
   44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
@@ -184,7 +245,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   Technik: Der Generator gibt `ex: { mode, … }` mit; die Erklärung bekommt das als `ctx` mit
   `pre` (ähnliches Beispiel) oder `post` (genau die Aufgabe). Mit `ex.via: '<Themen-ID>'` nutzt
   eine Aufgabe die Erklärung eines anderen Themas (so bei den Textaufgaben).
-- **Entdecken (14 Staunen-Momente, dunkle „Bühne“):** Ich kann Gedanken lesen! · Der Trick
+- **Entdecken (16 Staunen-Momente, dunkle „Bühne“; seit v38 auch Römische Zahlen und Zählen wie ein Computer):** Ich kann Gedanken lesen! · Der Trick
   des kleinen Gauß · Ungerade Zahlen bauen Quadrate · Unendlich viele Brüche ergeben 1 ·
   Das Sieb des Eratosthenes · Reis auf dem Schachbrett · Das Galton-Brett · Das Pascalsche
   Dreieck · Wie hoch ist der Baum? · Warum hat jedes Dreieck 180°? · Das Geheimnis der
@@ -217,6 +278,11 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 | `web/plattform/trainings.js` | Trainings für einzelne Klassenarbeiten (`window.LERNDAX_TRAININGS`), Aufruf `<fach>/?t=<id>` |
 | `web/mathe/index.html` | MaDax-App (Ansichten, Übungsrunde, Player, Elternansicht) |
 | `web/mathe/generatoren/klasse5.js` | Aufgabengeneratoren Klasse 5 (`window.Mathelix.grades[5]`) |
+| `web/mathe/generatoren/klasse5-luecken.js` | 7 weitere Themen (Überschlagen, Schriftlich rechnen, Gemischte Zahlen, Dezimalzahlen runden, Symmetrie, Netze & Schrägbilder, Fermi); hängt sie in die Lernbereiche ein |
+| `web/mathe/generatoren/klasse5-buch.js` | 4 weitere Themen (Große Zahlen, Brüche am Zahlenstrahl, Senkrecht & parallel, Winkel messen), Zusatz-Aufgabenarten für vorhandene Themen und die **Reihenfolge aller Themen** (Tabelle `FOLGE`) |
+| `web/mathe/generatoren/klasse5-knobel.js` | Knobel-Aufgaben zu allen Themen (`topic.knobel`) |
+| `web/mathe/erklaerungen/klasse5-luecken.js`, `klasse5-buch.js` | Animationen zu den Themen der gleichnamigen Generator-Dateien; `erweitere()` in `klasse5-buch.js` hängt eine zusätzliche Aufgabenart an eine vorhandene Erklärung |
+| `web/plattform/symbole.js` | eigene Symbole statt Emojis, für alle Fächer (`window.LernDaxSymbole`) |
 | `web/mathe/symbole.js` | Themen-Symbole als SVG, Schlüssel = Themen-ID (`window.MathelixIcons`) |
 | `web/mathe/erklaerungen/klasse5.js` | Erklär-Animationen zu den Themen |
 | `web/mathe/erklaerungen/entdecken.js` | Entdecken-Animationen |
@@ -240,7 +306,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 (Reihenfolge in `DISC_ORDER` in `web/mathe/index.html`).
 
 ### Lernstand (pro Gerät im Browser, `localStorage`)
-- `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, hist:[letzte Ergebnisse 1 / 0,5 / 0], last}}, exSlow, days:[JJJJ-MM-TT], total, seen:{<id>:true}, rounds:{JJJJ-MM-TT: n}, resetAt }`
+- `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, hist:[letzte Ergebnisse 1 / 0,5 / 0], last}}, exSlow, days:[JJJJ-MM-TT], total, seen:{<id>:true}, rounds:{JJJJ-MM-TT: n}, knobel:{<themaId>:{n, ok}}, lastTopic, resetAt }` (`lastTopic` bleibt auf dem Gerät, alles andere außer `name`/`grade`/`exSlow` wird synchronisiert)
 - `lerndax.device` (aktives Profil), `lerndax.auth` (Anmeldung), `lerndax.avatar`
   (z. B. `fuchs:blau`), `lerndax.avatar.pending` (noch nicht hochgeladen),
   `lerndax.avatar.asked` (Auswahl wurde schon einmal automatisch gezeigt).
@@ -285,8 +351,9 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
   neu hinzufügen.
 
 ### Tests
-Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `ui2.py`,
-`sync_test.py` laufen lassen, nach Änderungen an Aufgaben oder Animationen auch `loesung.py`.
+Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `ui2.py` und `sync_test.py` laufen lassen, nach
+Änderungen an Aufgaben oder Animationen auch `loesung.py`, `knobel.py` und `bild_audit.py`, nach Änderungen am
+Aussehen `design_audit.py`. (`gen-test.js` braucht den Pfad einer Generator-Datei als Argument und kennt nur `klasse5.js`.)
 
 ## 5. Wichtige Entscheidungen (mit Begründung)
 
@@ -360,6 +427,11 @@ Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `gen-test.js`, `u
   Claude-Projekt „Familienkalender“.
 
 ## 9. Offene Punkte & Ideen
+
+**Aktuelle Liste (12.11.2026): siehe Abschnitt 0 „Offen bei MaDax“.** Die Punkte weiter unten sind älter;
+erledigt sind davon inzwischen: Lehrplan-Lücken Klasse 5, Abgleich mit dem Schulbuch, Knobel-Stufe, Design-Durchgang.
+Weiter als Idee offen: Hut-Tausch des Dachses beim Tagesziel, Spruch zur Serie, Elternbereich auf die Startseite
+verlegen (sinnvoll, sobald das zweite Fach da ist), „Bundesland wählen“.
 
 **Grundsatz (Entscheidung Auftraggeber, 10.11.2026): allgemein vs. Klasse**
 Mathelix bleibt **allgemein** nach dem Lehrplan Sachsen. Alles, was nur eine bestimmte Klasse betrifft
@@ -773,3 +845,6 @@ Infos zur ersten Arbeit:
   Außerdem: Die Lösungs-Animation zur Sachaufgabe „gleich große Gruppen“ nannte nur die Zahl der Teiler, nicht die
   Antwort; sie erklärt jetzt, warum 1 und die Zahl selbst wegfallen.
   Stand der Prüfung: 300 Bilder je Thema ohne Auffälligkeit, 632 Lösungs-Animationen und 156 freie Erklärungen ohne Meldung.
+- **Dokumentation für die Übergabe** (12.11.2026): Abschnitt 0 „Übergabe“ ergänzt, Abschnitte 3 und 4 auf den Stand
+  v43 gebracht, `README.md` und `faecher/README.md` aktualisiert, neuer Startpunkt `faecher/deutsch/README.md` für DeDax.
+  Der Auftraggeber macht in einem neuen Chat mit Deutsch weiter.

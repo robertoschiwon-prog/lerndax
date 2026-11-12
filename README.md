@@ -106,10 +106,12 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Erklär-Animationen zu allen 36 Themen, Pause und Langsam-Modus
 - [x] Beispiel vorher / Lösung als Animation nachher für alle 36 Themen
 - [x] Knobel-Stufe: schwerere, freiwillige Aufgaben zu allen 36 Themen (zählen nicht für die Sterne)
-- [x] Entdecken: 14 visuelle Beweise und Staunen-Momente
+- [x] Entdecken: 16 visuelle Beweise und Staunen-Momente
+- [x] Abgleich mit Schulbuch (Lambacher Schweizer 5 Sachsen) und Lehrplantext, Themen in Buch-Reihenfolge
 - [x] Entscheidungen aus der Prüfung vom 11.11.2026 umgesetzt: weniger Raten, leichtere Zahlen, „Gemischt“ nur aus geübten Themen, breite Darstellung am Tablet und PC
 - [ ] Verfahren beim schriftlichen Minus mit der Schule abgleichen
-- [ ] Lehrplan-Lücken Klasse 5: Symmetrie, Quader-Netze, Überschlag, schriftlich plus/minus/mal, Dezimalzahlen runden
+- [x] Lehrplan-Lücken Klasse 5 geschlossen (36 Themen)
+- [ ] Test mit dem Kind (geplant 13.11.2026), danach Klasse 5 abnehmen
 - [ ] Reihenfolge mit dem Schulbuch abgleichen
 - [ ] Klasse 6, danach Klasse 4 und die übrigen Klassen
 

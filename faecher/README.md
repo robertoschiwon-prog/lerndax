@@ -72,8 +72,8 @@ Das kann später neu entschieden werden.
 ## Fahrplan in drei Phasen
 
 **Phase 1: Klasse 5 fertig bauen, alle Fächer**
-1. MaDax ✅ (Lehrplan-Lücken schließen, siehe `STAND.md`)
-2. DeDax (Deutschbuch 5, Cornelsen) und EnDax (Green Line 1, Klett): die Hauptfächer zuerst
+1. MaDax ✅ inhaltlich fertig (36 Themen, Knobel-Stufe, Abgleich mit Buch und Lehrplan; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
+2. **DeDax: als Nächstes, Startpunkt `faecher/deutsch/README.md`** (Deutschbuch 5, Cornelsen), danach EnDax (Green Line 1, Klett)
 3. BioDax (Linder 5), GeoDax (Terra 5), GeDax (Anno 1)
 4. TecDax (Technik/Computer)
 5. Vielleicht: MuDax, KuDax, EthDax
