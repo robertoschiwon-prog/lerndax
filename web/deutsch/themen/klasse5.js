@@ -1444,6 +1444,454 @@
   }
   const silben = () => U.wahl([[34, silbTrennen], [20, silbZahl], [26, silbWahl], [20, silbTippen]]);
 
+
+  // =====================================================
+  // Bereich 4: Wörter bauen und Wortschatz
+  // =====================================================
+  // ---------- Thema: Zusammengesetzte Wörter ----------
+  // [Artikel 1, Wort 1, Artikel 2, Wort 2, zusammengesetztes Wort, Fugenzeichen (wenn vorhanden)]
+  const ZUS = [
+    ['das', 'Haus', 'die', 'Tür', 'Haustür'], ['der', 'Apfel', 'der', 'Baum', 'Apfelbaum'], ['der', 'Fuß', 'der', 'Ball', 'Fußball'], ['die', 'Hand', 'das', 'Tuch', 'Handtuch'],
+    ['der', 'Regen', 'der', 'Bogen', 'Regenbogen'], ['das', 'Wasser', 'die', 'Flasche', 'Wasserflasche'], ['der', 'Garten', 'der', 'Zaun', 'Gartenzaun'], ['der', 'Tisch', 'die', 'Lampe', 'Tischlampe'],
+    ['der', 'Brief', 'der', 'Kasten', 'Briefkasten'], ['das', 'Fenster', 'die', 'Bank', 'Fensterbank'], ['der', 'Schnee', 'der', 'Mann', 'Schneemann'], ['der', 'Zahn', 'die', 'Bürste', 'Zahnbürste'],
+    ['das', 'Auto', 'die', 'Bahn', 'Autobahn'], ['der', 'Vogel', 'das', 'Nest', 'Vogelnest'], ['der', 'Kopf', 'das', 'Kissen', 'Kopfkissen'], ['das', 'Haus', 'der', 'Schuh', 'Hausschuh'],
+    ['der', 'Ball', 'das', 'Spiel', 'Ballspiel'], ['der', 'Stuhl', 'das', 'Bein', 'Stuhlbein'], ['der', 'Tee', 'die', 'Kanne', 'Teekanne'], ['die', 'Nuss', 'die', 'Schale', 'Nussschale'],
+    ['die', 'Wand', 'die', 'Uhr', 'Wanduhr'], ['das', 'Glas', 'die', 'Tür', 'Glastür'], ['das', 'Gras', 'der', 'Halm', 'Grashalm'], ['das', 'Buch', 'die', 'Seite', 'Buchseite'],
+    ['die', 'Sonne', 'der', 'Schein', 'Sonnenschein', 'n'], ['der', 'Hund', 'die', 'Hütte', 'Hundehütte', 'e'], ['die', 'Geburt', 'der', 'Tag', 'Geburtstag', 's'], ['die', 'Blume', 'der', 'Topf', 'Blumentopf', 'n'],
+    ['die', 'Straße', 'die', 'Bahn', 'Straßenbahn', 'n'], ['die', 'Katze', 'das', 'Futter', 'Katzenfutter', 'n'], ['die', 'Tasche', 'die', 'Lampe', 'Taschenlampe', 'n'], ['das', 'Kind', 'das', 'Zimmer', 'Kinderzimmer', 'er'], ['das', 'Bild', 'das', 'Buch', 'Bilderbuch', 'er'],
+  ].map(([a1, w1, a2, w2, wort, fuge]) => ({ a1, w1, a2, w2, wort, fuge: fuge || '' }));
+  const REGEL_ZUS = 'Das <b>letzte</b> Wort ist das Grundwort. Es sagt, was die Sache ist, und bestimmt den <b>Artikel</b>. Das Wort davor beschreibt sie genauer.';
+  const exZus = (art, z) => zz(art, [`${z.a1} ${z.w1}`, ' + ', `${z.a2} ${z.w2}`], 2, [z.a2 + ' ', z.wort], 1, `Zwei Wörter werden zu einem. ${z.fuge ? `Dazwischen kommt hier ein <b>${z.fuge}</b>.` : ''}`, REGEL_ZUS, `${z.w1} + ${z.w2} = <b>${z.a2} ${z.wort}</b>`);
+  function zusArtikel() {
+    const z = pick(ZUS.filter((x) => x.a1 !== x.a2));
+    return {
+      prompt: `Welcher Artikel gehört zum zusammengesetzten Wort?<br><span class="bsp">${z.a1} ${z.w1} + ${z.a2} ${z.w2} = ___ ${z.wort}</span>`,
+      choices: ['der', 'die', 'das'], correct: ['der', 'die', 'das'].indexOf(z.a2),
+      hint: 'Welches der beiden Wörter steht <b>hinten</b>? Sein Artikel gilt für das ganze Wort.',
+      solution: `<b>${z.a2} ${z.wort}</b><br>${REGEL_ZUS} Hier: ${z.a2} ${z.w2} → ${z.a2} ${z.wort}.`, ex: exZus('zusArtikel', z),
+    };
+  }
+  function zusBauen() {
+    const z = pick(ZUS);
+    return {
+      prompt: 'Setze die beiden Wörter zu <b>einem</b> Wort zusammen.', layout: 'satz',
+      fields: [{ type: 'text', answer: z.wort, prefix: `${z.a1} ${z.w1} + ${z.a2} ${z.w2} = ${z.a2}`, label: 'zusammengesetztes Wort' }],
+      hint: 'Schreibe beide Wörter ohne Lücke hintereinander. Nur der Anfang ist groß. Manchmal kommt ein Buchstabe dazwischen, damit es sich gut spricht (Sonne<b>n</b>schein).',
+      solution: `<b>${z.a2} ${z.wort}</b>${z.fuge ? `<br>Zwischen die Wörter kommt hier ein <b>${z.fuge}</b>: ${z.w1} + ${z.fuge} + ${z.w2.toLowerCase()}.` : ''}<br>${REGEL_ZUS}`, ex: exZus('zusBauen', z),
+    };
+  }
+  function zusBedeutung() {
+    const z = pick(ZUS), wahl = shuffle([z.w2, z.w1]);
+    return {
+      prompt: `Welches Wort ist das <b>Grundwort</b>? Es sagt, was die Sache ist.<br><span class="bsp gross">${z.wort}</span>`,
+      choices: wahl, correct: wahl.indexOf(z.w2),
+      hint: 'Schau auf das <b>letzte</b> Wort im zusammengesetzten Wort.',
+      solution: `Das Grundwort ist <b>${z.w2}</b>: ${z.a2} ${z.wort} ist eine Art ${z.w2}. „${z.w1}“ beschreibt nur genauer, was für ${z.a2 === 'die' ? 'eine' : 'ein'} ${z.w2}.<br>${REGEL_ZUS}`, ex: exZus('zusBedeutung', z),
+    };
+  }
+  function zusTrennen() {
+    const z = pick(ZUS.filter((x) => !x.fuge && x.wort.length <= 10));
+    return {
+      prompt: 'Aus welchen zwei Wörtern besteht das Wort? Tippe die Stelle an, wo sie zusammenstoßen.',
+      tap: { tokens: [...z.wort], correct: [z.w1.length - 1], gaps: true, mark: '|', eng: true, one: true }, answerText: `${z.w1} + ${z.w2}`,
+      hint: 'Suche zwei Wörter, die du kennst. Jedes muss allein einen Sinn ergeben.',
+      solution: `<b>${z.w1} + ${z.w2}</b> = ${z.a2} ${z.wort}<br>${REGEL_ZUS}`,
+      ex: { mode: 'komma', art: 'zusTrennen', dicht: true, mark: '|', tokens: [...z.wort], gaps: [z.w1.length - 1], s1: 'Suche zwei Wörter, die du kennst.', merk: `<b>${z.w1} + ${z.w2}</b> = ${z.a2} ${z.wort}` },
+    };
+  }
+  const zusammen = () => U.wahl([[28, zusArtikel], [30, zusBauen], [17, zusBedeutung], [25, zusTrennen]]);
+
+  // ---------- Thema: Vorsilben und Nachsilben ----------
+  // [Satz mit Lücke vor dem Verbteil, richtige Vorsilbe, zwei falsche (ergeben kein Wort), fertiges Wort]
+  const VORS = [
+    ['Lina hat sich im Wald ___laufen.', 'ver', ['zer', 'be'], 'verlaufen'], ['Das Glas ist ___brochen.', 'zer', ['be', 'ent'], 'zerbrochen'],
+    ['Mia will das Bild bunt ___malen.', 'be', ['zer', 'ent'], 'bemalen'], ['Kolumbus hat Amerika ___deckt.', 'ent', ['zer', 'miss'], 'entdeckt'],
+    ['Opa will uns ein Märchen ___zählen.', 'er', ['zer', 'ent'], 'erzählen'], ['Ich habe meinen Schlüssel ___gessen.', 'ver', ['zer', 'be'], 'vergessen'],
+    ['Am Sonntag ___suchen wir Oma.', 'be', ['zer', 'ent'], 'besuchen'], ['Wer hat das Telefon ___funden?', 'er', ['zer', 'ent'], 'erfunden'],
+    ['Der Hund hat das Kissen ___rissen.', 'zer', ['be', 'er'], 'zerrissen'], ['Der Bäcker ___kauft Brot.', 'ver', ['zer', 'ent'], 'verkauft'],
+    ['Der Vogel ist aus dem Käfig ___kommen.', 'ent', ['zer', 'miss'], 'entkommen'], ['Ich habe dich leider ___verstanden.', 'miss', ['zer', 'ent'], 'missverstanden'],
+    ['Zum Geburtstag ___kommt Ben ein Fahrrad.', 'be', ['zer', 'er'], 'bekommt'],
+  ].map(([satz_, ok, falsch, wort]) => ({ satz: satz_, ok, falsch, wort }));
+  // Nachsilben: [Ausgangswort, Nachsilbe, neues Wort, neue Wortart (N/A), falsche Nachsilben (ergeben kein Wort), regelmäßig zusammengesetzt?]
+  const NACHS = [
+    ['frei', 'heit', 'Freiheit', 'N', ['ung', 'nis'], 1], ['krank', 'heit', 'Krankheit', 'N', ['ung', 'nis'], 1], ['schön', 'heit', 'Schönheit', 'N', ['ung', 'nis'], 1], ['klug', 'heit', 'Klugheit', 'N', ['ung', 'nis'], 1],
+    ['gesund', 'heit', 'Gesundheit', 'N', ['nis', 'schaft'], 1], ['fröhlich', 'keit', 'Fröhlichkeit', 'N', ['ung', 'nis'], 1], ['sauber', 'keit', 'Sauberkeit', 'N', ['ung', 'nis'], 1], ['ehrlich', 'keit', 'Ehrlichkeit', 'N', ['ung', 'nis'], 1],
+    ['wohnen', 'ung', 'Wohnung', 'N', ['heit', 'keit'], 0], ['üben', 'ung', 'Übung', 'N', ['heit', 'keit'], 0], ['zeichnen', 'ung', 'Zeichnung', 'N', ['heit', 'keit'], 0], ['rechnen', 'ung', 'Rechnung', 'N', ['heit', 'keit'], 0],
+    ['heizen', 'ung', 'Heizung', 'N', ['heit', 'keit'], 0], ['lösen', 'ung', 'Lösung', 'N', ['heit', 'keit'], 0], ['Freund', 'schaft', 'Freundschaft', 'N', ['ung', 'heit'], 1], ['Mann', 'schaft', 'Mannschaft', 'N', ['ung', 'keit'], 1],
+    ['Nachbar', 'schaft', 'Nachbarschaft', 'N', ['ung', 'heit'], 1], ['geheim', 'nis', 'Geheimnis', 'N', ['ung', 'schaft'], 1],
+    ['Wind', 'ig', 'windig', 'A', ['lich', 'bar'], 1], ['Mut', 'ig', 'mutig', 'A', ['lich', 'bar'], 1], ['Lust', 'ig', 'lustig', 'A', ['lich', 'sam'], 1], ['Glück', 'lich', 'glücklich', 'A', ['ig', 'bar'], 1],
+    ['Freund', 'lich', 'freundlich', 'A', ['ig', 'bar'], 1], ['Herz', 'lich', 'herzlich', 'A', ['bar', 'sam'], 1], ['Tier', 'isch', 'tierisch', 'A', ['ig', 'bar'], 1], ['Neid', 'isch', 'neidisch', 'A', ['bar', 'sam'], 1],
+    ['essen', 'bar', 'essbar', 'A', ['lich', 'sam'], 0], ['lesen', 'bar', 'lesbar', 'A', ['ig', 'sam'], 0], ['hören', 'bar', 'hörbar', 'A', ['lich', 'sam'], 0], ['trinken', 'bar', 'trinkbar', 'A', ['ig', 'sam'], 0],
+    ['sparen', 'sam', 'sparsam', 'A', ['ig', 'lich'], 0], ['Fehler', 'los', 'fehlerlos', 'A', ['ig', 'bar'], 1],
+  ].map(([basis, nach, wort, wa, falsch, reg]) => ({ basis, nach, wort, wa, falsch, reg: !!reg }));
+  const NREGEL = { N: 'Die Nachsilben <b>-ung, -heit, -keit, -nis, -schaft</b> machen ein <b>Substantiv</b>. Das schreibt man groß.', A: 'Die Nachsilben <b>-ig, -lich, -isch, -bar, -sam, -los</b> machen ein <b>Adjektiv</b>. Das schreibt man klein.' };
+  function vorsilbe() {
+    const v = pick(VORS), wahl = shuffle([v.ok, ...v.falsch]);
+    return {
+      prompt: `Welche Vorsilbe passt?<br><span class="bsp">${v.satz}</span>`,
+      choices: wahl.map((x) => x + '-'), correct: wahl.indexOf(v.ok),
+      hint: 'Setze jede Vorsilbe ein und lies den Satz. Nur mit einer entsteht ein Wort, das es gibt und das in den Satz passt.',
+      solution: `${v.satz.replace('___', `<b class="vb">${v.ok}</b>`)}<br>Eine Vorsilbe verändert die Bedeutung des Verbs: <b>${v.wort}</b>.`,
+      ex: zz('vorsilbe', v.satz.split('___'), 1, [v.satz.split('___')[0], v.ok, v.satz.split('___')[1]], 1, 'Eine Vorsilbe steht vor dem Wortstamm und verändert die Bedeutung.', `Nur <b>${v.ok}-</b> ergibt hier ein sinnvolles Wort.`, `<b>${v.wort}</b>`),
+    };
+  }
+  const exNach = (art, n) => zz(art, [n.basis, ' + ', '-' + n.nach], 2, [n.wort.slice(0, n.wort.length - n.nach.length), n.nach], 1, 'Eine Nachsilbe hängt man hinten an. Sie kann die Wortart ändern.', NREGEL[n.wa], `${n.basis} + -${n.nach} = <b>${n.wort}</b> (${WA[n.wa]})`);
+  function nachWortart() {
+    const n = pick(NACHS);
+    return {
+      prompt: `Welche Wortart ist das neue Wort?<br><span class="bsp">${n.basis} + -${n.nach} = ${n.wort}</span>`,
+      choices: ['Substantiv', 'Adjektiv', 'Verb'], correct: n.wa === 'N' ? 0 : 1,
+      hint: 'Schau auf die Nachsilbe und auf den Anfangsbuchstaben: groß oder klein?',
+      solution: `<b>${n.wort}</b> ist ein ${WA[n.wa]}.<br>${NREGEL[n.wa]}`, ex: exNach('nachWortart', n),
+    };
+  }
+  function nachBauen() {
+    const n = pick(NACHS.filter((x) => x.reg));
+    return {
+      prompt: 'Hänge die Nachsilbe an. Achte auf <b>groß</b> oder <b>klein</b>.', layout: 'satz',
+      fields: [{ type: 'text', answer: n.wort, prefix: `${n.basis} + -${n.nach} =`, label: 'neues Wort' }],
+      hint: `${NREGEL.N} ${NREGEL.A}`,
+      solution: `${n.basis} + -${n.nach} = <b class="vb">${n.wort}</b><br>${NREGEL[n.wa]}`, ex: exNach('nachBauen', n),
+    };
+  }
+  function nachWahl() {
+    const n = pick(NACHS), wahl = shuffle([n.nach, ...n.falsch]);
+    const stamm_n = n.wort.slice(0, n.wort.length - n.nach.length);
+    return {
+      prompt: `Welche Nachsilbe macht aus <b>${n.basis}</b> ein <b>${WA[n.wa]}</b>?`,
+      choices: wahl.map((x) => '-' + x), correct: wahl.indexOf(n.nach),
+      hint: 'Hänge jede Nachsilbe an und sprich das Wort. Welches Wort gibt es?',
+      solution: `${n.basis} + -${n.nach} = <b class="vb">${n.wort}</b><br>${NREGEL[n.wa]}`, ex: exNach('nachWahl', n),
+    };
+  }
+  const ableitung = () => U.wahl([[38, vorsilbe], [20, nachWortart], [22, nachBauen], [20, nachWahl]]);
+
+  // ---------- Thema: Wortfamilien ----------
+  // [Wortstamm, Wörter der Familie, ähnlich aussehende Wörter, die NICHT verwandt sind]
+  const FAM = [
+    ['fahr', ['fahren', 'Fahrer', 'Fahrrad', 'Fahrt', 'Abfahrt', 'Fahrzeug'], ['Farbe', 'Fahne', 'fast']], ['spiel', ['spielen', 'Spiel', 'Spieler', 'Spielplatz', 'verspielt', 'Spielzeug'], ['Spiegel', 'Spinne', 'spitz']],
+    ['lauf', ['laufen', 'Läufer', 'Wettlauf', 'verlaufen', 'Laufschuh'], ['Laub', 'laut', 'Laus']], ['back', ['backen', 'Bäcker', 'Bäckerei', 'Gebäck', 'Backofen'], ['Bach', 'Bank', 'packen']],
+    ['lehr', ['lehren', 'Lehrer', 'Lehrerin', 'Lehrbuch'], ['leer', 'Lehm', 'Leder']], ['les', ['lesen', 'Leser', 'Lesebuch', 'vorlesen', 'lesbar'], ['leise', 'Leiste', 'Lust']],
+    ['wohn', ['wohnen', 'Wohnung', 'Wohnzimmer', 'bewohnen', 'Bewohner'], ['Wolle', 'Woche', 'Wolke']], ['mal', ['malen', 'Maler', 'Malerei', 'bemalen', 'Malkasten'], ['Mantel', 'Maus', 'schmal']],
+    ['flieg', ['fliegen', 'Flieger', 'Fliege', 'wegfliegen'], ['fliehen', 'Fleiß', 'Flöte']], ['freund', ['Freund', 'Freundin', 'freundlich', 'Freundschaft', 'befreunden'], ['Freude', 'fremd', 'Frieden']],
+    ['zahl', ['Zahl', 'zählen', 'bezahlen', 'zahlreich', 'Anzahl'], ['Zahn', 'zahm', 'Saal']], ['haus', ['Haus', 'Häuser', 'häuslich', 'Haustür', 'Hausaufgabe'], ['Hase', 'Haut', 'Haufen']],
+    ['schlaf', ['schlafen', 'Schlaf', 'schläfrig', 'Schlafzimmer', 'verschlafen'], ['schlau', 'Schlange', 'Schaf']],
+  ].map(([st, fam, fremd]) => ({ st, fam, fremd }));
+  const REGEL_FAM = 'Wörter einer <b>Wortfamilie</b> haben denselben <b>Wortstamm</b>. Manchmal wird aus a, o, u ein Umlaut (backen → Bäcker). Verwandte Wörter schreibt man im Stamm gleich.';
+  const exFam = (art, f, woerter, raus) => ({ mode: 'liste', art, woerter, stamm: f.st, raus, s1: `Der Wortstamm ist <b>${f.st}</b>. Steckt er in jedem Wort?`, merk: raus >= 0 ? `<b>${woerter[raus]}</b> gehört nicht dazu: kein Wortstamm „${f.st}“.` : `Wortstamm <b>${f.st}</b>: ${woerter.join(', ')}` });
+  function famNicht() {
+    const f = pick(FAM), w = shuffle([...shuffle(f.fam).slice(0, 3), pick(f.fremd)]);
+    const i = w.findIndex((x) => f.fremd.includes(x));
+    return {
+      prompt: 'Welches Wort gehört <b>nicht</b> zur Wortfamilie?', choices: w, correct: i,
+      hint: 'Suche den Teil, der in fast allen Wörtern gleich ist. Das ist der Wortstamm. Ein Wort sieht nur ähnlich aus.',
+      solution: `<b>${w[i]}</b> gehört nicht dazu. Die anderen haben den Wortstamm <b>${f.st}</b>: ${w.filter((x, k) => k !== i).join(', ')}.<br>${REGEL_FAM}`,
+      ex: exFam('famNicht', f, w, i),
+    };
+  }
+  function famDazu() {
+    const f = pick(FAM), kern = f.fam[0], ok = pick(f.fam.slice(1));
+    const w = shuffle([ok, ...shuffle(f.fremd).slice(0, 2)]);
+    return {
+      prompt: `Welches Wort gehört zur Wortfamilie von <b>${kern}</b>?`, choices: w, correct: w.indexOf(ok),
+      hint: 'Verwandte Wörter haben denselben Wortstamm. Ähnlich klingen reicht nicht.',
+      solution: `<b>${ok}</b> gehört zu „${kern}“: Beide haben den Wortstamm <b>${f.st}</b>.<br>${REGEL_FAM}`,
+      ex: exFam('famDazu', f, [kern, ok], -1),
+    };
+  }
+  function famStamm() {
+    const f = pick(FAM), w = shuffle(f.fam).slice(0, 3);
+    const wahl = shuffle([f.st, f.st.slice(0, 2), f.st + 'en']);
+    return {
+      prompt: `Welcher <b>Wortstamm</b> steckt in allen drei Wörtern?<br><span class="bsp">${w.join(' · ')}</span>`,
+      choices: wahl, correct: wahl.indexOf(f.st),
+      hint: 'Der Wortstamm ist der Teil, der in allen Wörtern vorkommt (ein Umlaut zählt mit: a und ä). Er soll so lang wie möglich sein, aber ohne Endung.',
+      solution: `Der Wortstamm ist <b>${f.st}</b>: ${w.join(', ')}.<br>${REGEL_FAM}`,
+      ex: exFam('famStamm', f, w, -1),
+    };
+  }
+  const wortfamilie = () => U.wahl([[40, famNicht], [35, famDazu], [25, famStamm]]);
+
+  // ---------- Thema: Wortfelder ----------
+  const FELD = { sagen: ['flüstern', 'rufen', 'schreien', 'murmeln', 'fragen', 'antworten', 'erzählen', 'brüllen', 'stottern'], gehen: ['rennen', 'schleichen', 'schlendern', 'humpeln', 'stapfen', 'marschieren', 'trödeln', 'hüpfen'], sehen: ['schauen', 'blicken', 'beobachten', 'starren', 'betrachten', 'spähen'], essen: ['naschen', 'schlingen', 'knabbern', 'futtern', 'speisen'] };
+  // [Satz mit Lücke, treffendes Wort, zwei unpassende, Wortfeld, Hinweis im Satz]
+  const TREFF = [
+    ['Der Dieb ___ leise um das Haus.', 'schleicht', ['stampft', 'marschiert'], 'gehen', 'leise'], ['Mit dem verletzten Fuß ___ Ben nach Hause.', 'humpelt', ['rennt', 'hüpft'], 'gehen', 'verletzter Fuß'],
+    ['Wir haben es eilig und ___ zum Bus.', 'rennen', ['schlendern', 'trödeln'], 'gehen', 'eilig'], ['Am Sonntag ___ wir gemütlich durch den Park.', 'schlendern', ['rennen', 'rasen'], 'gehen', 'gemütlich'],
+    ['Die Soldaten ___ im Gleichschritt.', 'marschieren', ['schleichen', 'humpeln'], 'gehen', 'im Gleichschritt'], ['Das Kind ___ fröhlich von Stein zu Stein.', 'hüpft', ['schleicht', 'humpelt'], 'gehen', 'von Stein zu Stein'],
+    ['Durch den tiefen Schnee ___ wir mühsam.', 'stapfen', ['hüpfen', 'rasen'], 'gehen', 'tiefer Schnee, mühsam'],
+    ['Im Kino ___ Mia mir etwas ins Ohr.', 'flüstert', ['brüllt', 'ruft'], 'sagen', 'im Kino, ins Ohr'], ['Der Trainer ___ laut über den ganzen Platz.', 'brüllt', ['flüstert', 'murmelt'], 'sagen', 'laut'],
+    ['„Wie spät ist es?“, ___ Lina.', 'fragt', ['antwortet', 'befiehlt'], 'sagen', 'Fragezeichen'], ['Opa ___ uns jeden Abend eine Geschichte.', 'erzählt', ['fragt', 'schreit'], 'sagen', 'eine Geschichte'],
+    ['Unverständlich ___ er etwas in seinen Bart.', 'murmelt', ['brüllt', 'ruft'], 'sagen', 'unverständlich'],
+    ['Durch das Fernglas ___ wir die Vögel.', 'beobachten', ['übersehen', 'überhören'], 'sehen', 'Fernglas'], ['Vor Schreck ___ er mit großen Augen auf die Tür.', 'starrt', ['blinzelt', 'zwinkert'], 'sehen', 'vor Schreck, große Augen'],
+    ['Heimlich ___ Mia ein Stück Schokolade.', 'nascht', ['speist', 'frühstückt'], 'essen', 'heimlich, Schokolade'], ['Der hungrige Hund ___ sein Futter in Sekunden hinunter.', 'schlingt', ['knabbert', 'nascht'], 'essen', 'hungrig, in Sekunden'],
+    ['Das Kaninchen ___ an einer Möhre.', 'knabbert', ['schlingt', 'speist'], 'essen', 'an einer Möhre'],
+  ].map(([satz_, ok, falsch, feld, grund]) => ({ satz: satz_, ok, falsch, feld, grund }));
+  const STARK = [
+    ['Welches Wort ist am <b>lautesten</b>?', ['flüstern', 'sagen', 'rufen', 'brüllen'], 3], ['Welches Wort ist am <b>leisesten</b>?', ['flüstern', 'rufen', 'schreien', 'sagen'], 0],
+    ['Womit kommt man am <b>schnellsten</b> voran?', ['schlendern', 'gehen', 'rennen', 'humpeln'], 2], ['Welches Wort bedeutet <b>sehr klein</b>?', ['winzig', 'riesig', 'mächtig', 'breit'], 0],
+    ['Welches Wort bedeutet <b>sehr groß</b>?', ['winzig', 'riesig', 'zierlich', 'schmal'], 1], ['Welches Wort passt für <b>genau und lange hinsehen</b>?', ['blinzeln', 'beobachten', 'übersehen', 'zwinkern'], 1],
+  ];
+  const REGEL_FELD = 'Wörter mit ähnlicher Bedeutung bilden ein <b>Wortfeld</b>. Mit dem treffenden Wort wird ein Text genauer und lebendiger als mit „sagen“ oder „gehen“.';
+  function feldTreffend() {
+    const t = pick(TREFF), wahl = shuffle([t.ok, ...t.falsch]);
+    return {
+      prompt: `Welches Wort passt am besten?<br><span class="bsp">${t.satz}</span>`, choices: wahl, correct: wahl.indexOf(t.ok),
+      hint: 'Lies den Satz genau: Ein Wort darin verrät, <b>wie</b> etwas geschieht.',
+      solution: `${t.satz.replace('___', `<b class="vb">${t.ok}</b>`)}<br>Der Hinweis im Satz: „${t.grund}“. Dazu passt nur <b>${t.ok}</b>.`,
+      ex: zz('feldTreffend', t.satz.split('___'), 1, [t.satz.split('___')[0], t.ok, t.satz.split('___')[1]], 1, `Der Hinweis im Satz: „${t.grund}“.`, REGEL_FELD, `<b>${t.ok}</b> (Wortfeld „${t.feld}“)`),
+    };
+  }
+  function feldNicht() {
+    const namen = Object.keys(FELD), a = pick(namen), b = pick(namen.filter((x) => x !== a));
+    const fremd = pick(FELD[b]), w = shuffle([...shuffle(FELD[a]).slice(0, 3), fremd]);
+    return {
+      prompt: `Welches Wort passt <b>nicht</b> ins Wortfeld „${a}“?`, choices: w, correct: w.indexOf(fremd),
+      hint: `Frage bei jedem Wort: Ist das eine Art zu ${a}?`,
+      solution: `<b>${fremd}</b> passt nicht: Es gehört zum Wortfeld „${b}“. Die anderen sind Arten zu ${a}.<br>${REGEL_FELD}`,
+      ex: { mode: 'liste', art: 'feldNicht', woerter: w, stamm: '', raus: w.indexOf(fremd), s1: `Wortfeld „${a}“: Ist jedes Wort eine Art zu ${a}?`, merk: `<b>${fremd}</b> gehört zum Wortfeld „${b}“, nicht zu „${a}“.` },
+    };
+  }
+  function feldWelches() {
+    const namen = Object.keys(FELD), a = pick(namen), w = pick(FELD[a]);
+    return {
+      prompt: `Zu welchem Wortfeld gehört <b>${w}</b>?`, choices: namen, correct: namen.indexOf(a),
+      hint: 'Ein Wortfeld sammelt Wörter mit ähnlicher Bedeutung. Wofür könntest du das Wort einsetzen?',
+      solution: `<b>${w}</b> ist eine Art zu <b>${a}</b>.<br>${REGEL_FELD}`,
+      ex: { mode: 'liste', art: 'feldWelches', woerter: [a, w], stamm: '', raus: -1, s1: `Was bedeutet „${w}“?`, merk: `<b>${w}</b> gehört zum Wortfeld „<b>${a}</b>“.` },
+    };
+  }
+  function feldStark() {
+    const [frage, woerter, ok] = pick(STARK), w = shuffle(woerter);
+    return {
+      prompt: frage, choices: w, correct: w.indexOf(woerter[ok]),
+      hint: 'Stell dir jedes Wort vor: Wie laut, wie schnell, wie groß ist das?',
+      solution: `<b>${woerter[ok]}</b>.<br>${REGEL_FELD}`,
+      ex: { mode: 'liste', art: 'feldStark', woerter: w, stamm: '', raus: -1, hell: w.indexOf(woerter[ok]), s1: frage, merk: `<b>${woerter[ok]}</b>` },
+    };
+  }
+  const wortfeld = () => U.wahl([[45, feldTreffend], [20, feldNicht], [20, feldWelches], [15, feldStark]]);
+
+  // =====================================================
+  // Bereich 5: Texte verstehen (alle Texte selbst geschrieben)
+  // =====================================================
+  // ---------- Thema: Märchen und Sage ----------
+  // Erkennungswörter sind mit * markiert. Orte und Namen in den Sagen sind erfunden.
+  const MS = [
+    ['M', '*Es *war *einmal ein armer Müller, der hatte *drei Söhne. Eines Tages begegnete der jüngste im Wald einem *sprechenden Fuchs.'],
+    ['M', '*Vor *langer *Zeit lebte in einem *fernen Land eine Königin. Eine *Fee schenkte ihr einen Spiegel, der jede Frage beantwortete.'],
+    ['M', 'Hinter den *sieben Bergen wohnte ein Schneider. Wer *drei Rätsel löste, sollte die *Prinzessin heiraten.'],
+    ['M', '*Es *war *einmal ein Mädchen, das fand im Wald einen *goldenen Schlüssel. Eine alte *Hexe wollte ihn ihr abnehmen.'],
+    ['S', 'Bei dem Dorf *Lindenau steht ein großer Felsen am Fluss. Die Leute *erzählen, ein Riese habe ihn vor *800 *Jahren im Zorn dorthin geworfen.'],
+    ['S', 'Auf der Burg *Falkenstein soll um das Jahr *1350 ein Ritter gelebt haben. Seit jener Zeit, so *erzählt man, hört man dort um Mitternacht seine Schritte.'],
+    ['S', 'Der *Teufelssee im Hochwald hat seinen Namen von einer alten Geschichte. Dort *soll im Jahr *1502 ein Fuhrmann mit dem Teufel gewettet haben.'],
+    ['S', 'In der Stadt *Altenbrück zeigt man noch heute einen Stein mit einem Hufabdruck. Er *soll von dem Pferd stammen, mit dem ein Graf im Jahr *1420 über den Fluss sprang.'],
+  ].map(([typ, roh]) => { const w = roh.split(' '); return { typ, tokens: w.map((x) => x.replace('*', '')), mark: w.map((x, i) => (x[0] === '*' ? i : -1)).filter((i) => i >= 0), text: roh.replace(/\*/g, '') }; });
+  const MERKM = { M: ['Es beginnt oft mit „Es war einmal“.', 'Ort und Zeit bleiben unbestimmt.', 'Tiere können sprechen.', 'Am Ende siegt das Gute.', 'Die Zahlen 3, 7 und 12 kommen oft vor.', 'Es treten Feen, Hexen und Zauberer auf.'], S: ['Es wird ein bestimmter Ort genannt.', 'Oft wird eine Jahreszahl oder eine bekannte Person genannt.', 'Die Geschichte hat einen wahren Kern.', 'Sie erklärt, wie ein Ort oder ein Name entstanden sein soll.'] };
+  const MSNAME = { M: 'Märchen', S: 'Sage' };
+  const MSWARUM = { M: 'Ein <b>Märchen</b> spielt irgendwo und irgendwann. Es gibt Zauberei, sprechende Tiere, die Zahlen 3 und 7, und am Ende siegt das Gute.', S: 'Eine <b>Sage</b> nennt einen bestimmten Ort, oft auch eine Zeit oder Person. Sie hat einen wahren Kern und erklärt etwas Besonderes, zum Beispiel einen Felsen oder einen Namen.' };
+  function msErkennen() {
+    const x = pick(MS);
+    return {
+      prompt: `Märchen oder Sage?<br><span class="bsp text">${x.text}</span>`, choices: ['Märchen', 'Sage'], correct: x.typ === 'M' ? 0 : 1,
+      hint: 'Wird ein <b>bestimmter Ort</b> oder eine <b>Jahreszahl</b> genannt? Oder spielt es „irgendwo, vor langer Zeit“, mit Zauberwesen?',
+      solution: `Das ist ein Ausschnitt aus einer <b>${MSNAME[x.typ] === 'Sage' ? 'Sage' : 'einem Märchen'}</b>`.replace('aus einer <b>einem Märchen', 'aus einem <b>Märchen') + `. Daran erkennst du es: ${x.mark.map((i) => x.tokens[i].replace(/[.,]/g, '')).join(', ')}.<br>${MSWARUM[x.typ]}`,
+      ex: { mode: 'marken', art: 'msErkennen', tokens: x.tokens, correct: x.mark, was: 'Erkennungswörter', klein: true, s1: MSWARUM[x.typ], merk: `<b>${MSNAME[x.typ]}</b>. Erkennungswörter: ${x.mark.map((i) => x.tokens[i].replace(/[.,]/g, '')).join(', ')}` },
+    };
+  }
+  function msMerkmal() {
+    const typ = pick(['M', 'S']), anders = typ === 'M' ? 'S' : 'M';
+    const ok = pick(MERKM[typ]), w = shuffle([ok, ...shuffle(MERKM[anders]).slice(0, 2)]);
+    return {
+      prompt: `Welches Merkmal gehört zu${typ === 'M' ? 'm <b>Märchen</b>' : 'r <b>Sage</b>'}?`, choices: w, correct: w.indexOf(ok),
+      hint: 'Märchen: irgendwo, irgendwann, mit Zauberei. Sage: bestimmter Ort, wahrer Kern.',
+      solution: `<b>${ok}</b><br>${MSWARUM[typ]}`,
+      ex: { mode: 'liste', art: 'msMerkmal', woerter: [MSNAME[typ], ...MERKM[typ].slice(0, 3).map((m) => m.replace(/\.$/, ''))], stamm: '', raus: -1, hell: 0, klein: true, s1: `Typisch für ${typ === 'M' ? 'das Märchen' : 'die Sage'}:`, merk: `${MSNAME[typ]}: <b>${ok}</b>` },
+    };
+  }
+  const MSFEST = [
+    ['Welcher Satz ist ein typischer <b>Märchen-Anfang</b>?', ['Es war einmal ein König, der hatte drei Töchter.', 'Sehr geehrte Damen und Herren,', 'Gestern um 15 Uhr stießen zwei Autos zusammen.'], 'Viele Märchen beginnen mit einer festen Formel wie „Es war einmal“.'],
+    ['Welcher Satz ist ein typischer <b>Märchen-Schluss</b>?', ['Und wenn sie nicht gestorben sind, dann leben sie noch heute.', 'Mit freundlichen Grüßen', 'Fortsetzung folgt.'], 'Viele Märchen enden mit einer festen Formel, und es geht gut aus.'],
+    ['Ein Märchen wurde lange nur weitererzählt, niemand kennt den Erfinder. Wie nennt man es?', ['Volksmärchen', 'Kunstmärchen', 'Sage'], 'Volksmärchen wurden mündlich überliefert und später gesammelt, zum Beispiel von den Brüdern Grimm.'],
+    ['Ein Dichter wie Hans Christian Andersen hat sich ein Märchen ausgedacht. Wie nennt man es?', ['Kunstmärchen', 'Volksmärchen', 'Sage'], 'Bei einem Kunstmärchen kennt man den Verfasser.'],
+  ];
+  function msFest() {
+    const [frage, woerter, warum] = pick(MSFEST), w = shuffle(woerter);
+    return { prompt: frage, choices: w, correct: w.indexOf(woerter[0]), hint: 'Denke an die Märchen, die du kennst: Wie fangen sie an, wie hören sie auf, und wer hat sie erzählt?', solution: `<b>${woerter[0]}</b><br>${warum}`,
+      ex: { mode: 'liste', art: 'msFest', woerter: w, stamm: '', raus: -1, hell: w.indexOf(woerter[0]), klein: true, s1: frage.replace(/<[^>]+>/g, ''), merk: `<b>${woerter[0]}</b><br>${warum}` } };
+  }
+  const maerchen = () => U.wahl([[45, msErkennen], [35, msMerkmal], [20, msFest]]);
+
+  // ---------- Thema: Gedichte ----------
+  const GED = [
+    ['aabb', ['Der Igel raschelt durch das Laub,', 'er sucht nach Futter unterm Staub.', 'Bald rollt er sich zur Kugel ein', 'und schläft bis in den Frühling rein.']],
+    ['aabb', ['Im Winter fällt der erste Schnee,', 'er deckt die Wiese und den See.', 'Die Kinder holen Schlitten raus', 'und sausen jubelnd um das Haus.']],
+    ['abab', ['Die Sonne steigt am Morgen auf,', 'der Nebel zieht vom Feld,', 'die Vögel singen froh darauf', 'und wecken alle Welt.']],
+    ['abab', ['Ein Drachen tanzt im Wind,', 'er steigt und fällt und dreht,', 'ihm winkt ein kleines Kind,', 'das staunend unten steht.']],
+    ['abba', ['Am Abend wird es still im Haus,', 'die Katze schnurrt auf ihrem Kissen,', 'kein Mensch will jetzt noch etwas wissen,', 'und leise geht das Licht dann aus.']],
+    ['abba', ['Der Herbst malt alle Blätter bunt,', 'sie tanzen durch die Gassen,', 'der Wind will sie nicht lassen', 'und treibt sie um den Brunnen rund.']],
+  ].map(([schema, zeilen]) => ({ schema, zeilen, enden: zeilen.map((z) => z.replace(/[.,]$/, '').split(' ').pop()) }));
+  const REIMNAME = { aabb: 'Paarreim (aabb)', abab: 'Kreuzreim (abab)', abba: 'umarmender Reim (abba)' };
+  const REIMWARUM = { aabb: 'Beim <b>Paarreim</b> reimen sich zwei Verse direkt hintereinander: a a b b.', abab: 'Beim <b>Kreuzreim</b> reimt sich immer der übernächste Vers: a b a b.', abba: 'Beim <b>umarmenden Reim</b> umschließt ein Reimpaar das andere: a b b a.' };
+  const vers = (g) => `<span class="bsp vers">${g.zeilen.join('<br>')}</span>`;
+  const exReim = (art, g) => ({ mode: 'reim', art, zeilen: g.zeilen, schema: g.schema, merk: `${g.enden[0]} (a) · ${g.enden[1]} (${g.schema[1]}) · ${g.enden[2]} (${g.schema[2]}) · ${g.enden[3]} (${g.schema[3]})<br><b>${REIMNAME[g.schema]}</b>` });
+  function gedSchema() {
+    const g = pick(GED), s = ['aabb', 'abab', 'abba'];
+    return {
+      prompt: `Welches <b>Reimschema</b> hat die Strophe?${vers(g)}`, choices: s.map((x) => REIMNAME[x]), correct: s.indexOf(g.schema),
+      hint: 'Schau auf das <b>letzte Wort</b> jedes Verses. Gib dem ersten Reim den Buchstaben a, dem nächsten neuen Reim b.',
+      solution: `${g.enden.map((e, i) => `${e} (${g.schema[i]})`).join(' · ')}<br>${REIMWARUM[g.schema]}`, ex: exReim('gedSchema', g),
+    };
+  }
+  function gedReimwort() {
+    const g = pick(GED), i = R(0, 3), partner = [0, 1, 2, 3].find((k) => k !== i && g.schema[k] === g.schema[i]);
+    const w = shuffle([0, 1, 2, 3].filter((k) => k !== i));
+    return {
+      prompt: `Welches Wort reimt sich auf <b>${g.enden[i]}</b>?${vers(g)}`, choices: w.map((k) => g.enden[k]), correct: w.indexOf(partner),
+      hint: 'Sprich die Wörter am Versende laut. Zwei Wörter reimen sich, wenn sie ab dem letzten betonten Vokal gleich klingen.',
+      solution: `<b>${g.enden[i]}</b> reimt sich auf <b>${g.enden[partner]}</b>.<br>${REIMWARUM[g.schema]}`, ex: exReim('gedReimwort', g),
+    };
+  }
+  const GEDFEST = [
+    ['Wie nennt man eine <b>Zeile</b> in einem Gedicht?', ['Vers', 'Strophe', 'Reim'], 'Eine Zeile im Gedicht heißt Vers.'],
+    ['Wie nennt man einen <b>Abschnitt</b> aus mehreren Versen?', ['Strophe', 'Vers', 'Kapitel'], 'Mehrere Verse bilden zusammen eine Strophe.'],
+    ['Wie nennt man es, wenn zwei Wörter am Ende <b>gleich klingen</b> (Haus – Maus)?', ['Reim', 'Vers', 'Strophe'], 'Gleichklang am Wortende heißt Reim.'],
+    ['Wer ist das <b>lyrische Ich</b>?', ['die Stimme, die im Gedicht „ich“ sagt', 'immer der Dichter selbst', 'der Leser des Gedichts'], 'Das lyrische Ich ist die Stimme im Gedicht. Es muss nicht der Dichter sein.'],
+  ];
+  function gedFest() {
+    const g = pick(GED), [frage, woerter, warum] = pick(GEDFEST), w = shuffle(woerter);
+    return { prompt: frage, choices: w, correct: w.indexOf(woerter[0]), hint: 'Vers = Zeile · Strophe = Abschnitt · Reim = Gleichklang.', solution: `<b>${woerter[0]}</b><br>${warum}`, ex: exReim('gedFest', g) };
+  }
+  function gedZaehlen() {
+    const g = pick(GED);
+    return { prompt: `Wie viele <b>Verse</b> hat diese Strophe?${vers(g)}`, choices: ['1', '2', '4', '8'], correct: 2, hint: 'Ein Vers ist eine Zeile im Gedicht.', solution: 'Die Strophe hat <b>4</b> Verse. Jede Zeile ist ein Vers, alle vier zusammen bilden eine Strophe.', ex: exReim('gedZaehlen', g) };
+  }
+  const gedicht = () => U.wahl([[42, gedSchema], [33, gedReimwort], [17, gedFest], [8, gedZaehlen]]);
+
+  // ---------- Thema: Sprachliche Bilder ----------
+  // [Satz (Bildwort mit *), Bedeutung, zwei falsche Deutungen, Art: P Personifikation, V Vergleich, B anderes Bild]
+  const BILDER = [
+    ['Der Wind *flüstert in den Bäumen.', 'Der Wind weht leise.', ['Der Wind kann sprechen.', 'Jemand flüstert im Wald.'], 'P'], ['Die Sonne *lacht.', 'Die Sonne scheint hell.', ['Die Sonne macht ein Geräusch.', 'Jemand lacht in der Sonne.'], 'P'],
+    ['Er ist stark *wie ein Bär.', 'Er ist sehr stark.', ['Er ist ein Bär.', 'Er hat ein Fell.'], 'V'], ['Sie hat ein Herz aus *Gold.', 'Sie ist sehr gutherzig.', ['Ihr Herz ist aus Metall.', 'Sie besitzt viel Schmuck.'], 'B'],
+    ['Die Zeit vergeht im *Flug.', 'Die Zeit vergeht sehr schnell.', ['Die Zeit kann fliegen.', 'Wir sitzen im Flugzeug.'], 'B'], ['Der Himmel *weint.', 'Es regnet.', ['Jemand weint draußen.', 'Der Himmel hat Augen.'], 'P'],
+    ['Er schläft *wie ein Murmeltier.', 'Er schläft tief und lange.', ['Er schläft in einer Höhle.', 'Er ist ein Tier.'], 'V'], ['Die Blätter *tanzen im Wind.', 'Die Blätter bewegen sich im Wind hin und her.', ['Die Blätter hören Musik.', 'Kinder tanzen im Laub.'], 'P'],
+    ['Der Bach *murmelt.', 'Der Bach plätschert leise.', ['Der Bach spricht undeutlich.', 'Jemand murmelt am Bach.'], 'P'], ['Sie ist flink *wie ein Wiesel.', 'Sie ist sehr schnell.', ['Sie ist ein kleines Tier.', 'Sie wohnt im Wald.'], 'V'],
+    ['Der Nebel *verschluckt das Dorf.', 'Im Nebel sieht man das Dorf nicht mehr.', ['Der Nebel hat einen Mund.', 'Das Dorf ist zerstört.'], 'P'], ['Seine Augen leuchten *wie Sterne.', 'Seine Augen strahlen vor Freude.', ['Seine Augen sind Lampen.', 'Es ist gerade Nacht.'], 'V'],
+  ].map(([roh, sinn, falsch, typ]) => { const w = roh.split(' '); return { tokens: w.map((x) => x.replace('*', '')), mark: w.findIndex((x) => x[0] === '*'), text: roh.replace('*', ''), sinn, falsch, typ }; });
+  const BWARUM = { P: 'Das ist eine <b>Personifikation</b>: Etwas, das kein Mensch ist (Wind, Sonne, Bach), handelt wie ein Mensch.', V: 'Das ist ein <b>Vergleich</b>: Mit „wie“ wird etwas mit etwas anderem verglichen.', B: 'Das ist ein <b>sprachliches Bild</b>: Die Wörter sind nicht wörtlich gemeint, sie malen ein Bild im Kopf.' };
+  const exBild = (art, b) => ({ mode: 'marken', art, tokens: b.tokens, correct: [b.mark], was: 'Bildwort', s1: BWARUM[b.typ], merk: `„${b.text}“ bedeutet: <b>${b.sinn}</b>` });
+  function bildSinn() {
+    const b = pick(BILDER), w = shuffle([b.sinn, ...b.falsch]);
+    return { prompt: `Was ist gemeint?<br><span class="bsp">${b.text}</span>`, choices: w, correct: w.indexOf(b.sinn), hint: 'Ein sprachliches Bild ist <b>nicht wörtlich</b> gemeint. Stell dir das Bild vor: Was will es zeigen?', solution: `<b>${b.sinn}</b><br>${BWARUM[b.typ]}`, ex: exBild('bildSinn', b) };
+  }
+  function bildArt() {
+    const b = pick(BILDER.filter((x) => x.typ !== 'B'));
+    return { prompt: `Welches sprachliche Bild ist das?<br><span class="bsp">${b.text}</span>`, choices: ['Vergleich (mit „wie“)', 'Personifikation'], correct: b.typ === 'V' ? 0 : 1, hint: 'Steht ein „wie“ im Satz? Oder tut ein Ding oder die Natur etwas, das sonst nur Menschen tun?', solution: `${BWARUM[b.typ]}<br>Gemeint ist: ${b.sinn}`, ex: exBild('bildArt', b) };
+  }
+  function bildWort() {
+    const b = pick(BILDER.filter((x) => x.typ === 'P'));
+    return { prompt: 'Tippe das Wort an, das etwas <b>Menschliches</b> ausdrückt.', tap: { tokens: b.tokens, correct: [b.mark], one: true }, answerText: b.tokens[b.mark].replace('.', ''), hint: 'Welches Wort beschreibt etwas, das eigentlich nur Menschen tun?', solution: `<b>${b.tokens[b.mark].replace('.', '')}</b>: Das können eigentlich nur Menschen.<br>${BWARUM.P} Gemeint ist: ${b.sinn}`, ex: Object.assign(exBild('bildWort', b), { merk: `<b>${b.tokens[b.mark].replace('.', '')}</b>: Das können eigentlich nur Menschen. Gemeint ist: ${b.sinn}` }) };
+  }
+  const bilder = () => U.wahl([[50, bildSinn], [28, bildArt], [22, bildWort]]);
+
+  // ---------- Thema: Erzählen, Beschreiben, Berichten ----------
+  const TS = [
+    ['E', '*Plötzlich knackte es hinter mir im Gebüsch. Mein *Herz *klopfte bis zum Hals, und ich wagte kaum zu atmen.'],
+    ['E', '*„Wo bleibt ihr denn?“, rief Mia *aufgeregt. Da sahen wir es auch: Im Schnee führten *riesige Spuren zum Schuppen.'],
+    ['E', 'Endlich stand ich ganz oben auf dem Turm. Meine *Knie *zitterten, aber ich war *stolz wie noch nie.'],
+    ['B', 'Am *Montag, dem 3. Mai, stießen um *7:40 *Uhr vor der Schule zwei Radfahrer zusammen. Ein Schüler wurde leicht am Knie verletzt.'],
+    ['B', 'Am *Samstag fand in der *Turnhalle das Sportfest statt. *120 Kinder nahmen teil, die Klasse 5b gewann den Staffellauf.'],
+    ['B', 'Am *12. *Juni besuchte die Klasse 5a die Feuerwehr. Um *9 *Uhr begann die Führung, sie dauerte zwei Stunden.'],
+    ['S', 'Der Rucksack ist *dunkelblau und etwa *40 *Zentimeter hoch. *Vorn befindet sich eine kleine Tasche mit einem roten Reißverschluss.'],
+    ['S', '*Zuerst faltet man das Blatt in der Mitte. *Danach knickt man die beiden oberen Ecken zur Mittellinie.'],
+    ['S', 'Das Fahrrad hat einen *grünen Rahmen und *schwarze Griffe. *Am *Lenker ist eine silberne Klingel befestigt.'],
+  ].map(([typ, roh]) => { const w = roh.split(' '); return { typ, tokens: w.map((x) => x.replace('*', '')), mark: w.map((x, i) => (x[0] === '*' ? i : -1)).filter((i) => i >= 0), text: roh.replace(/\*/g, '') }; });
+  const TSNAME = { E: 'Erzählung', B: 'Bericht', S: 'Beschreibung' };
+  const TSWARUM = { E: 'Eine <b>Erzählung</b> will unterhalten: Sie ist spannend, zeigt Gefühle und Gedanken und nutzt oft wörtliche Rede.', B: 'Ein <b>Bericht</b> informiert sachlich: Er beantwortet die W-Fragen (Wer? Was? Wann? Wo?), steht im Präteritum und kommt ohne Gefühle aus.', S: 'Eine <b>Beschreibung</b> ist genau und sachlich und steht im Präsens: Sie nennt Farbe, Form und Größe oder die Schritte der Reihe nach.' };
+  const TSMERK = { E: ['ist spannend und zeigt Gefühle', 'nutzt oft wörtliche Rede', 'hat Einleitung, Höhepunkt und Schluss'], B: ['beantwortet die W-Fragen: Wer? Was? Wann? Wo?', 'ist sachlich und steht im Präteritum', 'nennt genaue Zeiten und Orte, aber keine Gefühle'], S: ['nennt Farbe, Form und Größe eines Gegenstands', 'steht im Präsens und ist sachlich', 'erklärt Schritt für Schritt, wie etwas geht'] };
+  function tsErkennen() {
+    const x = pick(TS), a = ['E', 'B', 'S'];
+    return { prompt: `Welche Textsorte ist das?<br><span class="bsp text">${x.text}</span>`, choices: a.map((k) => TSNAME[k]), correct: a.indexOf(x.typ), hint: 'Will der Text <b>unterhalten</b> (spannend, mit Gefühlen), sachlich über ein Ereignis <b>informieren</b> (wann, wo, wer) oder etwas <b>genau beschreiben</b>?', solution: `Das ist ${x.typ === 'B' ? 'ein' : 'eine'} <b>${TSNAME[x.typ]}</b>. Daran erkennst du es: ${x.mark.map((i) => x.tokens[i].replace(/^[„“]+|[.,:„“?!]+$/g, '')).filter(Boolean).join(', ')}.<br>${TSWARUM[x.typ]}`,
+      ex: { mode: 'marken', art: 'tsErkennen', tokens: x.tokens, correct: x.mark, was: 'Erkennungswörter', klein: true, s1: TSWARUM[x.typ], merk: `<b>${TSNAME[x.typ]}</b>. ${TSWARUM[x.typ]}` } };
+  }
+  function tsMerkmal() {
+    const a = ['E', 'B', 'S'], typ = pick(a), m = pick(TSMERK[typ]);
+    return { prompt: `Zu welcher Textsorte passt das?<br><span class="bsp">Dieser Text ${m}.</span>`, choices: a.map((k) => TSNAME[k]), correct: a.indexOf(typ), hint: 'Erzählung: unterhalten. Bericht: sachlich informieren, was passiert ist. Beschreibung: genau zeigen, wie etwas aussieht oder geht.', solution: `<b>${TSNAME[typ]}</b><br>${TSWARUM[typ]}`,
+      ex: { mode: 'liste', art: 'tsMerkmal', woerter: [TSNAME[typ], ...TSMERK[typ]], stamm: '', raus: -1, hell: 0, klein: true, s1: `Typisch für ${typ === 'B' ? 'den Bericht' : 'die ' + TSNAME[typ]}:`, merk: `<b>${TSNAME[typ]}</b>: ${m}` } };
+  }
+  const ABLAUF = [['einen Brief verschicken', ['den Brief schreiben', 'den Brief in den Umschlag stecken', 'den Umschlag in den Briefkasten werfen']], ['Zähne putzen', ['Zahnpasta auf die Bürste geben', 'die Zähne gründlich putzen', 'den Mund ausspülen']], ['einen Kuchen backen', ['den Teig rühren', 'den Teig in die Form füllen', 'die Form in den Ofen schieben']], ['eine Blume pflanzen', ['ein Loch graben', 'die Pflanze einsetzen', 'die Pflanze angießen']], ['einen Fahrradreifen flicken', ['das Loch suchen', 'den Flicken aufkleben', 'den Reifen aufpumpen']]];
+  function tsReihe() {
+    const [was, schritte] = pick(ABLAUF), k = R(0, 2), w = shuffle(schritte);
+    const wort = ['zuerst', 'danach', 'zum Schluss'][k];
+    return { prompt: `Du beschreibst, wie man ${was} kann. Welcher Schritt kommt <b>${wort}</b>?`, choices: w.map(gross), correct: w.indexOf(schritte[k]), hint: 'Stell dir vor, du machst es wirklich. Was geht nur, wenn etwas anderes schon erledigt ist?', solution: `Zuerst: ${schritte[0]}. Danach: ${schritte[1]}. Zum Schluss: ${schritte[2]}.<br>Bei einer Vorgangsbeschreibung muss die <b>Reihenfolge</b> stimmen. Wörter wie zuerst, danach, zum Schluss helfen.`,
+      ex: { mode: 'liste', art: 'tsReihe', woerter: schritte.map((s, i) => `${i + 1}. ${s}`), stamm: '', raus: -1, hell: k, klein: true, s1: 'Eine Vorgangsbeschreibung nennt die Schritte der Reihe nach.', merk: `${gross(wort)}: <b>${schritte[k]}</b>` } };
+  }
+  const WFR = [['Am Montag, dem 3. Mai, stießen um 7:40 Uhr vor der Schule zwei Radfahrer zusammen.', [['um 7:40 Uhr', 'Wann?'], ['vor der Schule', 'Wo?'], ['zwei Radfahrer', 'Wer?']]], ['Am Samstag gewann die Klasse 5b in der Turnhalle den Staffellauf.', [['Am Samstag', 'Wann?'], ['in der Turnhalle', 'Wo?'], ['die Klasse 5b', 'Wer?']]], ['Am 12. Juni besuchte die Klasse 5a die Feuerwehr in der Bergstraße.', [['Am 12. Juni', 'Wann?'], ['in der Bergstraße', 'Wo?'], ['die Klasse 5a', 'Wer?']]]];
+  function tsWFrage() {
+    const [satz_, teile] = pick(WFR), [teil, frage] = pick(teile), f = ['Wer?', 'Wann?', 'Wo?', 'Warum?'];
+    const tok = satz_.split(' '), tt = teil.split(' ');
+    const start = tok.findIndex((_, i) => tt.every((w, k) => (tok[i + k] || '').replace(/[.,]/g, '') === w.replace(/[.,]/g, '')));
+    return { prompt: `Welche W-Frage beantwortet der markierte Teil?<br><span class="bsp text">${satz_.replace(teil, `<u>${teil}</u>`)}</span>`, choices: f, correct: f.indexOf(frage), hint: 'Stelle die Frage und antworte mit dem markierten Teil. Passt das?', solution: `<b>${frage}</b> → ${teil}.<br>${TSWARUM.B}`,
+      ex: { mode: 'marken', art: 'tsWFrage', tokens: tok, correct: tt.map((_, k) => start + k), was: frage, klein: true, s1: 'Ein Bericht beantwortet die W-Fragen: Wer? Was? Wann? Wo?', merk: `<b>${frage}</b> → ${teil}` } };
+  }
+  const textsorten = () => U.wahl([[36, tsErkennen], [24, tsMerkmal], [20, tsReihe], [20, tsWFrage]]);
+
+  // ---------- Thema: Sachtexte, Tabellen und Schaubilder ----------
+  // [Überschrift, Text, Fragen: [Frage, richtige Antwort, zwei falsche, Belegsatz-Nummer]]
+  const SACH = [
+    ['Der Dachs', ['Der Dachs lebt in Wäldern und baut unter der Erde große Höhlen, die man Bau nennt.', 'Tagsüber schläft er, erst in der Dämmerung geht er auf Futtersuche.', 'Er frisst Regenwürmer, Käfer, Beeren und Wurzeln.', 'Im Winter hält er Winterruhe und zehrt von seinem Fettpolster.'],
+      [['Wann geht der Dachs auf Futtersuche?', 'in der Dämmerung', ['am Mittag', 'nur im Winter'], 1], ['Wie nennt man die Höhle des Dachses?', 'Bau', ['Nest', 'Stall'], 0], ['Was frisst der Dachs laut Text <b>nicht</b>?', 'Fische', ['Regenwürmer', 'Beeren'], 2], ['Wovon lebt der Dachs im Winter?', 'von seinem Fettpolster', ['von Vorräten im Bau', 'von Fischen'], 3]],
+      ['Der Dachs, ein heimlicher Waldbewohner', 'Tiere im Zoo', 'Wie man Höhlen baut']],
+    ['Die Elbe', ['Die Elbe entspringt im Riesengebirge in Tschechien.', 'Sie fließt durch Dresden, Magdeburg und Hamburg und mündet in die Nordsee.', 'Der Fluss ist etwa 1100 Kilometer lang.', 'In Dresden fahren auf der Elbe alte Raddampfer mit Ausflugsgästen.'],
+      [['Wo entspringt die Elbe?', 'im Riesengebirge', ['in der Nordsee', 'in Hamburg'], 0], ['In welches Meer mündet die Elbe?', 'in die Nordsee', ['in die Ostsee', 'ins Mittelmeer'], 1], ['Wie lang ist die Elbe ungefähr?', '1100 Kilometer', ['110 Kilometer', '11 000 Kilometer'], 2], ['Welche Schiffe nennt der Text?', 'Raddampfer', ['Segelschiffe', 'Fischerboote'], 3]],
+      ['Die Elbe: von der Quelle bis zum Meer', 'Urlaub an der Nordsee', 'Die Geschichte der Dampfmaschine']],
+    ['Honigbienen', ['Honigbienen leben in einem Volk mit vielen tausend Tieren zusammen.', 'Die Arbeiterinnen sammeln Nektar und Blütenstaub.', 'Dabei bestäuben sie die Blüten, sodass Früchte wachsen können.', 'Aus dem Nektar machen die Bienen Honig, ihren Vorrat für den Winter.'],
+      [['Wer sammelt Nektar und Blütenstaub?', 'die Arbeiterinnen', ['die Königin', 'der Imker'], 1], ['Wozu brauchen die Bienen den Honig?', 'als Vorrat für den Winter', ['als Futter für Vögel', 'zum Bauen der Waben'], 3], ['Was geschieht beim Sammeln mit den Blüten?', 'Sie werden bestäubt.', ['Sie welken sofort.', 'Sie werden gefressen.'], 2], ['Wie leben Honigbienen?', 'in einem großen Volk', ['allein', 'zu zweit'], 0]],
+      ['Fleißige Bienen und ihr Honig', 'Gefährliche Insekten', 'Blumen im Garten']],
+    ['Papier', ['Papier wird aus Holzfasern hergestellt.', 'Dazu wird Holz zerkleinert und mit Wasser zu einem Brei verrührt.', 'Der Brei wird auf einem Sieb verteilt, gepresst und getrocknet.', 'Aus Altpapier kann man neues Papier machen, das spart Holz und Wasser.'],
+      [['Woraus wird Papier laut Text hergestellt?', 'aus Holzfasern', ['aus Sand', 'aus Wolle'], 0], ['Was geschieht mit dem Holz zuerst?', 'Es wird zerkleinert.', ['Es wird gepresst.', 'Es wird getrocknet.'], 1], ['Warum ist es gut, Altpapier zu sammeln?', 'Das spart Holz und Wasser.', ['Das Papier wird bunter.', 'Das Papier hält länger.'], 3], ['Worauf wird der Brei verteilt?', 'auf einem Sieb', ['auf einem Tisch', 'in einer Flasche'], 2]],
+      ['Wie Papier entsteht', 'Bäume im Herbst', 'Warum Bücher teuer sind']],
+  ].map(([titel, saetze, fragen, ueber]) => ({ titel, saetze, fragen, ueber }));
+  const sachBox = (t) => `<span class="bsp text">${t.saetze.join(' ')}</span>`;
+  function sachFrage() {
+    const t = pick(SACH), [frage, ok, falsch, beleg] = pick(t.fragen), w = shuffle([ok, ...falsch]);
+    const tok = t.saetze[beleg].split(' ');
+    return { prompt: `${sachBox(t)}${frage}`, choices: w, correct: w.indexOf(ok), hint: 'Lies den Text noch einmal langsam. Suche den Satz, in dem die Antwort steht.', solution: `<b>${ok}</b><br>Das steht hier: „${t.saetze[beleg]}“`,
+      ex: { mode: 'marken', art: 'sachFrage', tokens: tok, correct: [], was: 'Antwort', klein: true, s1: 'Suche im Text den Satz, der zur Frage passt.', merk: `„${t.saetze[beleg]}“<br>Antwort: <b>${ok}</b>` } };
+  }
+  function sachTitel() {
+    const t = pick(SACH), w = shuffle(t.ueber);
+    return { prompt: `${sachBox(t)}Welche <b>Überschrift</b> passt am besten?`, choices: w, correct: w.indexOf(t.ueber[0]), hint: 'Worum geht es in <b>allen</b> Sätzen? Die Überschrift nennt das Thema des ganzen Textes.', solution: `<b>${t.ueber[0]}</b><br>Die Überschrift fasst zusammen, worum es im ganzen Text geht.`,
+      ex: { mode: 'liste', art: 'sachTitel', woerter: w, stamm: '', raus: -1, hell: w.indexOf(t.ueber[0]), klein: true, s1: 'Die Überschrift nennt das Thema des ganzen Textes.', merk: `<b>${t.ueber[0]}</b>` } };
+  }
+  // Tabellen und Schaubilder: Umfragen mit erfundenen Zahlen
+  const UMFR = [['Lieblingstiere der Klasse 5a', ['Hund', 'Katze', 'Pferd', 'Hase'], 'Tier'], ['So kommen die Kinder zur Schule', ['zu Fuß', 'Fahrrad', 'Bus', 'Auto'], 'Schulweg'], ['Lieblingssport der Klasse 5b', ['Fußball', 'Schwimmen', 'Turnen', 'Tanzen'], 'Sport'], ['Lieblingsobst der Klasse 5c', ['Apfel', 'Banane', 'Erdbeere', 'Kirsche'], 'Obst']];
+  function umfrage() { const [titel, namen, kopf] = pick(UMFR); const werte = shuffle([2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).slice(0, 4); return { titel, namen, kopf, werte }; }
+  const tabelle = (u) => `<span class="bsp"><b>${u.titel}</b><table class="tbl"><tr><th>${u.kopf}</th>${u.namen.map((n) => `<td>${n}</td>`).join('')}</tr><tr><th>Kinder</th>${u.werte.map((v) => `<td>${v}</td>`).join('')}</tr></table></span>`;
+  function schaubild(u) {
+    const h = 96, top = 8, y = (v) => top + h - (v / 12) * h;
+    let g = '';
+    for (let v = 0; v <= 12; v++) g += `<line x1="26" y1="${y(v)}" x2="296" y2="${y(v)}" stroke="${v % 2 ? '#ebe6da' : '#cfc8ba'}" stroke-width="1"/>${v % 2 ? '' : `<text x="20" y="${y(v) + 4}" text-anchor="end" font-size="10" font-weight="700" fill="#6b6680">${v}</text>`}`;
+    u.namen.forEach((n, i) => { const x = 44 + i * 64; g += `<rect x="${x}" y="${y(u.werte[i])}" width="34" height="${(u.werte[i] / 12) * h}" rx="3" fill="#3d7bff" stroke="#1d1b2e" stroke-width="1.5"/><text x="${x + 17}" y="${top + h + 15}" text-anchor="middle" font-size="11" font-weight="800" fill="#1d1b2e">${n}</text>`; });
+    return `<span class="bsp"><b>${u.titel}</b><svg viewBox="0 0 300 126" width="100%" role="img" aria-label="Schaubild">${g}</svg></span>`;
+  }
+  function datenAufgabe(art, zeig) {
+    const u = umfrage(), k = R(0, 3), typ = pick(zeig === schaubild ? ['max', 'min', 'wert', 'mehr'] : ['max', 'min', 'wert', 'summe', 'mehr']);
+    const exB = (idx, merk) => ({ mode: 'balken', art, namen: u.namen, werte: u.werte, idx, merk });
+    const tipp = zeig === schaubild ? 'Jeder Balken gehört zu einem Namen. Seine Höhe liest du links an den Zahlen ab. Jede Linie ist ein Kind mehr, beschriftet ist jede zweite.' : 'Suche die Spalte mit dem passenden Namen. Die Zahl darunter gehört dazu.';
+    if (typ === 'max' || typ === 'min') {
+      const ziel = typ === 'max' ? Math.max(...u.werte) : Math.min(...u.werte), i = u.werte.indexOf(ziel);
+      return { prompt: `${zeig(u)}Was wurde am <b>${typ === 'max' ? 'häufigsten' : 'seltensten'}</b> genannt?`, choices: u.namen, correct: i, hint: tipp, solution: `<b>${u.namen[i]}</b> mit ${ziel} Kindern. Das ist der ${typ === 'max' ? 'größte' : 'kleinste'} Wert.`, ex: exB([i], `<b>${u.namen[i]}</b>: ${ziel} Kinder, der ${typ === 'max' ? 'größte' : 'kleinste'} Wert.`) };
+    }
+    if (typ === 'wert') return { prompt: `${zeig(u)}Wie viele Kinder nannten <b>${u.namen[k]}</b>?`, fields: [{ answer: u.werte[k], label: 'Anzahl', suffix: 'Kinder' }], hint: tipp, solution: `<b>${u.werte[k]}</b> Kinder nannten ${u.namen[k]}.`, ex: exB([k], `${u.namen[k]}: <b>${u.werte[k]}</b> Kinder`) };
+    if (typ === 'summe') { const sum = u.werte.reduce((a, b) => a + b, 0); return { prompt: `${zeig(u)}Wie viele Kinder wurden <b>insgesamt</b> befragt?`, fields: [{ answer: sum, label: 'Anzahl', suffix: 'Kinder' }], hint: 'Zähle alle vier Zahlen zusammen.', solution: `${u.werte.join(' + ')} = <b>${sum}</b> Kinder.`, ex: exB([0, 1, 2, 3], `${u.werte.join(' + ')} = <b>${sum}</b> Kinder`) }; }
+    const a = u.werte.indexOf(Math.max(...u.werte)), b = u.werte.indexOf(Math.min(...u.werte)), d = u.werte[a] - u.werte[b];
+    return { prompt: `${zeig(u)}Wie viele Kinder <b>mehr</b> nannten ${u.namen[a]} als ${u.namen[b]}?`, fields: [{ answer: d, label: 'Unterschied', suffix: 'Kinder' }], hint: 'Lies beide Zahlen ab und rechne den Unterschied aus.', solution: `${u.werte[a]} − ${u.werte[b]} = <b>${d}</b> Kinder.`, ex: exB([a, b], `${u.namen[a]} ${u.werte[a]}, ${u.namen[b]} ${u.werte[b]}: Unterschied <b>${d}</b>`) };
+  }
+  const sachTabelle = () => datenAufgabe('sachTabelle', tabelle);
+  const sachBild = () => datenAufgabe('sachBild', schaubild);
+  const sachtext = () => U.wahl([[34, sachFrage], [14, sachTitel], [26, sachTabelle], [26, sachBild]]);
+
   D.daten = { LANG, KURZ, AUSL, UML, SL, SILB, V, SUBJ, HILF, ZEITEN, ZNAME, ZDEUTSCH, satz, text, bauplan, subjFuer, praesens, praeteritum,
     N, GENUS, substSatz, markSatz, WA, WAPL, WAPROBE, ROLLE, RFRAGE, FAELLE, FNAME, FFRAGE, ARTIKEL, pluralBau, pluralSatz, gruppe, fallSatz };
   D.arten = { // für Tests
@@ -1467,6 +1915,15 @@
     'd5-slaute': { slLuecke, slRegel, slTippen },
     'd5-gross': { grossAntippen, grossWort, grossVerb, grossWelches },
     'd5-silben': { silbTrennen, silbZahl, silbWahl, silbTippen },
+    'd5-zusammen': { zusArtikel, zusBauen, zusBedeutung, zusTrennen },
+    'd5-ableitung': { vorsilbe, nachWortart, nachBauen, nachWahl },
+    'd5-wortfamilie': { famNicht, famDazu, famStamm },
+    'd5-wortfeld': { feldTreffend, feldNicht, feldWelches, feldStark },
+    'd5-maerchen': { msErkennen, msMerkmal, msFest },
+    'd5-gedicht': { gedSchema, gedReimwort, gedFest, gedZaehlen },
+    'd5-bilder': { bildSinn, bildArt, bildWort },
+    'd5-textsorten': { tsErkennen, tsMerkmal, tsReihe, tsWFrage },
+    'd5-sachtext': { sachFrage, sachTitel, sachTabelle, sachBild },
     'd5-zeitformen': { erkennen, einsetzen, bilden, antippen, hilfsverb, grundform, welcherSatz },
   };
 
@@ -1502,6 +1959,19 @@
         { id: 'd5-slaute', title: 's-Laute: s, ss, ß', icon: 'ß', gen: sLaute },
         { id: 'd5-gross', title: 'Groß- und Kleinschreibung', icon: 'Aa', gen: grossKlein },
         { id: 'd5-silben', title: 'Silben und Worttrennung', icon: '✂', gen: silben },
+      ] },
+      { id: 'd5-wort', nr: 4, title: 'Wörter bauen und Wortschatz', topics: [
+        { id: 'd5-zusammen', title: 'Zusammengesetzte Wörter', icon: '🧩', gen: zusammen },
+        { id: 'd5-ableitung', title: 'Vorsilben und Nachsilben', icon: '➕', gen: ableitung },
+        { id: 'd5-wortfamilie', title: 'Wortfamilien', icon: '🌳', gen: wortfamilie },
+        { id: 'd5-wortfeld', title: 'Wortfelder', icon: '☁', gen: wortfeld },
+      ] },
+      { id: 'd5-text', nr: 5, title: 'Texte verstehen', topics: [
+        { id: 'd5-maerchen', title: 'Märchen und Sage', icon: '👑', gen: maerchen },
+        { id: 'd5-gedicht', title: 'Gedichte: Vers, Strophe, Reim', icon: '🎵', gen: gedicht },
+        { id: 'd5-bilder', title: 'Sprachliche Bilder', icon: '🖼', gen: bilder },
+        { id: 'd5-textsorten', title: 'Erzählen, Beschreiben, Berichten', icon: '📝', gen: textsorten },
+        { id: 'd5-sachtext', title: 'Sachtexte, Tabellen, Schaubilder', icon: '📊', gen: sachtext },
       ] },
     ],
   };

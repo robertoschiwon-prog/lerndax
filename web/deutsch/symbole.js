@@ -44,6 +44,24 @@ window.DeDaxIcons = (function () {
     'd5-gross': `<path d="M3 20 8 4l5 16"/><path d="M5 14.5h6"/><circle cx="18" cy="16" r="3.5"/><path d="M21.5 12.5v7.5"/>`,
     // Silben: Wort mit Schnitt in der Mitte
     'd5-silben': `<rect x="2" y="8.5" width="8" height="7" rx="1.5"/><rect x="14" y="8.5" width="8" height="7" rx="1.5"/><path d="M12 4v16" stroke-dasharray="2.5 2.5"/>`,
+    // Zusammengesetzte Wörter: zwei Puzzleteile
+    'd5-zusammen': `<path d="M2.5 7.5h8v3.2a1.9 1.9 0 1 1 0 3.6v3.2h-8z"/><path d="M13.5 7.5h8v10h-8v-3.2a1.9 1.9 0 1 0 0-3.6z" ${F}/>`,
+    // Vorsilben und Nachsilben: Stamm mit Baustein vorn und hinten
+    'd5-ableitung': `<rect x="1.5" y="9" width="5" height="6" rx="1.2" ${F}/><rect x="8.5" y="7.5" width="7" height="9" rx="1.5"/><rect x="17.5" y="9" width="5" height="6" rx="1.2" ${F}/>`,
+    // Wortfamilie: Baum mit Stamm und Krone
+    'd5-wortfamilie': `<path d="M12 21v-9"/><path d="M12 15l-4-3.5M12 13l4-3.5"/><circle cx="12" cy="7.5" r="5.5"/>`,
+    // Wortfeld: Wolke
+    'd5-wortfeld': `<path d="M7 18.5a4 4 0 0 1-.5-8 5.5 5.5 0 0 1 10.6-1.2A4.6 4.6 0 0 1 17.5 18.5z"/>`,
+    // Märchen: Krone
+    'd5-maerchen': `<path d="M3 17.5 4.5 7l4.5 5 3-7 3 7 4.5-5L21 17.5z"/><path d="M3 20.5h18"/>`,
+    // Gedicht: vier Verse, zwei Reimpaare (gleich lange Zeilen)
+    'd5-gedicht': `<path d="M3 5.5h13M3 10h9M3 14.5h13M3 19h9"/><circle cx="20" cy="5.5" r="1.4" ${F}/><circle cx="20" cy="14.5" r="1.4" ${F}/>`,
+    // Sprachliche Bilder: Bilderrahmen mit Sonne und Berg
+    'd5-bilder': `<rect x="2.5" y="4" width="19" height="16" rx="2"/><circle cx="8" cy="9.5" r="2" ${F}/><path d="M4.5 18l5.5-5.5 3.5 3.5 2.5-2.5 3.5 4.5"/>`,
+    // Textsorten: Blatt mit Zeilen und Stift
+    'd5-textsorten': `<path d="M5 3h10l4 4v14H5z"/><path d="M8.5 9.5h6M8.5 13h7M8.5 16.5h4.5"/>`,
+    // Sachtexte und Schaubilder: Balkendiagramm
+    'd5-sachtext': `<path d="M3 3v18h18"/><rect x="6.5" y="12" width="3.2" height="6" ${F}/><rect x="11.5" y="7.5" width="3.2" height="10.5" ${F}/><rect x="16.5" y="10" width="3.2" height="8" ${F}/>`,
     // Zeitformen: Zeitstrahl mit drei Punkten, der mittlere („jetzt“) ist groß
     'd5-zeitformen': `<path d="M2 14h19"/><path d="M18.5 10.8 21.8 14l-3.3 3.2"/><circle cx="5.5" cy="14" r="1.7" ${F}/><circle cx="11.5" cy="14" r="3.1" ${F}/><path d="M11.5 3.5v4.5"/><path d="M9.4 6.2l2.1 2.1 2.1-2.1"/>`,
   };

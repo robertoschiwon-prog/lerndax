@@ -298,6 +298,14 @@
     fit(t, 336, 19);
     return { t, ts, br };
   }
+  // längerer Text: mehrere Zeilen mit höchstens 40 Zeichen, kleinere Schrift
+  function absatz(api, tokens) {
+    const t = el('text', { x: 180, y: 30, 'text-anchor': 'middle', class: 'ex-b', style: 'font-size:13.5px' }, api.svg);
+    let c = 0;
+    const ts = tokens.map((w, i) => { const neu = i > 0 && c + w.length + 1 > 40; const e = el('tspan', { text: (i && !neu ? ' ' : '') + w }, t); if (neu) { e.setAttribute('x', 180); e.setAttribute('dy', 21); c = 0; } c += w.length + 1; return e; });
+    return { t, ts };
+  }
+  const ohneU = (w) => w.toLowerCase().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u');
   const mitteX = (t, teile, idx, sep) => { // Mitte eines Teils in x (für Pfeile)
     try { let a = 0; for (let i = 0; i < idx; i++) a += teile[i].length + (sep && i ? 1 : 0); if (sep && idx) a += 1;
       return (t.getStartPositionOfChar(a).x + t.getEndPositionOfChar(a + teile[idx].length - 1).x) / 2; } catch (e) { return 180; }
@@ -319,7 +327,7 @@
     },
     // Wörter im Satz nacheinander markieren
     async marken(api, x) {
-      const a = zeile(api, x.tokens, 66, !x.dicht, true);
+      const a = x.klein ? absatz(api, x.tokens) : zeile(api, x.tokens, 66, !x.dicht, true);
       api.say(x.s1); await api.wait(2600);
       for (const i of x.correct) { a.ts[i].setAttribute('fill', x.dicht ? ORANGE : BLAU); await api.wait(x.dicht ? 700 : 1100); }
       api.say(x.merk || `${x.was}: <b>${x.correct.map((i) => x.tokens[i].replace(/[.,!?]/g, '')).join(', ')}</b>.`);
@@ -383,6 +391,55 @@
         wagen[k].lab.setAttribute('x', mitte - pos[k]);
         await api.wait(x.idx && x.idx.length ? 900 : 350);
       }
+      api.say(x.merk);
+    },
+    // Wörter oder kurze Sätze untereinander: Wortstamm farbig, ein Wort ausgegraut (raus) oder hervorgehoben (hell)
+    async liste(api, x) {
+      const n = x.woerter.length, schritt = n > 3 ? 27 : 32, y0 = (x.klein ? 30 : 36);
+      const zeilen = x.woerter.map((w, i) => {
+        const t = el('text', { x: 180, y: y0 + i * schritt, 'text-anchor': 'middle', class: 'ex-b', style: `font-size:${x.klein ? 14 : 19}px`, opacity: 0 }, api.svg);
+        const k = x.stamm ? ohneU(w).indexOf(x.stamm) : -1;
+        if (k >= 0) { el('tspan', { text: w.slice(0, k) }, t); el('tspan', { text: w.slice(k, k + x.stamm.length), fill: BLAU }, t); el('tspan', { text: w.slice(k + x.stamm.length) }, t); } else t.textContent = w;
+        try { for (let fs = x.klein ? 14 : 19; fs >= 9 && t.getBBox().width > 336; fs--) t.setAttribute('style', `font-size:${fs}px`); } catch (e) {}
+        return t;
+      });
+      api.say(x.s1);
+      for (const t of zeilen) { await api.tw(300, (k) => t.setAttribute('opacity', k)); await api.wait(450); }
+      await api.wait(1400);
+      if (x.raus >= 0) { zeilen[x.raus].style.fill = '#9a94a8'; zeilen[x.raus].setAttribute('text-decoration', 'line-through'); }
+      if (x.hell >= 0 && x.hell !== undefined) zeilen[x.hell].style.fill = BLAU;
+      api.say(x.merk);
+    },
+    // Reimschema: gleiche Reime in gleicher Farbe, rechts die Buchstaben
+    async reim(api, x) {
+      const farbe = { a: BLAU, b: ORANGE };
+      const zs = x.zeilen.map((z, i) => {
+        const w = z.split(' '), letzter = w.pop();
+        const t = el('text', { x: 16, y: 34 + i * 27, class: 'ex-b', style: 'font-size:14px' }, api.svg);
+        el('tspan', { text: w.join(' ') + ' ' }, t);
+        const e = el('tspan', { text: letzter }, t);
+        try { for (let fs = 14; fs >= 9 && t.getBBox().width > 296; fs--) t.setAttribute('style', `font-size:${fs}px`); } catch (err) {}
+        const b = el('text', { x: 338, y: 34 + i * 27, 'text-anchor': 'middle', class: 'ex-b', text: '', style: 'font-size:17px' }, api.svg);
+        return { e, b };
+      });
+      api.say('Schau auf das <b>letzte Wort</b> jedes Verses. Gleiche Reime bekommen denselben Buchstaben.');
+      await api.wait(2600);
+      for (let i = 0; i < 4; i++) { zs[i].e.setAttribute('fill', farbe[x.schema[i]]); zs[i].b.textContent = x.schema[i]; zs[i].b.style.fill = farbe[x.schema[i]]; await api.wait(1000); }
+      api.say(x.merk);
+    },
+    // Schaubild: Balken wachsen, die gefragten werden hervorgehoben und beschriftet
+    async balken(api, x) {
+      const h = 100, top = 16, y = (v) => top + h - (v / 12) * h;
+      for (let v = 0; v <= 12; v += 2) { el('line', { x1: 40, y1: y(v), x2: 330, y2: y(v), stroke: '#d9d2c3', 'stroke-width': 1 }, api.svg); el('text', { x: 32, y: y(v) + 4, 'text-anchor': 'end', class: 'ex-s', text: v, style: 'font-size:10px;fill:#6b6680' }, api.svg); }
+      const bs = x.namen.map((n, i) => {
+        const bx = 62 + i * 68;
+        el('text', { x: bx + 18, y: top + h + 16, 'text-anchor': 'middle', class: 'ex-s', text: n, style: 'font-size:11.5px' }, api.svg);
+        return { r: el('rect', { x: bx, y: y(0), width: 36, height: 0, rx: 3, fill: '#e9e3d6', stroke: 'var(--ink)', 'stroke-width': 1.5 }, api.svg), bx };
+      });
+      api.say('Jeder Balken zeigt eine Zahl. Je höher der Balken, desto mehr Kinder.');
+      await api.tw(700, (t) => bs.forEach((b, i) => { b.r.setAttribute('height', (x.werte[i] / 12) * h * t); b.r.setAttribute('y', y(x.werte[i] * t)); }));
+      await api.wait(1500);
+      for (const i of x.idx) { bs[i].r.setAttribute('fill', 'var(--c2)'); el('text', { x: bs[i].bx + 18, y: y(x.werte[i]) - 5, 'text-anchor': 'middle', class: 'ex-b', text: x.werte[i], style: 'font-size:14px' }, api.svg); await api.wait(700); }
       api.say(x.merk);
     },
     // Wortarten: Zielwörter in der Farbe ihrer Wortart, unten die Legende
@@ -468,4 +525,13 @@
   thema('d5-slaute', 's, ss oder ß?', '0 0 360 150');
   thema('d5-gross', 'Groß oder klein?', '0 0 360 150');
   thema('d5-silben', 'Silben', '0 0 360 120');
+  thema('d5-zusammen', 'Zusammengesetzte Wörter', '0 0 360 150');
+  thema('d5-ableitung', 'Vorsilben und Nachsilben', '0 0 360 150');
+  thema('d5-wortfamilie', 'Wortfamilien: ein Stamm, viele Wörter', '0 0 360 150');
+  thema('d5-wortfeld', 'Wortfelder: das treffende Wort', '0 0 360 150');
+  thema('d5-maerchen', 'Märchen oder Sage?', '0 0 360 150');
+  thema('d5-gedicht', 'Vers, Strophe, Reim', '0 0 360 140');
+  thema('d5-bilder', 'Sprachliche Bilder', '0 0 360 120');
+  thema('d5-textsorten', 'Erzählen, Beschreiben, Berichten', '0 0 360 150');
+  thema('d5-sachtext', 'Sachtexte und Schaubilder lesen', '0 0 360 150');
 })();

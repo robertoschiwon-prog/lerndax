@@ -582,3 +582,9 @@ body.noscroll{overflow:hidden}
 .tapline.gaps.eng .tw{font-size:26px}
 .tapline.gaps.eng .gap{width:20px;margin:0 1px}
 .bsp.gross{font-size:26px;letter-spacing:.5px}
+.bsp.text{font-size:15.5px;font-weight:700;line-height:1.5;margin-bottom:10px}
+.bsp.vers{font-size:16px;font-weight:700;line-height:1.7}
+.tbl{border-collapse:collapse;margin-top:8px;width:100%;font-size:14.5px}
+.tbl th,.tbl td{border:2px solid #cfc8ba;padding:5px 6px;text-align:center}
+.tbl th{text-align:left;background:#e9e3d6}
+.bsp svg{display:block;margin-top:6px}

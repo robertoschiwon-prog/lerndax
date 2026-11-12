@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v50`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v51`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -78,11 +78,13 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
   „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
   27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
-- **Gebaut (v50): Bereich 3 „Rechtschreibung“ ist vollständig** (6 Themen). DeDax hat damit 21 Themen.
+- **Gebaut (v51): Bereich 4 „Wörter bauen und Wortschatz“ (4 Themen) und Bereich 5 „Texte verstehen“ (5 Themen).**
+  **Damit ist der Themenplan Klasse 5 vollständig gebaut: 30 Themen in 5 Bereichen.**
+- **Gebaut (v50): Bereich 3 „Rechtschreibung“ ist vollständig** (6 Themen).
 - **Gebaut (v49): Bereich 2 „Satzbau und Satzzeichen“ ist vollständig** (8 Themen).
-- **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 21 Themen).
+- **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 30 Themen).
   Die Zahl `themen` dort bei jedem neuen Thema mitzählen.
-- **Als Nächstes:** Bereich 4 (Wörter bauen und Wortschatz) und 5 (Texte verstehen), danach „Entdecken“ für Deutsch, siehe Themenplan.
+- **Als Nächstes:** „Entdecken“ für Deutsch (Ideen im Themenplan), Knobel-Aufgaben, „Gemischt“-Prüfung über alle Bereiche ansehen, Schulbuch-Abgleich (ISBN und Inhaltsverzeichnis fehlen), Rückmeldung des Auftraggebers und Test mit Bruno.
   ISBN und Inhaltsverzeichnis des Deutschbuchs,
   Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
@@ -372,7 +374,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v50`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v51`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -955,4 +957,19 @@ Infos zur ersten Arbeit:
   Worttrennung nach heutiger Regel (Fens-ter, Zu-cker); Wörter mit einem einzelnen Vokal am Anfang (Abend, Igel) fehlen.
   Plattform: Antippen zwischen Buchstaben (`tap.eng`), zwei lange Antworten stehen untereinander statt nebeneinander.
   `tests/dedax.py`: 21 Themen, 756 richtige Antworten angenommen, 252 Lösungs-Animationen; 210 000 erzeugte Aufgaben
+  ohne Fehler.
+- **DeDax: Bereiche 4 und 5 fertig, Themenplan Klasse 5 vollständig** (Version `lerndax-v51`, 30 Themen).
+  Bereich 4: „Zusammengesetzte Wörter“ (Artikel, zusammensetzen auch mit Fugenzeichen, Grundwort, Nahtstelle antippen),
+  „Vorsilben und Nachsilben“ (passende Vorsilbe, Wortart nach Nachsilbe, Wort bauen mit Groß/Klein), „Wortfamilien“
+  (gehört nicht dazu, gehört dazu, Wortstamm), „Wortfelder“ (treffendes Wort, passt nicht, welches Wortfeld).
+  Bereich 5: „Märchen und Sage“, „Gedichte: Vers, Strophe, Reim“, „Sprachliche Bilder“, „Erzählen, Beschreiben,
+  Berichten“, „Sachtexte, Tabellen, Schaubilder“ (Tabelle und Balken-Schaubild mit zufälligen Zahlen, Antwort als Zahl).
+  **Alle Texte sind selbst geschrieben** (6 Strophen, 8 Märchen- und Sagen-Anfänge, 9 Textsorten-Ausschnitte, 4 Sachtexte).
+  Orte und Namen in den Sagen sind erfunden. Sachtext-Fakten geprüft (Elbe: Quelle im Riesengebirge, rund 1100 km,
+  Mündung in die Nordsee).
+  Eindeutigkeit: Vorsilben-Angebote ergeben nur mit der richtigen Vorsilbe ein Wort (nicht „verdeckt“ neben „entdeckt“);
+  falsche Nachsilben ergeben kein Wort (nicht „herzig“ neben „herzlich“); in Wortfamilien keine strittigen Verwandten
+  (nicht „Gefahr“ bei „fahren“, nicht „lernen“ bei „lehren“); Nahtstelle nur bei Wörtern ohne Fugenzeichen.
+  Neue Animationen: Wortliste mit farbigem Wortstamm, Reimschema in Farben, wachsendes Balken-Schaubild.
+  `tests/dedax.py`: 30 Themen, 1080 richtige Antworten angenommen, 360 Lösungs-Animationen; 240 000 erzeugte Aufgaben
   ohne Fehler.
