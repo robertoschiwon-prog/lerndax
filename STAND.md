@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v52`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v53`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -78,6 +78,11 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
   „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
   27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
+- **Gebaut (v53): Elternübersicht auf der Startseite** (`web/index.html`, Adresse `…/lerndax/#eltern`, Link „Für Eltern“
+  ganz unten). Je fertigem Fach eine Karte: Aufgaben, Übungstage, geübte Themen, Trefferquote, Sterne, zuletzt geübt.
+  Knopf „Alle Themen in MaDax/DeDax ansehen“ führt in die ausführliche Elternansicht des Fachs (`mathe/#eltern`,
+  `deutsch/#eltern`, unverändert in `fach.js`). „Geräte & Konto“ bleibt in der Fach-App (ein Konto für alle Fächer),
+  die Startseite verlinkt dorthin. Neuer Test `tests/eltern.py`.
 - **Gebaut (v52): „Entdecken“ für Deutsch** mit sechs Entdeckungen (`web/deutsch/erklaerungen/entdecken.js`). Auf der
   Startseite gibt es jetzt je Fach eine „Entdecken“-Karte (`entdecken` in `faecher.js`).
 - **Gebaut (v51): Bereich 4 „Wörter bauen und Wortschatz“ (4 Themen) und Bereich 5 „Texte verstehen“ (5 Themen).**
@@ -86,9 +91,7 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v49): Bereich 2 „Satzbau und Satzzeichen“ ist vollständig** (8 Themen).
 - **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 30 Themen).
   Die Zahl `themen` dort bei jedem neuen Thema mitzählen.
-- **Als Nächstes:** Elternbereich für beide Fächer auf die Startseite, Knobel-Aufgaben für Deutsch, „Gemischt“-Prüfung über alle Bereiche ansehen, Schulbuch-Abgleich (ISBN und Inhaltsverzeichnis fehlen), Rückmeldung des Auftraggebers und Test mit Bruno.
-  ISBN und Inhaltsverzeichnis des Deutschbuchs,
-  Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
+- **Als Nächstes:** Knobel-Aufgaben für Deutsch, „Gemischt“-Prüfung über alle Bereiche ansehen, Schulbuch-Abgleich (ISBN und Inhaltsverzeichnis fehlen), Rückmeldung des Auftraggebers und Test mit Bruno.
 
 **So wird hier gearbeitet (hat sich bewährt)**
 - Der Auftraggeber programmiert nicht. Antworten auf Deutsch, kurz, ohne Fachwörter. Er entscheidet gern anhand von
@@ -283,7 +286,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   Dreieck · Wie hoch ist der Baum? · Warum hat jedes Dreieck 180°? · Das Geheimnis der
   Sonnenblume · Was ist π? · Aus der Pizza wird ein Rechteck · Der Satz des Pythagoras.
   Schon angesehene sind mit ✓ markiert, neue mit „neu“.
-- **Elternansicht** (Mathe → ganz unten, oder Startseite → „Für Eltern“): Fortschritt je Thema,
+- **Elternansicht** (Startseite → „Für Eltern“ zeigt seit v53 alle Fächer im Überblick; im Fach ganz unten die Einzelheiten): Fortschritt je Thema,
   Anmeldung/Profile/PIN, Fortschritt zurücksetzen.
 
 ### Live geprüft (10.11.2026)
@@ -376,7 +379,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v52`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v53`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -593,7 +596,7 @@ Infos zur ersten Arbeit:
 - [ ] Sammelkarten (Gauß, Eratosthenes, Pythagoras …) als Belohnung
 - [ ] Klassen-Bereich für die Klasse des Kindes (eigenes Thema, siehe oben), evtl. mit Terminen aus dem Familienkalender
 - [ ] „Heute geübt“ im Familienkalender anzeigen (gemeinsam mit dem Kalender-Projekt)
-- [ ] Elternbereich von MaDax auf die Startseite verlegen, sobald ein zweites Fach kommt
+- [x] Elternbereich auf der Startseite für alle Fächer (v53: Übersicht je Fach, Einzelheiten weiter im Fach)
 - [ ] Phase 1 (Klasse 5): DeDax, EnDax, dann BioDax, GeoDax, GeDax, TecDax; vielleicht MuDax, KuDax, EthDax
       (Fahrplan und offene Fragen in `faecher/README.md`)
 - [ ] Welche 2. Fremdsprache ab Klasse 6? Stundenplan-Kürzel der Schule mit der amtlichen Liste vergleichen
@@ -985,3 +988,9 @@ Infos zur ersten Arbeit:
   Geprüft: alle Palindrome per Programm, Buchstabenzahl per Programm. „vasistas von ‚Was ist das?‘“ ist als Erzählung
   formuliert („man erzählt“), weil die Herkunft nicht ganz sicher ist. Sächsische Schreibweisen sind Lautschrift.
   Startseite: „Entdecken in MaDax“ und „Entdecken in DeDax“. `tests/dedax.py` spielt jetzt auch alle Entdeckungen durch.
+- **Elternübersicht auf der Startseite** (Version `lerndax-v53`): „Für Eltern“ öffnet jetzt eine Übersicht über alle
+  fertigen Fächer statt nur MaDax. Je Fach: Aufgaben, Übungstage, „x / y Themen geübt“, Trefferquote (Durchschnitt der
+  letzten Aufgaben je Thema), Sterne-Balken, „zuletzt geübt am“. Von dort ein Knopf in die ausführliche Ansicht des
+  Fachs und einer zu „Geräte & Konto“. Die Zahlen kommen aus dem Lernstand im Browser (`mathelix.v1`, `dedax.v1`),
+  nichts Neues in der Datenbank. `tests/eltern.py` prüft Zahlen, Links und den Zurück-Knopf über einen kleinen
+  Webserver (Links wie `deutsch/#eltern` öffnen als Datei keine `index.html`).

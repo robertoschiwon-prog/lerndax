@@ -61,7 +61,7 @@ Lehrkraft oder Kind im öffentlichen Code; Aufgaben aus dem Schulbuch werden nic
   (selbst geschrieben, kindgerecht, ohne Urheberrechtsprobleme) und Regeln, die daraus Aufgaben bauen.
 - Erklärungen im Stil von MaDax: Was lässt sich in Deutsch gut **zeigen** (zum Beispiel Sätze umstellen, Wortbausteine
   zerlegen, Zeitstrahl für Zeitformen)? Je Thema eine Idee, bevor gebaut wird.
-- Der Elternbereich gehört bei zwei Fächern auf die LernDax-Startseite (steht als Idee in `STAND.md`).
+- Der Elternbereich steht seit `lerndax-v53` als Übersicht über alle Fächer auf der LernDax-Startseite; die Einzelheiten je Thema bleiben im Fach (`deutsch/#eltern`).
 
 ## Was sich aus MaDax übernehmen lässt
 

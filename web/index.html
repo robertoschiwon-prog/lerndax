@@ -70,6 +70,27 @@ a{color:inherit}
 .foot{text-align:center;margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:center}
 .foot a{font-weight:800;padding:8px 12px}
 .foot p{margin:0;color:var(--soft);font-size:13px}
+/* Elternübersicht: alle Fächer auf einen Blick */
+.eh{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.eh .back{width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);background:var(--card);box-shadow:2px 2px 0 var(--ink);font:800 20px Nunito,sans-serif;color:var(--ink);cursor:pointer}
+.eh h1{font-size:28px}
+.esub{color:var(--soft);font-weight:700;margin:0 0 16px}
+.ecard{background:var(--card);border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);padding:14px;margin-bottom:14px}
+.ecard .kopf{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ecard .kopf .ic{flex:0 0 auto;width:48px;height:48px;border-radius:13px;border:2px solid var(--ink);overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:800}
+.ecard .kopf .ic img{width:100%;height:100%}
+.ecard .kopf small{display:block;color:var(--soft);font-weight:700}
+.ecard .kopf h2{font-size:22px}
+.ezahlen{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.ezahlen div{background:var(--tint);border-radius:12px;padding:8px 4px;text-align:center}
+.ezahlen b{display:block;font:800 20px "Bricolage Grotesque",Nunito,sans-serif}
+.ezahlen span{display:block;font-size:11.5px;font-weight:700;color:var(--soft);line-height:1.2}
+.ebar{height:10px;border-radius:99px;background:var(--tint);overflow:hidden;margin:2px 0 4px}
+.ebar i{display:block;height:100%;background:var(--c5);border-radius:99px}
+.eleer{color:var(--soft);font-weight:700;margin:0 0 10px}
+.elink{display:inline-block;font-weight:800;color:var(--ink);padding:10px 14px;border:2px solid var(--ink);border-radius:12px;box-shadow:2px 2px 0 var(--ink);text-decoration:none;background:var(--card)}
+.enote{color:var(--soft);font-size:13px;font-weight:700;margin:4px 2px 14px}
+@media (max-width:360px){.ezahlen{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -101,17 +122,21 @@ a{color:inherit}
       render();
     }, first ? { title: 'Hallo! Such dir deinen Avatar aus!', text: 'Das bist du in LernDax. Du kannst ihn jederzeit wieder ändern.' } : {});
   }
-  document.addEventListener('click', (e) => { if (e.target.closest('#avaBtn')) choose(false); });
+  document.addEventListener('click', (e) => { if (e.target.closest('#avaBtn')) choose(false); if (e.target.closest('#elternZurueck')) { history.replaceState(null, '', location.pathname + location.search); render(); } });
+  window.addEventListener('hashchange', () => render());
 
   function stats(f) {
     const S = f.key ? load(f.key) : null;
-    if (!S) return { name: '', days: [], tasks: 0, stars: 0, rounds: 0 };
+    if (!S) return { name: '', days: [], tasks: 0, stars: 0, rounds: 0, geuebt: 0, quote: null };
     let stars = 0;
     for (const id in S.stats || {}) {
       const h = S.stats[id].hist || [];
       if (h.length >= 3) { const a = h.reduce((x, y) => x + y, 0) / h.length; stars += a >= 0.9 && h.length >= 8 ? 3 : a >= 0.75 ? 2 : a >= 0.5 ? 1 : 0; }
     }
-    return { name: S.name || '', days: S.days || [], tasks: S.total || 0, stars, rounds: (S.rounds || {})[dayStr(new Date())] || 0 };
+    // für die Elternübersicht: geübte Themen und Trefferquote (Durchschnitt der letzten Aufgaben je Thema)
+    const hists = Object.values(S.stats || {}).map((x) => x.hist || []).filter((h) => h.length);
+    const quote = hists.length ? hists.reduce((a, h) => a + h.reduce((x, y) => x + y, 0) / h.length, 0) / hists.length : null;
+    return { name: S.name || '', days: S.days || [], tasks: S.total || 0, stars, rounds: (S.rounds || {})[dayStr(new Date())] || 0, geuebt: hists.length, quote };
   }
   function streak(days) {
     const set = new Set(days), d = new Date();
@@ -120,7 +145,43 @@ a{color:inherit}
     return n;
   }
 
+  // Elternübersicht: Fortschritt in allen fertigen Fächern, Einzelheiten und Konto im jeweiligen Fach
+  function eltern() {
+    const k = klasse();
+    const aktiv = ALLE.filter((f) => f.status === 'fertig' && f.fertig.includes(k)).map((f) => ({ f, s: stats(f) }));
+    const name = (SYS.profileName || aktiv.map((x) => x.s.name).find(Boolean) || '').trim();
+    const datum = (d) => `${d.slice(8, 10)}.${d.slice(5, 7)}.`;
+    $.innerHTML = `
+      <div class="eh"><button class="back" id="elternZurueck" aria-label="Zurück">←</button><h1>Für Eltern</h1></div>
+      <p class="esub">${name ? `So lernt ${esc(name)}` : 'Fortschritt'} in Klasse ${k}, alle Fächer auf einen Blick.</p>
+      ${aktiv.map(({ f, s }) => {
+        const letzter = s.days.length ? s.days.slice().sort().pop() : '';
+        return `<div class="ecard" data-fach="${f.id}">
+          <div class="kopf"><span class="ic" style="background:${f.farbe}">${f.dachs ? `<img src="${f.dachs}" alt="">` : f.icon}</span>
+            <span><small>${esc(fachname(f, k))}</small><h2>${f.name}</h2></span></div>
+          ${s.tasks ? `<div class="ezahlen">
+              <div><b>${s.tasks}</b><span>Aufgaben</span></div>
+              <div><b>${s.days.length}</b><span>Übungs­tage</span></div>
+              <div><b>${s.geuebt} / ${f.themen}</b><span>Themen geübt</span></div>
+              <div><b>${s.quote === null ? '–' : Math.round(s.quote * 100) + ' %'}</b><span>Treffer­quote*</span></div>
+            </div>
+            <div class="ebar" title="Sterne"><i style="width:${Math.round((s.stars / (f.themen * 3)) * 100)}%"></i></div>
+            <p class="enote" style="margin:0 0 10px"><span class="stars">★</span> ${s.stars} von ${f.themen * 3} Sternen${letzter ? ` · zuletzt geübt am ${datum(letzter)}` : ''}</p>`
+            : '<p class="eleer">Hier wurde noch nicht geübt.</p>'}
+          <a class="elink" href="${f.href}#eltern">Alle Themen in ${f.name} ansehen →</a>
+        </div>`; }).join('')}
+      <p class="enote">* Durchschnitt der letzten Aufgaben je Thema (erster Versuch richtig = 100 %, zweiter Versuch = 50 %).</p>
+      <div class="ecard">
+        <div class="kopf"><span class="ic" style="background:var(--ink)">☁︎</span><span><small>Für alle Fächer</small><h2>Geräte &amp; Konto</h2></span></div>
+        <p class="eleer">${SYS.enabled && SYS.profileId ? `Dieses Gerät lernt als <b>${esc(SYS.profileName || '')}</b> und gleicht den Fortschritt mit allen Geräten ab.` : SYS.enabled ? 'Mit dem Elternkonto lernt dein Kind auf jedem Gerät mit demselben Stand weiter.' : 'Der Lernstand liegt gerade nur auf diesem Gerät.'}</p>
+        ${aktiv.length ? `<a class="elink" href="${aktiv[0].f.href}#eltern">Anmelden, Geräte und Zurücksetzen →</a>` : ''}
+      </div>
+      <div class="foot"><p>LernDax · ein Familienprojekt · nach dem Lehrplan Sachsen</p></div>`;
+    window.scrollTo(0, 0);
+  }
+
   function render() {
+    if (location.hash === '#eltern') return eltern();
     const k = klasse();
     const hier = ALLE.filter((f) => k >= f.klassen[0] && k <= f.klassen[1]);
     const aktiv = hier.filter((f) => f.status === 'fertig' && f.fertig.includes(k));
@@ -157,7 +218,7 @@ a{color:inherit}
         <span><b>Entdecken${aktiv.filter((x) => x.entdecken).length > 1 ? ' in ' + f.name : ''}</b><small>${esc(f.entdecken)}</small></span>
       </a>`).join('')}
       <div class="foot">
-        <a href="mathe/#eltern">Für Eltern: Fortschritt &amp; Geräte</a>
+        <a href="#eltern">Für Eltern: Fortschritt &amp; Geräte</a>
         <p>LernDax · ein Familienprojekt · nach dem Lehrplan Sachsen</p>
       </div>`;
   }

@@ -39,3 +39,4 @@ Neue Themen prüfen: `python3 tests/loesung.py 12 k5-ueberschlag,k5-schriftlich,
 - `dedax.py [Runden]`: **DeDax (Deutsch).** Spielt jedes Thema in der App durch: jede richtige Antwort wird angenommen (Auswahl, Wort eintippen, Satz mit Lücken, Wörter antippen), falsche Antworten führen zur Lösung, die Lösungs-Animation läuft zu Ende, nennt die Antwort und kein Text ragt aus dem Bild.
 
 Seit `lerndax-v44` steckt die App in `web/plattform/fach.js`; die Mathe-Tests laufen unverändert über `web/mathe/index.html`.
+- `eltern.py`: **Elternübersicht auf der Startseite.** Legt einen Lernstand für Mathe und Deutsch an und prüft: beide Fächer mit richtigen Zahlen, der Knopf führt in die Elternansicht des Fachs, „Zurück“ führt zur Startseite. Startet dafür selbst einen kleinen Webserver.
