@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v47`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v48`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -78,8 +78,9 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
   „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
   27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
-- **Als Nächstes:** Auftraggeber fragen, ob DeDax jetzt auf die Startseite soll (`faecher.js`: Status „fertig“, Link).
-  Dann Bereich 2 (Satzbau und Satzzeichen) oder Bereich 3 (Rechtschreibung), siehe Themenplan. Offen:
+- **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, 7 Themen).
+  Die Zahl `themen` dort bei jedem neuen Thema mitzählen.
+- **Als Nächstes:** Bereich 2 (Satzbau und Satzzeichen) oder Bereich 3 (Rechtschreibung), siehe Themenplan. Offen:
   ISBN und Inhaltsverzeichnis des Deutschbuchs,
   Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
@@ -369,7 +370,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v47`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v48`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -922,3 +923,5 @@ Infos zur ersten Arbeit:
   Türme fürs Steigern, als/wie, Wortarten in Farben); „ähnliches Beispiel“ erzeugt eine neue Aufgabe derselben Art.
   `tests/dedax.py`: 7 Themen, alle richtigen Antworten angenommen, alle Lösungs-Animationen nennen die Antwort;
   140 000 erzeugte Aufgaben ohne Fehler (keine doppelten Auswahl-Antworten).
+- **DeDax auf der Startseite** (Version `lerndax-v48`): zweite Kachel neben MaDax. „Entdecken“ und „Für Eltern“ auf der
+  Startseite führen weiter zu MaDax (offen: Elternbereich für beide Fächer).
