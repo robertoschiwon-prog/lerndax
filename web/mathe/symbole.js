@@ -42,6 +42,10 @@ window.MathelixIcons = (function () {
     // Ergänzte Themen (klasse5-luecken.js)
     'k5-symmetrie': `<path d="M12 2v20" stroke-dasharray="2.4 2.6" stroke-width="1.6"/><path d="M9 6v12l-6-6z" ${F}/><path d="M15 6v12l6-6z"/>`,
     'k5-netze': `<path d="M9.3 1.5h5.4v5.4H9.3zM3.9 6.9h16.2v5.4H3.900zM9.3 6.900v5.400M14.700 6.900v5.400M9.300 12.300v10.800h5.400V12.300M9.300 17.700h5.400" stroke-width="1.6"/>`.replace(/(\.\d)00/g, '$1'),
+    // Abgleich mit dem Schulbuch
+    'k5-zahlen': `<path d="M2 16.5h20"/><path d="M5 13.5v6M12 13.5v6M19 13.5v6" stroke-width="1.8"/><circle cx="15.5" cy="16.5" r="2.3" ${F}/><path d="M15.5 4v6M13 7.8l2.5 2.6L18 7.8"/>`,
+    'k5-bruchstrahl': `<path d="M2 15.5h20"/><path d="M4 11.5v8M20 11.5v8" stroke-width="2.2"/><path d="M9.3 13.3v4.4M14.7 13.3v4.4" stroke-width="1.6"/><circle cx="14.7" cy="6.5" r="2.4" ${F}/>`,
+    'k5-lage': `<path d="M3 20 14 4M10 20 21 4"/><path d="M4.500 9.500l6 4.200" stroke-width="1.8"/>`.replace(/(\.\d)00/g, '$1'),
     'k5-fermi': `<path d="M8.4 8.6a3.700 3.700 0 1 1 5.800 3c-1.300.900-2.200 1.700-2.200 3.400"/><circle cx="12" cy="19" r="1.5" ${F}/><path d="M3 20.500c1-1.200 2.100-1.200 3 0M18 20.500c1-1.200 2.100-1.200 3 0" stroke-width="1.5"/>`.replace(/(\.\d)00/g, '$1'),
   };
   function svg(id) {

@@ -122,17 +122,18 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
-- **5 Lernbereiche, 32 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
-  - LB 1 Natürliche Zahlen: Runden · Überschlagen · Schriftlich rechnen · **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen ·
-    Schriftlich dividieren · Teiler & Vielfache · Primzahlen & Primfaktoren · Einfache Gleichungen · **Textaufgaben**
-  - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern · Gemischte Zahlen ·
-    Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Dezimalzahlen runden · Zahlen vergleichen · Arithmetisches Mittel
-  - LB 3 Geometrie: Koordinatensystem · Winkelarten · Winkel an Geraden · Symmetrie & Spiegeln
-  - LB 4 Rechtecke & Quader: Umfang & Fläche · Volumen & Oberfläche · Netze & Schrägbilder
+- **5 Lernbereiche, 35 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
+  - LB 1 Natürliche Zahlen: Große Zahlen & Zahlenstrahl · Runden · Überschlagen · Schriftlich rechnen · Einfache Gleichungen ·
+    **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen · Teiler & Vielfache · Primzahlen & Primfaktoren ·
+    Schriftlich dividieren · **Textaufgaben**
+  - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern · Brüche am Zahlenstrahl · Gemischte Zahlen ·
+    Bruch · Dezimal · Prozent · Zahlen vergleichen · Dezimalzahlen runden · Mit Dezimalzahlen rechnen · Arithmetisches Mittel
+  - LB 3 Geometrie: Senkrecht & parallel · Koordinatensystem · Winkelarten · Winkel an Geraden · Symmetrie & Spiegeln
+  - LB 4 Rechtecke & Quader: Umfang & Fläche · Netze & Schrägbilder · Volumen & Oberfläche
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld · Schätzen wie Fermi
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **Erklär-Animationen** zu allen 32 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
+- **Erklär-Animationen** zu allen 35 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
   Textaufgaben „in vier Schritten“, Zahlen vergleichen und Sachaufgaben „Wechselgeld ergänzen“). Liste der Grund-Animationen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Dividieren: Bonbons in Tüten und
   schriftlich Stelle für Stelle · Teilbarkeit: Regeln und Teiler (Quersumme, Endziffern, durch 6,
@@ -693,3 +694,15 @@ Infos zur ersten Arbeit:
   Schulbuch abgleichen). Elternbereich: je Lernbereich eine Zeile „x von y Themen geübt · Sterne“.
   Langer Animations-Test über alle 32 Themen gelaufen (`tests/loesung.py 5`). Die Trainingsseite für den 24.11. bleibt
   unverändert: Ihre Themen stammen aus der Themenliste der Schule; Überschlagen und schriftliches Rechnen stehen dort nicht.
+- **Abgleich mit dem Schulbuch** (Version `lerndax-v36`): MaDax Klasse 5 mit dem Stoffverteilungsplan zu
+  Lambacher Schweizer 5 Sachsen (Klett) verglichen, Ergebnis in `faecher/mathe/lehrplan/schulbuch-abgleich.md`.
+  Drei Themen fehlten und sind neu (jetzt **35 Themen**), jeweils mit Aufgaben, Tipp, Lösungsweg, Symbol und Animation:
+  - LB 1: **Große Zahlen & Zahlenstrahl** (Zahlenstrahl ablesen, Stellenwert, Zahlwort → Zahl, Vorgänger/Nachfolger,
+    ordnen, Nullen zählen, Kurzschreibweise „9 HT + 3 T“)
+  - LB 2: **Brüche am Zahlenstrahl** (Bruch ablesen, Brüche vergleichen mit <, =, >, Bruch als Quotient „3 : 4 = 3/4“)
+  - LB 3: **Senkrecht & parallel** (Lage zweier Geraden auf Kästchenpapier über das Schrittmuster, passende Gerade
+    finden, Abstand Punkt–Gerade, Merksätze)
+  Die Themen stehen jetzt **in der Reihenfolge des Schulbuchs** (Tabelle `FOLGE` in `web/mathe/generatoren/klasse5-buch.js`).
+  Neue Dateien: `web/mathe/generatoren/klasse5-buch.js`, `web/mathe/erklaerungen/klasse5-buch.js`.
+  Offen gelassen (siehe Abgleich): Winkel mit dem Geodreieck messen, Rechengesetze mit Dezimalzahlen, römische Zahlen
+  und Zweiersystem (Kandidaten für „Entdecken“). Noch zu prüfen: ob die Schule genau diese Buchausgabe nutzt.

@@ -8,7 +8,9 @@ Pro Klassenstufe sind 25 Wochen Pflicht-Lernbereiche verbindlich, dazu ein Wahlb
 
 ---
 
-## Klasse 5 (umgesetzt, 32 Themen)
+## Klasse 5 (umgesetzt, 35 Themen)
+
+Abgleich mit dem Schulbuch (Lambacher Schweizer 5 Sachsen): siehe `schulbuch-abgleich.md`.
 
 ### LB 1 – Arbeiten mit natürlichen Zahlen (23 Ustd.)
 - Veranschaulichen, schätzen, runden, vergleichen, ordnen; Zahlenstrahl, Stellenwerttafel
