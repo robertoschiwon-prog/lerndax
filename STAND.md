@@ -751,3 +751,12 @@ Infos zur ersten Arbeit:
   `S.lastTopic`, nur auf diesem Gerät gemerkt); „Entdecken“ und „Knobeln“ stehen nebeneinander in einer Zeile; je
   Lernbereich eine Zeile „x von y geübt“; ein Lernbereich, in dem **alle** Themen drei Sterne haben, ist eingeklappt
   („Geschafft! Themen anzeigen“). `tests/ui2.py` klappt eingeklappte Bereiche vor dem Klick auf.
+- **Abgleich mit dem Originaltext des Lehrplans** (Version `lerndax-v42`): Drei Lücken gefunden und geschlossen, jeweils
+  als Aufgabenart mit eigener Animation (`erweitere()` in `erklaerungen/klasse5-buch.js`): **Dezimalzahl : einstellige
+  Zahl** (k5-dezimal, etwa jede fünfte Aufgabe), **Koordinaten mit Halben** (k5-koord, etwa jede sechste),
+  **zusammengesetzte Körper, Volumen** (k5-quader, etwa jede fünfte). Knobel-Aufgabe mit Ungleichung umformuliert
+  (Ungleichungen sind laut Lehrplan erst Klasse 6). Was bewusst fehlt (Zeichnen, DGS, Projekte) steht in
+  `faecher/mathe/lehrplan/sachsen-gymnasium.md`.
+  **Fehler behoben:** Bei Aufgaben wie „2250 : 1000“ sagte die Stellenwerttafel-Animation „Das passt nicht mehr in die
+  Tafel“, weil die Endnull beim Verschieben keinen Platz hatte (`klasse5.js`, Tafel wird jetzt breit genug angelegt).
+  Das war die einzelne Test-Meldung aus v40. `tests/loesung.py` prüft Koordinaten jetzt mit Komma-Schreibweise.

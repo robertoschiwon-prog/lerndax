@@ -5,7 +5,8 @@
  *   Kap. II, 3–6: Brüche am Zahlenstrahl (ablesen, vergleichen, Bruch als Quotient)
  *   Kap. IV, 1:   Senkrecht & parallel
  *   Kap. IV, 4:   Winkel messen (am Geodreieck ablesen, schätzen)
- * Dazu eine Aufgabenart für ein vorhandenes Thema: Kap. III, 8 Geschickt rechnen mit Dezimalzahlen (in k5-dezimal).
+ * Dazu Aufgabenarten für vorhandene Themen: Geschickt rechnen mit Dezimalzahlen und Dezimalzahl : einstellige Zahl
+ * (k5-dezimal), Koordinaten mit Halben (k5-koord), zusammengesetzte Körper (k5-quader).
  * Außerdem bringt diese Datei alle Themen in die Reihenfolge des Schulbuchs (ganz unten).
  * Wird NACH klasse5.js und klasse5-luecken.js geladen.
  */
@@ -634,15 +635,94 @@
       ex: geschicktEx(parts, pos[0], pos[1], '+', String(ganz), fmt(erg)),
     };
   }
+  // Dezimalzahl durch einstellige Zahl teilen (Lehrplan LB 2: „z. B. 2,4 : 6“)
+  function dezDiv() {
+    const st = pick([10, 100]);
+    let q, d, a; // weder Aufgabe noch Ergebnis enden auf 0: beide haben gleich viele Nachkommastellen
+    do { d = R(2, 9); q = R(4, st === 10 ? 250 : 999); a = q * d; } while (q % 10 === 0 || a % 10 === 0);
+    return {
+      prompt: `Berechne: <b>${fmt(a / st)} : ${d}</b>`,
+      fields: [{ answer: q / st }],
+      hint: 'Rechne wie mit natürlichen Zahlen. Sobald du beim Teilen das Komma überschreitest, setzt du auch im Ergebnis das Komma.',
+      solution: `Ohne Komma gerechnet: ${fmt(a)} : ${d} = ${fmt(q)}.<br>${fmt(a / st)} hat ${st === 10 ? 'eine Nachkommastelle' : 'zwei Nachkommastellen'}, das Ergebnis auch: <b>${fmt(q / st)}</b><br><small>Probe: ${fmt(q / st)} · ${d} = ${fmt(a / st)}</small>`,
+      ex: { mode: 'div', a, st, d, q },
+    };
+  }
+  const thema = (id) => M.grades[5].lbs.flatMap((l) => l.topics).find((x) => x.id === id);
   {
-    const t = M.grades[5].lbs.flatMap((l) => l.topics).find((x) => x.id === 'k5-dezimal'), alt = t.gen;
+    const t = thema('k5-dezimal'), alt = t.gen;
     t.gen = () => {
-      if (R(1, 5) !== 1) return alt();
+      const r = R(1, 10);
+      if (r <= 2) return dezDiv();
+      if (r > 4) return alt();
       const a = dezGeschickt();
       a.ex.alt = dezGeschickt().ex; // „ähnliches Beispiel“ zeigt eine andere Aufgabe derselben Art
       return a;
     };
   }
+
+  // =====================================================
+  // Koordinaten mit Halben (Lehrplan LB 3: „Koordinaten auch als Brüche und Dezimalzahlen“)
+  // =====================================================
+  function koordBildHalb(x, y) {
+    const sz = 24, ox = 34, oy = 222;
+    let g = '';
+    for (let i = 0; i <= 10; i++) g += `<line class="grid" x1="${ox + i * sz}" y1="${oy}" x2="${ox + i * sz}" y2="${oy - 8 * sz}"/>`;
+    for (let j = 0; j <= 8; j++) g += `<line class="grid" x1="${ox}" y1="${oy - j * sz}" x2="${ox + 10 * sz}" y2="${oy - j * sz}"/>`;
+    g += `<line class="axis" x1="${ox}" y1="${oy}" x2="${ox + 10 * sz + 12}" y2="${oy}"/><path class="arrh" d="M${ox + 10 * sz + 10} ${oy - 4} l8 4 l-8 4z"/><line class="axis" x1="${ox}" y1="${oy}" x2="${ox}" y2="${oy - 8 * sz - 12}"/><path class="arrh" d="M${ox - 4} ${oy - 8 * sz - 10} l4 -8 l4 8z"/>`;
+    for (let i = 0; i <= 10; i++) g += `<text class="tick" x="${ox + i * sz}" y="${oy + 16}" text-anchor="middle">${i}</text>`;
+    for (let j = 1; j <= 8; j++) g += `<text class="tick" x="${ox - 9}" y="${oy - j * sz + 4}" text-anchor="end">${j}</text>`;
+    g += `<text class="tick b" x="${ox + 10 * sz + 4}" y="${oy + 18}">x</text><text class="tick b" x="${ox + 9}" y="${oy - 8 * sz - 8}">y</text>`;
+    g += `<circle class="pt" cx="${ox + x * sz}" cy="${oy - y * sz}" r="6"/><text class="ptl" x="${ox + x * sz + 8}" y="${oy - y * sz - 8}">P</text>`;
+    return `<svg viewBox="0 0 300 245">${g}</svg>`;
+  }
+  function koordHalb() {
+    const welche = pick(['x', 'y', 'xy']);
+    const x = R(1, 8) + (welche !== 'y' ? 0.5 : 0), y = R(1, 6) + (welche !== 'x' ? 0.5 : 0);
+    return {
+      prompt: 'Welche Koordinaten hat der Punkt <b>P</b>? Schau genau hin: Er liegt nicht auf einem Gitterpunkt.',
+      figure: koordBildHalb(x, y),
+      layout: 'coord',
+      fields: [{ answer: x, label: 'x' }, { answer: y, label: 'y' }],
+      hint: 'Liegt der Punkt genau in der Mitte zwischen zwei Gitterlinien, ist das ein halbes Kästchen: Schreibe dann ,5 (zum Beispiel 2,5).',
+      solution: `Nach rechts: ${fmt(x)}${x % 1 ? ` (genau zwischen ${Math.floor(x)} und ${Math.floor(x) + 1})` : ''}. Nach oben: ${fmt(y)}${y % 1 ? ` (genau zwischen ${Math.floor(y)} und ${Math.floor(y) + 1})` : ''}.<br>→ <b>P(${fmt(x)} | ${fmt(y)})</b>`,
+      answerText: `P(${fmt(x)} | ${fmt(y)})`,
+      ex: { mode: 'halb', x, y },
+    };
+  }
+  { const t = thema('k5-koord'), alt = t.gen; t.gen = () => (R(1, 6) === 1 ? koordHalb() : alt()); }
+
+  // =====================================================
+  // Zusammengesetzte Körper (Lehrplan LB 4: „aus Quadern zusammengesetzte Körper“)
+  // =====================================================
+  // Schrägbild zweier aufeinander gestellter Quader (Maße in Kästchen-Einheiten e)
+  function quaderPfad(x, y, w, h, t) { // vordere linke untere Ecke (x, y); t = gezeichnete Tiefe
+    const k = t * 0.5;
+    return `<polygon class="wf" points="${x},${y} ${x + w},${y} ${x + w},${y - h} ${x},${y - h}"/><polygon class="wt" points="${x},${y - h} ${x + w},${y - h} ${x + w + k},${y - h - k} ${x + k},${y - h - k}"/><polygon class="ws" points="${x + w},${y} ${x + w + k},${y - k} ${x + w + k},${y - h - k} ${x + w},${y - h}"/>`;
+  }
+  function doppelBild(u, o) {
+    const e = Math.min(16, 150 / (u[0] + u[1] * 0.5), 120 / (u[2] + o[2] + u[1] * 0.5));
+    const x = 60, y = 172;
+    let g = quaderPfad(x, y, u[0] * e, u[2] * e, u[1] * e) + quaderPfad(x, y - u[2] * e, o[0] * e, o[2] * e, o[1] * e);
+    g += `<text class="tick b" x="${x + (u[0] * e) / 2}" y="${y + 16}" text-anchor="middle">${u[0]} cm</text><text class="tick b" x="${x - 6}" y="${y - (u[2] * e) / 2 + 4}" text-anchor="end">${u[2]} cm</text><text class="tick b" x="${x - 6}" y="${y - u[2] * e - (o[2] * e) / 2 + 4}" text-anchor="end">${o[2]} cm</text>`;
+    g += `<text class="tick b" x="${x + u[0] * e + u[1] * e * 0.25 + 8}" y="${y - u[1] * e * 0.25 + 12}">${u[1]} cm</text>`;
+    g += `<text class="tick b" x="${x + (o[0] * e) / 2}" y="${y - u[2] * e - 5}" text-anchor="middle" style="fill:#fff;paint-order:stroke;stroke:var(--ink);stroke-width:3px">${o[0]} cm</text>`;
+    return `<svg viewBox="0 0 300 196">${g}</svg>`;
+  }
+  M.doppelBild = doppelBild;
+  function zusammengesetzt() {
+    const u = [R(5, 9), R(3, 5), R(2, 4)], o = [R(2, u[0] - 2), u[1], R(2, 4)];
+    const v1 = u[0] * u[1] * u[2], v2 = o[0] * o[1] * o[2];
+    return {
+      prompt: `Der Körper besteht aus zwei Quadern. Beide sind <b>${u[1]} cm</b> tief. Der untere ist ${u[0]} cm lang und ${u[2]} cm hoch, der obere ${o[0]} cm lang und ${o[2]} cm hoch. Wie groß ist das <b>Volumen</b> des ganzen Körpers?`,
+      figure: doppelBild(u, o),
+      fields: [{ answer: v1 + v2, suffix: 'cm³' }],
+      hint: 'Zerlege den Körper in die zwei Quader. Rechne jedes Volumen einzeln aus (Länge · Breite · Höhe) und addiere.',
+      solution: `Unten: ${u[0]} · ${u[1]} · ${u[2]} = ${v1} cm³<br>Oben: ${o[0]} · ${o[1]} · ${o[2]} = ${v2} cm³<br>Zusammen: ${v1} + ${v2} = <b>${v1 + v2} cm³</b>`,
+      ex: { mode: 'zus', u, o },
+    };
+  }
+  { const t = thema('k5-quader'), alt = t.gen; t.gen = () => (R(1, 5) === 1 ? zusammengesetzt() : alt()); }
 
   // =====================================================
   // Einhängen und Reihenfolge wie im Schulbuch

@@ -530,4 +530,101 @@
       };
     },
   });
+
+  // =====================================================
+  // Zusätzliche Aufgabenarten in vorhandenen Themen: eigene Animation, sonst die bisherige Erklärung
+  // =====================================================
+  function erweitere(id, mode, titel, viewBox, create) {
+    const alt = EX[id];
+    EX[id] = Object.assign({}, alt, {
+      titleFor: (ctx) => (ctx && ctx.mode === mode ? titel : alt.titleFor ? alt.titleFor(ctx) : alt.title),
+      create(api, ctx) {
+        if (!ctx || ctx.mode !== mode) { api.svg.setAttribute('viewBox', alt.viewBox); return alt.create(api, ctx); }
+        api.svg.setAttribute('viewBox', viewBox);
+        return create(api, ctx.post ? ctx : aehnlich(id, ctx, (e) => JSON.stringify(e) !== JSON.stringify(Object.assign({}, ctx, { pre: undefined }))), ctx);
+      },
+    });
+  }
+  // Dezimalzahl : einstellige Zahl
+  erweitere('k5-dezimal', 'div', 'Dezimalzahl durch eine Zahl teilen', '0 0 360 150', (api, c, ctx) => {
+    let g;
+    const A = fmt(c.a / c.st), Q = fmt(c.q / c.st), nk = c.st === 10 ? 1 : 2;
+    return {
+      reset() {
+        api.clear(); api.sub(subText(ctx)); g = {};
+        g.l1 = el('text', { x: 180, y: 36, class: 'ex-b', 'text-anchor': 'middle', text: `${A} : ${c.d} = ?` }, api.svg);
+        g.l2 = el('text', { x: 180, y: 80, class: 'ex-b f2', 'text-anchor': 'middle', opacity: 0, text: `${fmt(c.a)} : ${c.d} = ${fmt(c.q)}` }, api.svg);
+        g.l3 = el('text', { x: 180, y: 124, class: 'ex-b f1', 'text-anchor': 'middle', opacity: 0, text: `${A} : ${c.d} = ${Q}` }, api.svg);
+      },
+      async play() {
+        api.say(`<b>${A} : ${c.d}</b>. Das Komma stört beim Rechnen. Wir denken es uns erst einmal weg.`);
+        await api.wait(3600);
+        show(g.l2, 1);
+        api.say(`Ohne Komma: ${fmt(c.a)} : ${c.d} = <b>${fmt(c.q)}</b>. Das kannst du im Kopf oder schriftlich rechnen.`);
+        await api.wait(3800);
+        show(g.l3, 1);
+        api.say(`${A} hat <b>${nk === 1 ? 'eine Nachkommastelle' : 'zwei Nachkommastellen'}</b>. Beim Teilen durch eine ganze Zahl bleibt das so: Auch das Ergebnis bekommt ${nk === 1 ? 'eine' : 'zwei'}.<br>${A} : ${c.d} = <b>${Q}</b>`);
+        await api.wait(4200);
+        api.say(`${A} : ${c.d} = <b>${Q}</b><br><small>Probe: ${Q} · ${c.d} = ${A}. Und der Überschlag passt: ${A} ist ${c.a / c.st < c.d ? 'kleiner als ' + c.d + ', also muss das Ergebnis kleiner als 1 sein' : 'etwa ' + Math.round(c.a / c.st) + ', geteilt durch ' + c.d + ' ergibt etwa ' + fmt(Math.round((c.a / c.st / c.d) * 10) / 10)}.</small>`);
+      },
+    };
+  });
+  // Koordinaten mit Halben
+  erweitere('k5-koord', 'halb', 'Koordinaten zwischen den Gitterlinien', '0 0 300 245', (api, c, ctx) => {
+    const sz = 24, ox = 34, oy = 222;
+    let g;
+    return {
+      reset() {
+        api.clear(); api.sub(subText(ctx)); g = {};
+        for (let i = 0; i <= 10; i++) el('line', { x1: ox + i * sz, y1: oy, x2: ox + i * sz, y2: oy - 8 * sz, class: 'grid' }, api.svg);
+        for (let j = 0; j <= 8; j++) el('line', { x1: ox, y1: oy - j * sz, x2: ox + 10 * sz, y2: oy - j * sz, class: 'grid' }, api.svg);
+        el('line', { x1: ox, y1: oy, x2: ox + 10 * sz + 12, y2: oy, class: 'axis' }, api.svg); el('line', { x1: ox, y1: oy, x2: ox, y2: oy - 8 * sz - 12, class: 'axis' }, api.svg);
+        for (let i = 0; i <= 10; i++) el('text', { x: ox + i * sz, y: oy + 16, class: 'tick', 'text-anchor': 'middle', text: i }, api.svg);
+        for (let j = 1; j <= 8; j++) el('text', { x: ox - 9, y: oy - j * sz + 4, class: 'tick', 'text-anchor': 'end', text: j }, api.svg);
+        g.wx = el('line', { x1: ox, y1: oy, x2: ox, y2: oy, style: 'stroke:var(--c2);stroke-width:4;stroke-linecap:round' }, api.svg);
+        g.wy = el('line', { x1: ox + c.x * sz, y1: oy, x2: ox + c.x * sz, y2: oy, style: 'stroke:var(--c1);stroke-width:4;stroke-linecap:round' }, api.svg);
+        el('circle', { cx: ox + c.x * sz, cy: oy - c.y * sz, r: 6, class: 'pt' }, api.svg);
+        el('text', { x: ox + c.x * sz + 8, y: oy - c.y * sz - 8, class: 'ptl', text: 'P' }, api.svg);
+      },
+      async play() {
+        const zw = (v) => (v % 1 ? `Das ist genau zwischen ${Math.floor(v)} und ${Math.floor(v) + 1}, also <b>${fmt(v)}</b>.` : `Das ist genau <b>${v}</b>.`);
+        api.say('Nicht jeder Punkt liegt auf einer Kreuzung der Gitterlinien. Wir gehen wie immer: erst nach rechts, dann nach oben.');
+        await api.wait(3800);
+        await api.tw(900, (t) => g.wx.setAttribute('x2', ox + c.x * sz * t));
+        api.say(`Nach rechts bis unter den Punkt. ${zw(c.x)}`);
+        await api.wait(3600);
+        await api.tw(900, (t) => g.wy.setAttribute('y2', oy - c.y * sz * t));
+        api.say(`Nach oben bis zum Punkt. ${zw(c.y)}`);
+        await api.wait(3600);
+        api.say(`Erst der x-Wert, dann der y-Wert:<br><b>P(${fmt(c.x)} | ${fmt(c.y)})</b><br><small>Ein halbes Kästchen schreibt man als ,5.</small>`);
+      },
+    };
+  });
+  // Zusammengesetzter Körper: zwei Quader
+  erweitere('k5-quader', 'zus', 'Zusammengesetzte Körper zerlegen', '0 0 300 196', (api, c, ctx) => {
+    let g;
+    const v1 = c.u[0] * c.u[1] * c.u[2], v2 = c.o[0] * c.o[1] * c.o[2];
+    return {
+      reset() {
+        api.clear(); api.sub(subText(ctx)); g = {};
+        g.bild = el('g', {}, api.svg);
+        g.bild.innerHTML = M.doppelBild(c.u, c.o).replace(/^<svg[^>]*>|<\/svg>$/g, '');
+        g.t1 = el('text', { x: 292, y: 150, class: 'ex-s f2', 'text-anchor': 'end', opacity: 0, text: `unten: ${v1} cm³` }, api.svg);
+        g.t2 = el('text', { x: 292, y: 60, class: 'ex-s f4', 'text-anchor': 'end', opacity: 0, text: `oben: ${v2} cm³` }, api.svg);
+        g.t3 = el('text', { x: 292, y: 105, class: 'ex-b f1', 'text-anchor': 'end', opacity: 0, text: `${v1 + v2} cm³` }, api.svg);
+      },
+      async play() {
+        api.say('Für diesen Körper gibt es keine fertige Formel. Der Trick: Wir <b>zerlegen</b> ihn in zwei Quader und rechnen jeden einzeln.');
+        await api.wait(4000);
+        show(g.t1, 1);
+        api.say(`Unterer Quader: Länge · Breite · Höhe = ${c.u[0]} · ${c.u[1]} · ${c.u[2]} = <b>${v1} cm³</b>`);
+        await api.wait(3800);
+        show(g.t2, 1);
+        api.say(`Oberer Quader: ${c.o[0]} · ${c.o[1]} · ${c.o[2]} = <b>${v2} cm³</b>`);
+        await api.wait(3800);
+        show(g.t3, 1);
+        api.say(`Beide zusammen: ${v1} + ${v2} = <b>${v1 + v2} cm³</b>`);
+      },
+    };
+  });
 })();

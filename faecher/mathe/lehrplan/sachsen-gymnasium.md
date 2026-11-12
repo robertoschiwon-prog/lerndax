@@ -44,6 +44,15 @@ Abgleich mit dem Schulbuch (Lambacher Schweizer 5 Sachsen): siehe `schulbuch-abg
 - Größen in Sachaufgaben; Einheiten umrechnen (Zeit, Masse, Länge, Fläche, Volumen)
 - Fahrpläne, Fermi-Aufgaben, realitätsnahe Probleme
 
+### Abgleich mit dem Lehrplantext (12.11.2026, Version v42)
+Der Lehrplan wurde noch einmal am Originaltext geprüft. Dabei fehlten drei Dinge, die jetzt Aufgabenarten sind:
+Dezimalzahl durch einstellige Zahl („2,4 : 6“, in „Mit Dezimalzahlen rechnen“), Koordinaten mit Halben
+(in „Koordinatensystem“) und zusammengesetzte Körper (Volumen, in „Volumen & Oberfläche“).
+Nicht in der App, weil es Arbeit mit Stift, Zeichengerät oder Material ist: Winkel und Spiegelbilder **zeichnen**,
+Quader als Schrägbild oder Netz **zeichnen**, Arbeiten mit Geometrie-Software (DGS), Projekt „Verpackungen“,
+projektorientiertes Arbeiten. Der Oberflächeninhalt zusammengesetzter Körper ist noch offen.
+Nicht Klasse 5 laut Lehrplan (deshalb nicht enthalten): Diagramme und Tabellen, Maßstab, Ungleichungen, Mengenschreibweise, Kreis.
+
 ### Wahlbereiche (einer davon)
 - WB 1 Dynamisieren geometrischer Objekte (DGS)
 - WB 2 Mathematische Puzzles und Spiele

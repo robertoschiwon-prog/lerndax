@@ -1297,7 +1297,9 @@
           }
           setNum(x); demoK = k;
           const r1 = Object.keys(digitsOf(x)).map(Number), r2 = Object.keys(digitsOf(round6(k > 0 ? x * 10 ** k : x / 10 ** -k))).map(Number);
-          EMAX = Math.max(1, ...r1, ...r2); EMIN = Math.min(-1, ...r1, ...r2);
+          // auch Platz für Nullen, die beim Verschieben mitwandern (z. B. 2250 : 1000: die Endnull rutscht auf die Tausendstel)
+          const r3 = r1.map((e) => e + k);
+          EMAX = Math.max(1, ...r1, ...r2, ...r3); EMIN = Math.min(-1, ...r1, ...r2, ...r3);
         } else setNum(+pick(starts).replace(',', '.'));
         const cols = () => EMAX - EMIN + 1, cw = () => Math.min(44, 300 / cols());
         const colX = (e) => 30 + (EMAX - e) * cw() + cw() / 2 + (e < 0 ? 6 : 0);
