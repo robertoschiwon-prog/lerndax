@@ -348,11 +348,11 @@
     if (task.tap) {
       // Antippen: Wörter im Satz (tokens) oder Stellen zwischen den Wörtern (gaps), eines (one) oder mehrere
       const T = task.tap;
-      inputs = `<div class="tapline${T.gaps ? ' gaps' : ''}">${T.tokens.map((w, i) => (T.gaps
+      inputs = `<div class="tapline${T.gaps ? ' gaps' : ''}${T.eng ? ' eng' : ''}">${T.tokens.map((w, i) => (T.gaps
         ? `<span class="tw">${w}</span>${i < T.tokens.length - 1 ? `<button class="gap" data-tok="${i}" data-mark="${T.mark || ','}" aria-label="Stelle nach ${esc(cleanTok(w))}"></button>` : ''}`
         : `<button class="tok" data-tok="${i}">${w}</button>`)).join('')}</div>`;
     } else if (task.choices) {
-      inputs = `<div class="choices ${task.choices.length === 2 ? 'two' : ''}">${task.choices.map((c, i) => `<button class="choice" data-choice="${i}">${c}</button>`).join('')}</div>`;
+      inputs = `<div class="choices ${task.choices.length === 2 && task.choices.every((c) => String(c).replace(/<[^>]+>/g, '').length <= 22) ? 'two' : ''}">${task.choices.map((c, i) => `<button class="choice" data-choice="${i}">${c}</button>`).join('')}</div>`;
     } else {
       const inp = (f, i) => 'fixed' in f
         ? `<span class="fx">${f.fixed}</span>`

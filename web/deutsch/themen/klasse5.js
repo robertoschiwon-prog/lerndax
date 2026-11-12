@@ -1176,7 +1176,275 @@
   }
   const rede = () => U.wahl([[44, redeRichtig], [32, redeZeichen], [24, redeTeil]]);
 
-  D.daten = { V, SUBJ, HILF, ZEITEN, ZNAME, ZDEUTSCH, satz, text, bauplan, subjFuer, praesens, praeteritum,
+
+  // =====================================================
+  // Bereich 3: Rechtschreibung
+  // =====================================================
+  // Lückenwörter: 'F[eh]ler|e,ee' = richtige Buchstaben in Klammern, danach die falschen Angebote.
+  // Jedes Wort ist geprüft: Mit keinem falschen Angebot entsteht ein anderes richtiges Wort
+  // (deshalb fehlen z. B. Meer/mehr, Hütte/Hüte, Gäste/Geste, reißen/reisen).
+  const lw = (z, extra) => { const m = z.match(/^(.*)\[(.+)\](.*?)\|(.*)$/); const f = m[4].split('|'); return Object.assign({ vor: m[1], ein: m[2], nach: m[3], falsch: f[0].split(','), mehr: f.slice(1), wort: m[1] + m[2] + m[3] }, extra); };
+  const liste = (txt, extra) => txt.split(' ; ').map((z) => lw(z.trim(), extra));
+  const luecke = (w) => `${w.vor}▢${w.nach}`;
+  const exLw = (art, w, s1, s2) => zz(art, [w.vor, '▢', w.nach], 1, [w.vor, w.ein, w.nach], 1, s1, s2, `<b>${w.wort}</b><br>${s2}`);
+  function lwWahl(art, w, frage, hint, warum, s1) {
+    const wahl = shuffle([w.ein, ...w.falsch]);
+    return { prompt: `${frage}<br><span class="bsp gross">${luecke(w)}</span>`, choices: wahl, correct: wahl.indexOf(w.ein), hint, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${warum}`, ex: exLw(art, w, s1, warum) };
+  }
+  function lwTippen(art, w, hint, warum, s1) {
+    // Die Auswahl steht dabei: Ohne sie könnten in die Lücke auch andere Wörter passen (T▢r: Tür, Tor, Tier …)
+    const angebot = [w.ein, ...w.falsch].sort((a, b) => a.length - b.length || a.localeCompare(b, 'de')).map((x) => `<b>${x}</b>`).join(', ').replace(/, (?!.*, )/, ' oder ');
+    return { prompt: `Schreibe das ganze Wort richtig: mit ${angebot}?<br><span class="bsp gross">${luecke(w)}</span>`, fields: [{ type: 'text', answer: w.wort, label: 'Wort' }], hint, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${warum}`, ex: exLw(art, w, s1, warum) };
+  }
+
+  // ---------- Thema: Lange Vokale ----------
+  const LANG = [
+    ...liste('F[eh]ler|e,ee ; f[ah]ren|a,aa ; Z[ah]l|a,aa ; St[uh]l|u ; w[oh]nen|o,oo ; S[oh]n|o,oo ; B[ah]n|a,aa ; n[eh]men|e,ee ; J[ah]r|a,aa ; K[oh]le|o,oo ; Z[ah]n|a,aa ; H[öh]le|ö ; k[üh]l|ü ; f[üh]len|ü ; z[äh]len|ä', { typ: 'h' }),
+    ...liste('T[ee]|e,eh ; H[aa]r|a,ah ; Schn[ee]|e,eh ; B[ee]t|e,eh ; S[aa]l|a,ah ; M[oo]s|o,oh ; Kl[ee]|e,eh ; B[ee]re|e,eh ; Id[ee]|e,eh', { typ: 'dd' }),
+    ...liste('T[a]l|ah,aa ; Sch[u]le|uh ; T[ü]r|üh ; H[u]t|uh ; sch[ö]n|öh ; B[ä]r|äh ; N[a]me|ah,aa ; T[o]r|oh,oo ; Bl[u]me|uh ; Kr[o]ne|oh,oo ; R[e]gen|eh,ee ; H[a]se|ah,aa ; T[o]n|oh,oo ; Sp[u]r|uh ; T[a]g|ah,aa', { typ: 'e' }),
+    ...liste('B[ie]ne|i,ih ; Sp[ie]l|i,ih ; T[ie]r|i,ih ; Br[ie]f|i,ih ; W[ie]se|i,ih ; l[ie]b|i,ih ; v[ie]l|i,ih ; S[ie]b|i,ih ; Z[ie]l|i,ih ; R[ie]se|i,ih ; fl[ie]gen|i,ih ; v[ie]r|i,ih ; D[ie]b|i,ih ; Zw[ie]bel|i,ih', { typ: 'ie' }),
+    ...liste('T[i]ger|ie,ih ; K[i]no|ie,ih ; Krokod[i]l|ie,ih ; w[i]r|ie,ih ; m[i]r|ie,ih ; d[i]r|ie,ih', { typ: 'i' }),
+  ];
+  const LANGART = { h: 'mit Dehnungs-h', dd: 'mit doppeltem Vokal', e: 'mit einfachem Vokal', ie: 'mit ie', i: 'mit einfachem Vokal' };
+  const LANGWARUM = {
+    h: 'Ein <b>Dehnungs-h</b> zeigt den langen Vokal. Es steht oft vor l, m, n oder r. Diese Wörter muss man sich merken.',
+    dd: 'Hier wird der lange Vokal <b>verdoppelt</b>. Das gibt es nur bei wenigen Wörtern mit aa, ee, oo. Das sind Merkwörter.',
+    e: 'Die meisten langen Vokale schreibt man <b>einfach</b>, ohne h und ohne Verdopplung.',
+    ie: 'Das lange i schreibt man fast immer <b>ie</b>.',
+    i: 'Ausnahme: Hier schreibt man das lange i nur mit <b>i</b>. Das ist ein Merkwort.',
+  };
+  const TIPP_LANG = 'Der Vokal klingt lang. Dafür gibt es drei Schreibweisen: einfach (T<b>a</b>l), mit Dehnungs-h (Z<b>ah</b>l) oder doppelt (H<b>aa</b>r). Das lange i heißt meistens <b>ie</b>. Die meisten Wörter haben den einfachen Vokal.';
+  const S1_LANG = 'Der Vokal klingt lang. Wie wird er hier geschrieben?';
+  const langLuecke = () => { const w = pick(LANG); return lwWahl('langLuecke', w, 'Der Vokal ist <b>lang</b>. Was gehört in die Lücke?', TIPP_LANG, LANGWARUM[w.typ], S1_LANG); };
+  const langTippen = () => { const w = pick(LANG); return lwTippen('langTippen', w, TIPP_LANG, LANGWARUM[w.typ], S1_LANG); };
+  function langArt() {
+    const w = pick(LANG.filter((x) => x.typ !== 'i')), arten = ['e', 'h', 'dd', 'ie'];
+    return {
+      prompt: `Wie wird der lange Vokal hier geschrieben?<br><span class="bsp gross">${w.wort}</span>`,
+      choices: arten.map((a) => LANGART[a]), correct: arten.indexOf(w.typ),
+      hint: 'Suche den langen Vokal. Steht ein <b>h</b> dahinter? Steht er <b>doppelt</b>? Oder ist es ein <b>ie</b>?',
+      solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b>: ${LANGART[w.typ]}.<br>${LANGWARUM[w.typ]}`,
+      ex: zz('langArt', [w.vor, w.ein, w.nach], 1, [LANGART[w.typ] + ': ', w.ein], 1, 'Suche den langen Vokal im Wort.', LANGWARUM[w.typ], `<b>${w.wort}</b>: ${LANGART[w.typ]}`),
+    };
+  }
+  const langeVokale = () => U.wahl([[45, langLuecke], [25, langArt], [30, langTippen]]);
+
+  // ---------- Thema: Kurze Vokale und Doppelkonsonanten ----------
+  const KURZ = [
+    ...liste('Ro[ll]e|l ; So[nn]e|n ; Ka[nn]e|n ; Wa[ss]er|s ; Mu[tt]er|t ; Bu[tt]er|t ; Hi[mm]el|m ; So[mm]er|m ; Te[ll]er|l ; Ko[ff]er|f ; Schi[ff]|f ; Ba[ll]|l ; schne[ll]|l ; dü[nn]|n ; Pu[pp]e|p ; Su[pp]e|p ; Tre[pp]e|p ; Kla[ss]e|s ; Lö[ff]el|f ; Zi[mm]er|m ; ko[mm]en|m ; re[nn]en|n ; fa[ll]en|l ; Ta[ss]e|s ; Bri[ll]e|l ; Wo[ll]e|l ; Ta[nn]e|n ; Pfa[nn]e|n', { typ: 'dop', kurz: true }),
+    ...liste('Blu[m]e|mm ; Schu[l]e|ll ; Na[m]e|mm ; Ta[f]el|ff ; Ne[b]el|bb ; Ga[b]el|bb ; Vo[g]el|gg ; Re[g]en|gg ; Ki[n]o|nn ; Be[s]en|ss ; Ho[s]e|ss ; Do[s]e|ss ; Le[b]en|bb ; Fa[d]en|dd ; Ku[g]el|gg ; Hu[t]|tt ; ro[t]|tt ; gu[t]|tt ; Ta[l]|ll ; Pla[n]|nn ; Zu[g]|gg', { typ: 'lang', kurz: false }),
+    ...liste('Wa[l]d|ll ; Hu[n]d|nn ; Ki[n]d|nn ; Bi[l]d|ll ; Wo[l]ke|ll ; La[m]pe|mm ; Ta[n]te|nn ; Wi[n]ter|nn ; Ki[s]te|ss ; Fe[n]ster|nn ; Ha[n]d|nn ; Gu[r]ke|rr ; Bi[r]ne|rr ; He[f]t|ff ; Lu[f]t|ff ; ka[l]t|ll ; Fe[l]d|ll ; Ge[l]d|ll ; bu[n]t|nn', { typ: 'zwei', kurz: true }),
+    ...liste('Ja[ck]e|k ; Brü[ck]e|k ; De[ck]e|k ; Zu[ck]er|k ; ba[ck]en|k ; di[ck]|k ; Ro[ck]|k ; Stü[ck]|k ; E[ck]e|k ; Glü[ck]|k', { typ: 'ck', kurz: true }),
+    ...liste('Wol[k]e|ck ; Gur[k]e|ck ; dan[k]en|ck ; Ban[k]|ck ; Schran[k]|ck ; trin[k]en|ck ; Bir[k]e|ck ; star[k]|ck ; On[k]el|ck', { typ: 'k' }),
+    ...liste('Ka[tz]e|z ; Mü[tz]e|z ; si[tz]en|z ; Bli[tz]|z ; Pla[tz]|z ; Sa[tz]|z ; Ne[tz]|z ; pu[tz]en|z ; Hi[tz]e|z ; Spi[tz]e|z', { typ: 'tz', kurz: true }),
+    ...liste('Ker[z]e|tz ; Pil[z]|tz ; tan[z]en|tz ; Wur[z]el|tz ; Hol[z]|tz ; Sal[z]|tz ; kur[z]|tz ; Schnau[z]e|tz ; Wei[z]en|tz', { typ: 'z' }),
+  ];
+  const KURZWARUM = {
+    dop: 'Der Vokal davor ist <b>kurz</b>, und man hört danach nur einen Konsonanten. Dann wird er <b>verdoppelt</b>.',
+    lang: 'Der Vokal davor ist <b>lang</b>. Nach einem langen Vokal wird nicht verdoppelt.',
+    zwei: 'Der Vokal ist zwar kurz, aber danach folgen schon <b>zwei verschiedene</b> Konsonanten. Dann wird nicht verdoppelt.',
+    ck: 'Der Vokal davor ist <b>kurz</b>. Statt „kk“ schreibt man <b>ck</b>.',
+    k: 'Nach <b>l, n, r</b> (und nach langem Vokal) steht nie ck, nur <b>k</b>.',
+    tz: 'Der Vokal davor ist <b>kurz</b>. Statt „zz“ schreibt man <b>tz</b>.',
+    z: 'Nach <b>l, n, r</b> und nach au, ei, eu steht nie tz, nur <b>z</b>.',
+  };
+  const TIPP_KURZ = 'Sprich das Wort deutlich: Ist der betonte Vokal <b>kurz</b> oder <b>lang</b>? Nach kurzem Vokal folgen zwei Konsonanten. Hörst du nur einen, wird er verdoppelt (ck statt kk, tz statt zz). Merke: Nach l, n, r steht nie tz und nie ck.';
+  const S1_KURZ = 'Sprich das Wort: Ist der betonte Vokal kurz oder lang? Und wie viele Konsonanten folgen?';
+  const kurzLuecke = () => { const w = pick(KURZ); return lwWahl('kurzLuecke', w, 'Was gehört in die Lücke?', TIPP_KURZ, KURZWARUM[w.typ], S1_KURZ); };
+  const kurzTippen = () => { const w = pick(KURZ); return lwTippen('kurzTippen', w, TIPP_KURZ, KURZWARUM[w.typ], S1_KURZ); };
+  function kurzLang() {
+    const w = pick(KURZ.filter((x) => x.kurz !== undefined));
+    return {
+      prompt: `Ist der betonte Vokal <b>kurz</b> oder <b>lang</b>?<br><span class="bsp gross">${w.wort}</span>`,
+      choices: ['kurz', 'lang'], correct: w.kurz ? 0 : 1,
+      hint: 'Sprich das Wort laut und dehne den Vokal. Klingt es noch richtig? Schau auch, was danach kommt: zwei Konsonanten (auch ck, tz) zeigen einen kurzen Vokal.',
+      solution: `<b>${w.wort}</b>: Der Vokal ist <b>${w.kurz ? 'kurz' : 'lang'}</b>.<br>${KURZWARUM[w.typ]}`,
+      ex: zz('kurzLang', [w.vor, w.ein, w.nach], 1, [`${w.kurz ? 'kurzer' : 'langer'} Vokal: `, w.wort], 1, 'Schau auf die Konsonanten nach dem betonten Vokal.', KURZWARUM[w.typ], `<b>${w.wort}</b>: Der Vokal ist <b>${w.kurz ? 'kurz' : 'lang'}</b>.`),
+    };
+  }
+  function kurzWarum() {
+    const w = pick(KURZ.filter((x) => x.typ === 'lang' || x.typ === 'zwei'));
+    return {
+      prompt: `Warum wird der Konsonant hier <b>nicht</b> verdoppelt?<br><span class="bsp gross">${w.wort}</span>`,
+      choices: ['Der Vokal davor ist lang.', 'Nach dem kurzen Vokal folgen schon zwei verschiedene Konsonanten.'], correct: w.typ === 'lang' ? 0 : 1,
+      hint: 'Sprich das Wort: Ist der betonte Vokal lang oder kurz? Zähle dann die Konsonanten, die danach kommen.',
+      solution: `<b>${w.wort}</b><br>${KURZWARUM[w.typ]}`,
+      ex: zz('kurzWarum', [w.vor, w.ein, w.nach], 1, [w.wort], 0, 'Verdoppelt wird nur nach kurzem Vokal, wenn danach nur ein Konsonant zu hören ist.', KURZWARUM[w.typ], `<b>${w.wort}</b>: nicht verdoppelt.`),
+    };
+  }
+  const kurzeVokale = () => U.wahl([[42, kurzLuecke], [18, kurzLang], [25, kurzTippen], [15, kurzWarum]]);
+
+  // ---------- Thema: Verlängern und Ableiten ----------
+  // Auslaut: 'Ber[g]|k|Berge' = richtiger Buchstabe, falscher, verlängertes Wort
+  const AUSL = [
+    ...liste('Ber[g]|k|Berge ; Kor[b]|p|Körbe ; Wal[d]|t|Wälder ; Kin[d]|t|Kinder ; Ta[g]|k|Tage ; Zu[g]|k|Züge ; We[g]|k|Wege ; Die[b]|p|Diebe ; Sta[b]|p|Stäbe ; Sie[b]|p|Siebe ; Ran[d]|t|Ränder ; Stran[d]|t|Strände ; Han[d]|t|Hände ; Pfer[d]|t|Pferde ; Bil[d]|t|Bilder ; Fel[d]|t|Felder ; Aben[d]|t|Abende ; Flu[g]|k|Flüge ; Zwer[g]|k|Zwerge ; Kru[g]|k|Krüge ; Hu[t]|d|Hüte ; Bro[t]|d|Brote ; Zel[t]|d|Zelte ; Wel[t]|d|Welten ; Schran[k]|g|Schränke ; Geschen[k]|g|Geschenke ; Vol[k]|g|Völker', { adj: false }),
+    ...liste('gel[b]|p|gelbe ; lie[b]|p|liebe ; frem[d]|t|fremde ; run[d]|t|runde ; klu[g]|k|kluge ; kal[t]|d|kalte ; al[t]|d|alte ; lau[t]|d|laute ; star[k]|g|starke', { adj: true }),
+  ];
+  // Umlaut: 'H[äu]ser|eu|Haus' = mit verwandtem Wort; ohne drittes Feld gibt es kein verwandtes Wort mit a/au
+  const UML = [
+    ...liste('H[äu]ser|eu|Haus ; B[äu]me|eu|Baum ; Tr[äu]me|eu|Traum ; M[äu]se|eu|Maus ; l[äu]ft|eu|laufen ; R[äu]ber|eu|rauben ; K[äu]fer|eu|kaufen ; Geb[äu]de|eu|bauen ; tr[äu]men|eu|Traum ; H[ä]nde|e|Hand ; W[ä]lder|e|Wald ; k[ä]lter|e|kalt ; Gl[ä]ser|e|Glas ; St[ä]dte|e|Stadt ; L[ä]nder|e|Land ; B[ä]nder|e|Band ; Z[ä]hne|e|Zahn ; N[ä]chte|e|Nacht ; st[ä]rker|e|stark ; l[ä]nger|e|lang ; Bl[ä]tter|e|Blatt ; R[ä]der|e|Rad ; K[ä]mme|e|Kamm ; tr[ä]gt|e|tragen ; f[ä]hrt|e|fahren ; schl[ä]ft|e|schlafen', {}),
+    ...liste('Fr[eu]nd|äu ; n[eu]|äu ; F[eu]er|äu ; t[eu]er|äu ; B[eu]le|äu ; Z[eu]gnis|äu ; Fr[eu]de|äu ; Kr[eu]z|äu ; F[e]ld|ä ; W[e]lt|ä ; G[e]ld|ä ; H[e]ft|ä ; B[e]tt|ä ; N[e]tz|ä ; schn[e]ll|ä ; F[e]nster|ä ; M[e]nsch|ä ; St[e]rn|ä ; B[e]rg|ä ; H[e]rz|ä ; T[e]ller|ä ; Z[e]lt|ä', {}),
+  ];
+  const auslWarum = (w) => `Verlängere das Wort: <b>${w.wort}</b> → <b>${w.mehr[0]}</b>. Jetzt hörst du das <b>${w.ein}</b> deutlich.`;
+  const umlWarum = (w) => (w.mehr.length ? `Verwandtes Wort: <b>${w.mehr[0]}</b>. Aus ${/u/.test(w.ein) ? 'au wird äu' : 'a wird ä'}, also <b>${w.wort}</b> mit <b>${w.ein}</b>.` : `Es gibt kein verwandtes Wort mit ${/u/.test(w.ein) ? 'au' : 'a'}. Also schreibt man <b>${w.ein}</b>.`);
+  const TIPP_AUSL = 'Am Wortende klingen b, d, g wie p, t, k. <b>Verlängere</b> das Wort, dann hörst du den richtigen Buchstaben: ein Hun?, viele Hun<b>d</b>e.';
+  const TIPP_UML = '<b>ä</b> oder <b>e</b>, <b>äu</b> oder <b>eu</b>? Suche ein verwandtes Wort mit <b>a</b> oder <b>au</b>. Gibt es eins, schreibst du ä oder äu. Gibt es keins, schreibst du e oder eu.';
+  const auslLuecke = () => { const w = pick(AUSL); return lwWahl('auslLuecke', w, 'Welcher Buchstabe gehört ans Wortende?', TIPP_AUSL, auslWarum(w), 'Am Wortende hört man b, d, g nicht genau. Verlängere das Wort!'); };
+  const auslTippen = () => { const w = pick(AUSL); return lwTippen('auslTippen', w, TIPP_AUSL, auslWarum(w), 'Am Wortende hört man b, d, g nicht genau. Verlängere das Wort!'); };
+  const umlLuecke = () => { const w = pick(UML); return lwWahl('umlLuecke', w, 'Was gehört in die Lücke?', TIPP_UML, umlWarum(w), 'Suche ein verwandtes Wort mit a oder au.'); };
+  function verlaengern() {
+    const w = pick(AUSL);
+    return {
+      prompt: 'Verlängere das Wort.', layout: 'satz',
+      fields: [{ type: 'text', answer: w.mehr[0], prefix: w.adj ? `${w.wort} → die` : `ein ${w.wort}, viele`, suffix: w.adj ? 'Maus' : '', label: 'verlängertes Wort' }],
+      hint: w.adj ? 'Setze das Adjektiv vor ein Substantiv: „die … Maus“. Dann bekommt es eine Endung.' : 'Bilde die Mehrzahl: „ein …, viele …“.',
+      solution: `<b>${w.wort}</b> → <b class="vb">${w.mehr[0]}</b><br>Beim Verlängern hörst du das <b>${w.ein}</b> deutlich. Deshalb schreibt man auch „${w.wort}“ mit ${w.ein}.`,
+      ex: zz('verlaengern', [w.vor, w.ein], 1, [w.adj ? 'die ' : 'viele ', w.mehr[0]], 1, 'Am Wortende hört man b, d, g nicht genau. Verlängere das Wort!', `Jetzt steht der Buchstabe nicht mehr am Ende, und du hörst das <b>${w.ein}</b>.`, `${w.wort} → <b>${w.mehr[0]}</b>`),
+    };
+  }
+  function stamm_() {
+    const w = pick(UML.filter((x) => x.mehr.length));
+    const andere = shuffle(UML.filter((x) => x.mehr.length && x.mehr[0] !== w.mehr[0]).map((x) => x.mehr[0]).filter((x, i, a) => a.indexOf(x) === i)).slice(0, 2);
+    const wahl = shuffle([w.mehr[0], ...andere]);
+    return {
+      prompt: `Welches verwandte Wort erklärt das <b>${w.ein}</b>?<br><span class="bsp gross">${w.wort}</span>`,
+      choices: wahl, correct: wahl.indexOf(w.mehr[0]),
+      hint: 'Verwandte Wörter haben denselben Wortstamm. Suche das Wort, das fast gleich aussieht, nur mit a oder au.',
+      solution: umlWarum(w),
+      ex: zz('stamm_', [w.mehr[0]], 0, [w.vor, w.ein, w.nach], 1, `Das verwandte Wort ist <b>${w.mehr[0]}</b>.`, `Aus ${/u/.test(w.ein) ? 'au wird äu' : 'a wird ä'}.`, `${w.mehr[0]} → <b>${w.wort}</b>`),
+    };
+  }
+  const ableiten = () => U.wahl([[26, auslLuecke], [26, umlLuecke], [18, verlaengern], [14, auslTippen], [16, stamm_]]);
+
+  // ---------- Thema: s-Laute ----------
+  const SL = [
+    ...liste('Wa[ss]er|ß,s ; Ta[ss]e|ß,s ; Kla[ss]e|ß,s ; Flu[ss]|ß,s ; Ku[ss]|ß,s ; Schlo[ss]|ß,s ; Nu[ss]|ß,s ; na[ss]|ß,s ; me[ss]en|ß,s ; e[ss]en|ß,s ; kü[ss]en|ß,s ; mü[ss]en|ß,s ; Schlü[ss]el|ß,s ; Me[ss]er|ß,s ; Ri[ss]|ß,s ; Pa[ss]|ß,s ; Fa[ss]|ß,s ; wi[ss]en|ß,s ; Ka[ss]e|ß,s', { typ: 'ss' }),
+    ...liste('Stra[ß]e|ss,s ; Fu[ß]|ss,s ; gro[ß]|ss,s ; hei[ß]|ss,s ; wei[ß]|ss,s ; sü[ß]|ss,s ; flei[ß]ig|ss,s ; drau[ß]en|ss,s ; Sto[ß]|ss,s ; au[ß]en|ss,s ; bei[ß]en|ss,s ; schlie[ß]en|ss,s ; gie[ß]en|ss,s ; hei[ß]en|ss,s ; So[ß]e|ss,s ; Fü[ß]e|ss,s', { typ: 'ß' }),
+    ...liste('Be[s]en|ss,ß ; Ho[s]e|ss,ß ; Do[s]e|ss,ß ; Wie[s]e|ss,ß ; Rie[s]e|ss,ß ; le[s]en|ss,ß ; Hau[s]|ss,ß|Häuser ; Mau[s]|ss,ß|Mäuse ; Gra[s]|ss,ß|Gräser ; Gla[s]|ss,ß|Gläser ; Prei[s]|ss,ß|Preise ; Krei[s]|ss,ß|Kreise ; Mu[s]ik|ss,ß ; Va[s]e|ss,ß ; Kä[s]e|ss,ß ; Gan[s]|ss,ß|Gänse ; Hal[s]|ss,ß|Hälse ; lei[s]e|ss,ß ; bö[s]e|ss,ß ; Pau[s]e|ss,ß', { typ: 's' }),
+  ];
+  const SREGEL = { ss: 'Der Vokal davor ist kurz.', 'ß': 'Davor steht ein langer Vokal oder au, ei, eu, ie, und das s zischt.', s: 'Das s summt weich (oder es summt, wenn man das Wort verlängert).' };
+  const slWarum = (w) => ({
+    ss: 'Der Vokal vor dem s-Laut ist <b>kurz</b>. Dann schreibt man <b>ss</b>.',
+    'ß': 'Vor dem s-Laut steht ein <b>langer Vokal</b> oder ein Zwielaut (au, ei, eu, ie), und das s <b>zischt</b>. Dann schreibt man <b>ß</b>.',
+    s: w.mehr.length ? `Verlängere: <b>${w.wort}</b> → <b>${w.mehr[0]}</b>. Dort <b>summt</b> das s weich. Also schreibt man einfaches <b>s</b>.` : 'Das s <b>summt</b> weich wie eine Biene. Dann schreibt man einfaches <b>s</b>.',
+  }[w.typ]);
+  const TIPP_SL = 'Sprich das Wort. <b>Summt</b> das s weich (wie eine Biene)? Dann einfaches s. <b>Zischt</b> es: nach kurzem Vokal <b>ss</b>, nach langem Vokal oder au, ei, eu, ie <b>ß</b>. Am Wortende hilft Verlängern.';
+  const S1_SL = 'Summt das s oder zischt es? Und ist der Vokal davor kurz oder lang?';
+  const slLuecke = () => { const w = pick(SL); return lwWahl('slLuecke', w, '<b>s</b>, <b>ss</b> oder <b>ß</b>?', TIPP_SL, slWarum(w), S1_SL); };
+  const slTippen = () => { const w = pick(SL); return lwTippen('slTippen', w, TIPP_SL, slWarum(w), S1_SL); };
+  function slRegel() {
+    const w = pick(SL), typen = ['ss', 'ß', 's'];
+    return {
+      prompt: `Warum schreibt man dieses Wort mit <b>${w.ein}</b>?<br><span class="bsp gross">${w.wort}</span>`,
+      choices: typen.map((t) => SREGEL[t]), correct: typen.indexOf(w.typ),
+      hint: TIPP_SL, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${slWarum(w)}`,
+      ex: zz('slRegel', [w.vor, w.ein, w.nach], 1, [w.wort], 0, S1_SL, slWarum(w), `<b>${w.wort}</b> mit <b>${w.ein}</b>`),
+    };
+  }
+  const sLaute = () => U.wahl([[48, slLuecke], [22, slRegel], [30, slTippen]]);
+
+  // ---------- Thema: Groß- und Kleinschreibung ----------
+  const REGEL_GROSS = 'Groß schreibt man den <b>Satzanfang</b> und alle <b>Substantive</b>. Probe: Vor ein Substantiv passt ein Artikel (der, die, das), auch mit Adjektiv dazwischen (der kleine Hund).';
+  function grossAntippen() {
+    const z = pick(SATZ_WA);
+    const correct = z.tag.map((t, k) => (k === 0 || t === 'N' ? k : -1)).filter((k) => k >= 0);
+    const tokens = z.w.map((w, i) => w.toLowerCase() + (i === z.w.length - 1 ? '.' : ''));
+    return {
+      prompt: 'Hier ist alles kleingeschrieben. Tippe alle Wörter an, die man <b>groß</b> schreiben muss.',
+      tap: { tokens, correct }, answerText: correct.map((k) => z.w[k]).join(', '),
+      hint: REGEL_GROSS,
+      solution: `<b>${z.w.join(' ')}.</b><br>${z.w[0]}: Satzanfang. ${correct.slice(1).map((k) => z.w[k]).join(', ')}: Substantiv${correct.length > 2 ? 'e' : ''}.`,
+      ex: { mode: 'marken', art: 'grossAntippen', tokens, correct, was: 'Groß', s1: REGEL_GROSS, merk: `<b>${z.w.join(' ')}.</b><br>Groß: ${correct.map((k) => z.w[k]).join(', ')}` },
+    };
+  }
+  function grossWort() {
+    const z = pick(SATZ_WA), i = pick(z.tag.map((t, k) => (k > 0 && ['N', 'A', 'V'].includes(t) ? k : -1)).filter((k) => k >= 0));
+    const vor = z.w.slice(0, i).join(' '), nach = z.w.slice(i + 1).join(' ');
+    const ist = z.tag[i] === 'N';
+    return {
+      prompt: `Groß oder klein? Schreibe das Wort <b>${z.w[i].toUpperCase()}</b> richtig in die Lücke.`, layout: 'satz',
+      fields: [{ type: 'text', answer: z.w[i], prefix: vor, suffix: (nach ? nach : '') + '.', label: 'Wort' }],
+      hint: REGEL_GROSS,
+      solution: `${vor} <b class="vb">${z.w[i]}</b>${nach ? ' ' + nach : ''}.<br>„${z.w[i]}“ ist ein ${WA[z.tag[i]]}${ist ? ', also <b>groß</b>. Probe: Ein Artikel passt davor.' : ', also <b>klein</b>.'}`,
+      ex: zz('grossWort', [z.w[i].toUpperCase()], 0, [vor + ' ', z.w[i], (nach ? ' ' + nach : '') + '.'], 1, `Welche Wortart ist das? ${ist ? 'Passt ein Artikel davor?' : 'Passt ein Artikel davor? Hier nicht.'}`, `„${z.w[i]}“ ist ein ${WA[z.tag[i]]}: ${ist ? 'groß' : 'klein'}.`, `${vor} <b>${z.w[i]}</b>${nach ? ' ' + nach : ''}.`),
+    };
+  }
+  // Aus Verben werden Substantive: das Laufen, beim Spielen
+  const NOMV = ['laufen', 'schwimmen', 'lesen', 'singen', 'malen', 'spielen', 'tanzen', 'lachen', 'schreiben', 'rechnen'];
+  const NOMS = [['Das', 'macht mir Spaß', 'das'], ['Beim', 'vergesse ich die Zeit', 'beim (= bei dem)'], ['Zum', 'brauche ich Ruhe', 'zum (= zu dem)']];
+  const NOMK = [['Wir', 'jeden Tag'], ['Die Kinder', 'gern'], ['Heute wollen wir', '']];
+  function grossVerb() {
+    const v = pick(NOMV), subst = Math.random() < 0.55;
+    const [vor, nach, wort] = subst ? pick(NOMS) : pick(NOMK);
+    const gr = gross(v), wahl = shuffle([gr, v]);
+    return {
+      prompt: `Welche Schreibweise ist richtig?<br><span class="bsp">${vor} ___ ${nach}${nach ? '' : ''}.</span>`.replace(' .', '.'),
+      choices: wahl, correct: wahl.indexOf(subst ? gr : v),
+      hint: 'Auch ein Verb kann zum Substantiv werden. Das erkennst du am <b>Artikel</b> davor: das, beim (= bei dem), zum (= zu dem). Dann schreibt man es groß.',
+      solution: `${vor} <b class="vb">${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.<br>${subst ? `Vor dem Wort steht „${wort}“. Das Verb ist hier ein Substantiv, also <b>groß</b>.` : 'Hier sagt das Wort, was jemand tut. Es ist ein Verb, also <b>klein</b>.'}`,
+      ex: zz('grossVerb', [vor + ' ', '___', nach ? ' ' + nach + '.' : '.'], 1, [vor + ' ', subst ? gr : v, nach ? ' ' + nach + '.' : '.'], 1, 'Steht ein Artikel davor (das, beim, zum)?', subst ? `„${wort}“ macht das Verb zum Substantiv: groß.` : 'Kein Artikel davor: Es bleibt ein Verb, also klein.', `${vor} <b>${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.`),
+    };
+  }
+  function grossWelches() {
+    const n = pick(N.filter((x) => /(ung|in|er|el|e|en|chen)$/.test(x.sg) && x.sg.length > 4)).sg;
+    const v = pick(V), a = pick(ADJ.filter((x) => !['viel', 'gern', 'arm', 'laut', 'gut', 'hoch', 'dunkel'].includes(x.pos))).pos, p = pick(['wir', 'euch', 'unser', 'dein', 'ihm', 'mir']);
+    const w = shuffle([n.toLowerCase(), v.du, a, p]);
+    return {
+      prompt: 'Welches Wort muss man <b>groß</b> schreiben?',
+      choices: w, correct: w.indexOf(n.toLowerCase()),
+      hint: 'Mach die Artikelprobe: Vor welches Wort passt „der“, „die“ oder „das“?',
+      solution: `<b>${n}</b> ist ein Substantiv: ${N.find((x) => x.sg === n).art} ${n}. Die anderen Wörter sind Verb, Adjektiv und Pronomen. Die schreibt man klein.`,
+      ex: zz('grossWelches', [n.toLowerCase()], 0, [N.find((x) => x.sg === n).art + ' ', n], 1, 'Artikelprobe: Vor welches Wort passt der, die oder das?', 'Passt ein Artikel davor, ist es ein Substantiv: groß.', `<b>${n}</b>`),
+    };
+  }
+  const grossKlein = () => U.wahl([[34, grossAntippen], [26, grossWort], [24, grossVerb], [16, grossWelches]]);
+
+  // ---------- Thema: Silben und Worttrennung ----------
+  const SILB = ['Was-ser', 'Som-mer', 'Scho-ko-la-de', 'El-tern', 'Fens-ter', 'Kat-ze', 'Zu-cker', 'Brü-cke', 'Ja-cke', 'Kin-der', 'Blu-me', 'Gar-ten', 'Schu-le', 'Leh-re-rin', 'Ap-fel', 'Vo-gel', 'Mut-ter', 'Son-ne', 'Tel-ler', 'Him-mel', 'Ta-sche', 'Fla-sche', 'Kü-che', 'la-chen', 'ko-chen', 'Tep-pich', 'Kar-tof-fel', 'To-ma-te', 'Ba-na-ne', 'Kis-te', 'Schwes-ter', 'Haus-tür', 'Fuß-ball', 'Schul-hof', 'Hand-tuch', 'Ba-de-wan-ne', 'Re-gen-bo-gen', 'Was-ser-fla-sche', 'Früh-stück', 'Ge-burts-tag', 'Fahr-rad', 'Com-pu-ter', 'Fe-ri-en', 'Kro-ko-dil', 'Pa-pa-gei', 'Schmet-ter-ling', 'Erd-bee-re', 'Wol-ke', 'Lam-pe', 'Win-ter', 'Mon-tag', 'Diens-tag', 'Mitt-woch', 'Don-ners-tag', 'Frei-tag', 'Sams-tag', 'Sonn-tag', 'sin-gen', 'Fin-ger', 'Stra-ße', 'Fü-ße', 'Leh-rer', 'fah-ren', 'Bäu-me', 'Häu-ser', 'Feu-er', 'Mau-er', 'sit-zen', 'Müt-ze', 'Städ-te', 'Som-mer-fe-ri-en'];
+  const EINSILBER = ['Pferd', 'Strumpf', 'Herbst', 'Tisch', 'Schrank', 'Stuhl'];
+  const REGEL_SILB = 'Sprich das Wort langsam und klatsche dazu: Jede Silbe hat einen Vokal (oder au, ei, eu, ie). Getrennt wird zwischen den Silben. <b>ch, sch, ck</b> bleiben zusammen. Von mehreren Konsonanten kommt nur der letzte in die nächste Zeile (Fens-ter, Kat-ze).';
+  const silbInfo = (t) => { const teile = t.split('-'), wort = teile.join(''); const grenzen = []; let c = 0; teile.slice(0, -1).forEach((x) => { c += x.length; grenzen.push(c - 1); }); return { teile, wort, grenzen, t }; };
+  const exSilb = (art, x) => ({ mode: 'komma', art, dicht: true, mark: '-', tokens: [...x.wort], gaps: x.grenzen, s1: 'Sprich das Wort in Silben. Jede Silbe hat einen Vokal.', merk: `<b>${x.t}</b>: ${x.teile.length} ${x.teile.length === 1 ? 'Silbe' : 'Silben'}` });
+  function silbTrennen() {
+    const x = silbInfo(pick(SILB.filter((t) => t.replace(/-/g, '').length <= 9)));
+    return {
+      prompt: 'Trenne das Wort in <b>Silben</b>: Tippe die Trennstellen an.',
+      tap: { tokens: [...x.wort], correct: x.grenzen, gaps: true, mark: '-', eng: true }, answerText: x.t,
+      hint: REGEL_SILB, solution: `<b>${x.t}</b><br>${REGEL_SILB}`, ex: exSilb('silbTrennen', x),
+    };
+  }
+  function silbZahl() {
+    const x = silbInfo(Math.random() < 0.15 ? pick(EINSILBER) : pick(SILB));
+    return {
+      prompt: `Wie viele <b>Silben</b> hat das Wort?<br><span class="bsp gross">${x.wort}</span>`,
+      choices: ['1', '2', '3', '4', '5'], correct: x.teile.length - 1,
+      hint: 'Klatsche das Wort. Oder zähle die Vokale: Jede Silbe hat genau einen Vokal. au, ei, eu, ie, äu zählen als einer.',
+      solution: `<b>${x.t}</b>: ${x.teile.length} ${x.teile.length === 1 ? 'Silbe. Einsilbige Wörter kann man nicht trennen.' : 'Silben.'}`,
+      ex: exSilb('silbZahl', x),
+    };
+  }
+  function silbWahl() {
+    const x = silbInfo(pick(SILB));
+    const verschieb = (g, k, d) => { const n = g.slice(); n[k] += d; return n; };
+    const schreib = (g) => [...x.wort].map((c, i) => c + (g.includes(i) ? '-' : '')).join('');
+    const f1 = schreib(verschieb(x.grenzen, 0, 1)), f2 = schreib(verschieb(x.grenzen, x.grenzen.length - 1, -1));
+    const wahl = shuffle([x.t, ...[f1, f2].filter((f, i, a) => f !== x.t && a.indexOf(f) === i && !/^-|--|-$/.test(f))]);
+    return {
+      prompt: 'Welche Trennung ist richtig?', choices: wahl, correct: wahl.indexOf(x.t),
+      hint: REGEL_SILB, solution: `<b>${x.t}</b><br>${REGEL_SILB}`, ex: exSilb('silbWahl', x),
+    };
+  }
+  function silbTippen() {
+    const x = silbInfo(pick(SILB));
+    return {
+      prompt: `Schreibe das Wort mit <b>Trennstrichen</b> (Beispiel: Blu-me).<br><span class="bsp gross">${x.wort}</span>`,
+      fields: [{ type: 'text', answer: x.t, ci: true, label: 'Wort mit Trennstrichen' }],
+      hint: REGEL_SILB, solution: `<b>${x.t}</b><br>${REGEL_SILB}`, ex: exSilb('silbTippen', x),
+    };
+  }
+  const silben = () => U.wahl([[34, silbTrennen], [20, silbZahl], [26, silbWahl], [20, silbTippen]]);
+
+  D.daten = { LANG, KURZ, AUSL, UML, SL, SILB, V, SUBJ, HILF, ZEITEN, ZNAME, ZDEUTSCH, satz, text, bauplan, subjFuer, praesens, praeteritum,
     N, GENUS, substSatz, markSatz, WA, WAPL, WAPROBE, ROLLE, RFRAGE, FAELLE, FNAME, FFRAGE, ARTIKEL, pluralBau, pluralSatz, gruppe, fallSatz };
   D.arten = { // für Tests
     'd5-substantive': { artikelWahl, mehrzahl, einzahl, einOderMehr, substAntippen },
@@ -1193,6 +1461,12 @@
     'd5-satzarten': { sartBestimmen, sartWelcher, sartZeichen, sartVerb },
     'd5-komma': { kommaAufz, kommaWahl, kommaGef },
     'd5-rede': { redeRichtig, redeZeichen, redeTeil },
+    'd5-lang': { langLuecke, langArt, langTippen },
+    'd5-kurz': { kurzLuecke, kurzLang, kurzTippen, kurzWarum },
+    'd5-ableiten': { auslLuecke, umlLuecke, verlaengern, auslTippen, stamm_ },
+    'd5-slaute': { slLuecke, slRegel, slTippen },
+    'd5-gross': { grossAntippen, grossWort, grossVerb, grossWelches },
+    'd5-silben': { silbTrennen, silbZahl, silbWahl, silbTippen },
     'd5-zeitformen': { erkennen, einsetzen, bilden, antippen, hilfsverb, grundform, welcherSatz },
   };
 
@@ -1220,6 +1494,14 @@
         { id: 'd5-satzarten', title: 'Satzarten und Satzschlusszeichen', icon: '❔', gen: satzarten },
         { id: 'd5-komma', title: 'Komma: Aufzählung und Satzgefüge', icon: '❜', gen: komma },
         { id: 'd5-rede', title: 'Wörtliche Rede', icon: '💬', gen: rede },
+      ] },
+      { id: 'd5-recht', nr: 3, title: 'Rechtschreibung', topics: [
+        { id: 'd5-lang', title: 'Lange Vokale', icon: '➖', gen: langeVokale },
+        { id: 'd5-kurz', title: 'Kurze Vokale und Doppelkonsonanten', icon: '✌', gen: kurzeVokale },
+        { id: 'd5-ableiten', title: 'Verlängern und Ableiten', icon: '🔧', gen: ableiten },
+        { id: 'd5-slaute', title: 's-Laute: s, ss, ß', icon: 'ß', gen: sLaute },
+        { id: 'd5-gross', title: 'Groß- und Kleinschreibung', icon: 'Aa', gen: grossKlein },
+        { id: 'd5-silben', title: 'Silben und Worttrennung', icon: '✂', gen: silben },
       ] },
     ],
   };

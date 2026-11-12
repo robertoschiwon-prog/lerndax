@@ -23,15 +23,27 @@ window.DeDaxIcons = (function () {
     // Objekte: Geschenk (jemandem etwas geben)
     'd5-objekte': `<rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M3 10h18V7H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3.5-5-3.5-4.5-1s3 1 4.5 1c1.5 0 4-1 4.5-1s-3-2.5-4.5 1"/>`,
     // Attribute: Substantiv mit Schmuck-Stern davor
-    'd5-attribute': `<path d="M6.5 4l1.300 2.900 3.200.3-2.400 2.100.7 3.100-2.800-1.700-2.800 1.700.7-3.100L2 7.200l3.200-.3z" ${F}/><rect x="11" y="13" width="10.5" height="7" rx="1.5"/>`,
+    'd5-attribute': `<path d="M6.5 4l1.300 2.900 3.2.3-2.400 2.100.7 3.100-2.8-1.7-2.8 1.7.7-3.100L2 7.2l3.2-.3z" ${F}/><rect x="11" y="13" width="10.5" height="7" rx="1.5"/>`,
     // Hauptsatz und Nebensatz: großer und kleiner Kasten mit Komma dazwischen
-    'd5-nebensatz': `<rect x="2" y="6" width="10" height="9" rx="1.5"/><rect x="16" y="8.5" width="6" height="6.5" rx="1.5" ${F}/><path d="M14 14.5c.300 1.5-.300 2.800-1.200 3.800"/>`,
+    'd5-nebensatz': `<rect x="2" y="6" width="10" height="9" rx="1.5"/><rect x="16" y="8.5" width="6" height="6.5" rx="1.5" ${F}/><path d="M14 14.5c.300 1.5-.300 2.8-1.2 3.8"/>`,
     // Satzarten: Punkt, Fragezeichen, Ausrufezeichen
-    'd5-satzarten': `<circle cx="4.5" cy="18.5" r="1.600" ${F}/><path d="M9 8c0-2.200 1.400-3.5 3.200-3.5S15.5 5.800 15.5 7.700c0 2.300-3.200 2.600-3.200 5.300"/><circle cx="12.300" cy="18.5" r="1.300" ${F}/><path d="M19.5 4.5v9"/><circle cx="19.5" cy="18.5" r="1.300" ${F}/>`,
+    'd5-satzarten': `<circle cx="4.5" cy="18.5" r="1.6" ${F}/><path d="M9 8c0-2.2 1.400-3.5 3.2-3.5S15.5 5.8 15.5 7.7c0 2.300-3.2 2.6-3.2 5.300"/><circle cx="12.300" cy="18.5" r="1.300" ${F}/><path d="M19.5 4.5v9"/><circle cx="19.5" cy="18.5" r="1.300" ${F}/>`,
     // Komma: ein großes Komma zwischen zwei Strichen
-    'd5-komma': `<path d="M2.5 9h6"/><path d="M15.5 9h6"/><circle cx="12" cy="12.5" r="2.300" ${F}/><path d="M14 12.5c.400 3.200-1 5.600-3.5 7.5"/>`,
+    'd5-komma': `<path d="M2.5 9h6"/><path d="M15.5 9h6"/><circle cx="12" cy="12.5" r="2.300" ${F}/><path d="M14 12.5c.400 3.2-1 5.6-3.5 7.5"/>`,
     // Wörtliche Rede: Sprechblase mit Anführungszeichen
-    'd5-rede': `<path d="M3 5.5h18v10.5H11l-4.5 4v-4H3z"/><path d="M8 9.200v3M10.5 9.200v3M14 9.200v3M16.5 9.200v3"/>`,
+    'd5-rede': `<path d="M3 5.5h18v10.5H11l-4.5 4v-4H3z"/><path d="M8 9.2v3M10.5 9.2v3M14 9.2v3M16.5 9.2v3"/>`,
+    // Lange Vokale: gedehnter Strich
+    'd5-lang': `<path d="M3 12h18"/><path d="M3 8.5v7M21 8.5v7"/>`,
+    // Kurze Vokale: Punkt (kurz) und zwei gleiche Striche (Doppelkonsonant)
+    'd5-kurz': `<circle cx="5.5" cy="12" r="2.4" ${F}/><path d="M13 5.5v13M18.5 5.5v13"/>`,
+    // Verlängern: Wort mit angesetztem Stück
+    'd5-ableiten': `<rect x="2" y="8.5" width="10" height="7" rx="1.5"/><path d="M12 12h3.5"/><rect x="15.5" y="8.5" width="6.5" height="7" rx="1.5" stroke-dasharray="2.2 2.2"/>`,
+    // s-Laute: geschwungenes S
+    'd5-slaute': `<path d="M17 6.5c-1-1.7-2.8-2.5-5-2.5-3 0-5 1.5-5 3.8 0 5 10.5 2.7 10.5 8.2 0 2.5-2.2 4-5.5 4-2.6 0-4.6-1-5.5-3"/>`,
+    // Groß und klein: großer und kleiner Balken
+    'd5-gross': `<path d="M3 20 8 4l5 16"/><path d="M5 14.5h6"/><circle cx="18" cy="16" r="3.5"/><path d="M21.5 12.5v7.5"/>`,
+    // Silben: Wort mit Schnitt in der Mitte
+    'd5-silben': `<rect x="2" y="8.5" width="8" height="7" rx="1.5"/><rect x="14" y="8.5" width="8" height="7" rx="1.5"/><path d="M12 4v16" stroke-dasharray="2.5 2.5"/>`,
     // Zeitformen: Zeitstrahl mit drei Punkten, der mittlere („jetzt“) ist groß
     'd5-zeitformen': `<path d="M2 14h19"/><path d="M18.5 10.8 21.8 14l-3.3 3.2"/><circle cx="5.5" cy="14" r="1.7" ${F}/><circle cx="11.5" cy="14" r="3.1" ${F}/><path d="M11.5 3.5v4.5"/><path d="M9.4 6.2l2.1 2.1 2.1-2.1"/>`,
   };

@@ -326,20 +326,23 @@
     },
     // Kommas erscheinen nacheinander an ihren Stellen
     async komma(api, x) {
+      // dicht: ohne Leerzeichen (Buchstaben eines Worts), mark: Zeichen, das erscheint (Komma oder Trennstrich)
+      const sep = x.dicht ? '' : ' ', mark = x.mark || ',';
       const t = el('text', { x: 180, y: 66, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
-      const lang = x.tokens.join(' ').length; let br = -1;
-      if (lang > 30) { let c = 0; for (let i = 0; i < x.tokens.length; i++) { c += x.tokens[i].length + 1; if (c >= lang / 2) { br = i + 1; break; } } if (br >= x.tokens.length) br = -1; }
+      if (x.dicht) t.setAttribute('style', 'font-size:26px');
+      const lang = x.tokens.join(sep).length; let br = -1;
+      if (!x.dicht && lang > 30) { let c = 0; for (let i = 0; i < x.tokens.length; i++) { c += x.tokens[i].length + 1; if (c >= lang / 2) { br = i + 1; break; } } if (br >= x.tokens.length) br = -1; }
       const ks = {};
       x.tokens.forEach((w, i) => {
-        const e = el('tspan', { text: (i && i !== br ? ' ' : '') + w }, t);
+        const e = el('tspan', { text: (i && i !== br ? sep : '') + w }, t);
         if (i === br) { e.setAttribute('x', 180); e.setAttribute('dy', 26); }
-        if (x.gaps.includes(i)) ks[i] = el('tspan', { text: ',', fill: ORANGE, 'fill-opacity': 0 }, t);
+        if (x.gaps.includes(i)) ks[i] = el('tspan', { text: mark, fill: ORANGE, 'fill-opacity': 0 }, t);
       });
       if (br > 0) t.setAttribute('y', 53);
-      fit(t, 336, 19);
-      api.say(x.s1); await api.wait(3200);
+      if (!x.dicht) fit(t, 336, 19); else { try { for (let fs = 26; fs >= 12 && t.getBBox().width > 336; fs--) t.setAttribute('style', `font-size:${fs}px`); } catch (e) {} }
+      api.say(x.s1); await api.wait(x.dicht ? 2200 : 3200);
       for (const i of x.gaps) { await api.tw(350, (k) => ks[i].setAttribute('fill-opacity', k)); await api.wait(900); }
-      api.say(`<b>${x.tokens.map((w, i) => w + (x.gaps.includes(i) ? ',' : '')).join(' ')}</b>`);
+      api.say(x.merk || `<b>${x.tokens.map((w, i) => w + (x.gaps.includes(i) ? ',' : '')).join(' ')}</b>`);
     },
     // Satzglieder als Wagen: markieren, benennen und (bei um) umstellen
     async glieder(api, x) {
@@ -459,4 +462,10 @@
   thema('d5-satzarten', 'Satzarten', '0 0 360 120');
   thema('d5-komma', 'Das Komma', '0 0 360 120');
   thema('d5-rede', 'Wörtliche Rede', '0 0 360 120');
+  thema('d5-lang', 'Lange Vokale', '0 0 360 150');
+  thema('d5-kurz', 'Kurz oder lang? Doppelt oder einfach?', '0 0 360 150');
+  thema('d5-ableiten', 'Verlängern und Ableiten', '0 0 360 150');
+  thema('d5-slaute', 's, ss oder ß?', '0 0 360 150');
+  thema('d5-gross', 'Groß oder klein?', '0 0 360 150');
+  thema('d5-silben', 'Silben', '0 0 360 120');
 })();

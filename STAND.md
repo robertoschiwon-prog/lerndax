@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v49`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v50`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -78,10 +78,11 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
   „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
   27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
-- **Gebaut (v49): Bereich 2 „Satzbau und Satzzeichen“ ist vollständig** (8 Themen). DeDax hat damit 15 Themen.
-- **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 15 Themen).
+- **Gebaut (v50): Bereich 3 „Rechtschreibung“ ist vollständig** (6 Themen). DeDax hat damit 21 Themen.
+- **Gebaut (v49): Bereich 2 „Satzbau und Satzzeichen“ ist vollständig** (8 Themen).
+- **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 21 Themen).
   Die Zahl `themen` dort bei jedem neuen Thema mitzählen.
-- **Als Nächstes:** Bereich 3 (Rechtschreibung), dann 4 (Wörter bauen) und 5 (Texte verstehen), siehe Themenplan.
+- **Als Nächstes:** Bereich 4 (Wörter bauen und Wortschatz) und 5 (Texte verstehen), danach „Entdecken“ für Deutsch, siehe Themenplan.
   ISBN und Inhaltsverzeichnis des Deutschbuchs,
   Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
@@ -371,7 +372,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v49`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v50`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -940,3 +941,18 @@ Infos zur ersten Arbeit:
   Neue Animationen: Satzglieder als Wagen, die die Plätze tauschen; Kommas, die an ihrer Stelle erscheinen.
   `tests/dedax.py` misst jetzt echte Bildschirmpositionen (vorher Fehlalarm bei verschobenen Gruppen): 15 Themen,
   540 richtige Antworten angenommen, 180 Lösungs-Animationen; 150 000 erzeugte Aufgaben ohne Fehler.
+- **DeDax: Bereich 3 „Rechtschreibung“ fertig** (Version `lerndax-v50`): sechs Themen.
+  „Lange Vokale“ (Dehnungs-h, Doppelvokal, einfach, ie), „Kurze Vokale und Doppelkonsonanten“ (auch ck/k, tz/z),
+  „Verlängern und Ableiten“ (b/d/g am Wortende, ä/e, äu/eu), „s-Laute: s, ss, ß“, „Groß- und Kleinschreibung“
+  (kleingeschriebenen Satz antippen, Wort in Großbuchstaben richtig einsetzen, „das Laufen“ / „wir laufen“),
+  „Silben und Worttrennung“ (Trennstellen zwischen Buchstaben antippen, zählen, richtige Trennung, mit Strichen
+  schreiben).
+  **Lückenwörter:** rund 330 Wörter in der Schreibweise `F[eh]ler|e,ee` (richtig in Klammern, dahinter die falschen
+  Angebote). Jedes Wort mit allen falschen Varianten ausgegeben und durchgelesen: Mit keinem Angebot darf ein anderes
+  richtiges Wort entstehen. Deshalb fehlen z. B. Meer/mehr, Hütte/Hüte, Gäste/Geste, Kälte/Kelte, reißen/reisen,
+  Maße/Masse, Paar (Par), Tor (Torr), Hund (Hunt), Kloß (Klos), Gruß (Grus), Spaß (in Österreich auch Spass).
+  Beim Eintippen steht die Auswahl dabei („mit u oder uh?“), weil in „T▢r“ sonst auch Tor, Tür und Tier passen.
+  Worttrennung nach heutiger Regel (Fens-ter, Zu-cker); Wörter mit einem einzelnen Vokal am Anfang (Abend, Igel) fehlen.
+  Plattform: Antippen zwischen Buchstaben (`tap.eng`), zwei lange Antworten stehen untereinander statt nebeneinander.
+  `tests/dedax.py`: 21 Themen, 756 richtige Antworten angenommen, 252 Lösungs-Animationen; 210 000 erzeugte Aufgaben
+  ohne Fehler.

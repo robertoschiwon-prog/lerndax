@@ -578,3 +578,7 @@ body.noscroll{overflow:hidden}
 .gap.sel::after,.gap.g::after{content:attr(data-mark);position:absolute;inset:0;display:grid;place-items:center;font:800 26px Nunito,system-ui,sans-serif;color:var(--ink)}
 .bsp{display:block;margin-top:8px;padding:10px 12px;background:var(--tint);border-radius:12px;font-weight:800}
 .vb{color:#1f55d6}
+.tapline.gaps.eng{gap:10px 0}
+.tapline.gaps.eng .tw{font-size:26px}
+.tapline.gaps.eng .gap{width:20px;margin:0 1px}
+.bsp.gross{font-size:26px;letter-spacing:.5px}
