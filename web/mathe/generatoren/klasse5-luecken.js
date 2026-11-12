@@ -221,7 +221,7 @@
           return { ok: true };
         },
         hint: `Ein Ganzes sind ${fr(d, d)}. Rechne ${w} · ${d} und zähle ${r} dazu.`,
-        solution: `${w} Ganze = ${w} · ${d} = ${w * d} Teile, dazu ${r} → ${w * d + r} Teile<br><b>${gem} = ${fr(n, d)}</b>`,
+        solution: `${w} ${w === 1 ? "Ganzes" : "Ganze"} = ${w} · ${d} = ${w * d} Teile, dazu ${r} → ${w * d + r} Teile<br><b>${gem} = ${fr(n, d)}</b>`,
         answerText: fr(n, d),
         ex: { mode: 'gem', n, d, back: true },
       };
@@ -332,7 +332,7 @@
         figure: figurBild(id),
         fields: [{ answer: n }],
         hint: 'Stell dir vor, du faltest die Figur. An einer Symmetrieachse liegen beide Hälften genau aufeinander.',
-        solution: n ? `Die Figur hat <b>${n} ${n === 1 ? 'Symmetrieachse' : 'Symmetrieachsen'}</b>. An jeder kannst du sie so falten, dass beide Hälften genau aufeinander liegen.` : `Die Figur hat <b>keine</b> Symmetrieachse: Wie du sie auch faltest, die Hälften passen nie aufeinander.${f.punkt ? ' Sie ist aber punktsymmetrisch: Eine halbe Drehung bringt sie auf sich selbst.' : ''}`,
+        solution: n ? `Die Figur hat <b>${n} ${n === 1 ? 'Symmetrieachse' : 'Symmetrieachsen'}</b>. ${n === 1 ? 'An ihr' : 'An jeder'} kannst du sie so falten, dass beide Hälften genau aufeinander liegen.` : `Die Figur hat <b>keine</b> Symmetrieachse: Wie du sie auch faltest, die Hälften passen nie aufeinander.${f.punkt ? ' Sie ist aber punktsymmetrisch: Eine halbe Drehung bringt sie auf sich selbst.' : ''}`,
         answerText: String(n),
         ex: { mode: 'achsen', id },
       };
@@ -581,7 +581,7 @@
           figure: netzBild(cells),
           choices: ['Ja, das ist ein Würfelnetz', 'Nein, das klappt nicht'],
           correct: 1,
-          hint: 'Ein Würfel hat 6 Seiten. Falte in Gedanken: Darf dabei kein Quadrat auf einem anderen landen.',
+          hint: 'Ein Würfel hat 6 Seiten. Falte in Gedanken: Dabei darf kein Quadrat auf einem anderen landen.',
           solution: `<b>Nein.</b> ${grund}<br><small>Merke: Vier Quadrate, die einen 2 × 2-Block bilden, oder fünf in einer Reihe gehen nie.</small>`,
           ex: { mode: 'netz', cells },
         };
@@ -591,7 +591,7 @@
         figure: netzBild(cells),
         choices: ['Ja, das ist ein Würfelnetz', 'Nein, das klappt nicht'],
         correct: 0,
-        hint: 'Ein Würfel hat 6 Seiten. Falte in Gedanken: Darf dabei kein Quadrat auf einem anderen landen.',
+        hint: 'Ein Würfel hat 6 Seiten. Falte in Gedanken: Dabei darf kein Quadrat auf einem anderen landen.',
         solution: '<b>Ja.</b> Beim Falten landet jedes der 6 Quadrate auf einer anderen Würfelseite: Boden, Deckel und vier Seitenwände.',
         ex: { mode: 'netz', cells },
       };
@@ -662,7 +662,7 @@
   function fermi() {
     const f = pick(FERMI)();
     // Tausender-Lücken dürfen nicht umbrechen
-    const nb = (t) => t.replace(/(\d) (?=\d{3})/g, '$1\u202F');
+    const nb = (t) => t.replace(/(?<!\d)(\d) (\d{3})(?! ?\d)/g, '$1$2').replace(/(\d) (?=\d{3})/g, '$1\u202F'); // vierstellige Zahlen ohne Lücke, wie überall in der App
     ['frage', 'weiss', 'schaetz'].forEach((k) => (f[k] = nb(f[k]))); f.rechnung = f.rechnung.map(nb);
     const opts = f.opts || [`etwa ${fmt(f.erg / 10)}`, `etwa ${fmt(f.erg)}`, `etwa ${fmt(f.erg * 10)}`];
     const order = shuffle([0, 1, 2]);

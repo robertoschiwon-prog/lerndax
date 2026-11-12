@@ -732,3 +732,14 @@ Infos zur ersten Arbeit:
   Lösungsweg, aber keine Animation. Neues Symbol „puzzle“ in `plattform/symbole.js`. Neuer Test `tests/knobel.py`.
   Geprüft: je Thema 2000 erzeugte Aufgaben ohne Fehler, alle Aufgabenarten durchgelesen, 225 Knobel-Aufgaben in der
   App mit der richtigen Antwort gelöst (jede wird angenommen).
+- **Gründliche Prüfung aller 36 Themen** (Version `lerndax-v40`): Zu jedem Thema alle Aufgabenarten mit Antwort, Tipp und
+  Lösungsweg durchgelesen (normale Aufgaben und Knobel-Aufgaben), dazu automatisch geprüft, ob die richtige Antwort im
+  Lösungsweg steht und ob bei Auswahl-Aufgaben die richtige Antwort nicht immer an derselben Stelle steht.
+  Korrigiert: Fermi-Lösungswege schrieben vierstellige Zahlen mit Lücke („1 200“ statt „1200“ wie sonst in der App);
+  „1 Ganze“ → „1 Ganzes“; Tipp bei Würfelnetzen sprachlich; „An jeder“ bei nur einer Symmetrieachse; Knobel-Aufgabe
+  „Was ist größer: 2⁵ oder 5²?“ hatte die richtige Antwort fast immer an erster Stelle. Rechenfehler wurden keine gefunden.
+  Bekannt und so gelassen: Beim Überschlagen auf Zehner kann die Schätzung weit weg liegen (17 · 28 ≈ 600, genau 476);
+  der Lösungsweg sagt das dazu.
+  Tests nach der Prüfung: 576 Aufgaben in der App gelöst, 546 Lösungs-Animationen gelaufen. Dabei gab es in einem von
+  vier Läufen eine einzelne Meldung (1 von 108), die sich in 546 weiteren Animationen nicht wiederholt hat; Ursache offen,
+  vermutlich Zeitüberschreitung im Test bei hoher Last. Beim Test mit Bruno darauf achten, ob eine Animation hängen bleibt.

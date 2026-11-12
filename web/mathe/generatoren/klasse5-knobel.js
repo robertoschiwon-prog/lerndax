@@ -142,7 +142,8 @@
 
   K('k5-potenz',
     () => { // a^b oder b^a?
-      const [a, b] = pick([[2, 5], [2, 3], [3, 4], [2, 6], [2, 4], [3, 5], [2, 7], [4, 5], [2, 10]]);
+      let [a, b] = pick([[2, 5], [2, 3], [3, 4], [2, 6], [2, 4], [3, 5], [2, 7], [4, 5], [2, 10]]);
+      if (R(0, 1)) [a, b] = [b, a];
       const l = a ** b, r = b ** a;
       const opts = [`${a}${sup(b)} ist größer`, `${b}${sup(a)} ist größer`, 'beide sind gleich groß'];
       const o = l > r ? 0 : l < r ? 1 : 2;
