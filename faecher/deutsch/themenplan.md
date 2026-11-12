@@ -1,6 +1,6 @@
 # DeDax Klasse 5 – Themenplan (Vorschlag)
 
-Stand 12.11.2026 · **Vorschlag.** Entschieden ist bisher nur: Start mit Bereich 1 (Wortarten); gebaut ist „Zeitformen“. Grundlage: Lehrplan (`lehrplan/sachsen-gymnasium.md`).
+Stand 12.11.2026 · **Vorschlag.** Entschieden: Start mit Bereich 1 (Wortarten), Begriff „Substantiv“. Gebaut: Substantive (Geschlecht und Mehrzahl), Die vier Fälle, Zeitformen. Grundlage: Lehrplan (`lehrplan/sachsen-gymnasium.md`).
 Reihenfolge und Begriffe werden nach dem Abgleich mit dem Schulbuch angepasst.
 
 5 Bereiche, 31 Themen. Jedes Thema bekommt wie in MaDax: Aufgaben, Tipp, Lösungsweg, Symbol, Erklär-Animation, Knobeln.

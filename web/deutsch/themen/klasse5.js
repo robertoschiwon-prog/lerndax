@@ -233,8 +233,240 @@
   }
   const zeitformen = () => U.wahl([[20, erkennen], [25, einsetzen], [20, bilden], [12, antippen], [8, hilfsverb], [8, grundform], [7, welcherSatz]]);
 
-  D.daten = { V, SUBJ, HILF, ZEITEN, ZNAME, ZDEUTSCH, satz, text, bauplan, subjFuer, praesens, praeteritum };
-  D.arten = { 'd5-zeitformen': { erkennen, einsetzen, bilden, antippen, hilfsverb, grundform, welcherSatz } }; // für Tests
+
+  // =====================================================
+  // Substantive (für Geschlecht, Mehrzahl, die vier Fälle)
+  // =====================================================
+  // [Artikel, Einzahl, Genitiv (nur der/das; „(e)“ = mit und ohne e richtig), Mehrzahl, Art: P Person, T Tier, sonst Ding]
+  const N = [
+    ['der', 'Hund', 'Hund(e)s', 'Hunde', 'T'], ['der', 'Baum', 'Baum(e)s', 'Bäume'], ['der', 'Stuhl', 'Stuhl(e)s', 'Stühle'],
+    ['der', 'Tisch', 'Tisch(e)s', 'Tische'], ['der', 'Ball', 'Ball(e)s', 'Bälle'], ['der', 'Apfel', 'Apfels', 'Äpfel'],
+    ['der', 'Vogel', 'Vogels', 'Vögel', 'T'], ['der', 'Garten', 'Gartens', 'Gärten'], ['der', 'Lehrer', 'Lehrers', 'Lehrer', 'P'],
+    ['der', 'Bruder', 'Bruders', 'Brüder', 'P'], ['der', 'Fluss', 'Flusses', 'Flüsse'], ['der', 'Wald', 'Wald(e)s', 'Wälder'],
+    ['der', 'Zug', 'Zug(e)s', 'Züge'], ['der', 'Brief', 'Brief(e)s', 'Briefe'], ['der', 'Koffer', 'Koffers', 'Koffer'],
+    ['der', 'Schlüssel', 'Schlüssels', 'Schlüssel'], ['der', 'Berg', 'Berg(e)s', 'Berge'], ['der', 'Löffel', 'Löffels', 'Löffel'],
+    ['der', 'Mantel', 'Mantels', 'Mäntel'], ['der', 'Freund', 'Freund(e)s', 'Freunde', 'P'],
+    ['die', 'Katze', '', 'Katzen', 'T'], ['die', 'Blume', '', 'Blumen'], ['die', 'Tasche', '', 'Taschen'], ['die', 'Lampe', '', 'Lampen'],
+    ['die', 'Schule', '', 'Schulen'], ['die', 'Straße', '', 'Straßen'], ['die', 'Maus', '', 'Mäuse', 'T'], ['die', 'Hand', '', 'Hände'],
+    ['die', 'Stadt', '', 'Städte'], ['die', 'Nacht', '', 'Nächte'], ['die', 'Tür', '', 'Türen'], ['die', 'Uhr', '', 'Uhren'],
+    ['die', 'Gabel', '', 'Gabeln'], ['die', 'Schwester', '', 'Schwestern', 'P'], ['die', 'Wolke', '', 'Wolken'], ['die', 'Brücke', '', 'Brücken'],
+    ['die', 'Wand', '', 'Wände'], ['die', 'Nuss', '', 'Nüsse'], ['die', 'Zeitung', '', 'Zeitungen'], ['die', 'Lehrerin', '', 'Lehrerinnen', 'P'],
+    ['die', 'Freundin', '', 'Freundinnen', 'P'],
+    ['das', 'Haus', 'Hauses', 'Häuser'], ['das', 'Buch', 'Buch(e)s', 'Bücher'], ['das', 'Kind', 'Kind(e)s', 'Kinder', 'P'],
+    ['das', 'Bild', 'Bild(e)s', 'Bilder'], ['das', 'Fenster', 'Fensters', 'Fenster'], ['das', 'Mädchen', 'Mädchens', 'Mädchen', 'P'],
+    ['das', 'Auto', 'Autos', 'Autos'], ['das', 'Heft', 'Heft(e)s', 'Hefte'], ['das', 'Pferd', 'Pferd(e)s', 'Pferde', 'T'],
+    ['das', 'Schiff', 'Schiff(e)s', 'Schiffe'], ['das', 'Tier', 'Tier(e)s', 'Tiere', 'T'], ['das', 'Dorf', 'Dorf(e)s', 'Dörfer'],
+    ['das', 'Blatt', 'Blatt(e)s', 'Blätter'], ['das', 'Zimmer', 'Zimmers', 'Zimmer'], ['das', 'Fahrrad', 'Fahrrad(e)s', 'Fahrräder'],
+    ['das', 'Kleid', 'Kleid(e)s', 'Kleider'], ['das', 'Schaf', 'Schaf(e)s', 'Schafe', 'T'], ['das', 'Spiel', 'Spiel(e)s', 'Spiele'],
+    ['das', 'Glas', 'Glases', 'Gläser'],
+  ].map(([art, sg, gen, pl, typ]) => ({ art, sg, pl, typ: typ || 'D',
+    gen: gen ? (gen.includes('(e)') ? [gen.replace('(e)', 'e'), gen.replace('(e)', '')] : [gen]) : [sg] }));
+  const GENUS = { der: 'männlich (maskulin)', die: 'weiblich (feminin)', das: 'sächlich (neutral)' };
+  const FAELLE = ['nominativ', 'genitiv', 'dativ', 'akkusativ'];
+  const FNAME = { nominativ: 'Nominativ', genitiv: 'Genitiv', dativ: 'Dativ', akkusativ: 'Akkusativ' };
+  const FFRAGE = { nominativ: 'Wer oder was?', genitiv: 'Wessen?', dativ: 'Wem?', akkusativ: 'Wen oder was?' };
+  const ARTIKEL = { der: ['der', 'des', 'dem', 'den'], die: ['die', 'der', 'der', 'die'], das: ['das', 'des', 'dem', 'das'], pl: ['die', 'der', 'den', 'die'] };
+  const ohneUml = (w) => w.replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/Ä/g, 'A').replace(/Ö/g, 'O').replace(/Ü/g, 'U');
+  const gross = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+  // Was ändert sich in der Mehrzahl? → { umlaut: 'a → ä' | '', endung: '-e' | '' }
+  function pluralBau(n) {
+    const um = n.pl !== ohneUml(n.pl) && n.sg === ohneUml(n.sg);
+    let umlaut = '';
+    if (um) { for (let i = 0; i < n.pl.length; i++) if (n.pl[i] !== ohneUml(n.pl[i])) { umlaut = `${ohneUml(n.pl[i]).toLowerCase()} → ${n.pl[i].toLowerCase()}`; break; } }
+    const endung = n.pl.length > n.sg.length ? '-' + n.pl.slice(n.sg.length) : '';
+    return { umlaut, endung };
+  }
+  function pluralSatz(n) {
+    const b = pluralBau(n);
+    if (!b.umlaut && !b.endung) return 'Das Wort bleibt gleich. Nur der Artikel zeigt die Mehrzahl.';
+    return [b.umlaut ? `Umlaut: <b>${b.umlaut}</b>` : '', b.endung ? `Endung <b>${b.endung}</b>` : ''].filter(Boolean).join(', ') + '.';
+  }
+  // Wortgruppe „Artikel + Substantiv“ im Fall f (0 Nominativ … 3 Akkusativ); gibt alle richtigen Schreibweisen zurück
+  function gruppe(n, f, plural) {
+    if (plural) { const w = f === 2 && !/[ns]$/.test(n.pl) ? n.pl + 'n' : n.pl; return [`${ARTIKEL.pl[f]} ${w}`]; }
+    const a = ARTIKEL[n.art][f];
+    return f === 1 ? n.gen.map((g) => `${a} ${g}`) : [`${a} ${n.sg}`];
+  }
+
+  // ---------- Thema: Substantive – Geschlecht und Mehrzahl ----------
+  const EXN = (n, mode) => ({ mode, art: n.art, sg: n.sg, pl: n.pl });
+  function artikelWahl() {
+    const n = pick(N);
+    return {
+      prompt: `Welcher Artikel gehört zu <b>${n.sg}</b>?`,
+      choices: ['der', 'die', 'das'], correct: ['der', 'die', 'das'].indexOf(n.art),
+      hint: 'Sprich das Wort mit allen drei Artikeln. Was klingt richtig? Ein paar Endungen helfen: <b>-ung, -heit, -keit, -in</b> → die, <b>-chen</b> → das.',
+      solution: `<b>${n.art} ${n.sg}</b>: Das Substantiv ist ${GENUS[n.art]}. Das Geschlecht (Genus) lernt man am besten gleich mit dem Wort.`,
+      ex: EXN(n, 'genus'),
+    };
+  }
+  function mehrzahl() {
+    const n = pick(N);
+    return {
+      prompt: 'Wie heißt die <b>Mehrzahl</b> (Plural)?', layout: 'satz',
+      fields: [{ type: 'text', answer: n.pl, prefix: `${n.art} ${n.sg} → die`, label: 'Mehrzahl' }],
+      hint: 'Sprich: „ein …, viele …“. Achte auf zwei Dinge: Bekommt das Wort eine <b>Endung</b>? Wird aus a, o, u ein <b>Umlaut</b> (ä, ö, ü)?',
+      solution: `${n.art} ${n.sg} → <b>die ${n.pl}</b><br>${pluralSatz(n)}`,
+      ex: EXN(n, 'plural'),
+    };
+  }
+  function einzahl() {
+    const n = pick(N.filter((x) => x.sg !== x.pl));
+    return {
+      prompt: 'Wie heißt die <b>Einzahl</b> (Singular)?', layout: 'satz',
+      fields: [{ type: 'text', answer: n.sg, prefix: `die ${n.pl} → ${n.art}`, label: 'Einzahl' }],
+      hint: 'Sprich: „viele …, aber nur ein …“. Ein Umlaut (ä, ö, ü) kann wieder zu a, o, u werden.',
+      solution: `die ${n.pl} → <b>${n.art} ${n.sg}</b><br>Von der Einzahl zur Mehrzahl: ${pluralSatz(n)}`,
+      ex: EXN(n, 'plural'),
+    };
+  }
+  function einOderMehr() {
+    const gleich = Math.random() < 0.6;
+    const n = pick(N.filter((x) => (x.sg === x.pl) === gleich && (gleich || x.art === 'die')));
+    const plural = Math.random() < 0.5;
+    const wort = plural ? `die ${n.pl}` : `${n.art} ${n.sg}`;
+    return {
+      prompt: `Einzahl oder Mehrzahl?<br><span class="bsp">${wort}</span>`,
+      choices: ['Einzahl (Singular)', 'Mehrzahl (Plural)'], correct: plural ? 1 : 0,
+      hint: 'Schau auf den <b>Artikel</b> und auf die <b>Endung</b>. In der Mehrzahl heißt der Artikel immer „die“.',
+      solution: gleich
+        ? `<b>${wort}</b> ist ${plural ? 'Mehrzahl' : 'Einzahl'}. Das Wort sieht in Einzahl und Mehrzahl gleich aus: ${n.art} ${n.sg}, die ${n.pl}. Hier verrät es nur der Artikel.`
+        : `<b>${wort}</b> ist ${plural ? 'Mehrzahl' : 'Einzahl'}: ${n.art} ${n.sg}, die ${n.pl}. Der Artikel „die“ steht hier in beiden Fällen, also entscheidet die Endung.`,
+      ex: EXN(n, 'plural'),
+    };
+  }
+  // Sätze zum Antippen: Substantive sind mit * markiert
+  const SATZ_SUBST = [
+    'Heute sucht der *Lehrer den *Schlüssel im *Garten.', 'Morgens fährt der *Zug über die *Brücke.', 'Leise schleicht die *Katze durch das *Zimmer.',
+    'Abends liest die *Schwester ein dickes *Buch.', 'Schnell rollt der *Ball über die *Straße.', 'Dort hängt ein altes *Bild an der *Wand.',
+    'Später schreibt der *Bruder einen langen *Brief.', 'Oft sitzt der *Vogel auf dem *Baum vor dem *Fenster.', 'Vorsichtig trägt das *Mädchen die *Gläser in die *Küche.',
+    'Draußen ziehen dunkle *Wolken über die *Stadt.', 'Gestern fand der *Hund einen *Löffel im *Garten.', 'Nachts leuchtet die *Lampe über dem *Tisch.',
+    'Fröhlich packt die *Freundin ihren *Koffer.', 'Im *Wald sammelt das *Kind bunte *Blätter.',
+  ];
+  const substSatz = (ausser) => {
+    const roh = pick(SATZ_SUBST.filter((x) => x.replace(/\*/g, '') !== ausser)).split(' ');
+    return { tokens: roh.map((w) => w.replace('*', '')), correct: roh.map((w, i) => (w[0] === '*' ? i : -1)).filter((i) => i >= 0) };
+  };
+  function substAntippen() {
+    const { tokens, correct } = substSatz();
+    const liste = correct.map((i) => tokens[i].replace('.', ''));
+    return {
+      prompt: 'Tippe <b>alle Substantive</b> an.',
+      tap: { tokens, correct }, answerText: liste.join(', '),
+      hint: 'Substantive schreibt man <b>groß</b>, und man kann einen Artikel davorsetzen (der, die, das). Vorsicht: Das erste Wort im Satz ist immer groß.',
+      solution: `Substantive: <b>${liste.join(', ')}</b>.${correct[0] === 0 ? '' : ` „${tokens[0]}“ ist nur groß, weil es am Satzanfang steht.`} Probe: Vor ein Substantiv passt ein Artikel.`,
+      ex: { mode: 'satz', tokens, correct },
+    };
+  }
+  const substantive = () => U.wahl([[28, artikelWahl], [34, mehrzahl], [16, einzahl], [10, einOderMehr], [12, substAntippen]]);
+
+  // ---------- Thema: Die vier Fälle ----------
+  // Satzmuster je Fall: vor = Text vor der Wortgruppe, nach = Text danach, q = Frage, typ = für welche Substantive (P, T, D)
+  const MUSTER = {
+    nominativ: [
+      { vor: 'Dort', verb: ['ist', 'sind'], nach: '', q: (pl) => `Wer oder was ${pl ? 'sind' : 'ist'} dort?`, typ: 'PTD', nachVerb: true },
+      { vor: '', verb: ['gefällt', 'gefallen'], nach: 'mir', q: () => 'Wer oder was gefällt mir?', typ: 'PTD', vorne: true },
+    ],
+    akkusativ: [
+      { vor: 'Lina sieht', nach: '', q: () => 'Wen oder was sieht Lina?', typ: 'PTD' },
+      { vor: 'Emil sucht', nach: '', q: () => 'Wen oder was sucht Emil?', typ: 'PTD' },
+      { vor: 'Wir malen', nach: '', q: () => 'Wen oder was malen wir?', typ: 'PTD' },
+    ],
+    dativ: [
+      { vor: 'Lina hilft', nach: '', q: () => 'Wem hilft Lina?', typ: 'PT' },
+      { vor: 'Emil dankt', nach: '', q: () => 'Wem dankt Emil?', typ: 'P' },
+      { vor: 'Das Buch gehört', nach: '', q: () => 'Wem gehört das Buch?', typ: 'P' },
+      { vor: 'Mia gibt', nach: 'Wasser', q: () => 'Wem gibt Mia Wasser?', typ: 'T' },
+      { vor: 'Wir folgen', nach: '', q: () => 'Wem folgen wir?', typ: 'PT' },
+    ],
+    genitiv: [
+      { vor: 'Die Farbe', nach: 'gefällt mir', q: () => 'Wessen Farbe gefällt mir?', typ: 'D' },
+      { vor: 'Der Name', nach: 'ist kurz', q: () => 'Wessen Name ist kurz?', typ: 'PT' },
+      { vor: 'Das ist ein Foto', nach: '', q: () => 'Wessen Foto ist das?', typ: 'PTD' },
+    ],
+  };
+  // Baut einen Satz um eine Wortgruppe: { teile:[…], idx (Stelle der Wortgruppe), fall, frage, formen (alle richtigen), n, plural }
+  function fallSatz(fall, plural) {
+    fall = fall || pick(FAELLE);
+    plural = plural === undefined ? Math.random() < 0.25 : plural;
+    const m = pick(MUSTER[fall]);
+    const n = pick(N.filter((x) => m.typ.includes(x.typ)));
+    const f = FAELLE.indexOf(fall);
+    const formen = gruppe(n, f, plural);
+    let teile, idx;
+    if (m.vorne) { teile = [gross(formen[0]), m.verb[plural ? 1 : 0], m.nach]; idx = 0; }
+    else if (m.nachVerb) { teile = [m.vor, m.verb[plural ? 1 : 0], formen[0]]; idx = 2; }
+    else { teile = [m.vor, formen[0]]; idx = 1; if (m.nach) teile.push(m.nach); }
+    return { teile, idx, fall, frage: m.q(plural), formen: m.vorne ? formen.map(gross) : formen, n, plural, grund: plural ? `die ${n.pl}` : `${n.art} ${n.sg}` };
+  }
+  const fallText = (s, mark) => s.teile.map((t, i) => (i === s.idx && mark ? mark(t) : t)).join(' ') + '.';
+  const reihe = (s) => { const a = ARTIKEL[s.plural ? 'pl' : s.n.art]; return FAELLE.map((f, i) => `${FNAME[f]}: ${a[i]}`).join(' · '); };
+  const fallLoesung = (s) => `${fallText(s, (t) => `<b class="vb">${t}</b>`)}<br>Frage: <b>${s.frage}</b> → ${s.formen[0]}. Das ist der <b>${FNAME[s.fall]}</b>.<br><small>${reihe(s)}</small>`;
+  const EXF = (s) => ({ mode: 'fall', fall: s.fall, teile: s.teile, idx: s.idx, frage: s.frage, form: s.formen[0], art: s.plural ? 'pl' : s.n.art });
+  const TIPP_FALL = 'Frage nach der Wortgruppe: <b>Wer oder was?</b> → Nominativ · <b>Wessen?</b> → Genitiv · <b>Wem?</b> → Dativ · <b>Wen oder was?</b> → Akkusativ.';
+
+  function fallBestimmen() {
+    const s = fallSatz();
+    const nachFrage = Math.random() < 0.4;
+    return {
+      prompt: `${nachFrage ? 'Mit welcher <b>Frage</b> findest du die markierte Wortgruppe?' : 'In welchem <b>Fall</b> steht die markierte Wortgruppe?'}<br><span class="bsp">${fallText(s, (t) => `<u>${t}</u>`)}</span>`,
+      choices: FAELLE.map((f) => (nachFrage ? FFRAGE[f] : FNAME[f])), correct: FAELLE.indexOf(s.fall),
+      hint: nachFrage ? 'Stelle die Frage mit dem ganzen Satz und antworte mit der markierten Wortgruppe. Welche Frage passt?' : TIPP_FALL,
+      solution: fallLoesung(s), ex: EXF(s),
+    };
+  }
+  function fallArtikel() {
+    // nur eindeutige Lücken: Wort steht nicht am Satzanfang, und Einzahl und Mehrzahl sehen verschieden aus
+    // (sonst wären bei „Lina sieht ___ Lehrer“ sowohl „den“ als auch „die“ richtig)
+    let s; do { s = fallSatz(undefined, false); } while (s.idx === 0 || s.n.sg === s.n.pl);
+    const f = FAELLE.indexOf(s.fall), art = ARTIKEL[s.n.art][f];
+    const wort = s.formen[0].split(' ')[1];
+    const alle = ['der', 'die', 'das', 'des', 'dem', 'den'];
+    return {
+      prompt: `Welcher Artikel passt in die Lücke?<br><span class="bsp">${fallText(s, () => '___ ' + wort)}</span>`,
+      choices: alle, correct: alle.indexOf(art),
+      hint: `Das Wort heißt in der Grundform „${s.grund}“. Frage nach der Lücke: „${s.frage}“ Die Frage verrät den Fall.`,
+      solution: fallLoesung(s), ex: EXF(s),
+    };
+  }
+  function fallBilden() {
+    const s = fallSatz(pick(['genitiv', 'dativ', 'akkusativ', 'dativ', 'genitiv']));
+    const vor = s.teile.slice(0, s.idx).join(' '), nach = s.teile.slice(s.idx + 1).join(' ');
+    return {
+      prompt: `Setze <b>${s.grund}</b> in den richtigen Fall.`, layout: 'satz',
+      fields: [{ type: 'text', answer: s.formen, prefix: vor, suffix: (nach ? nach : '') + '.', label: 'Wortgruppe im richtigen Fall' }],
+      hint: `Frage nach der Lücke: „${s.frage}“ Die Frage verrät den Fall. Dann ändert sich der Artikel, manchmal auch das Wortende.`,
+      solution: `${fallLoesung(s)}${s.fall === 'genitiv' && !s.plural && s.n.art !== 'die' ? '<br>Im Genitiv bekommen männliche und sächliche Substantive ein <b>-s</b> oder <b>-es</b>.' : ''}${s.fall === 'dativ' && s.plural && s.formen[0].split(' ')[1] !== s.n.pl ? '<br>Im Dativ der Mehrzahl kommt ein <b>-n</b> ans Wort.' : ''}`,
+      ex: EXF(s),
+    };
+  }
+  // Satz mit Subjekt, Dativ- und Akkusativobjekt: das gesuchte Satzglied antippen
+  function fallAntippen() {
+    const wer = pick(N.filter((x) => x.typ === 'P'));
+    const wem = pick(N.filter((x) => x.typ !== 'D' && x !== wer));
+    const was = pick(N.filter((x) => x.typ === 'D' && ['Ball', 'Brief', 'Schlüssel', 'Apfel', 'Löffel', 'Blume', 'Tasche', 'Lampe', 'Uhr', 'Zeitung', 'Buch', 'Bild', 'Heft', 'Spiel', 'Glas', 'Fahrrad'].includes(x.sg)));
+    const verb = pick(wem.typ === 'T' ? ['bringt', 'zeigt', 'gibt'] : ['bringt', 'zeigt', 'gibt', 'schenkt', 'leiht']);
+    const ziel = pick(['dativ', 'akkusativ', 'dativ', 'akkusativ', 'nominativ']);
+    const teile = [gross(gruppe(wer, 0)[0]), verb, gruppe(wem, 2)[0], gruppe(was, 3)[0]];
+    const idx = { nominativ: 0, dativ: 2, akkusativ: 3 }[ziel];
+    const frage = { nominativ: `Wer ${verb} etwas?`, dativ: `Wem ${verb} ${teile[0].toLowerCase().startsWith('d') ? teile[0].charAt(0).toLowerCase() + teile[0].slice(1) : teile[0]} etwas?`, akkusativ: `Wen oder was ${verb} ${teile[0].charAt(0).toLowerCase() + teile[0].slice(1)}?` }[ziel];
+    const s = { teile, idx, fall: ziel, frage, formen: [teile[idx]], n: [wer, null, wem, was][idx], plural: false };
+    return {
+      prompt: `Tippe die Wortgruppe im <b>${FNAME[ziel]}</b> an.`,
+      tap: { tokens: teile.map((t, i) => (i === teile.length - 1 ? t + '.' : t)), correct: [idx], one: true }, answerText: teile[idx],
+      hint: TIPP_FALL,
+      solution: fallLoesung(s), ex: EXF(s),
+    };
+  }
+  const faelle = () => U.wahl([[32, fallBestimmen], [22, fallArtikel], [28, fallBilden], [18, fallAntippen]]);
+
+  D.daten = { V, SUBJ, HILF, ZEITEN, ZNAME, ZDEUTSCH, satz, text, bauplan, subjFuer, praesens, praeteritum,
+    N, GENUS, substSatz, FAELLE, FNAME, FFRAGE, ARTIKEL, pluralBau, pluralSatz, gruppe, fallSatz };
+  D.arten = { // für Tests
+    'd5-substantive': { artikelWahl, mehrzahl, einzahl, einOderMehr, substAntippen },
+    'd5-faelle': { fallBestimmen, fallArtikel, fallBilden, fallAntippen },
+    'd5-zeitformen': { erkennen, einsetzen, bilden, antippen, hilfsverb, grundform, welcherSatz },
+  };
 
   // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/deutsch/themenplan.md)
@@ -243,6 +475,8 @@
   D.grades[5] = {
     lbs: [
       { id: 'd5-wortarten', nr: 1, title: 'Wortarten', topics: [
+        { id: 'd5-substantive', title: 'Substantive: Geschlecht und Mehrzahl', icon: '🏷', gen: substantive },
+        { id: 'd5-faelle', title: 'Die vier Fälle', icon: '❓', gen: faelle },
         { id: 'd5-zeitformen', title: 'Zeitformen', icon: '⏳', gen: zeitformen },
       ] },
     ],

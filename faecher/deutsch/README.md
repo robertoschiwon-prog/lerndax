@@ -8,9 +8,9 @@ Schulbuchs, für Schritt 3 liegt ein Vorschlag vor. Diese Datei sagt, was festst
 | 1 Lehrplan auswerten | ✅ 12.11.2026 | `lehrplan/sachsen-gymnasium.md` |
 | 2 Schulbuch abgleichen | wartet: ISBN und Foto des Inhaltsverzeichnisses | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | Vorschlag (5 Bereiche, 31 Themen), noch nicht entschieden | `themenplan.md` |
-| 4 Erstes Thema bauen | ✅ „Zeitformen“ (Bereich Wortarten), wartet auf Abnahme | `web/deutsch/`, Test `tests/dedax.py` |
+| 4 Themen bauen | Bereich Wortarten: ✅ Substantive (Geschlecht und Mehrzahl), ✅ Die vier Fälle, ✅ Zeitformen; offen: Pronomen, Adjektive, Verbformen, gemischt | `web/deutsch/`, Test `tests/dedax.py` |
 
-**Entschieden am 12.11.2026:** Start mit dem Bereich **Wortarten**. Die gemeinsamen Teile wurden **sofort** aus der
+**Entschieden am 12.11.2026:** Start mit dem Bereich **Wortarten**. Es heißt **„Substantiv“** (nicht „Nomen“). Die gemeinsamen Teile wurden **sofort** aus der
 Mathe-Seite herausgezogen (`web/plattform/fach.js` und `fach.css`); beide Fächer nutzen sie.
 DeDax ist unter `…/lerndax/deutsch/` erreichbar, steht auf der Startseite aber noch unter „Kommt bald“.
 Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`.

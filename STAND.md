@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v45`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v46`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -72,8 +72,12 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Erstes Thema gebaut: „Zeitformen“** (`web/deutsch/`), mit Aufgaben, Tipp, Lösungsweg, Symbol und der Animation
   „Zeitformen am Zeitstrahl“ (frei, ähnliches Beispiel, Lösung zur Aufgabe). Erreichbar unter `…/lerndax/deutsch/`.
   Auf der Startseite steht DeDax weiter unter „Kommt bald“ (`faecher.js` unverändert), bis mehr Themen da sind.
-- **Als Nächstes:** „Zeitformen“ vom Auftraggeber ansehen lassen, dann die übrigen Wortarten-Themen. Offen:
-  „Nomen“ oder „Substantiv“ (Lehrplan sagt Substantiv), ISBN und Inhaltsverzeichnis des Deutschbuchs,
+- **Entschieden: „Substantiv“** (nicht „Nomen“), so sagt es auch der Lehrplan. Gilt für alle Texte in DeDax.
+- **Gebaut (v46): „Substantive: Geschlecht und Mehrzahl“ und „Die vier Fälle“**, je mit Aufgaben, Tipp, Lösungsweg,
+  Symbol und Animation. Wortliste: 60 Substantive mit Artikel, Genitiv und Mehrzahl in `web/deutsch/themen/klasse5.js`.
+- **Als Nächstes:** die übrigen Wortarten-Themen in dieser Reihenfolge: Pronomen, Adjektive steigern, Verben
+  (Personalform, Partizip, Aufforderung), Wortarten erkennen (gemischt). Danach DeDax auf die Startseite. Offen:
+  ISBN und Inhaltsverzeichnis des Deutschbuchs,
   Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
 **So wird hier gearbeitet (hat sich bewährt)**
@@ -362,7 +366,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v45`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v46`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -893,3 +897,12 @@ Infos zur ersten Arbeit:
 - Rückmeldung Auftraggeber zu „Zeitformen“ (Version `lerndax-v45`): Der Satzanfang „Sie“ war mehrdeutig (eine Person oder
   mehrere, also „trinkt“ oder „trinken“). „Sie“ allein kommt als Subjekt nicht mehr vor. **Lehre für alle Sprach-Aufgaben:**
   Jede Lücke muss genau eine richtige Lösung haben; sonst alle richtigen Antworten zulassen.
+- **DeDax: zwei weitere Themen** (Version `lerndax-v46`, Entscheidung des Auftraggebers: „Substantiv“ statt „Nomen“).
+  „Substantive: Geschlecht und Mehrzahl“: Artikel wählen, Mehrzahl und Einzahl eintippen, Einzahl oder Mehrzahl,
+  alle Substantive im Satz antippen. „Die vier Fälle“: Fall oder Frage bestimmen, Artikel in die Lücke, Wortgruppe in
+  den richtigen Fall setzen (auch Mehrzahl, Dativ mit -n), Wortgruppe im gesuchten Fall antippen.
+  Eindeutigkeit geprüft: Beim Genitiv gelten „-s“ und „-es“, wo beides richtig ist (des Hundes, des Hunds). Bei der
+  Artikel-Lücke kommen keine Wörter vor, die in Einzahl und Mehrzahl gleich aussehen (sonst wären „den Lehrer“ und
+  „die Lehrer“ beide richtig). Dativ-Sätze nur mit Personen und Tieren, damit die Frage „Wem?“ passt.
+  Alle Wortformen ausgegeben und durchgelesen. `tests/dedax.py`: 144 richtige Antworten angenommen, 48 Lösungs-Animationen
+  nennen die Antwort; 60 000 erzeugte Aufgaben ohne Fehler.

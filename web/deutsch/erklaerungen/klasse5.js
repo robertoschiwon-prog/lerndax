@@ -129,4 +129,154 @@
       };
     },
   };
+
+  // =====================================================
+  // Substantive: Geschlecht und Mehrzahl
+  // =====================================================
+  //   ctx: { mode:'genus'|'plural', art, sg, pl } oder { mode:'satz', tokens, correct } (Substantive im Satz finden), dazu pre/post
+  const GFARBE = { der: '#1f55d6', die: '#c62f4b', das: '#0a7d57' };
+  const ORANGE = '#c2410c';
+  EX['d5-substantive'] = {
+    title: 'Substantive: Geschlecht und Mehrzahl',
+    viewBox: '0 0 360 190',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!(ctx.sg || ctx.mode === 'satz') && (ctx.pre || ctx.post);
+      const SZ = ctx.mode === 'satz' && task ? (ctx.post ? ctx : T.substSatz(ctx.tokens.join(' '))) : null;
+      let n;
+      const neu = () => { n = U.pick(T.N.filter((x) => !n || x.sg !== n.sg)); };
+      if (task && ctx.post) n = T.N.find((x) => x.sg === ctx.sg);
+      else if (task) n = U.pick(T.N.filter((x) => x.art === ctx.art && x.sg !== ctx.sg && (x.sg === x.pl) === (ctx.sg === ctx.pl)));
+      else { neu(); api.chips([{ label: 'Anderes Wort', onClick() { neu(); api.replay(); } }]); }
+      const kreis = (x, y) => el('circle', { cx: x, cy: y, r: 9, fill: 'var(--c3)', stroke: 'var(--ink)', 'stroke-width': 2, opacity: 0 }, api.svg);
+      const zeig = (e) => api.tw(350, (t) => e.setAttribute('opacity', t));
+      return {
+        reset() {
+          api.clear();
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+        },
+        async play() {
+          if (SZ) { // Substantive im Satz finden: jedes groß geschriebene Wort prüfen
+            const tx = el('text', { x: 180, y: 60, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
+            const ts = SZ.tokens.map((w, i) => el('tspan', { text: (i ? ' ' : '') + w }, tx));
+            try { for (let fs = 18; fs >= 10 && tx.getBBox().width > 340; fs--) tx.setAttribute('style', `font-size:${fs}px`); } catch (e) {}
+            const probe = el('text', { x: 180, y: 120, 'text-anchor': 'middle', class: 'ex-s', text: '', style: 'font-size:15px' }, api.svg);
+            api.say('Substantive schreibt man <b>groß</b>. Probe: Passt ein Artikel (der, die, das) davor?');
+            await api.wait(2200);
+            const liste = SZ.correct.map((i) => SZ.tokens[i].replace('.', ''));
+            if (!SZ.correct.includes(0)) {
+              ts[0].setAttribute('fill', '#6b6680'); probe.textContent = `„${SZ.tokens[0]}“: nur groß wegen des Satzanfangs`;
+              api.say(`Vorsicht: <b>${SZ.tokens[0]}</b> ist kein Substantiv. Es ist nur groß, weil der Satz damit anfängt.`);
+              await api.wait(2600);
+            }
+            for (const i of SZ.correct) {
+              const w = SZ.tokens[i].replace('.', ''), nn = T.N.find((x) => x.sg === w || x.pl === w);
+              ts[i].setAttribute('fill', BLAU); probe.textContent = nn ? (nn.sg === w ? `${nn.art} ${w} ✓` : `die ${w} ✓`) : `${w} ✓`;
+              await api.wait(1300);
+            }
+            probe.textContent = '';
+            api.say(`Substantive: <b>${liste.join(', ')}</b>. Vor jedes passt ein Artikel.`);
+            return;
+          }
+          // links: Einzahl
+          const k1 = kreis(92, 38);
+          const sg = el('text', { x: 92, y: 84, 'text-anchor': 'middle', class: 'ex-b', opacity: 0 }, api.svg);
+          el('tspan', { text: n.art, fill: GFARBE[n.art] }, sg); el('tspan', { text: ' ' + n.sg }, sg);
+          zeig(k1); await zeig(sg);
+          api.say(`<b>${n.art} ${n.sg}</b>: Jedes Substantiv hat ein Geschlecht (Genus). Der Artikel zeigt es.`);
+          await api.wait(2200);
+          const g = el('text', { x: 92, y: 108, 'text-anchor': 'middle', class: 'ex-s', text: T.GENUS[n.art], style: `font-size:12px;fill:${GFARBE[n.art]}`, opacity: 0 }, api.svg);
+          await zeig(g);
+          api.say(`<b>${n.art}</b> → ${T.GENUS[n.art]}. Zur Erinnerung: der = männlich, die = weiblich, das = sächlich.`);
+          await api.wait(2600);
+          // Pfeil und Mehrzahl
+          const pf = el('path', { d: 'M 160 78 H 196 M 188 71 L 197 78 L 188 85', fill: 'none', class: 'ray', opacity: 0 }, api.svg);
+          await zeig(pf);
+          const ks = [246, 270, 294].map((x) => kreis(x, 38));
+          const pl = el('text', { x: 270, y: 84, 'text-anchor': 'middle', class: 'ex-b', opacity: 0 }, api.svg);
+          el('tspan', { text: 'die ' }, pl);
+          [...n.pl].forEach((c, i) => { const neuB = i >= n.sg.length || c !== n.sg[i]; const ts = el('tspan', { text: c }, pl); if (neuB) ts.setAttribute('fill', ORANGE); });
+          ks.forEach(zeig); await zeig(pl);
+          try { for (let fs = 20; fs >= 12 && pl.getBBox().width > 170; fs--) pl.setAttribute('style', `font-size:${fs}px`); } catch (e) {}
+          el('text', { x: 92, y: 140, 'text-anchor': 'middle', class: 'ex-s', text: 'Einzahl (Singular)', style: 'font-size:12px;fill:#6b6680' }, api.svg);
+          el('text', { x: 270, y: 140, 'text-anchor': 'middle', class: 'ex-s', text: 'Mehrzahl (Plural)', style: 'font-size:12px;fill:#6b6680' }, api.svg);
+          api.say(`Eines oder mehrere? Das ist die Zahl (Numerus). In der Mehrzahl heißt der Artikel immer <b>die</b>.`);
+          await api.wait(2600);
+          api.say(`<b>${n.art} ${n.sg}</b> → <b>die ${n.pl}</b><br>${T.pluralSatz(n)}`);
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // Die vier Fälle: vier Fragen
+  // =====================================================
+  //   ctx: { mode:'fall', fall, teile:[…], idx, frage, form, art:'der'|'die'|'das'|'pl' }, dazu pre/post
+  const FREI = [
+    { teile: ['Die Schwester', 'des Lehrers', 'zeigt', 'dem Kind', 'das Bild'], i: [0, 1, 3, 4], q: ['Wer zeigt dem Kind das Bild?', 'Wessen Schwester ist es?', 'Wem zeigt sie das Bild?', 'Wen oder was zeigt sie?'] },
+    { teile: ['Der Hund', 'des Bruders', 'bringt', 'der Freundin', 'den Ball'], i: [0, 1, 3, 4], q: ['Wer bringt der Freundin den Ball?', 'Wessen Hund ist es?', 'Wem bringt er den Ball?', 'Wen oder was bringt er?'] },
+    { teile: ['Die Freundin', 'der Schwester', 'leiht', 'dem Bruder', 'das Fahrrad'], i: [0, 1, 3, 4], q: ['Wer leiht dem Bruder das Fahrrad?', 'Wessen Freundin ist es?', 'Wem leiht sie das Fahrrad?', 'Wen oder was leiht sie?'] },
+  ];
+  EX['d5-faelle'] = {
+    title: 'Vier Fragen, vier Fälle',
+    titleFor: (ctx) => (ctx && ctx.fall ? `${T.FNAME[ctx.fall]}: die passende Frage` : 'Vier Fragen, vier Fälle'),
+    viewBox: '0 0 360 200',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!ctx.fall;
+      let S = null, frei = U.pick(FREI), satzEl, teilEls, frageEl, zeilen;
+      if (task && ctx.post) S = ctx;
+      if (task && ctx.pre) { const s = T.fallSatz(ctx.fall); S = { fall: s.fall, teile: s.teile, idx: s.idx, frage: s.frage, form: s.formen[0], art: s.plural ? 'pl' : s.n.art }; }
+      if (!task) api.chips([{ label: 'Anderer Satz', onClick() { frei = U.pick(FREI.filter((x) => x !== frei)); api.replay(); } }]);
+      const Y = (i) => 112 + i * 24;
+      function aufbau(teile) {
+        satzEl = el('text', { x: 180, y: 36, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
+        teilEls = teile.map((t, i) => el('tspan', { text: (i ? ' ' : '') + t + (i === teile.length - 1 ? '.' : '') }, satzEl));
+        try { for (let fs = 18; fs >= 10 && satzEl.getBBox().width > 340; fs--) satzEl.setAttribute('style', `font-size:${fs}px`); } catch (e) {}
+        frageEl = el('text', { x: 180, y: 70, 'text-anchor': 'middle', class: 'ex-s', text: '', style: `font-size:15px;fill:${BLAU}` }, api.svg);
+        zeilen = T.FAELLE.map((f, i) => ({
+          bg: el('rect', { x: 10, y: Y(i) - 16, width: 340, height: 22, rx: 7, fill: '#dfe9ff', opacity: 0 }, api.svg),
+          name: el('text', { x: 20, y: Y(i), class: 'ex-s', text: T.FNAME[f], style: 'font-size:13px' }, api.svg),
+          frage: el('text', { x: 118, y: Y(i), class: 'ex-s', text: T.FFRAGE[f], style: 'font-size:13px;fill:#6b6680' }, api.svg),
+          form: el('text', { x: 340, y: Y(i), 'text-anchor': 'end', class: 'ex-s', text: task && S.art ? T.ARTIKEL[S.art][i] : '', style: 'font-size:13px' }, api.svg),
+        }));
+      }
+      async function zeige(fallIdx, teilIdx, frage, form) {
+        teilEls.forEach((t) => t.removeAttribute('fill'));
+        zeilen.forEach((z) => z.bg.setAttribute('opacity', 0));
+        frageEl.textContent = frage;
+        await api.wait(900);
+        teilEls[teilIdx].setAttribute('fill', BLAU);
+        await api.tw(350, (t) => zeilen[fallIdx].bg.setAttribute('opacity', t));
+        if (form !== undefined) zeilen[fallIdx].form.textContent = form;
+      }
+      return {
+        reset() {
+          api.clear();
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          aufbau(task ? S.teile : frei.teile);
+        },
+        async play() {
+          if (task) {
+            const i = T.FAELLE.indexOf(S.fall);
+            api.say('Den Fall findest du mit einer <b>Frage</b>. Stelle sie mit dem ganzen Satz.');
+            await api.wait(2000);
+            await zeige(i, S.idx, S.frage);
+            api.say(`<b>${S.frage}</b> → <b>${S.form}</b>`);
+            await api.wait(2400);
+            api.say(`Frage: <b>${S.frage}</b> → <b>${S.form}</b>. Das ist der <b>${T.FNAME[S.fall]}</b>. In der Tabelle siehst du, wie der Artikel sich in den vier Fällen ändert.`);
+            return;
+          }
+          api.say('Ein Substantiv kann in vier Fällen stehen. Jeden Fall findest du mit einer <b>Frage</b>.');
+          await api.wait(2200);
+          for (let k = 0; k < 4; k++) {
+            await zeige(k, frei.i[k], frei.q[k], frei.teile[frei.i[k]]);
+            api.say(`<b>${frei.q[k]}</b> → <b>${frei.teile[frei.i[k]]}</b>: ${T.FNAME[T.FAELLE[k]]}.`);
+            await api.wait(2600);
+          }
+          api.say('Merke: Wer oder was? → Nominativ · Wessen? → Genitiv · Wem? → Dativ · Wen oder was? → Akkusativ.');
+        },
+      };
+    },
+  };
 })();

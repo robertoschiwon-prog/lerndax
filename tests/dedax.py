@@ -63,6 +63,8 @@ async def main():
                             for w in (a['fields'] or []):
                                 if w and w not in cap: meld.append(f'{t}: Antwort „{w}“ fehlt im Text der Animation: {cap}')
                             for x in await pg.evaluate(OUT): meld.append(f'{t}: Text ragt aus dem Bild: {x}')
+                            for w in (a['answer'].replace(' … ', ', ').split(', ') if a['tap'] is not None else []):
+                                if w and w not in cap: meld.append(f'{t}: Antwort „{w}“ fehlt im Text der Animation: {cap}')
                             if rnd == 1 and k == 0: await pg.screenshot(path=str(SHOTS / f'dedax-anim-{t}.png'))
                             await pg.click('[data-exclose]')
                         else: meld.append(f'{t}: keine Lösungs-Animation')
