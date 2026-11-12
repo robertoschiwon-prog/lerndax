@@ -680,3 +680,8 @@ Infos zur ersten Arbeit:
   Figuren auf ihre Symmetrie nachgerechnet; 96 Lösungs-Animationen laufen durch und nennen das richtige Ergebnis;
   512 Aufgaben über alle 32 Themen in der App gelöst.
 - Neuer Test `tests/design_audit.py` (Design-Prüfung auf vier Bildschirmgrößen), siehe `tests/README.md`.
+- **Entscheidung Auftraggeber (12.11.2026): MaDax bleibt am sächsischen Lehrplan.** Die Themen einer Klassenstufe sind
+  genau der Stoff nach Lehrplan Gymnasium Sachsen; kein Stoff anderer Bundesländer oder höherer Klassen im Pflichtteil.
+  Alles jenseits des Lehrplans gehört in den Bereich „Entdecken“. Idee, nicht beschlossen: je Thema eine freiwillige
+  Stufe „Knobeln“ mit schwereren Aufgaben, die nicht für die Sterne zählt. Ein späteres „Bundesland wählen“ wäre nur
+  eine zusätzliche Zuordnung der vorhandenen Themen zu Klassenstufen und braucht keinen Umbau.
