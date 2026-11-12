@@ -1,9 +1,10 @@
 /* MaDax (Mathe) – Klasse 5, Abgleich mit dem Schulbuch (Lambacher Schweizer 5, Ausgabe Sachsen)
  *
- * Drei Themen, zu denen es im Buch eigene Lerneinheiten gibt und die in MaDax noch fehlten:
+ * Vier Themen, zu denen es im Buch eigene Lerneinheiten gibt und die in MaDax noch fehlten:
  *   Kap. I, 1–2:  Große Zahlen & Zahlenstrahl (ordnen, Stellenwerttafel, Zahlenstrahl)
  *   Kap. II, 3–6: Brüche am Zahlenstrahl (ablesen, vergleichen, Bruch als Quotient)
  *   Kap. IV, 1:   Senkrecht & parallel
+ *   Kap. IV, 4:   Winkel messen (am Geodreieck ablesen, schätzen)
  * Außerdem bringt diese Datei alle Themen in die Reihenfolge des Schulbuchs (ganz unten).
  * Wird NACH klasse5.js und klasse5-luecken.js geladen.
  */
@@ -169,7 +170,71 @@
   M.bruchStrahlBild = bruchStrahlBild;
   const kgv = (a, b) => (a * b) / gcd(a, b);
   function bruchstrahl() {
-    const v = R(1, 8);
+    const v = R(1, 13);
+    if (v === 9) {
+      // Zwischen welchen ganzen Zahlen liegt der unechte Bruch?
+      const d = pick([2, 3, 4, 5]);
+      let n;
+      do n = R(d + 1, 4 * d - 1); while (n % d === 0);
+      const w = Math.floor(n / d);
+      const opts = [0, 1, 2, 3].map((k) => `zwischen ${k} und ${k + 1}`);
+      return {
+        prompt: `Wo liegt ${fr(n, d)} auf dem Zahlenstrahl?`,
+        choices: opts,
+        correct: w,
+        hint: `Wie viele Ganze stecken in ${n} Stücken, wenn ${d} Stücke ein Ganzes sind? Rechne ${n} : ${d} mit Rest.`,
+        solution: `${n} : ${d} = ${w} Rest ${n % d}. Es sind also ${w} ${w === 1 ? 'Ganzes' : 'Ganze'} und noch ${fr(n % d, d)} dazu.<br>→ ${fr(n, d)} liegt <b>zwischen ${w} und ${w + 1}</b>.`,
+        ex: { mode: 'strahl', n, d, max: Math.max(2, w + 1) },
+      };
+    }
+    if (v === 10) {
+      // Vergleich mit einem Halben
+      let n, d;
+      do { d = R(3, 12); n = R(1, d - 1); } while (R(0, 3) === 0 ? 2 * n !== d : 2 * n === d);
+      const opts = ['kleiner als ein Halbes', 'genau ein Halbes', 'größer als ein Halbes'];
+      const k = 2 * n < d ? 0 : 2 * n === d ? 1 : 2;
+      return {
+        prompt: `Ist ${fr(n, d)} kleiner als ${fr(1, 2)}, genau ${fr(1, 2)} oder größer als ${fr(1, 2)}?`,
+        choices: opts,
+        correct: k,
+        hint: 'Ein Halbes heißt: Der Zähler ist genau halb so groß wie der Nenner. Verdopple den Zähler und vergleiche mit dem Nenner.',
+        solution: `Zähler verdoppeln: 2 · ${n} = ${2 * n}. Das ist ${k === 0 ? 'kleiner als' : k === 1 ? 'genau' : 'größer als'} der Nenner ${d}.<br>→ ${fr(n, d)} ist <b>${opts[k]}</b>.${k !== 1 ? `<br><small>Zum Vergleich: ${fr(1, 2)} = ${d % 2 === 0 ? fr(d / 2, d) : fr(d, 2 * d) + ' und ' + fr(n, d) + ' = ' + fr(2 * n, 2 * d)}.</small>` : ''}`,
+        ex: { mode: 'vgl', a: [n, d], b: [1, 2] },
+      };
+    }
+    if (v === 11 || v === 12) {
+      // Der größte / kleinste von drei Brüchen (gleicher Nenner oder gleicher Zähler)
+      const art = pick(['nenner', 'zaehler', 'stamm']), was = pick(['größte', 'kleinste']);
+      let br;
+      if (art === 'nenner') { const d = R(6, 12); br = shuffle([...Array(d - 1)].map((_, i) => i + 1)).slice(0, 3).map((z) => [z, d]); }
+      else { const z = art === 'stamm' ? 1 : R(2, 5); br = shuffle([...Array(11)].map((_, i) => i + 2).filter((x) => x > z)).slice(0, 3).map((d) => [z, d]); }
+      const wert = (b) => b[0] / b[1];
+      const sort = [...br].sort((x, y) => wert(x) - wert(y));
+      const ziel = was === 'größte' ? sort[2] : sort[0], zweiter = was === 'größte' ? sort[1] : sort[1];
+      return {
+        prompt: `Welcher Bruch ist der <b>${was}</b>?`,
+        choices: br.map((b) => fr(b[0], b[1])),
+        correct: br.indexOf(ziel),
+        hint: art === 'nenner' ? 'Die Nenner sind gleich, die Teile also gleich groß. Es kommt nur auf die Anzahl der Teile an.' : 'Die Zähler sind gleich. Überlege, wann die Teile größer sind: bei wenigen oder bei vielen Teilen?',
+        solution: `${art === 'nenner' ? 'Gleicher Nenner: Die Teile sind gleich groß. Je mehr Teile (Zähler), desto größer der Bruch.' : 'Gleicher Zähler: gleich viele Teile. Je größer der Nenner, desto <b>kleiner</b> ist jedes Teil.'}<br>Der Größe nach: ${sort.map((b) => fr(b[0], b[1])).join(' &lt; ')}<br>→ Der ${was} Bruch ist ${fr(ziel[0], ziel[1])}`,
+        ex: { mode: 'vgl', a: ziel, b: zweiter },
+      };
+    }
+    if (v === 13) {
+      // Division, bei der mehr als ein Ganzes herauskommt
+      let n, d;
+      do { d = R(2, 6); n = R(d + 1, 9); } while (gcd(n, d) !== 1);
+      return {
+        prompt: `<b>${n} Pfannkuchen</b> werden gerecht an <b>${d} Kinder</b> verteilt. Wie viel bekommt jedes Kind? Schreibe als Bruch.`,
+        layout: 'frac',
+        fields: [{ answer: n, label: 'Zähler' }, { answer: d, label: 'Nenner' }],
+        check([a, b]) { return { ok: !!b && a * d === b * n }; },
+        hint: `Teile jeden Pfannkuchen in ${d} gleiche Stücke. Von jedem Pfannkuchen bekommt jedes Kind ein Stück.`,
+        solution: `Von jedem Pfannkuchen bekommt jedes Kind ${fr(1, d)}. Bei ${n} Pfannkuchen sind das ${fr(n, d)}<br><b>${n} : ${d} = ${fr(n, d)}</b><br><small>Das ist mehr als ein ganzer Pfannkuchen: ${Math.floor(n / d)} ${fr(n % d, d)}.</small>`,
+        answerText: fr(n, d),
+        ex: { mode: 'quot', n, d },
+      };
+    }
     if (v <= 3) {
       const d = pick([2, 3, 4, 5, 6, 8, 10]), max = d >= 8 ? 1 : pick([1, 2, 2, 3]);
       let n;
@@ -264,7 +329,7 @@
   }
   const aufLinie = (s, p) => (p[0] - s[0]) * (s[3] - s[1]) === (p[1] - s[1]) * (s[2] - s[0]);
   const FARBE = ['var(--c2)', 'var(--c1)', 'var(--c3)', 'var(--c4)'];
-  const linie = (s, name, i) => `<line x1="${gx(s[0])}" y1="${gy(s[1])}" x2="${gx(s[2])}" y2="${gy(s[3])}" style="stroke:${FARBE[i]};stroke-width:3.5;stroke-linecap:round"/><text class="tick b" x="${gx(s[2]) + 6}" y="${gy(s[3]) - 5}" style="fill:${FARBE[i]};font-size:15px">${name}</text>`;
+  const linie = (s, name, i) => `<line x1="${gx(s[0])}" y1="${gy(s[1])}" x2="${gx(s[2])}" y2="${gy(s[3])}" style="stroke:${FARBE[i]};stroke-width:3.5;stroke-linecap:round"/><text class="tick b" x="${gx(s[2]) + 6}" y="${Math.max(15, gy(s[3]) - 5)}" style="fill:${FARBE[i]};font-size:15px">${name}</text>`;
   const lage = (d1, d2) => (d1[0] * d2[1] === d1[1] * d2[0] ? 'parallel' : d1[0] * d2[0] + d1[1] * d2[1] === 0 ? 'senkrecht' : 'weder');
   const muster = ([a, b]) => (a === 0 ? `${Math.abs(b)} nach oben` : b === 0 ? `${a} nach rechts` : `${a} nach rechts und ${Math.abs(b)} nach ${b > 0 ? 'oben' : 'unten'}`);
   M.lageMuster = muster; M.lageSenk = senk; M.lageArt = lage;
@@ -278,8 +343,87 @@
     }
     return null;
   }
+  const punktBild = (p, name, cls) => `<circle class="pt${cls || ''}" cx="${gx(p[0])}" cy="${gy(p[1])}" r="5.5"/><text class="ptl" x="${gx(p[0]) + 7}" y="${gy(p[1]) - 7}">${name}</text>`;
+  const imGitter = (p) => p[0] >= 0 && p[0] <= 10 && p[1] >= 0 && p[1] <= 8;
+  // Figuren für „parallele Seiten“ und „rechte Winkel“
+  const FIGUREN = [
+    ['Rechteck', [[1, 1], [8, 1], [8, 5], [1, 5]]],
+    ['Quadrat', [[2, 1], [7, 1], [7, 6], [2, 6]]],
+    ['Quadrat auf der Spitze', [[5, 1], [8, 4], [5, 7], [2, 4]]],
+    ['Parallelogramm', [[1, 1], [6, 1], [9, 5], [4, 5]]],
+    ['Trapez', [[1, 1], [9, 1], [7, 5], [3, 5]]],
+    ['Trapez', [[1, 1], [8, 1], [5, 5], [1, 5]]],
+    ['Dreieck', [[1, 1], [9, 1], [4, 6]]],
+    ['Dreieck', [[1, 1], [8, 1], [1, 6]]],
+    ['Drachenviereck', [[5, 0], [8, 5], [5, 7], [2, 5]]],
+    ['Sechseck', [[3, 1], [7, 1], [9, 4], [7, 7], [3, 7], [1, 4]]],
+  ];
+  // Seiten als Richtungen; Paare paralleler Seiten; Ecken mit rechtem Winkel
+  function figurInfo(pts) {
+    const n = pts.length, seiten = pts.map((p, i) => [pts[(i + 1) % n][0] - p[0], pts[(i + 1) % n][1] - p[1]]);
+    const paare = [], rechte = [];
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (seiten[i][0] * seiten[j][1] === seiten[i][1] * seiten[j][0]) paare.push([i, j]);
+    for (let i = 0; i < n; i++) { const a = seiten[(i + n - 1) % n], b = seiten[i]; if (a[0] * b[0] + a[1] * b[1] === 0) rechte.push(i); }
+    return { seiten, paare, rechte };
+  }
+  M.figurInfo = figurInfo;
+  const figurBild = (pts) => kaestchen(`<polygon points="${pts.map((p) => gx(p[0]) + ',' + gy(p[1])).join(' ')}" style="fill:#d9e6ff;stroke:var(--c2);stroke-width:3;stroke-linejoin:round"/>`);
   function senkParallel() {
-    const v = R(1, 7);
+    const v = R(1, 12);
+    if (v === 8 || v === 9) {
+      // Parallele bzw. Senkrechte zu g durch P: Durch welchen Punkt verläuft sie?
+      const art = v === 8 ? 'parallel' : 'senkrecht';
+      for (let t = 0; t < 300; t++) {
+        const d1 = norm(pick(RICHT.slice(2))), s1 = strecke(d1);
+        const d2 = art === 'parallel' ? d1 : senk(d1);
+        const P = [R(0, 10), R(0, 8)], k = pick([1, 2, 3]);
+        const Q = [P[0] + k * d2[0], P[1] + k * d2[1]];
+        if (d2[0] === 0 || !imGitter(Q) || aufLinie(s1, P) || aufLinie(s1, Q)) continue;
+        const falsch = shuffle([[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1]]).map((o) => [Q[0] + o[0], Q[1] + o[1]])
+          .filter((F) => imGitter(F) && (F[0] - P[0]) * d2[1] !== (F[1] - P[1]) * d2[0] && !aufLinie(s1, F)).slice(0, 2);
+        if (falsch.length < 2) continue;
+        const order = shuffle([Q, ...falsch]), namen = ['A', 'B', 'C'];
+        return {
+          prompt: `Zeichne in Gedanken die <b>${art === 'parallel' ? 'Parallele' : 'Senkrechte'}</b> zu <b style="color:var(--c2)">g</b> durch den Punkt <b>P</b>. Durch welchen Punkt verläuft sie?`,
+          figure: kaestchen(linie(s1, 'g', 0) + order.map((o, i) => punktBild(o, namen[i], ' z')).join('') + punktBild(P, 'P')),
+          choices: namen,
+          correct: order.indexOf(Q),
+          hint: art === 'parallel' ? 'Lies das Schrittmuster von g ab (Kästchen nach rechts, Kästchen nach oben oder unten). Gehe dasselbe Muster von P aus.' : 'Lies das Schrittmuster von g ab und drehe es um eine Vierteldrehung: Die beiden Zahlen tauschen die Plätze, eine Richtung kehrt sich um. Gehe dieses Muster von P aus.',
+          solution: `g: ${muster(d1)}.<br>${art === 'parallel' ? 'Die Parallele hat dasselbe Schrittmuster.' : `Die Senkrechte hat das gedrehte Muster: ${muster(d2)}.`}<br>Von P aus ${k === 1 ? 'einmal' : k + '-mal'} dieses Muster gehen: Du landest bei <b>${namen[order.indexOf(Q)]}</b>.`,
+          ex: { mode: 'paar', s1, s2: [P[0], P[1], Q[0], Q[1]], d1, d2, art },
+        };
+      }
+    }
+    if (v === 10) {
+      // Abstand zweier paralleler Geraden
+      const waag = R(0, 1) === 1, lim = waag ? 8 : 10;
+      const k = R(0, lim - 2), k2 = R(k + 2, lim);
+      const s = (q) => (waag ? [0, q, 10, q] : [q, 0, q, 8]);
+      const px = waag ? R(2, 8) : k2, py = waag ? k2 : R(2, 6);
+      return {
+        prompt: 'Die Geraden <b style="color:var(--c2)">g</b> und <b style="color:var(--c1)">h</b> sind parallel. Wie groß ist ihr <b>Abstand</b>? (in Kästchen)',
+        figure: kaestchen(linie(s(k), 'g', 0) + linie(s(k2), 'h', 1)),
+        fields: [{ answer: k2 - k, suffix: 'Kästchen' }],
+        hint: 'Der Abstand wird immer senkrecht zu den Geraden gemessen. Bei parallelen Geraden ist er überall gleich.',
+        solution: `Senkrecht von h zu g gemessen sind es <b>${k2 - k} Kästchen</b>.<br><small>Parallele Geraden haben überall denselben Abstand. Es ist also egal, wo du misst.</small>`,
+        ex: { mode: 'abstand', px, py, waag, k, zwei: k2 },
+      };
+    }
+    if (v === 11 || v === 12) {
+      const [name, pts] = pick(FIGUREN), info = figurInfo(pts), frage = v === 11 ? 'par' : 'recht';
+      const ans = frage === 'par' ? info.paare.length : info.rechte.length;
+      return {
+        prompt: frage === 'par' ? `Wie viele <b>Paare paralleler Seiten</b> hat diese Figur (${name})?` : `Wie viele <b>rechte Winkel</b> hat diese Figur (${name})?`,
+        figure: figurBild(pts),
+        fields: [{ answer: ans }],
+        hint: frage === 'par' ? 'Zwei Seiten sind parallel, wenn sie dasselbe Schrittmuster haben (gleich viele Kästchen zur Seite und nach oben). Gibt es keine, ist die Antwort 0.' : 'Ein rechter Winkel sieht aus wie die Ecke eines Kästchens oder eines Blatts Papier. Prüfe jede Ecke. Gibt es keinen, ist die Antwort 0.',
+        solution: frage === 'par'
+          ? `${ans === 0 ? 'Keine zwei Seiten haben dasselbe Schrittmuster.' : `${ans === 1 ? 'Ein Paar hat' : ans + ' Paare haben'} jeweils dasselbe Schrittmuster.`}<br>→ <b>${ans}</b> ${ans === 1 ? 'Paar paralleler Seiten' : 'Paare paralleler Seiten'}`
+          : `${ans === 0 ? 'An keiner Ecke stehen die Seiten senkrecht aufeinander.' : `An ${ans === 1 ? 'einer Ecke' : ans + ' Ecken'} stehen die beiden Seiten senkrecht aufeinander.`}<br>→ <b>${ans}</b> ${ans === 1 ? 'rechter Winkel' : 'rechte Winkel'}`,
+        answerText: String(ans),
+        ex: { mode: 'figur', pts, frage },
+      };
+    }
     if (v <= 3) {
       const art = pick(['parallel', 'senkrecht', 'weder']);
       const d1 = norm(pick(RICHT)), s1 = strecke(d1), z = zweite(d1, art, s1);
@@ -352,17 +496,108 @@
   }
 
   // =====================================================
+  // Winkel messen (am Geodreieck ablesen, schätzen)
+  // =====================================================
+  // Geodreieck mit Scheitel in der Mitte der langen Kante. Äußere Skala: 0° rechts → 180° links, innere Skala umgekehrt.
+  const GEO = { cx: 170, cy: 178, r: 160 };
+  M.GEO = GEO;
+  const gpt = (grad, r) => [GEO.cx + r * Math.cos((grad * Math.PI) / 180), GEO.cy - r * Math.sin((grad * Math.PI) / 180)];
+  M.geoPt = gpt;
+  function geoDreieck() {
+    const { cx, cy, r } = GEO;
+    let g = `<path class="geo" d="M${cx - r} ${cy} H${cx + r} L${cx} ${cy - r}z"/>`;
+    for (let a = 0; a <= 180; a += 5) {
+      const lang = a % 10 === 0, [x1, y1] = gpt(a, 95), [x2, y2] = gpt(a, lang ? 85 : 90);
+      g += `<line class="geot" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+      if (lang && a > 0 && a < 180) {
+        const [xa, ya] = gpt(a, 103.5), [xi, yi] = gpt(a, 75);
+        g += `<text class="geoa" x="${xa.toFixed(1)}" y="${(ya + 3).toFixed(1)}" text-anchor="middle">${a}</text><text class="geoi" x="${xi.toFixed(1)}" y="${(yi + 2.5).toFixed(1)}" text-anchor="middle">${180 - a}</text>`;
+      }
+    }
+    g += `<line class="geot" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 60}"/><circle cx="${cx}" cy="${cy}" r="2.6" style="fill:var(--ink)"/>`;
+    return g;
+  }
+  M.geoDreieck = geoDreieck;
+  // Winkel mit Scheitel im Nullpunkt: th = Größe, links = erster Schenkel zeigt nach links
+  function winkelSchenkel(th, links, mitBogen) {
+    const { cx, cy } = GEO;
+    const a0 = links ? 180 : 0, a1 = links ? 180 - th : th;
+    const [x0, y0] = gpt(a0, 150), [x1, y1] = gpt(a1, 150);
+    let g = `<line class="ray" x1="${cx}" y1="${cy}" x2="${x0.toFixed(1)}" y2="${y0.toFixed(1)}" style="stroke:var(--c2)"/><line class="ray" x1="${cx}" y1="${cy}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" style="stroke:var(--c1)"/>`;
+    if (mitBogen) {
+      const [bx0, by0] = gpt(Math.min(a0, a1), 26), [bx1, by1] = gpt(Math.max(a0, a1), 26), [tx, ty] = gpt((a0 + a1) / 2, th < 40 ? 44 : 15);
+      g += `<path d="M${bx0.toFixed(1)} ${by0.toFixed(1)} A26 26 0 0 0 ${bx1.toFixed(1)} ${by1.toFixed(1)}" style="fill:none;stroke:var(--c1);stroke-width:2.2"/><text class="tick b" x="${tx.toFixed(1)}" y="${(ty + 4).toFixed(1)}" text-anchor="middle" style="fill:var(--c1)">α</text>`;
+    }
+    return g;
+  }
+  M.winkelSchenkel = winkelSchenkel;
+  const geoBild = (th, links, mitGeo) => `<svg viewBox="0 0 340 196">${winkelSchenkel(th, links, !mitGeo)}${mitGeo ? geoDreieck() : ''}</svg>`;
+  M.geoBild = geoBild;
+  const winkelArt = (th) => (th < 90 ? 'spitz' : th === 90 ? 'ein rechter Winkel' : 'stumpf');
+  function winkelMessen() {
+    const v = R(1, 8);
+    let th;
+    do th = R(3, 33) * 5; while (th === 90 && v !== 4);
+    const links = R(0, 1) === 1;
+    if (v <= 4) {
+      // Am Geodreieck ablesen (rechts: äußere Skala, links: innere Skala)
+      return {
+        prompt: 'Das Geodreieck liegt richtig an. Wie groß ist der Winkel?',
+        figure: geoBild(th, links, true),
+        fields: [{ answer: th, suffix: '°' }],
+        hint: `Am orangen Schenkel stehen zwei Zahlen: ${th} und ${180 - th}. Nimm die Skala, die am <b>blauen</b> Schenkel mit 0 beginnt. Prüfe zum Schluss: Ist der Winkel spitz oder stumpf?`,
+        solution: `Der blaue Schenkel liegt ${links ? 'links' : 'rechts'} auf der langen Kante. Dort beginnt die <b>${links ? 'innere' : 'äußere'} Skala</b> mit 0.<br>Auf dieser Skala zeigt der orange Schenkel auf <b>${th}°</b>.<br><small>Probe: Der Winkel ist ${winkelArt(th)}${th === 90 ? '' : `, also ${th < 90 ? 'kleiner' : 'größer'} als 90°`}. Das passt zu ${th}° und nicht zu ${180 - th}°.</small>`,
+        ex: { mode: 'geo', th, links, art: 'lesen' },
+      };
+    }
+    if (v <= 6) {
+      // Schätzen ohne Geodreieck
+      const opts = shuffle([th, ...shuffle([15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165].filter((o) => Math.abs(o - th) >= 25)).slice(0, 3)]);
+      return {
+        prompt: 'Schätze: Wie groß ist der Winkel α ungefähr?',
+        figure: geoBild(th, links, false),
+        choices: opts.map((o) => o + '°'),
+        correct: opts.indexOf(th),
+        hint: 'Vergleiche mit einem rechten Winkel (90°, wie eine Blattecke). Ist der Winkel kleiner oder größer? Ist er etwa halb so groß (45°)?',
+        solution: `Der Winkel ist ${th < 90 ? 'kleiner' : 'größer'} als ein rechter Winkel (90°), also <b>${winkelArt(th)}</b>.${th < 90 ? (th < 45 ? ' Er ist sogar kleiner als ein halber rechter Winkel (45°).' : ' Er ist größer als ein halber rechter Winkel (45°).') : (th > 135 ? ' Er ist schon nah am gestreckten Winkel (180°).' : ' Er ist näher an 90° als an 180°.')}<br>→ ungefähr <b>${th}°</b>`,
+        ex: { mode: 'geo', th, links, art: 'schaetz' },
+      };
+    }
+    if (v === 7) {
+      do th = R(3, 33) * 5; while (th === 90 || Math.abs(th - 90) < 10);
+      const art = th < 90 ? 'spitz' : 'stumpf';
+      return {
+        prompt: `Lena misst einen Winkel. Am Schenkel stehen auf dem Geodreieck die Zahlen <b>${Math.min(th, 180 - th)}</b> und <b>${Math.max(th, 180 - th)}</b>. Sie sieht: Der Winkel ist <b>${art}</b>. Wie groß ist er?`,
+        fields: [{ answer: th, suffix: '°' }],
+        hint: 'Spitze Winkel sind kleiner als 90°, stumpfe Winkel sind größer als 90°.',
+        solution: `Ein ${art}er Winkel ist ${th < 90 ? 'kleiner' : 'größer'} als 90°. Von den beiden Zahlen passt nur <b>${th}°</b>.<br><small>Die beiden Zahlen am Geodreieck ergeben zusammen immer 180°.</small>`,
+        ex: { mode: 'geo', th, links, art: 'zwei' },
+      };
+    }
+    // Überstumpfer Winkel
+    do th = R(4, 32) * 5; while (th === 90);
+    return {
+      prompt: `Ein überstumpfer Winkel passt nicht aufs Geodreieck. Tom misst deshalb den Winkel auf der anderen Seite: <b>${th}°</b>. Wie groß ist der überstumpfe Winkel?`,
+      fields: [{ answer: 360 - th, suffix: '°' }],
+      hint: 'Beide Winkel zusammen ergeben einen vollen Kreis, also 360°.',
+      solution: `Beide Winkel zusammen sind ein Vollwinkel: 360°.<br>360° − ${th}° = <b>${360 - th}°</b>`,
+      ex: { mode: 'geo', th, links, art: 'ueber' },
+    };
+  }
+
+  // =====================================================
   // Einhängen und Reihenfolge wie im Schulbuch
   // =====================================================
   const lb = (nr) => M.grades[5].lbs.find((l) => l.nr === nr);
   lb(1).topics.push({ id: 'k5-zahlen', title: 'Große Zahlen & Zahlenstrahl', icon: '1M', gen: zahlen });
   lb(2).topics.push({ id: 'k5-bruchstrahl', title: 'Brüche am Zahlenstrahl', icon: '½', gen: bruchstrahl });
   lb(3).topics.push({ id: 'k5-lage', title: 'Senkrecht & parallel', icon: '∥', gen: senkParallel });
+  lb(3).topics.push({ id: 'k5-winkelmessen', title: 'Winkel messen', icon: '∡', gen: winkelMessen });
   // Reihenfolge nach Lambacher Schweizer 5 Sachsen (Kapitel und Lerneinheit stehen in faecher/mathe/lehrplan/schulbuch-abgleich.md)
   const FOLGE = {
     1: ['k5-zahlen', 'k5-runden', 'k5-ueberschlag', 'k5-schriftlich', 'k5-gleichung', 'k5-vorrang', 'k5-gesetze', 'k5-vorteil', 'k5-potenz', 'k5-teilbar', 'k5-prim', 'k5-division', 'k5-text'],
     2: ['k5-anteil', 'k5-kuerzen', 'k5-erweitern', 'k5-bruchstrahl', 'k5-gemischt', 'k5-umwandeln', 'k5-vergleich', 'k5-dezrunden', 'k5-dezimal', 'k5-mittel'],
-    3: ['k5-lage', 'k5-koord', 'k5-winkelart', 'k5-winkelpaar', 'k5-symmetrie'],
+    3: ['k5-lage', 'k5-koord', 'k5-winkelart', 'k5-winkelmessen', 'k5-winkelpaar', 'k5-symmetrie'],
     4: ['k5-rechteck', 'k5-netze', 'k5-quader'],
     5: ['k5-einheit', 'k5-fahrplan', 'k5-sach', 'k5-fermi'],
   };

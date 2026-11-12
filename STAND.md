@@ -122,18 +122,18 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
-- **5 Lernbereiche, 35 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
+- **5 Lernbereiche, 36 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
   - LB 1 Natürliche Zahlen: Große Zahlen & Zahlenstrahl · Runden · Überschlagen · Schriftlich rechnen · Einfache Gleichungen ·
     **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen · Teiler & Vielfache · Primzahlen & Primfaktoren ·
     Schriftlich dividieren · **Textaufgaben**
   - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern · Brüche am Zahlenstrahl · Gemischte Zahlen ·
     Bruch · Dezimal · Prozent · Zahlen vergleichen · Dezimalzahlen runden · Mit Dezimalzahlen rechnen · Arithmetisches Mittel
-  - LB 3 Geometrie: Senkrecht & parallel · Koordinatensystem · Winkelarten · Winkel an Geraden · Symmetrie & Spiegeln
+  - LB 3 Geometrie: Senkrecht & parallel · Koordinatensystem · Winkelarten · Winkel messen · Winkel an Geraden · Symmetrie & Spiegeln
   - LB 4 Rechtecke & Quader: Umfang & Fläche · Netze & Schrägbilder · Volumen & Oberfläche
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld · Schätzen wie Fermi
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **Erklär-Animationen** zu allen 35 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
+- **Erklär-Animationen** zu allen 36 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
   Textaufgaben „in vier Schritten“, Zahlen vergleichen und Sachaufgaben „Wechselgeld ergänzen“). Liste der Grund-Animationen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Dividieren: Bonbons in Tüten und
   schriftlich Stelle für Stelle · Teilbarkeit: Regeln und Teiler (Quersumme, Endziffern, durch 6,
@@ -706,3 +706,11 @@ Infos zur ersten Arbeit:
   Neue Dateien: `web/mathe/generatoren/klasse5-buch.js`, `web/mathe/erklaerungen/klasse5-buch.js`.
   Offen gelassen (siehe Abgleich): Winkel mit dem Geodreieck messen, Rechengesetze mit Dezimalzahlen, römische Zahlen
   und Zweiersystem (Kandidaten für „Entdecken“). Noch zu prüfen: ob die Schule genau diese Buchausgabe nutzt.
+- **Buchstoff lückenlos** (Version `lerndax-v37`): Neues Thema **Winkel messen** in LB 3 (jetzt **36 Themen**): Winkel am
+  aufgelegten Geodreieck ablesen (Schenkel rechts → äußere Skala, links → innere Skala), Winkel schätzen, „welche der zwei
+  Zahlen gilt?“, überstumpfer Winkel als Rest zu 360°. Winkel sind Vielfache von 5°. Mit Animation (Geodreieck anlegen,
+  Skala wählen, mitzählen, Probe spitz/stumpf).
+  Mehr Aufgabenarten in den zwei jüngsten Themen: **Brüche am Zahlenstrahl** (zwischen welchen ganzen Zahlen, Vergleich
+  mit einem Halben, größter/kleinster von drei Brüchen, Division mit Ergebnis über 1) und **Senkrecht & parallel**
+  (Parallele/Senkrechte durch P trifft welchen Punkt, Abstand paralleler Geraden, Paare paralleler Seiten und rechte
+  Winkel in Figuren zählen).

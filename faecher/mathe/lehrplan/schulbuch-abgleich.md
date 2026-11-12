@@ -5,7 +5,7 @@ Quelle für Kapitel und Lerneinheiten: Stoffverteilungsplan des Verlags
 (https://assets.klett.de/assets/de7836ab/Stoffverteilungsplan_Lambacher_Schweizer_5_Sachsen_733150.pdf), gelesen am 12.11.2026.
 Ob die Schule genau diese Ausgabe nutzt, bitte einmal am Buch prüfen (ISBN auf der Rückseite).
 
-Die Themen in MaDax stehen seit Version v36 **in der Reihenfolge des Buchs**. Festgelegt ist sie in
+Die Themen in MaDax stehen seit Version v36 (Winkel messen seit v37) **in der Reihenfolge des Buchs**. Festgelegt ist sie in
 `web/mathe/generatoren/klasse5-buch.js` (Tabelle `FOLGE` am Ende der Datei).
 
 ## Kapitel I – Arbeiten mit natürlichen Zahlen
@@ -58,7 +58,7 @@ Die Themen in MaDax stehen seit Version v36 **in der Reihenfolge des Buchs**. Fe
 | 1 Senkrechte und parallele Geraden | Senkrecht & parallel *(neu in v36)* |
 | 2 Koordinatensystem | Koordinatensystem |
 | 3 Winkel | Winkelarten |
-| 4 Winkel mit dem Geodreieck zeichnen und messen | nur am Papier sinnvoll, siehe unten |
+| 4 Winkel mit dem Geodreieck zeichnen und messen | Winkel messen *(neu in v37; Zeichnen bleibt Papierarbeit)* |
 | 5 Winkel an sich schneidenden Geraden | Winkelpaare |
 | 6 Achsensymmetrische Figuren | Symmetrie & Spiegeln |
 | 7 Dreh- und Punktsymmetrie | Symmetrie & Spiegeln |
@@ -75,8 +75,8 @@ Die Themen in MaDax stehen seit Version v36 **in der Reihenfolge des Buchs**. Fe
 
 ## Was bewusst offen bleibt
 
-- **Winkel zeichnen und messen mit dem Geodreieck**: Das ist Handarbeit mit Stift und Geodreieck. Eine Aufgabenart
-  „Winkel am aufgelegten Geodreieck ablesen“ wäre möglich (Idee, noch nicht gebaut).
+- **Winkel zeichnen** mit dem Geodreieck: Das ist Handarbeit mit Stift und Papier. Das Ablesen am aufgelegten
+  Geodreieck übt seit v37 das Thema „Winkel messen“.
 - **Rechengesetze mit Dezimalzahlen** (Kap. III, 8): könnte als weitere Aufgabenart in „Vorteilhaft rechnen“ dazukommen.
 - **Römische Zahlen, Zweiersystem**: stehen im Buch als Exkursion (kein Pflichtstoff), passen in „Entdecken“.
 - Laut Plan werden Addition, Subtraktion und Multiplikation in Klasse 5 nur wiederholt (Grundschulstoff). „Gemischte Zahl“

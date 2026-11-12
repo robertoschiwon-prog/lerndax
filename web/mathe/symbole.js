@@ -45,6 +45,7 @@ window.MathelixIcons = (function () {
     // Abgleich mit dem Schulbuch
     'k5-zahlen': `<path d="M2 16.5h20"/><path d="M5 13.5v6M12 13.5v6M19 13.5v6" stroke-width="1.8"/><circle cx="15.5" cy="16.5" r="2.3" ${F}/><path d="M15.5 4v6M13 7.8l2.5 2.6L18 7.8"/>`,
     'k5-bruchstrahl': `<path d="M2 15.5h20"/><path d="M4 11.5v8M20 11.5v8" stroke-width="2.2"/><path d="M9.3 13.3v4.4M14.7 13.3v4.4" stroke-width="1.6"/><circle cx="14.7" cy="6.5" r="2.4" ${F}/>`,
+    'k5-winkelmessen': `<path d="M2.5 18.5a9.5 9.5 0 0 1 19 0z"/><path d="M12 18.5 17.2 8.6" stroke-width="2.4"/><path d="M12 9v2M6 12.5l1.4 1.4" stroke-width="1.6"/>`,
     'k5-lage': `<path d="M3 20 14 4M10 20 21 4"/><path d="M4.500 9.500l6 4.200" stroke-width="1.8"/>`.replace(/(\.\d)00/g, '$1'),
     'k5-fermi': `<path d="M8.4 8.6a3.700 3.700 0 1 1 5.800 3c-1.300.900-2.200 1.700-2.200 3.400"/><circle cx="12" cy="19" r="1.5" ${F}/><path d="M3 20.500c1-1.200 2.100-1.200 3 0M18 20.500c1-1.200 2.100-1.200 3 0" stroke-width="1.5"/>`.replace(/(\.\d)00/g, '$1'),
   };

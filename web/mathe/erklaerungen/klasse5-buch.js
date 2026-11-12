@@ -317,12 +317,12 @@
       ctx = ctx || {};
       const { gx, gy } = M.lageGitter;
       const frei = (art) => aehnlich('k5-lage', { mode: 'paar' }, (e) => e.art === (art || 'parallel') && e.s1[0] !== e.s1[2] && e.s1[1] !== e.s1[3] && !(e.d1[0] === 1 && e.d1[1] === 0 && e.s1[0] === 1 && e.s1[2] === 9));
-      let c = wahl('k5-lage', ctx, () => frei(), (e) => ctx.mode !== 'paar' || e.art === ctx.art);
+      let c = wahl('k5-lage', ctx, () => frei(), (e) => (ctx.mode !== 'paar' || e.art === ctx.art) && (ctx.mode !== 'abstand' || !!e.zwei === !!ctx.zwei) && (ctx.mode !== 'figur' || e.frage === ctx.frage));
       let g;
       const FARBE = ['var(--c2)', 'var(--c1)'];
       const strich = (s, i, name) => {
         el('line', { x1: gx(s[0]), y1: gy(s[1]), x2: gx(s[2]), y2: gy(s[3]), style: `stroke:${FARBE[i]};stroke-width:3.5;stroke-linecap:round` }, api.svg);
-        el('text', { x: gx(s[2]) + 6, y: gy(s[3]) - 5, class: 'ex-b', style: `fill:${FARBE[i]}`, text: name }, api.svg);
+        el('text', { x: gx(s[2]) + 6, y: Math.max(16, gy(s[3]) - 5), class: 'ex-b', style: `fill:${FARBE[i]}`, text: name }, api.svg);
       };
       // Schritt-Dreieck: von (x, y) erst dx nach rechts, dann dy nach oben/unten
       function treppe(s, d, i) {
@@ -340,9 +340,17 @@
           api.clear(); api.sub(subText(ctx)); g = {};
           for (let i = 0; i <= 10; i++) el('line', { x1: gx(i), y1: gy(0), x2: gx(i), y2: gy(8), class: 'grid' }, api.svg);
           for (let j = 0; j <= 8; j++) el('line', { x1: gx(0), y1: gy(j), x2: gx(10), y2: gy(j), class: 'grid' }, api.svg);
+          if (c.mode === 'figur') {
+            const P = c.pts.map((p) => [gx(p[0]), gy(p[1])]);
+            el('polygon', { points: P.map((p) => p.join(',')).join(' '), style: 'fill:#d9e6ff;stroke:var(--c2);stroke-width:3;stroke-linejoin:round' }, api.svg);
+            g.P = P; g.mark = el('g', {}, api.svg);
+            g.info = el('text', { x: 142, y: 214, class: 'ex-b f1', 'text-anchor': 'middle', text: '' }, api.svg);
+            return;
+          }
           if (c.mode === 'abstand') {
             const s = c.waag ? [0, c.k, 10, c.k] : [c.k, 0, c.k, 8];
             strich(s, 0, 'g');
+            if (c.zwei !== undefined) strich(c.waag ? [0, c.zwei, 10, c.zwei] : [c.zwei, 0, c.zwei, 8], 1, 'h');
             const fuss = c.waag ? [c.px, c.k] : [c.k, c.py];
             g.fuss = fuss;
             // zwei schräge Wege und der senkrechte
@@ -353,15 +361,60 @@
             const q = 9, sx = c.waag ? 1 : Math.sign(c.px - c.k), sy = c.waag ? Math.sign(c.py - c.k) : 1;
             g.winkel = el('path', { d: `M${gx(fuss[0]) + q * sx} ${gy(fuss[1])} v${-q * sy} h${-q * sx}`, style: 'fill:none;stroke:var(--ink);stroke-width:1.6', opacity: 0 }, api.svg);
             el('circle', { cx: gx(c.px), cy: gy(c.py), r: 6, class: 'pt' }, api.svg);
-            el('text', { x: gx(c.px) + 8, y: gy(c.py) - 8, class: 'ptl', text: 'P' }, api.svg);
+            if (c.zwei === undefined) el('text', { x: gx(c.px) + 8, y: gy(c.py) - 8, class: 'ptl', text: 'P' }, api.svg);
             return;
           }
           strich(c.s1, 0, 'g'); strich(c.s2, 1, 'h');
           g.t1 = treppe(c.s1, c.d1, 0); g.t2 = treppe(c.s2, c.d2, 1);
         },
         async play() {
+          if (c.mode === 'figur') {
+            const info = M.figurInfo(c.pts), n = c.pts.length, P = g.P;
+            const seite = (i, farbe) => el('line', { x1: P[i][0], y1: P[i][1], x2: P[(i + 1) % n][0], y2: P[(i + 1) % n][1], style: `stroke:${farbe};stroke-width:6;stroke-linecap:round` }, g.mark);
+            const mu = (d) => M.lageMuster(d[0] < 0 || (d[0] === 0 && d[1] < 0) ? [-d[0], -d[1]] : d);
+            if (c.frage === 'par') {
+              api.say('Zwei Seiten sind <b>parallel</b>, wenn sie dasselbe Schrittmuster haben. Wir prüfen die Seiten der Reihe nach.');
+              await api.wait(3600);
+              if (!info.paare.length) { api.say('Jede Seite läuft in eine andere Richtung. Keine zwei Seiten haben dasselbe Schrittmuster.<br>→ <b>0</b> Paare paralleler Seiten'); g.info.textContent = '0 Paare'; return; }
+              let k = 0;
+              for (const [i, j] of info.paare) {
+                g.mark.innerHTML = ''; seite(i, 'var(--c1)'); seite(j, 'var(--c1)'); k++;
+                g.info.textContent = `${k} ${k === 1 ? 'Paar' : 'Paare'}`;
+                api.say(`Diese beiden Seiten haben dasselbe Schrittmuster (${mu(info.seiten[i])}): Sie sind parallel. Das ist Paar Nummer <b>${k}</b>.`);
+                await api.wait(3400);
+              }
+              g.mark.innerHTML = '';
+              const farben = ['var(--c1)', 'var(--c3)', 'var(--c4)'];
+              info.paare.forEach(([i, j], q) => { seite(i, farben[q % 3]); seite(j, farben[q % 3]); });
+              api.say(`Gleiche Farbe heißt parallel.<br>→ <b>${k}</b> ${k === 1 ? 'Paar paralleler Seiten' : 'Paare paralleler Seiten'}`);
+              return;
+            }
+            api.say('Ein <b>rechter Winkel</b> sieht aus wie die Ecke eines Kästchens: Die beiden Seiten stehen senkrecht aufeinander. Wir prüfen jede Ecke.');
+            await api.wait(3600);
+            let k = 0;
+            for (const i of info.rechte) {
+              const a = [P[(i + n - 1) % n][0] - P[i][0], P[(i + n - 1) % n][1] - P[i][1]], b = [P[(i + 1) % n][0] - P[i][0], P[(i + 1) % n][1] - P[i][1]];
+              const la = Math.hypot(...a), lb = Math.hypot(...b), q = 11;
+              const u = [(a[0] / la) * q, (a[1] / la) * q], w = [(b[0] / lb) * q, (b[1] / lb) * q];
+              el('path', { d: `M${P[i][0] + u[0]} ${P[i][1] + u[1]} l${w[0]} ${w[1]} l${-u[0]} ${-u[1]}`, style: 'fill:none;stroke:var(--c1);stroke-width:2.6' }, g.mark);
+              el('circle', { cx: P[i][0] + (u[0] + w[0]) / 2, cy: P[i][1] + (u[1] + w[1]) / 2, r: 1.6, style: 'fill:var(--c1)' }, g.mark);
+              k++; g.info.textContent = `${k} ${k === 1 ? 'rechter Winkel' : 'rechte Winkel'}`;
+              await api.wait(900);
+            }
+            if (!k) g.info.textContent = '0 rechte Winkel';
+            api.say(k ? `An ${k === 1 ? 'dieser Ecke' : 'diesen ' + k + ' Ecken'} stehen die Seiten senkrecht aufeinander. Die anderen Ecken sind spitz oder stumpf.<br>→ <b>${k}</b> ${k === 1 ? 'rechter Winkel' : 'rechte Winkel'}`.replace('Die anderen Ecken sind spitz oder stumpf.', k === n ? 'Das gilt für alle Ecken.' : 'Die anderen Ecken sind spitz oder stumpf.') : 'An keiner Ecke stehen die Seiten senkrecht aufeinander: Alle Ecken sind spitz oder stumpf.<br>→ <b>0</b> rechte Winkel');
+            return;
+          }
           if (c.mode === 'abstand') {
             const ab = c.waag ? Math.abs(c.py - c.k) : Math.abs(c.px - c.k);
+            if (c.zwei !== undefined) {
+              api.say('Der Abstand zweier paralleler Geraden wird <b>senkrecht</b> zu ihnen gemessen. Wir starten an einem Punkt auf h.');
+              await api.wait(3200);
+              await api.tw(800, (t) => { g.lot.setAttribute('x2', lerp(gx(c.px), gx(g.fuss[0]), t)); g.lot.setAttribute('y2', lerp(gy(c.py), gy(g.fuss[1]), t)); });
+              show(g.winkel, 1);
+              api.say(`Der senkrechte Weg von h zu g ist <b>${ab} Kästchen</b> lang.<br><small>Weil die Geraden parallel sind, ist der Abstand an jeder Stelle gleich.</small>`);
+              return;
+            }
             api.say('Von P führen viele Wege zur Geraden g. Welcher ist der kürzeste?');
             await api.wait(2600);
             g.schraeg.forEach((l) => show(l, 1));
@@ -385,6 +438,94 @@
           api.say(c.art === 'parallel' ? 'Beide Geraden haben <b>dasselbe Schrittmuster</b>. Sie laufen in dieselbe Richtung und haben überall denselben Abstand. Sie schneiden sich nie.<br>→ <b>parallel</b> (g ∥ h)'
             : c.art === 'senkrecht' ? `${gerade ? 'Eine Gerade läuft genau waagerecht, die andere genau senkrecht nach oben.' : 'Die beiden Zahlen haben die <b>Plätze getauscht</b>, und eine Richtung ist umgekehrt. Das ist genau eine Vierteldrehung.'} Die Geraden bilden einen <b>rechten Winkel</b>.<br>→ <b>senkrecht</b> (g ⊥ h)`
               : 'Die Schrittmuster sind verschieden, und es ist auch keine Vierteldrehung. Die Geraden schneiden sich irgendwo, aber nicht im rechten Winkel.<br>→ <b>weder parallel noch senkrecht</b>');
+        },
+      };
+    },
+  });
+
+  // =====================================================
+  // Winkel messen mit dem Geodreieck
+  // =====================================================
+  reg('k5-winkelmessen', {
+    title: 'Winkel messen mit dem Geodreieck',
+    titleFor: (ctx) => (ctx && ctx.art === 'ueber' ? 'Überstumpfe Winkel: Rest zum vollen Kreis' : ctx && ctx.art === 'schaetz' ? 'Winkel schätzen und nachmessen' : 'Winkel messen mit dem Geodreieck'),
+    viewBox: '0 0 340 196',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const frei = () => ({ mode: 'geo', th: 55, links: false, art: 'lesen' });
+      let c = wahl('k5-winkelmessen', ctx, frei, (e) => e.art === ctx.art && e.th !== ctx.th);
+      const GEO = M.GEO, gpt = M.geoPt;
+      let g;
+      const bogen = (von, bis, r) => { let d = ''; const n = Math.max(2, Math.ceil(Math.abs(bis - von) / 4)); for (let i = 0; i <= n; i++) { const [x, y] = gpt(von + ((bis - von) * i) / n, r); d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return d; };
+      const art = (th) => (th < 90 ? 'spitz' : th === 90 ? 'ein rechter Winkel' : 'stumpf');
+      function lies() {
+        api.say(`Der blaue Schenkel liegt ${c.links ? 'links' : 'rechts'}: Wir lesen die <b>${c.links ? 'innere' : 'äußere'}</b> Skala. Der orange Schenkel zeigt auf <b>${c.th}°</b>. Der Winkel ist ${art(c.th)}.`);
+      }
+      if (!ctx.mode) {
+        api.slider({ label: 'Winkel', min: 2, max: 34, value: c.th / 5, onInput(v) { c.th = v * 5; zeichne(true); lies(); } });
+        api.chips([{ label: 'Seite wechseln', onClick() { c.links = !c.links; api.replay(); } }]);
+      }
+      function zeichne(mitGeo) {
+        api.clear(); g = {};
+        if (c.art === 'ueber') {
+          // eigenes Bild: Scheitel in der Mitte
+          const cx = 170, cy = 104, r = 78, P = (grad, rr) => [cx + rr * Math.cos((grad * Math.PI) / 180), cy - rr * Math.sin((grad * Math.PI) / 180)];
+          const kreis = (von, bis, rr) => { let d = ''; const n = Math.ceil((bis - von) / 4); for (let i = 0; i <= n; i++) { const [x, y] = P(von + ((bis - von) * i) / n, rr); d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return d; };
+          g.kreis = kreis;
+          el('line', { x1: cx, y1: cy, x2: P(0, r)[0], y2: P(0, r)[1], class: 'ray', style: 'stroke:var(--c2)' }, api.svg);
+          el('line', { x1: cx, y1: cy, x2: P(c.th, r)[0], y2: P(c.th, r)[1], class: 'ray', style: 'stroke:var(--c1)' }, api.svg);
+          g.klein = el('path', { d: kreis(0, c.th, 30), style: 'fill:none;stroke:var(--c3);stroke-width:3', opacity: 0 }, api.svg);
+          g.gross = el('path', { d: '', style: 'fill:none;stroke:var(--c1);stroke-width:3' }, api.svg);
+          const m = P(c.th / 2, 48), m2 = P(c.th + (360 - c.th) / 2, 62);
+          g.tk = el('text', { x: m[0], y: m[1] + 5, class: 'ex-s f3', 'text-anchor': 'middle', opacity: 0, text: c.th + '°' }, api.svg);
+          g.tg = el('text', { x: m2[0], y: m2[1] + 5, class: 'ex-b f1', 'text-anchor': 'middle', text: '?' }, api.svg);
+          g.info = el('text', { x: 170, y: 190, class: 'ex-b f1', 'text-anchor': 'middle', text: '' }, api.svg);
+          return;
+        }
+        g.recht = el('line', { x1: GEO.cx, y1: GEO.cy, x2: GEO.cx, y2: GEO.cy - 150, class: 'dash', opacity: 0 }, api.svg);
+        g.schenkel = el('g', {}, api.svg);
+        g.schenkel.innerHTML = M.winkelSchenkel(c.th, c.links, !mitGeo);
+        g.geo = el('g', { opacity: mitGeo ? 1 : 0 }, api.svg);
+        g.geo.innerHTML = M.geoDreieck();
+        g.sweep = el('path', { d: '', style: 'fill:none;stroke:var(--c1);stroke-width:5;stroke-linecap:round;opacity:.75' }, api.svg);
+        g.info = el('text', { x: c.links ? 332 : 8, y: 20, class: 'ex-b f1', 'text-anchor': c.links ? 'end' : 'start', text: mitGeo ? c.th + '°' : '' }, api.svg);
+      }
+      return {
+        reset() { api.sub(subText(ctx)); zeichne(false); },
+        async play() {
+          if (c.art === 'ueber') {
+            api.say('Ein <b>überstumpfer</b> Winkel ist größer als 180°. Das Geodreieck reicht aber nur bis 180°.');
+            await api.wait(3400);
+            show(g.klein, 1); show(g.tk, 1);
+            api.say(`Der Trick: Wir messen den Winkel auf der <b>anderen Seite</b>. Er ist ${c.th}° groß.`);
+            await api.wait(3400);
+            await api.tw(1400, (t) => { g.gross.setAttribute('d', g.kreis(c.th, c.th + (360 - c.th) * t, 40)); });
+            g.tg.textContent = 360 - c.th + '°';
+            g.info.textContent = `360° − ${c.th}° = ${360 - c.th}°`;
+            api.say(`Beide Winkel zusammen sind ein voller Kreis, also 360°.<br>360° − ${c.th}° = <b>${360 - c.th}°</b>`);
+            return;
+          }
+          const a0 = c.links ? 180 : 0, a1 = c.links ? 180 - c.th : c.th;
+          if (c.art === 'schaetz') {
+            show(g.recht, 1);
+            api.say(`Erst schätzen: Die gestrichelte Linie zeigt einen rechten Winkel (90°). Unser Winkel ist <b>${c.th < 90 ? 'kleiner' : 'größer'}</b>, also ${art(c.th)}.`);
+            await api.wait(4000);
+            api.say('Jetzt messen wir nach.');
+            await api.wait(1400);
+          } else if (c.art === 'zwei') {
+            api.say(`Am Schenkel stehen immer zwei Zahlen: ${Math.min(c.th, 180 - c.th)} und ${Math.max(c.th, 180 - c.th)}. Zusammen ergeben sie 180. Welche gilt?`);
+            await api.wait(3600);
+          }
+          api.say('Geodreieck anlegen: Der <b>Nullpunkt</b> (Mitte der langen Kante) kommt genau auf den Scheitel. Die lange Kante liegt auf dem blauen Schenkel.');
+          await api.tw(900, (t) => { show(g.geo, t); g.geo.setAttribute('transform', `translate(0 ${-36 * (1 - t)})`); });
+          g.schenkel.innerHTML = M.winkelSchenkel(c.th, c.links, false);
+          show(g.recht, 0);
+          await api.wait(3400);
+          api.say(`Wir zählen vom blauen Schenkel aus. Er liegt ${c.links ? 'links' : 'rechts'}, dort beginnt die <b>${c.links ? 'innere' : 'äußere'} Skala</b> mit 0.`);
+          await api.wait(3000);
+          await api.tw(1500, (t) => { g.sweep.setAttribute('d', bogen(a0, a0 + (a1 - a0) * t, 95)); g.info.textContent = Math.round((c.th * t) / 5) * 5 + '°'; });
+          g.info.textContent = c.th + '°';
+          api.say(`Der orange Schenkel zeigt auf dieser Skala auf <b>${c.th}°</b>.<br><small>Probe: Der Winkel ist ${art(c.th)}${c.th === 90 ? '' : `, also ${c.th < 90 ? 'kleiner' : 'größer'} als 90°`}. Das passt zu ${c.th}°${c.th === 90 ? '' : ` und nicht zu ${180 - c.th}°`}.</small>`);
         },
       };
     },
