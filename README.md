@@ -105,6 +105,7 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Klasse 5: alle 5 Lernbereiche, 36 Themen (Reihenfolge wie im Schulbuch), Tipps und Lösungswege
 - [x] Erklär-Animationen zu allen 36 Themen, Pause und Langsam-Modus
 - [x] Beispiel vorher / Lösung als Animation nachher für alle 36 Themen
+- [x] Knobel-Stufe: schwerere, freiwillige Aufgaben zu allen 36 Themen (zählen nicht für die Sterne)
 - [x] Entdecken: 14 visuelle Beweise und Staunen-Momente
 - [x] Entscheidungen aus der Prüfung vom 11.11.2026 umgesetzt: weniger Raten, leichtere Zahlen, „Gemischt“ nur aus geübten Themen, breite Darstellung am Tablet und PC
 - [ ] Verfahren beim schriftlichen Minus mit der Schule abgleichen

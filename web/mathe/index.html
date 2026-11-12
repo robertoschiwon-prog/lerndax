@@ -76,6 +76,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .later p b{font-weight:800;color:var(--ink)}
 .jump{width:100%;display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:9px 12px;border:2px solid var(--ink);border-radius:14px;background:#141628;color:#ece9f7;font:inherit;font-weight:800;font-size:15px;text-align:left;box-shadow:3px 3px 0 var(--c1);cursor:pointer}
 .jump:active{transform:translate(3px,3px);box-shadow:none}
+.jump.kn{background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--c4)}.jump.kn small{color:var(--c4)}
+.knz{display:inline-flex;align-items:center;gap:3px;margin-left:6px;font-size:12px;font-weight:800;color:#7443e6}
+.btn.knb{border-color:var(--c4)}
 .jump i{font-style:normal;color:#ffd166;font-size:18px}.jump small{color:#ffd166;font-weight:800;font-size:17px;margin-left:auto}
 .lb{margin:0 0 22px}
 .lbh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -581,6 +584,7 @@ body.noscroll{overflow:hidden}
 <script src="generatoren/klasse5.js"></script>
 <script src="generatoren/klasse5-luecken.js"></script>
 <script src="generatoren/klasse5-buch.js"></script>
+<script src="generatoren/klasse5-knobel.js"></script>
 <script src="symbole.js"></script>
 <script src="erklaerungen/klasse5.js"></script>
 <script src="erklaerungen/klasse5-luecken.js"></script>
@@ -729,7 +733,7 @@ body.noscroll{overflow:hidden}
               <button class="topic" data-topic="${t.id}">
                 <span class="ti bg${nr}">${(window.MathelixIcons && MathelixIcons.svg(t.id)) || t.icon}</span>
                 <span class="tt">${t.title}</span>
-                ${starHtml(mastery(t.id).stars)}
+                ${starHtml(mastery(t.id).stars)}${(S.knobel || {})[t.id] && S.knobel[t.id].ok ? `<span class="knz" title="${S.knobel[t.id].ok} Knobel-Aufgaben geknackt">🧩 ${S.knobel[t.id].ok}</span>` : ''}
               </button>
               ${EXP[t.id] ? `<button class="explbtn" data-explain="${t.id}" aria-label="Erklärung zu ${t.title} ansehen">▶</button>` : ''}
             </div>`;
@@ -792,6 +796,7 @@ body.noscroll{overflow:hidden}
         <button class="btn org" data-tr="all"><span class="ic">🎯</span>Trainingsrunde<small>${TASKS_PER_ROUND} Aufgaben, Schwaches öfter</small></button>
         <button class="btn" data-tr="review" ${weak.length ? '' : 'disabled'}><span class="ic">🔁</span>Fehler-Training<small>${weak.length ? (weak.length === 1 ? '1 Thema' : weak.length + ' Themen') + ' zum Wiederholen' : 'gerade nichts offen'}</small></button>
       </div>
+      ${knobelBar(TR.topics)}
       ${TR.gruppen.map((g, i) => `
         <section class="lb">
           <div class="lbh"><span class="nr bg${(i % 5) + 1}">${i + 1}</span><h2>${esc(g.titel)}</h2>${g.topics.length > 1 ? `<button class="btn mix" data-tr="g${i}">Mix</button>` : ''}</div>
@@ -815,6 +820,7 @@ body.noscroll{overflow:hidden}
       <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p><p class="goal${roundsToday() >= 1 ? ' done' : ''}">${goalLine()}</p></div></div>
       <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
       <button class="jump" data-jump="entdecken"><i>✦</i>Entdecken: Mathe zum Staunen<small>↓</small></button>
+      ${knobelBar(allTopics())}
       <div class="quick${mixOk && weak.length ? '' : mixOk || weak.length ? ' one' : ' none'}">
         ${mixOk ? `<button class="btn org" data-mix="all"><span class="ic">🎲</span>Gemischt<small>${TASKS_PER_ROUND} Aufgaben aus ${practicedTopics().length} geübten Themen</small></button>` : ''}
         ${weak.length ? `<button class="btn" data-review><span class="ic">🔁</span>Fehler-Training<small>${(weak.length === 1 ? '1 Thema' : weak.length + ' Themen')} zum Wiederholen</small></button>` : ''}
@@ -863,6 +869,10 @@ body.noscroll{overflow:hidden}
   let R = null; // laufende Runde
 
   const practicedTopics = () => allTopics().filter((t) => mastery(t.id).n > 0);
+  // Knobeln: schwerere, freiwillige Aufgaben (topic.knobel). Zählen nicht für die Sterne. Frei ab zwei Sternen im Thema.
+  const KNOBEL_N = 5;
+  const knobelReif = (topics) => topics.filter((t) => t.knobel && mastery(t.id).stars >= 2);
+  const knobelBar = (topics) => { const k = knobelReif(topics); return k.length ? `<button class="jump kn" data-knobel="${k.map((t) => t.id).join(',')}"><i>🧩</i>Knobeln: harte Nüsse aus ${k.length === 1 ? 'einem Thema' : k.length + ' Themen'}<small>→</small></button>` : ''; };
   function weightedPick(topics) {
     const w = topics.map((t) => { const m = mastery(t.id); return m.n === 0 ? 1 : 1.25 - m.avg; });
     let r = Math.random() * w.reduce((a, b) => a + b, 0);
@@ -877,13 +887,15 @@ body.noscroll{overflow:hidden}
       else if (arg === 'review') { pool = TR.topics.filter(isWeak); title = 'Fehler-Training'; }
       else { const g = TR.gruppen[+arg.slice(1)]; pool = g ? g.topics : []; title = g ? g.titel : ''; }
     }
+    else if (mode === 'knobel') { pool = String(arg).split(',').map(findTopic).filter((t) => t && t.knobel); title = 'Knobeln'; }
     else if (mode === 'topic') { pool = [findTopic(arg)]; title = pool[0].title; }
     else if (mode === 'review') { pool = weakTopics(); title = 'Fehler-Training'; }
     else if (arg === 'all') { pool = practicedTopics(); title = 'Gemischtes Training'; } // nur Themen, die schon einzeln geübt wurden
     else { const lb = grade().lbs.find((l) => l.id === arg); pool = lb.topics.map((t) => Object.assign({ lb }, t)); title = 'Mix: ' + lb.title; }
     if (!pool.length) return home();
-    const seq = Array.from({ length: TASKS_PER_ROUND }, () => (pool.length === 1 ? pool[0] : weightedPick(pool)));
-    R = { mode, arg, title, seq, idx: 0, results: [], before: mode === 'topic' ? mastery(arg).stars : null };
+    let seq = Array.from({ length: TASKS_PER_ROUND }, () => (pool.length === 1 ? pool[0] : weightedPick(pool)));
+    if (mode === 'knobel') { const mix = U.shuffle(pool.slice()); seq = Array.from({ length: KNOBEL_N }, (_, i) => mix[i % mix.length]); }
+    R = { mode, arg, title, seq, idx: 0, results: [], knobel: mode === 'knobel', before: mode === 'topic' ? mastery(arg).stars : null };
     nextTask();
   }
 
@@ -894,7 +906,7 @@ body.noscroll{overflow:hidden}
     // Dieselbe Aufgabe soll in einer Runde nicht zweimal kommen (bis zu 6 neue Versuche)
     R.seen = R.seen || [];
     const sig = (t) => topic.id + '|' + t.prompt + '|' + (t.figure || '') + '|' + (t.pre || '') + '|' + (t.fields || []).map((f) => (f.prefix || '') + ('fixed' in f ? f.fixed : '')).join('|');
-    for (let i = 0; i < 6; i++) { try { task = topic.gen(); if (!R.seen.includes(sig(task))) break; } catch (e) { console.error(e); } }
+    for (let i = 0; i < 6; i++) { try { task = R.knobel ? topic.knobel() : topic.gen(); if (!R.seen.includes(sig(task))) break; } catch (e) { console.error(e); } }
     if (task) R.seen.push(sig(task));
     R.cur = { topic, task, attempt: 1, done: false, hintShown: false };
     renderTask();
@@ -929,7 +941,7 @@ body.noscroll{overflow:hidden}
     $app.innerHTML = `
       <div class="ptop"><button class="x" data-go="home" aria-label="Runde beenden">✕</button><div class="bar">${bar}</div></div>
       <div class="card">
-        <span class="tag bg${lb.nr}">${topic.title}</span>
+        <span class="tag bg${lb.nr}">${R.knobel ? '🧩 Knobeln · ' : ''}${topic.title}</span>
         <p class="q">${task.prompt}</p>
         ${task.figure ? `<div class="fig">${task.figure}</div>` : ''}
         ${inputs}
@@ -937,7 +949,7 @@ body.noscroll{overflow:hidden}
         <div id="fb"></div>
         <div class="acts" id="acts">
           <button class="btn" id="hintB">💡 Tipp</button>
-          ${EXP[exId(topic, task)] ? `<button class="btn" data-explain="${exId(topic, task)}" data-when="pre">▶ Erklärung</button>` : ''}
+          ${EXP[exId(topic, task)] && !R.knobel ? `<button class="btn" data-explain="${exId(topic, task)}" data-when="pre">▶ Erklärung</button>` : ''}
           ${task.choices ? '' : '<button class="btn pri" id="checkB">Prüfen</button>'}
         </div>
       </div>`;
@@ -1009,7 +1021,7 @@ body.noscroll{overflow:hidden}
     } else {
       finish(0);
       if (t.choices) markChoices(choiceIdx);
-      fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[exId(c.topic, t)] ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
+      fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[exId(c.topic, t)] && !R.knobel ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
     }
     document.getElementById('acts').innerHTML = `<button class="btn pri wide" id="nextB">${R.idx + 1 < R.seq.length ? 'Weiter →' : 'Fertig →'}</button>`;
     document.getElementById('nextB').focus();
@@ -1031,8 +1043,14 @@ body.noscroll{overflow:hidden}
     document.querySelectorAll('.answer input').forEach((el) => (el.readOnly = true));
     R.results.push(score);
     const id = c.topic.id;
-    const st = S.stats[id] || (S.stats[id] = { n: 0, hist: [], last: '' });
-    st.n++; st.hist.push(score); if (st.hist.length > 10) st.hist.shift(); st.last = today();
+    if (R.knobel) { // Knobeln zählt nicht für die Sterne, wird aber gezählt (n = versucht, ok = geknackt)
+      S.knobel = S.knobel || {};
+      const k = S.knobel[id] || (S.knobel[id] = { n: 0, ok: 0 });
+      k.n++; if (score > 0) k.ok++;
+    } else {
+      const st = S.stats[id] || (S.stats[id] = { n: 0, hist: [], last: '' });
+      st.n++; st.hist.push(score); if (st.hist.length > 10) st.hist.shift(); st.last = today();
+    }
     if (!S.days.includes(today())) S.days.push(today());
     if (S.days.length > 400) S.days = S.days.slice(-400);
     S.total = (S.total || 0) + 1;
@@ -1046,10 +1064,11 @@ body.noscroll{overflow:hidden}
     const n = R.results.length;
     const ratio = R.results.reduce((a, b) => a + b, 0) / n;
     // Lob-Szene: der Avatar des Kindes und der Fach-Dachs freuen sich gemeinsam (4 Stufen)
-    const stufe = ratio >= 0.9 ? 3 : ratio >= 0.7 ? 2 : ratio >= 0.5 ? 1 : 0;
+    const stufe = R.knobel ? (ratio >= 0.6 ? 3 : ratio >= 0.2 ? 2 : 1) : ratio >= 0.9 ? 3 : ratio >= 0.7 ? 2 : ratio >= 0.5 ? 1 : 0;
     const emoji = ['🌱', '💪', '🌟', '🏆'][stufe];
     const du = S.name ? `, ${esc(S.name)}` : '';
-    const head = [`Das üben wir nochmal${du}.`, 'Gut dabei, weiter so!', `Richtig gut${du}!`, `Mega stark${du}!`][stufe];
+    const head = R.knobel ? ['', 'Harte Nüsse! Die knackst du noch.', 'Gut getüftelt!', `Stark geknobelt${du}!`][stufe]
+      : [`Das üben wir nochmal${du}.`, 'Gut dabei, weiter so!', `Richtig gut${du}!`, `Mega stark${du}!`][stufe];
     const ich = AVA && AVA.get() ? AVA.html(AVA.get(), 92) : '';
     const firstToday = roundsToday() === 0;
     S.rounds = Object.assign({}, S.rounds || {}, { [today()]: roundsToday() + 1 });
@@ -1063,6 +1082,8 @@ body.noscroll{overflow:hidden}
       const sternTipp = now >= 3 ? 'Alle drei Sterne: Dieses Thema sitzt!' : `Nächster Stern ab <b>${ziel} %</b> richtig in deinen letzten 10 Aufgaben. Du bist bei <b>${Math.round(m.avg * 100)} %</b>.`;
       starBlock += `${starHtml(now)}${now > R.before ? '<p style="color:#0b7a50">Neuer Stern! ⭐</p>' : ''}<p class="sternhint">${sternTipp}</p>`;
     }
+    if (R.knobel) starBlock += '<p class="sternhint">🧩 Knobel-Aufgaben sind zum Tüfteln da. Sie zählen nicht für die Sterne.</p>';
+    const kn = !R.knobel && ratio >= 0.75 ? [...new Set(R.seq.filter((t) => t.knobel).map((t) => t.id))] : [];
     $app.innerHTML = header() + `
       <div class="card res">
         <div class="fest s${stufe}${ich ? '' : ' solo'}">
@@ -1073,11 +1094,12 @@ body.noscroll{overflow:hidden}
         <div class="dots">${R.results.map((r) => `<i class="r${r === 1 ? 1 : r === 0.5 ? 2 : 0}"></i>`).join('')}</div>
         ${starBlock}
         <div class="btns">
-          <button class="btn org wide" data-again>Nochmal üben</button>
+          ${kn.length ? `<button class="btn wide knb" data-knobel="${kn.join(',')}">🧩 Jetzt knobeln: ${KNOBEL_N} harte Nüsse</button>` : ''}
+          <button class="btn org wide" data-again>${R.knobel ? 'Nochmal knobeln' : 'Nochmal üben'}</button>
           <button class="btn wide" data-go="home">Zur Übersicht</button>
         </div>
       </div>`;
-    if (ratio >= 0.85) confetti();
+    if (ratio >= (R.knobel ? 0.6 : 0.85)) confetti();
   }
 
   function confetti() {
@@ -1389,6 +1411,7 @@ body.noscroll{overflow:hidden}
     else if (d.reset === 'yes') { S = { name: S.name, grade: 5, stats: {}, days: [], total: 0, seen: {}, resetAt: Date.now(), exSlow: S.exSlow }; save(); parents(false); }
     else if (d.sync) syncAction(d.sync, b);
     else if (d.topic) { start('topic', d.topic); window.scrollTo(0, 0); }
+    else if (d.knobel) { start('knobel', d.knobel); window.scrollTo(0, 0); }
     else if (d.mix) { start('mix', d.mix); window.scrollTo(0, 0); }
     else if (d.tr) { start('tr', d.tr); window.scrollTo(0, 0); }
     else if ('review' in d) { start('review'); window.scrollTo(0, 0); }
@@ -1443,7 +1466,7 @@ body.noscroll{overflow:hidden}
   if (SYNC) {
     let lastKey = '';
     SYNC.init({
-      getState: () => ({ stats: S.stats, days: S.days, total: S.total || 0, seen: S.seen || {}, rounds: S.rounds || {}, resetAt: S.resetAt || 0 }),
+      getState: () => ({ stats: S.stats, days: S.days, total: S.total || 0, seen: S.seen || {}, rounds: S.rounds || {}, knobel: S.knobel || {}, resetAt: S.resetAt || 0 }),
       applyState(m) {
         Object.assign(S, m); saveLocal();
         if (VIEW === 'home' && !document.querySelector('.exov')) home();

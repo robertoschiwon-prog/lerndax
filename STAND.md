@@ -721,3 +721,14 @@ Infos zur ersten Arbeit:
   größtem Stück zuerst, Abzieh-Regel) und **Zählen wie ein Computer** (`binaer`, fünf Lampen 16-8-4-2-1 mit Regler).
   Damit ist jede Lerneinheit des Schulbuchs abgedeckt. **Knobel-Stufe: weiter nur Idee**, braucht eine Entscheidung
   (siehe Vorschlag im Chat vom 12.11.2026): schwerere Aufgaben müssen je Thema eigens geschrieben werden.
+- **Knobel-Stufe** (Version `lerndax-v39`, Entscheidung Auftraggeber 12.11.2026: bauen, für alle Themen):
+  Zu allen 36 Themen gibt es schwerere, freiwillige Aufgaben (gleicher Stoff, aber mehr Schritte, rückwärts denken,
+  Ideen verbinden; je Thema 3 bis 5 Aufgabenarten). Datei `web/mathe/generatoren/klasse5-knobel.js`, je Thema `topic.knobel()`.
+  So kommt man hin: (1) Balken „Knobeln: harte Nüsse“ auf der Start- und der Trainingsseite, sobald ein Thema
+  **zwei Sterne** hat (gemischt aus allen Themen mit zwei Sternen); (2) Knopf „Jetzt knobeln“ nach einer Runde mit
+  mindestens 75 %. Eine Knobel-Runde hat 5 Aufgaben. Sie **zählt nicht für die Sterne** und nicht fürs Fehler-Training,
+  aber fürs Tagesziel. Geknackte Aufgaben werden je Thema gezählt (`S.knobel = { id: { n, ok } }`, Zeichen an der Kachel,
+  wird mit synchronisiert: `plattform/sync.js` nimmt je Thema den höheren Wert). Knobel-Aufgaben haben Tipp und
+  Lösungsweg, aber keine Animation. Neues Symbol „puzzle“ in `plattform/symbole.js`. Neuer Test `tests/knobel.py`.
+  Geprüft: je Thema 2000 erzeugte Aufgaben ohne Fehler, alle Aufgabenarten durchgelesen, 225 Knobel-Aufgaben in der
+  App mit der richtigen Antwort gelöst (jede wird angenommen).

@@ -51,7 +51,13 @@
     const rounds = {};
     [...new Set([...Object.keys(A.rounds || {}), ...Object.keys(B.rounds || {})])].sort().slice(-60)
       .forEach((d) => { rounds[d] = Math.max((A.rounds || {})[d] || 0, (B.rounds || {})[d] || 0); });
-    return { stats, days, seen, rounds, total: Math.max(A.total || 0, B.total || 0), resetAt: r };
+    // Knobel-Zähler je Thema: der höhere Wert (fehlt in älteren Ständen)
+    const knobel = {};
+    new Set([...Object.keys(A.knobel || {}), ...Object.keys(B.knobel || {})]).forEach((k) => {
+      const x = (A.knobel || {})[k] || { n: 0, ok: 0 }, y = (B.knobel || {})[k] || { n: 0, ok: 0 };
+      knobel[k] = { n: Math.max(x.n || 0, y.n || 0), ok: Math.max(x.ok || 0, y.ok || 0) };
+    });
+    return { stats, days, seen, rounds, knobel, total: Math.max(A.total || 0, B.total || 0), resetAt: r };
   }
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 

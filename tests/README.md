@@ -34,3 +34,4 @@ Keine Ausgabe außer den Sternen (Deko), dem orangen „Dax“ im Logo und den K
 Bildschirmfotos landen in `tests/shots/audit/`.
 
 Neue Themen prüfen: `python3 tests/loesung.py 12 k5-ueberschlag,k5-schriftlich,k5-dezrunden,k5-gemischt,k5-symmetrie,k5-netze,k5-fermi`
+- `knobel.py [Runden]`: Knobel-Stufe. Prüft: Balken erscheint erst ab zwei Sternen, 5 Aufgaben je Runde, jede richtige Antwort wird angenommen, Sterne-Statistik bleibt unverändert, Zähler `S.knobel` stimmt, Knopf „Jetzt knobeln“ nach guter Runde.
