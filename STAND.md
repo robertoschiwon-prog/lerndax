@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v46`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v47`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -75,8 +75,11 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Entschieden: „Substantiv“** (nicht „Nomen“), so sagt es auch der Lehrplan. Gilt für alle Texte in DeDax.
 - **Gebaut (v46): „Substantive: Geschlecht und Mehrzahl“ und „Die vier Fälle“**, je mit Aufgaben, Tipp, Lösungsweg,
   Symbol und Animation. Wortliste: 60 Substantive mit Artikel, Genitiv und Mehrzahl in `web/deutsch/themen/klasse5.js`.
-- **Als Nächstes:** die übrigen Wortarten-Themen in dieser Reihenfolge: Pronomen, Adjektive steigern, Verben
-  (Personalform, Partizip, Aufforderung), Wortarten erkennen (gemischt). Danach DeDax auf die Startseite. Offen:
+- **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
+  „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
+  27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
+- **Als Nächstes:** Auftraggeber fragen, ob DeDax jetzt auf die Startseite soll (`faecher.js`: Status „fertig“, Link).
+  Dann Bereich 2 (Satzbau und Satzzeichen) oder Bereich 3 (Rechtschreibung), siehe Themenplan. Offen:
   ISBN und Inhaltsverzeichnis des Deutschbuchs,
   Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
@@ -366,7 +369,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v46`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v47`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -906,3 +909,16 @@ Infos zur ersten Arbeit:
   „die Lehrer“ beide richtig). Dativ-Sätze nur mit Personen und Tieren, damit die Frage „Wem?“ passt.
   Alle Wortformen ausgegeben und durchgelesen. `tests/dedax.py`: 144 richtige Antworten angenommen, 48 Lösungs-Animationen
   nennen die Antwort; 60 000 erzeugte Aufgaben ohne Fehler.
+- **DeDax: Bereich Wortarten fertig** (Version `lerndax-v47`): vier weitere Themen.
+  „Pronomen“ (Wortgruppe durch Personalpronomen ersetzen als Auswahl und zum Eintippen, Possessivpronomen, „Wofür steht
+  das Pronomen?“, alle Pronomen antippen), „Adjektive steigern“ (Vergleichs- und Höchststufe eintippen, Stufe bestimmen,
+  im Satz steigern, als oder wie), „Verbformen“ (Personalform eintippen, Pronomen zur Form, Partizip, Aufforderung an
+  eine oder mehrere Personen, Personalform/Grundform/Partizip unterscheiden), „Wortarten erkennen“ (Wortart bestimmen,
+  alle Wörter einer Wortart antippen, Wort aus vier wählen).
+  Eindeutigkeit: „das Mädchen“ kommt beim Ersetzen nicht vor (es/sie strittig); „Pronomen zur Verbform“ nur mit Formen,
+  die zu genau einer Person passen (nicht „spielt“: er und ihr); Aufforderung nimmt beide Formen an (Komm/Komme), bei
+  mehreren Personen nur Sätze ohne „dir/dein“; Adjektive mit strittigem Umlaut (nass, gesund, rot) fehlen bewusst.
+  Animationen: gemeinsame Bausteine in `web/deutsch/erklaerungen/klasse5.js` (zwei Zeilen mit Pfeil, Wörter markieren,
+  Türme fürs Steigern, als/wie, Wortarten in Farben); „ähnliches Beispiel“ erzeugt eine neue Aufgabe derselben Art.
+  `tests/dedax.py`: 7 Themen, alle richtigen Antworten angenommen, alle Lösungs-Animationen nennen die Antwort;
+  140 000 erzeugte Aufgaben ohne Fehler (keine doppelten Auswahl-Antworten).

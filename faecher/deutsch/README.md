@@ -8,7 +8,7 @@ Schulbuchs, für Schritt 3 liegt ein Vorschlag vor. Diese Datei sagt, was festst
 | 1 Lehrplan auswerten | ✅ 12.11.2026 | `lehrplan/sachsen-gymnasium.md` |
 | 2 Schulbuch abgleichen | wartet: ISBN und Foto des Inhaltsverzeichnisses | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | Vorschlag (5 Bereiche, 31 Themen), noch nicht entschieden | `themenplan.md` |
-| 4 Themen bauen | Bereich Wortarten: ✅ Substantive (Geschlecht und Mehrzahl), ✅ Die vier Fälle, ✅ Zeitformen; offen: Pronomen, Adjektive, Verbformen, gemischt | `web/deutsch/`, Test `tests/dedax.py` |
+| 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. Offen: Bereiche 2 bis 5 | `web/deutsch/`, Test `tests/dedax.py` |
 
 **Entschieden am 12.11.2026:** Start mit dem Bereich **Wortarten**. Es heißt **„Substantiv“** (nicht „Nomen“). Die gemeinsamen Teile wurden **sofort** aus der
 Mathe-Seite herausgezogen (`web/plattform/fach.js` und `fach.css`); beide Fächer nutzen sie.

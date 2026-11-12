@@ -279,4 +279,113 @@
       };
     },
   };
+
+  // =====================================================
+  // Gemeinsame Bilder für Pronomen, Adjektive, Verbformen, Wortarten
+  // =====================================================
+  // Jede Aufgabe bringt in ex mit, was gezeigt wird (mode) und aus welcher Aufgabenart sie stammt (art).
+  // „Ähnliches Beispiel“ = dieselbe Aufgabenart erzeugt eine neue Aufgabe; frei = irgendeine Aufgabe des Themas.
+  const WFARBE = { N: '#1f55d6', V: '#c62f4b', A: '#0a7d57', D: '#c2410c', P: '#7c3aed' };
+  const fit = (t, maxW, von) => { try { for (let fs = von; fs >= 10 && t.getBBox().width > maxW; fs--) t.setAttribute('style', `font-size:${fs}px`); } catch (e) {} };
+  function zeile(api, teile, y, sep) {
+    const t = el('text', { x: 180, y, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
+    const ts = teile.map((w, i) => el('tspan', { text: (sep && i ? ' ' : '') + w }, t));
+    fit(t, 336, 19);
+    return { t, ts };
+  }
+  const mitteX = (t, teile, idx, sep) => { // Mitte eines Teils in x (für Pfeile)
+    try { let a = 0; for (let i = 0; i < idx; i++) a += teile[i].length + (sep && i ? 1 : 0); if (sep && idx) a += 1;
+      return (t.getStartPositionOfChar(a).x + t.getEndPositionOfChar(a + teile[idx].length - 1).x) / 2; } catch (e) { return 180; }
+  };
+  const BILD = {
+    // zwei Zeilen: oben der Ausgangssatz, unten das Ergebnis, ein Pfeil verbindet die markierten Teile
+    async zz(api, x) {
+      const a = zeile(api, x.z1, 50);
+      api.say(x.s1); await api.wait(1200);
+      a.ts[x.i1].setAttribute('fill', BLAU); await api.wait(1800);
+      const b = zeile(api, x.z2, 124); b.t.setAttribute('opacity', 0);
+      const x1 = mitteX(a.t, x.z1, x.i1), x2 = mitteX(b.t, x.z2, x.i2);
+      const pf = el('path', { d: `M ${x1} 60 C ${x1} 84, ${x2} 80, ${x2} 100 M ${x2 - 6} 93 L ${x2} 101 L ${x2 + 6} 93`, fill: 'none', stroke: BLAU, 'stroke-width': 2.5, 'stroke-linecap': 'round', opacity: 0 }, api.svg);
+      await api.tw(400, (t) => pf.setAttribute('opacity', t));
+      b.ts[x.i2].setAttribute('fill', BLAU);
+      await api.tw(400, (t) => b.t.setAttribute('opacity', t));
+      api.say(x.s2); await api.wait(2600);
+      api.say(x.merk);
+    },
+    // Wörter im Satz nacheinander markieren
+    async marken(api, x) {
+      const a = zeile(api, x.tokens, 70, true);
+      api.say(x.s1); await api.wait(2400);
+      for (const i of x.correct) { a.ts[i].setAttribute('fill', BLAU); await api.wait(1100); }
+      api.say(`${x.was}: <b>${x.correct.map((i) => x.tokens[i].replace(/[.,!?]/g, '')).join(', ')}</b>.`);
+    },
+    // Wortarten: Zielwörter in der Farbe ihrer Wortart, unten die Legende
+    async wa(api, x) {
+      // einzelne Wörter (liste) stehen mit Abstand nebeneinander, ein Satz steht als Zeile
+      const a = x.liste
+        ? { ts: x.w.map((w, i) => el('text', { x: 54 + i * 84, y: 56, 'text-anchor': 'middle', class: 'ex-b', text: w, style: 'font-size:15px' }, api.svg)) }
+        : zeile(api, x.w.map((w, i) => (i === x.w.length - 1 ? w + '.' : w)), 56, true);
+      const lx = [14, 92, 138, 206, 264];
+      Object.keys(T.WA).forEach((k, i) => {
+        el('circle', { cx: lx[i], cy: 136, r: 5, fill: WFARBE[k] }, api.svg);
+        el('text', { x: lx[i] + 9, y: 140, class: 'ex-s', text: T.WA[k], style: `font-size:10.5px;fill:${k === x.ziel ? WFARBE[k] : '#6b6680'}` }, api.svg);
+      });
+      api.say(`Gesucht: <b>${x.idx.length > 1 || !x.liste && x.art === 'waAntippen' ? T.WAPL[x.ziel] : T.WA[x.ziel]}</b>. ${T.WAPROBE[x.ziel]}`);
+      await api.wait(3000);
+      for (const i of x.idx) { a.ts[i].style.fill = WFARBE[x.ziel]; await api.wait(1100); }
+      const ws = x.idx.map((i) => x.w[i]);
+      api.say(x.art === 'waAntippen' ? `${T.WAPL[x.ziel]}: <b>${ws.join(', ')}</b>.` : `<b>${ws[0]}</b> ist ein <b>${T.WA[x.ziel]}</b>.`);
+    },
+    // Steigern: drei Türme wachsen
+    async steigern(api, x) {
+      const formen = [x.pos, x.komp, 'am ' + x.sup], namen = ['Grundstufe', 'Vergleichsstufe', 'Höchststufe'], h = [34, 62, 92], xs = [66, 180, 294];
+      api.say(`Adjektive kann man <b>steigern</b>: drei Stufen, wie drei Türme.`);
+      for (let i = 0; i < 3; i++) {
+        const r = el('rect', { x: xs[i] - 22, y: 132, width: 44, height: 0, rx: 5, fill: i === x.stufe ? 'var(--c2)' : '#e9e3d6', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+        await api.tw(500, (t) => { r.setAttribute('height', h[i] * t); r.setAttribute('y', 132 - h[i] * t); });
+        const f = el('text', { x: xs[i], y: 154, 'text-anchor': 'middle', class: 'ex-b', text: formen[i], style: 'font-size:15px' }, api.svg);
+        if (i === x.stufe) f.setAttribute('fill', BLAU);
+        fit(f, 108, 15);
+        el('text', { x: xs[i], y: 172, 'text-anchor': 'middle', class: 'ex-s', text: namen[i], style: 'font-size:11px;fill:#6b6680' }, api.svg);
+        api.say([`<b>${x.pos}</b>: Grundstufe. So steht das Wort im Wörterbuch.`, `<b>${x.komp}</b>: Vergleichsstufe. Zwei werden verglichen.`, `<b>am ${x.sup}</b>: Höchststufe. Mehr geht nicht.`][i]);
+        await api.wait(1900);
+      }
+      api.say(`${x.pos} · ${x.komp} · am ${x.sup}<br>${['Grundstufe', 'Vergleichsstufe', 'Höchststufe'][x.stufe]}: <b>${formen[x.stufe]}</b>`);
+    },
+    // als oder wie: zwei Türme, gleich oder verschieden hoch
+    async alswie(api, x) {
+      const h = x.gleich ? [70, 70] : [92, 58], xs = [120, 240];
+      const t = el('text', { x: 180, y: 28, 'text-anchor': 'middle', class: 'ex-b', text: x.satz.replace(` ${x.wort} `, ' … ') }, api.svg); fit(t, 336, 18);
+      for (let i = 0; i < 2; i++) {
+        const r = el('rect', { x: xs[i] - 24, y: 140, width: 48, height: 0, rx: 5, fill: i ? '#e9e3d6' : 'var(--c2)', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+        el('text', { x: xs[i], y: 160, 'text-anchor': 'middle', class: 'ex-s', text: [x.n1, x.n2][i], style: 'font-size:13px' }, api.svg);
+        await api.tw(500, (k) => { r.setAttribute('height', h[i] * k); r.setAttribute('y', 140 - h[i] * k); });
+      }
+      api.say(x.gleich ? 'Die beiden sind <b>gleich</b>. Das Adjektiv bleibt in der Grundstufe.' : 'Die beiden sind <b>verschieden</b>. Das Adjektiv steht in der Vergleichsstufe.');
+      await api.wait(2400);
+      const linie = el('line', { x1: 84, y1: 140 - h[0], x2: 276, y2: 140 - h[0], stroke: BLAU, 'stroke-width': 2, 'stroke-dasharray': '5 5' }, api.svg);
+      t.textContent = x.satz; fit(t, 336, 18);
+      api.say(x.gleich ? `gleich → <b>so ${x.pos} wie</b><br>${x.satz}` : `verschieden → <b>${x.komp} als</b><br>${x.satz}`);
+    },
+  };
+  function thema(id, title, viewBox) {
+    EX[id] = {
+      title, viewBox,
+      create(api, ctx) {
+        ctx = ctx || {};
+        const task = !!ctx.mode && (ctx.pre || ctx.post);
+        const arten = D.arten[id], zufall = () => arten[U.pick(Object.keys(arten))]().ex;
+        let x = task ? (ctx.post ? ctx : arten[ctx.art]().ex) : zufall();
+        if (!task) api.chips([{ label: 'Anderes Beispiel', onClick() { x = zufall(); api.replay(); } }]);
+        return {
+          reset() { api.clear(); api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst'); },
+          play() { return BILD[x.mode](api, x); },
+        };
+      },
+    };
+  }
+  thema('d5-pronomen', 'Pronomen: kleine Wörter für große', '0 0 360 150');
+  thema('d5-adjektive', 'Adjektive steigern', '0 0 360 180');
+  thema('d5-verbformen', 'Verbformen: ein Verb, viele Formen', '0 0 360 150');
+  thema('d5-wortarten', 'Wortarten erkennen', '0 0 360 156');
 })();

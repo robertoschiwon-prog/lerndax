@@ -460,11 +460,328 @@
   }
   const faelle = () => U.wahl([[32, fallBestimmen], [22, fallArtikel], [28, fallBilden], [18, fallAntippen]]);
 
+
+  // ---------- Thema: Personal- und Possessivpronomen ----------
+  const PERS = { nominativ: { der: 'er', die: 'sie', das: 'es', pl: 'sie' }, akkusativ: { der: 'ihn', die: 'sie', das: 'es', pl: 'sie' }, dativ: { der: 'ihm', die: 'ihr', das: 'ihm', pl: 'ihnen' } };
+  const PWAHL = { nominativ: ['er', 'sie', 'es'], akkusativ: ['ihn', 'sie', 'es', 'ihm'], dativ: ['ihm', 'ihr', 'ihnen', 'ihn'] };
+  // Satz, in dem eine Wortgruppe durch ein Personalpronomen ersetzt wird („das Mädchen“ fehlt: es / sie wäre strittig)
+  function pronSatz() {
+    let s; do { s = fallSatz(pick(['nominativ', 'akkusativ', 'dativ', 'akkusativ', 'dativ'])); } while (s.n.sg === 'Mädchen');
+    const vorn = s.idx === 0;
+    let p = PERS[s.fall][s.plural ? 'pl' : s.n.art];
+    const zeig = vorn ? gross(p) : p;
+    const neuT = s.teile.map((t, i) => (i === s.idx ? zeig : t));
+    return { s, p: zeig, wahl: PWAHL[s.fall].map((x) => (vorn ? gross(x) : x)), neuT };
+  }
+  const zz = (art, z1, i1, z2, i2, s1, s2, merk) => ({ mode: 'zz', art, z1, i1, z2, i2, s1, s2, merk });
+  const mitLeer = (teile) => teile.map((t, i) => (i ? ' ' : '') + t).concat('.');
+  function pronEx(art, r) {
+    return zz(art, mitLeer(r.s.teile), r.s.idx, mitLeer(r.neuT), r.s.idx,
+      `Für welches Substantiv soll das Pronomen stehen? <b>${r.s.teile[r.s.idx]}</b>: ${r.s.plural ? 'Mehrzahl' : GENUS[r.s.n.art]}, ${FNAME[r.s.fall]}.`,
+      `Das Pronomen muss in Geschlecht, Zahl und Fall passen: <b>${r.p}</b>.`,
+      `<b>${r.s.teile[r.s.idx]}</b> → <b>${r.p}</b><br>${r.neuT.join(' ')}.`);
+  }
+  const pronLoesung = (r) => `${fallText(r.s, (t) => `<u>${t}</u>`)}<br>→ ${r.neuT.map((t, i) => (i === r.s.idx ? `<b class="vb">${t}</b>` : t)).join(' ')}.<br>„${r.s.teile[r.s.idx]}“: ${r.s.plural ? 'Mehrzahl' : GENUS[r.s.n.art]}, ${FNAME[r.s.fall]} (${r.s.frage}) → <b>${r.p}</b>.`;
+  const TIPP_PRON = 'Ein Personalpronomen steht <b>für</b> ein Substantiv. Es richtet sich nach dem Geschlecht (der → er, die → sie, das → es), nach der Zahl und nach dem Fall (Wem? → ihm, ihr, ihnen · Wen? → ihn, sie, es).';
+  function pronWahl() {
+    const r = pronSatz();
+    return {
+      prompt: `Welches Pronomen kann die markierte Wortgruppe ersetzen?<br><span class="bsp">${fallText(r.s, (t) => `<u>${t}</u>`)}</span>`,
+      choices: r.wahl, correct: r.wahl.indexOf(r.p), hint: TIPP_PRON, solution: pronLoesung(r), ex: pronEx('pronWahl', r),
+    };
+  }
+  function pronTippen() {
+    const r = pronSatz();
+    const vor = r.s.teile.slice(0, r.s.idx).join(' '), nach = r.s.teile.slice(r.s.idx + 1).join(' ');
+    return {
+      prompt: `Ersetze „<b>${r.s.teile[r.s.idx]}</b>“ durch ein Pronomen.<br><span class="bsp">${fallText(r.s)}</span>`, layout: 'satz',
+      fields: [{ type: 'text', answer: r.p, ci: true, prefix: vor, suffix: nach + '.', label: 'Pronomen' }],
+      hint: TIPP_PRON, solution: pronLoesung(r), ex: pronEx('pronTippen', r),
+    };
+  }
+  const BESITZER = [{ s: 'Ich habe', p: 'mein' }, { s: 'Du hast', p: 'dein' }, { s: 'Emil hat', p: 'sein' }, { s: 'Lina hat', p: 'ihr' }, { s: 'Wir haben', p: 'unser' }, { s: 'Ihr habt', p: 'euer' }, { s: 'Mia und Ben haben', p: 'ihr' }];
+  const BESITZ = ['Hund', 'Ball', 'Koffer', 'Schlüssel', 'Mantel', 'Katze', 'Tasche', 'Lampe', 'Uhr', 'Buch', 'Heft', 'Fahrrad', 'Pferd', 'Auto', 'Spiel', 'Zimmer', 'Kleid'];
+  const possForm = (p, art) => (art === 'die' ? (p === 'euer' ? 'eure' : p + 'e') : p);
+  function possessiv() {
+    const o = pick(BESITZER), wort = pick(BESITZ), n = N.find((x) => x.sg === wort);
+    const ein = { der: 'einen', die: 'eine', das: 'ein' }[n.art];
+    const staemme = shuffle(['mein', 'dein', 'sein', 'ihr', 'unser', 'euer'].filter((x) => x !== o.p)).slice(0, 3).concat(o.p);
+    const wahl = shuffle(staemme).map((x) => possForm(x, n.art));
+    const ok = possForm(o.p, n.art);
+    const s1 = `${o.s} ${ein} ${n.sg}.`;
+    return {
+      prompt: `Welches Pronomen passt in die Lücke?<br><span class="bsp">${s1} Das ist ___ ${n.sg}.</span>`,
+      choices: wahl, correct: wahl.indexOf(ok),
+      hint: 'Ein Possessivpronomen zeigt, <b>wem</b> etwas gehört. Schau in den ersten Satz: Wer hat es? ich → mein, du → dein, er → sein, sie → ihr, wir → unser, ihr → euer.',
+      solution: `${s1} Das ist <b class="vb">${ok}</b> ${n.sg}.<br>${o.s.replace(/ (habe|hast|hat|haben|habt)$/, '')} → <b>${o.p}</b>${n.art === 'die' ? `. Vor „die ${n.sg}“ kommt ein -e dazu: <b>${ok}</b>` : ''}.`,
+      ex: zz('possessiv', [s1], 0, ['Das ist ', ok, ' ' + n.sg + '.'], 1, 'Wem gehört es? Das steht im ersten Satz.', `${o.s.replace(/ (habe|hast|hat|haben|habt)$/, '')} → <b>${o.p}</b>. Das Possessivpronomen zeigt den Besitzer.`, `Das ist <b>${ok}</b> ${n.sg}.`),
+    };
+  }
+  // Wofür steht das Pronomen? Drei Dinge mit drei verschiedenen Geschlechtern
+  function pronBezug() {
+    const m = pick(['Tisch', 'Stuhl', 'Koffer', 'Ball']), f = pick(['Lampe', 'Tasche', 'Uhr', 'Blume']), n = pick(['Buch', 'Bild', 'Heft', 'Fahrrad', 'Spiel', 'Glas']);
+    const dinge = shuffle([['der', m, 'ein', 'Er'], ['die', f, 'eine', 'Sie'], ['das', n, 'ein', 'Es']]);
+    const ziel = pick(dinge), rest = pick(['ist neu', 'gehört mir', 'ist ein Geschenk', 'ist schon alt']);
+    const s1 = `Im Zimmer sind ${dinge[0][2]} ${dinge[0][1]}, ${dinge[1][2]} ${dinge[1][1]} und ${dinge[2][2]} ${dinge[2][1]}.`;
+    const wahl = dinge.map((d) => `${d[0]} ${d[1]}`);
+    return {
+      prompt: `Wofür steht das markierte Pronomen?<br><span class="bsp">${s1} <u>${ziel[3]}</u> ${rest}.</span>`,
+      choices: wahl, correct: dinge.indexOf(ziel),
+      hint: 'Das Pronomen hat dasselbe Geschlecht wie sein Substantiv: <b>er</b> → der, <b>sie</b> → die, <b>es</b> → das.',
+      solution: `<b>${ziel[3]}</b> steht für „<b>${ziel[0]} ${ziel[1]}</b>“, denn ${ziel[3].toLowerCase()} passt nur zu „${ziel[0]}“.<br>${ziel[0] === 'der' ? 'Der' : ziel[0] === 'die' ? 'Die' : 'Das'} ${ziel[1]} ${rest}.`,
+      ex: zz('pronBezug', [`${ziel[3]} ${rest}.`], 0, [gross(ziel[0]) + ' ' + ziel[1], ` ${rest}.`], 0, `<b>${ziel[3]}</b>: Welches Substantiv hat dieses Geschlecht?`, `${ziel[3].toLowerCase()} → <b>${ziel[0]}</b>: Das passt nur zu „${ziel[0]} ${ziel[1]}“.`, `<b>${ziel[3]}</b> steht für „<b>${ziel[0]} ${ziel[1]}</b>“.`),
+    };
+  }
+  // Sätze zum Antippen: Pronomen sind mit * markiert
+  const SATZ_PRON = [
+    '*Ich zeige *dir *meinen Hund.', '*Wir besuchen *unsere Freundin.', 'Gibst *du *mir *dein Heft?', '*Ihr habt *euer Spiel vergessen.',
+    '*Er dankt *ihr für *ihre Hilfe.', '*Wir zeigen *euch *unser Zimmer.', 'Emil ruft *seinen Bruder, doch *er hört *ihn nicht.',
+    'Lina sucht *ihre Tasche, aber *sie findet *sie nicht.', 'Die Kinder holen *ihre Fahrräder und putzen *sie.', 'Morgen bringe *ich *euch *eure Bücher.',
+    'Der Lehrer gibt *uns *unsere Hefte zurück.', 'Hast *du *deinen Schlüssel gefunden?',
+  ];
+  function markSatz(liste, ausser) {
+    const roh = pick(liste.filter((x) => x.replace(/\*/g, '') !== ausser)).split(' ');
+    return { tokens: roh.map((w) => w.replace('*', '')), correct: roh.map((w, i) => (w[0] === '*' ? i : -1)).filter((i) => i >= 0) };
+  }
+  function pronAntippen() {
+    const { tokens, correct } = markSatz(SATZ_PRON);
+    const liste = correct.map((i) => cleanW(tokens[i]));
+    return {
+      prompt: 'Tippe <b>alle Pronomen</b> an (Personal- und Possessivpronomen).',
+      tap: { tokens, correct }, answerText: liste.join(', '),
+      hint: 'Personalpronomen stehen <b>für</b> jemanden oder etwas: ich, du, er, sie, es, wir, ihr, mir, dir, ihn, ihm, uns, euch … Possessivpronomen zeigen, <b>wem</b> etwas gehört: mein, dein, sein, ihr, unser, euer.',
+      solution: `Pronomen: <b>${liste.join(', ')}</b>.`,
+      ex: { mode: 'marken', art: 'pronAntippen', tokens, correct, was: 'Pronomen', s1: 'Pronomen stehen für jemanden oder etwas (ich, dir, ihn …) oder zeigen, wem etwas gehört (mein, dein, sein …).' },
+    };
+  }
+  const cleanW = (w) => w.replace(/[.,!?]/g, '');
+  const pronomen = () => U.wahl([[26, pronWahl], [22, pronTippen], [22, possessiv], [14, pronBezug], [16, pronAntippen]]);
+
+  // ---------- Thema: Adjektive steigern, als und wie ----------
+  // [Grundstufe, Vergleichsstufe, Höchststufe (nach „am“), passt zu Personen?]
+  const ADJ = [
+    ['klein', 'kleiner', 'kleinsten', 1], ['schnell', 'schneller', 'schnellsten', 1], ['schön', 'schöner', 'schönsten'], ['leicht', 'leichter', 'leichtesten'],
+    ['laut', 'lauter', 'lautesten', 1], ['weit', 'weiter', 'weitesten'], ['alt', 'älter', 'ältesten', 1], ['kalt', 'kälter', 'kältesten'],
+    ['warm', 'wärmer', 'wärmsten'], ['lang', 'länger', 'längsten'], ['kurz', 'kürzer', 'kürzesten'], ['stark', 'stärker', 'stärksten', 1],
+    ['jung', 'jünger', 'jüngsten', 1], ['groß', 'größer', 'größten', 1], ['hoch', 'höher', 'höchsten'], ['nah', 'näher', 'nächsten'],
+    ['gut', 'besser', 'besten'], ['viel', 'mehr', 'meisten'], ['gern', 'lieber', 'liebsten'], ['teuer', 'teurer', 'teuersten'],
+    ['dunkel', 'dunkler', 'dunkelsten'], ['schwer', 'schwerer', 'schwersten'], ['hell', 'heller', 'hellsten'], ['dick', 'dicker', 'dicksten'],
+    ['breit', 'breiter', 'breitesten'], ['hart', 'härter', 'härtesten'], ['klug', 'klüger', 'klügsten', 1], ['süß', 'süßer', 'süßesten'],
+    ['heiß', 'heißer', 'heißesten'], ['leise', 'leiser', 'leisesten', 1], ['müde', 'müder', 'müdesten', 1], ['langsam', 'langsamer', 'langsamsten', 1],
+    ['arm', 'ärmer', 'ärmsten'], ['scharf', 'schärfer', 'schärfsten'],
+  ].map(([pos, komp, sup, pers]) => ({ pos, komp, sup, pers: !!pers }));
+  const STUFEN = ['Grundstufe (Positiv)', 'Vergleichsstufe (Komparativ)', 'Höchststufe (Superlativ)'];
+  const adjReihe = (a, i) => [a.pos, a.komp, 'am ' + a.sup].map((x, k) => (k === i ? `<b class="vb">${x}</b>` : x)).join(' · ');
+  const adjBesonders = (a) => (['gut', 'viel', 'gern', 'hoch', 'nah'].includes(a.pos) ? ' Dieses Adjektiv ist unregelmäßig, die Formen muss man sich merken.' : a.komp !== ohneUml(a.komp) && a.pos === ohneUml(a.pos) ? ' Beim Steigern wird hier der Vokal zum Umlaut.' : '');
+  const EXA = (art, a, stufe) => ({ mode: 'steigern', art, pos: a.pos, komp: a.komp, sup: a.sup, stufe });
+  const NAMEN = ['Lina', 'Emil', 'Mia', 'Ben', 'Nora', 'Paul'];
+  function adjKomp() {
+    const a = pick(ADJ);
+    return {
+      prompt: 'Wie heißt die <b>Vergleichsstufe</b> (Komparativ)?', layout: 'satz',
+      fields: [{ type: 'text', answer: a.komp, ci: true, prefix: `${a.pos} →`, suffix: `→ am ${a.sup}`, label: 'Vergleichsstufe' }],
+      hint: 'Die Vergleichsstufe endet auf <b>-er</b>: klein → klein<b>er</b>. Oft wird a, o, u zum Umlaut: alt → <b>ä</b>lter.',
+      solution: `${adjReihe(a, 1)}.${adjBesonders(a)}`, ex: EXA('adjKomp', a, 1),
+    };
+  }
+  function adjSup() {
+    const a = pick(ADJ);
+    return {
+      prompt: 'Wie heißt die <b>Höchststufe</b> (Superlativ)?', layout: 'satz',
+      fields: [{ type: 'text', answer: a.sup, ci: true, prefix: `${a.pos} → ${a.komp} → am`, label: 'Höchststufe' }],
+      hint: 'Die Höchststufe bildet man mit <b>am</b> und der Endung <b>-sten</b> oder <b>-esten</b>: klein → am klein<b>sten</b>, laut → am laut<b>esten</b>.',
+      solution: `${adjReihe(a, 2)}.${adjBesonders(a)}`, ex: EXA('adjSup', a, 2),
+    };
+  }
+  function adjStufe() {
+    const a = pick(ADJ), i = R(0, 2);
+    const form = [a.pos, a.komp, 'am ' + a.sup][i];
+    return {
+      prompt: `In welcher Stufe steht das Adjektiv?<br><span class="bsp">${form}</span>`,
+      choices: STUFEN, correct: i,
+      hint: 'Grundstufe: so steht es im Wörterbuch. Vergleichsstufe: Endung <b>-er</b>, man vergleicht zwei. Höchststufe: mit <b>am</b> und <b>-sten</b>, mehr geht nicht.',
+      solution: `${adjReihe(a, i)}<br><b>${form}</b> ist die ${STUFEN[i]}.${i === 0 && /er$/.test(a.pos) ? ' Vorsicht: Das -er gehört hier zum Wort, es ist keine Steigerung.' : ''}`,
+      ex: EXA('adjStufe', a, i),
+    };
+  }
+  function adjSatz() {
+    const a = pick(ADJ.filter((x) => x.pers)), [n1, n2] = shuffle(NAMEN);
+    const sup = Math.random() < 0.45;
+    return {
+      prompt: `Setze <b>${a.pos}</b> in die passende Stufe.`, layout: 'satz',
+      fields: [sup ? { type: 'text', answer: a.sup, ci: true, prefix: `Von allen Kindern ist ${n1} am`, suffix: '.', label: 'Höchststufe' }
+        : { type: 'text', answer: a.komp, ci: true, prefix: `${n1} ist`, suffix: `als ${n2}.`, label: 'Vergleichsstufe' }],
+      hint: sup ? '„Von allen … am …“: Niemand übertrifft das. Das ist die Höchststufe mit <b>-sten</b>.' : 'Nach der Lücke steht <b>als</b>: Zwei werden verglichen und sind verschieden. Das ist die Vergleichsstufe mit <b>-er</b>.',
+      solution: `${sup ? `Von allen Kindern ist ${n1} am <b class="vb">${a.sup}</b>.` : `${n1} ist <b class="vb">${a.komp}</b> als ${n2}.`}<br>${adjReihe(a, sup ? 2 : 1)}`,
+      ex: EXA('adjSatz', a, sup ? 2 : 1),
+    };
+  }
+  function alsWie() {
+    const a = pick(ADJ.filter((x) => x.pers)), [n1, n2] = shuffle(NAMEN);
+    const gleich = Math.random() < 0.5, so = pick(['so', 'genauso']);
+    const satzA = gleich ? `${n1} ist ${so} ${a.pos} ___ ${n2}.` : `${n1} ist ${a.komp} ___ ${n2}.`;
+    const w = gleich ? 'wie' : 'als';
+    return {
+      prompt: `<b>als</b> oder <b>wie</b>?<br><span class="bsp">${satzA}</span>`,
+      choices: ['als', 'wie'], correct: gleich ? 1 : 0,
+      hint: 'Sind die beiden <b>gleich</b> oder <b>verschieden</b>? Schau auf das Adjektiv: Grundstufe mit „so“ oder Vergleichsstufe mit -er?',
+      solution: `${satzA.replace('___', `<b class="vb">${w}</b>`)}<br>${gleich ? `Beide sind gleich: <b>so … wie</b> mit der Grundstufe (${a.pos}).` : `Die beiden sind verschieden: Vergleichsstufe (${a.komp}) + <b>als</b>.`}`,
+      ex: { mode: 'alswie', art: 'alsWie', gleich, n1, n2, pos: a.pos, komp: a.komp, satz: satzA.replace('___', w), wort: w },
+    };
+  }
+  const adjektive = () => U.wahl([[24, adjKomp], [22, adjSup], [16, adjStufe], [20, adjSatz], [18, alsWie]]);
+
+  // ---------- Thema: Verbformen – Personalform, Partizip, Aufforderung ----------
+  const PW = ['ich', 'du', 'er/sie/es', 'wir', 'ihr'];
+  const alleFormen = (v) => [0, 1, 2, 3, 4].map((p) => praesens(v, p));
+  const endung = (v, form) => { const st = stamm(v); return form.startsWith(st) ? form.slice(st.length) : ''; };
+  function persForm() {
+    const v = pick(V), p = pick([0, 1, 1, 2, 2, 3, 4]);
+    const f = praesens(v, p);
+    const ans = p === 0 && /ern$/.test(v.inf) ? [f, f.replace(/ere$/, 're')] : f;
+    const wechsel = (p === 1 || p === 2) && !f.startsWith(stamm(v));
+    return {
+      prompt: `Wie heißt die Personalform von <b>${v.inf}</b> im Präsens?`, layout: 'satz',
+      fields: [{ type: 'text', answer: ans, ci: true, prefix: PW[p], label: 'Personalform' }],
+      hint: 'Die Endung richtet sich nach der Person: ich -<b>e</b>, du -<b>st</b>, er/sie/es -<b>t</b>, wir -<b>en</b>, ihr -<b>t</b>. Bei manchen Verben ändert sich bei <i>du</i> und <i>er/sie/es</i> auch der Vokal.',
+      solution: `${v.inf}: ${[0, 1, 2, 3, 4].map((q) => (q === p ? `<b class="vb">${PW[q]} ${praesens(v, q)}</b>` : `${PW[q]} ${praesens(v, q)}`)).join(' · ')}${wechsel ? '<br>Hier ändert sich bei „du“ und „er/sie/es“ der Vokal im Wort.' : ''}`,
+      ex: zz('persForm', ['Grundform: ', v.inf], 1, [PW[p] + ' ', f], 1, `Die Grundform <b>${v.inf}</b> endet auf -en. Für jede Person bekommt das Verb eine eigene Endung.`, `${PW[p]} → ${endung(v, f) ? `Endung <b>-${endung(v, f)}</b>` : 'eine eigene Form'}${wechsel ? ', und der Vokal ändert sich' : ''}.`, `${v.inf} → <b>${PW[p]} ${f}</b>`),
+    };
+  }
+  function persWahl() {
+    // nur Formen, die zu genau einer Person passen (nicht „ihr spielt“ / „er spielt“)
+    let v, f, p; do { v = pick(V); f = alleFormen(v); p = R(0, 4); } while (f.filter((x) => x === f[p]).length !== 1);
+    return {
+      prompt: `Welches Pronomen passt zu dieser Verbform?<br><span class="bsp">___ ${f[p]}</span>`,
+      choices: PW, correct: p,
+      hint: 'Schau auf die <b>Endung</b>: -e → ich, -st → du, -en → wir. Bei -t hilft der Vokal: er <b>läuft</b>, aber ihr <b>lauft</b>.',
+      solution: `<b class="vb">${PW[p]} ${f[p]}</b><br>${v.inf}: ${[0, 1, 2, 3, 4].map((q) => `${PW[q]} ${f[q]}`).join(' · ')}`,
+      ex: zz('persWahl', ['___ ', f[p]], 1, [PW[p], ' ' + f[p]], 0, `Schau auf die Endung von <b>${f[p]}</b> und vergleiche mit den anderen Formen von „${v.inf}“.`, `Nur zu einer Person passt genau diese Form: <b>${PW[p]}</b>.`, `<b>${PW[p]} ${f[p]}</b>`),
+    };
+  }
+  function partizip() {
+    const v = pick(V), h = v.aux === 'sein' ? 'bin' : 'habe';
+    return {
+      prompt: `Wie heißt das <b>Partizip</b> von <b>${v.inf}</b>?`, layout: 'satz',
+      fields: [{ type: 'text', answer: v.part, ci: true, prefix: `ich ${h}`, label: 'Partizip' }],
+      hint: 'Das Partizip brauchst du für das Perfekt: „Ich habe …“ oder „Ich bin …“. Es beginnt meistens mit <b>ge-</b> und endet auf <b>-t</b> (regelmäßig) oder <b>-en</b> (unregelmäßig).',
+      solution: `${v.inf} → ich ${h} <b class="vb">${v.part}</b><br>${v.art === 's' ? 'Regelmäßig: ge- + Stamm + -t.' : v.art === 'g' ? 'Der Vokal ändert sich, die Endung ist -t.' : 'Unregelmäßig: Endung -en, oft mit anderem Vokal.'}`,
+      ex: zz('partizip', ['Grundform: ', v.inf], 1, [`ich ${h} `, v.part], 1, 'Das Partizip steht im Perfekt am Satzende. Bauplan: <b>ge-</b> + Stamm + <b>-t</b> oder <b>-en</b>.', v.art === 's' ? `„${v.inf}“ ist regelmäßig: Endung <b>-t</b>.` : `„${v.inf}“ ist unregelmäßig. Diese Form muss man sich merken.`, `${v.inf} → ich ${h} <b>${v.part}</b>`),
+    };
+  }
+  // Aufforderung (Imperativ): [Grundform, richtige Formen für eine Person, Rest des Satzes]
+  const IMP = [
+    ['kommen', ['Komm', 'Komme'], 'bitte her'], ['gehen', ['Geh', 'Gehe'], 'bitte zur Tür'], ['lesen', ['Lies'], 'bitte den Text'],
+    ['schreiben', ['Schreib', 'Schreibe'], 'bitte deinen Namen'], ['essen', ['Iss'], 'bitte dein Brot'], ['trinken', ['Trink', 'Trinke'], 'bitte genug Wasser'],
+    ['helfen', ['Hilf'], 'mir bitte'], ['nehmen', ['Nimm'], 'dir einen Apfel'], ['werfen', ['Wirf'], 'den Ball zu mir'], ['sehen', ['Sieh', 'Siehe'], 'mal nach oben'],
+    ['warten', ['Warte'], 'bitte auf mich'], ['arbeiten', ['Arbeite'], 'bitte leise'], ['laufen', ['Lauf', 'Laufe'], 'schnell zum Tor'],
+    ['fahren', ['Fahr', 'Fahre'], 'bitte langsam'], ['schlafen', ['Schlaf', 'Schlafe'], 'gut'], ['tragen', ['Trag', 'Trage'], 'bitte den Korb'],
+    ['bleiben', ['Bleib', 'Bleibe'], 'bitte hier'], ['singen', ['Sing', 'Singe'], 'bitte lauter'], ['spielen', ['Spiel', 'Spiele'], 'mit uns'],
+    ['fragen', ['Frag', 'Frage'], 'bitte deine Lehrerin'], ['suchen', ['Such', 'Suche'], 'bitte den Schlüssel'], ['lernen', ['Lern', 'Lerne'], 'das Gedicht'],
+    ['malen', ['Mal', 'Male'], 'ein Bild für mich'], ['bringen', ['Bring', 'Bringe'], 'mir bitte das Heft'], ['denken', ['Denk', 'Denke'], 'an deine Jacke'],
+    ['rennen', ['Renn', 'Renne'], 'nicht so schnell'], ['springen', ['Spring', 'Springe'], 'über den Bach'],
+  ];
+  function imperativ() {
+    let [inf, formen, rest] = pick(IMP);
+    const v = V.find((x) => x.inf === inf);
+    const mehrere = Math.random() < 0.35 && !/\b(dir|dein|deine|deinen)\b/.test(rest);
+    const ans = mehrere ? [gross(praesens(v, 4))] : formen;
+    return {
+      prompt: `Bilde die <b>Aufforderung</b> (Imperativ) von <b>${inf}</b>. Du sprichst mit <b>${mehrere ? 'mehreren Personen' : 'einer Person'}</b>.`, layout: 'satz',
+      fields: [{ type: 'text', answer: ans, ci: true, suffix: rest + '!', label: 'Aufforderung' }],
+      hint: mehrere ? 'Bei mehreren Personen nimmst du die <b>ihr-Form</b> und lässt „ihr“ weg: ihr kommt → Kommt!' : 'Bei einer Person: Nimm die <b>du-Form</b> und lass „du“ und die Endung -st weg: du kommst → Komm! Der Umlaut verschwindet: du fährst → Fahr!',
+      solution: `<b class="vb">${ans[0]}</b> ${rest}!<br>${mehrere ? `ihr ${praesens(v, 4)} → <b>${ans[0]}</b> (ohne „ihr“).` : (ohneUml(v.du.replace(/st$/, '')) === ans[0].toLowerCase()
+        ? `du ${v.du} → <b>${ans[0]}</b> (ohne „du“ und ohne -st${v.du !== ohneUml(v.du) && inf === ohneUml(inf) ? ', ohne Umlaut' : ''}).${ans.length > 1 ? ` Auch richtig: ${ans[1]}.` : ''}`
+        : `du ${v.du} → <b>${ans[0]}</b>. Der Vokal ist wie in der du-Form. Diese Form merkt man sich am besten.`)}`,
+      ex: zz('imperativ', [mehrere ? 'ihr ' : 'du ', mehrere ? praesens(v, 4) : v.du, ' ' + rest], 1, [ans[0], ' ' + rest + '!'], 0, mehrere ? `Starte mit der ihr-Form: <b>ihr ${praesens(v, 4)}</b>.` : `Starte mit der du-Form: <b>du ${v.du}</b>.`, mehrere ? 'Lass „ihr“ weg. Fertig ist die Aufforderung.' : 'Lass „du“ und die Endung -st weg (ein Umlaut verschwindet auch).', `<b>${ans[0]}</b> ${rest}!`),
+    };
+  }
+  const FORMART = ['Personalform', 'Grundform (Infinitiv)', 'Partizip'];
+  function formArt() {
+    const zeit = pick(['praesens', 'praeteritum', 'perfekt', 'futur', 'perfekt', 'futur', 'plusquamperfekt']);
+    const s = zufallSatz(zeit);
+    const hinten = s.v2 && Math.random() < 0.6;
+    const wort = hinten ? s.v2 : s.v1;
+    const art = !hinten ? 0 : zeit === 'futur' ? 1 : 2;
+    const teile = [s.subj + ' ', s.v1, ' ' + s.rest + (s.v2 ? ' ' : ''), s.v2 || '', '.'];
+    const mark = teile.map((t, i) => (i === (hinten ? 3 : 1) ? `<u>${t}</u>` : t)).join('');
+    const warum = ['Die Personalform passt zur Person (zum Subjekt) und steht an 2. Stelle. Sie ändert sich, wenn die Person wechselt.', 'Die Grundform endet auf -en und ändert sich nie, egal welche Person.', 'Das Partizip (ge…t / ge…en) ändert sich auch nicht mit der Person. Es steht am Satzende.'][art];
+    return {
+      prompt: `Welche Verbform ist das markierte Wort?<br><span class="bsp">${mark}</span>`,
+      choices: FORMART, correct: art,
+      hint: 'Probe: Ersetze das Subjekt durch „ich“. Ändert sich das markierte Wort? Dann ist es die <b>Personalform</b>. Bleibt es gleich, ist es Grundform (-en) oder Partizip (ge-).',
+      solution: `${mark}<br><b>${wort}</b> ist ${art === 0 ? 'die' : art === 1 ? 'die' : 'das'} <b>${FORMART[art]}</b>. ${warum}`,
+      ex: zz('formArt', teile, hinten ? 3 : 1, [FORMART[art] + ': ', wort], 1, 'Probe: Wechsle die Person. Welches Verbwort ändert sich?', warum, `<b>${wort}</b>: ${FORMART[art]}`),
+    };
+  }
+  const verbformen = () => U.wahl([[26, persForm], [14, persWahl], [22, partizip], [22, imperativ], [16, formArt]]);
+
+  // ---------- Thema: Wortarten erkennen ----------
+  // Jedes Wort trägt seine Wortart: N Substantiv, V Verb, A Adjektiv, D Artikel, P Pronomen, x andere (kommt später)
+  const WA = { N: 'Substantiv', V: 'Verb', A: 'Adjektiv', D: 'Artikel', P: 'Pronomen' };
+  const WAPL = { N: 'Substantive', V: 'Verben', A: 'Adjektive', D: 'Artikel', P: 'Pronomen' };
+  const WAPROBE = {
+    N: 'Substantive schreibt man groß, und ein Artikel passt davor.',
+    V: 'Verben sagen, was jemand tut oder was geschieht. Sie ändern sich mit der Person (ich …, du …).',
+    A: 'Adjektive sagen, wie etwas ist. Man kann sie steigern (klein, kleiner, am kleinsten).',
+    D: 'Artikel begleiten ein Substantiv: der, die, das, ein, eine (auch dem, den, des, einen …).',
+    P: 'Pronomen stehen für ein Substantiv (ich, er, uns …) oder zeigen, wem etwas gehört (mein, unser …).',
+  };
+  const SATZ_WA = [
+    'Der|D kleine|A Hund|N schläft|V im|x Garten|N', 'Wir|P suchen|V den|D roten|A Ball|N', 'Die|D alte|A Lampe|N steht|V auf|x dem|D Tisch|N',
+    'Er|P liest|V ein|D spannendes|A Buch|N', 'Das|D Mädchen|N trägt|V einen|D schweren|A Koffer|N', 'Ich|P male|V meiner|P Schwester|N ein|D buntes|A Bild|N',
+    'Der|D Zug|N fährt|V über|x die|D lange|A Brücke|N', 'Du|P bist|V heute|x sehr|x müde|A', 'Unser|P Nachbar|N kauft|V frische|A Äpfel|N',
+    'Die|D Kinder|N bauen|V eine|D große|A Hütte|N', 'Ihr|P habt|V den|D Schlüssel|N gefunden|V', 'Das|D Wasser|N im|x See|N ist|V kalt|A',
+    'Mein|P Bruder|N schreibt|V dir|P einen|D langen|A Brief|N', 'Die|D Katze|N ist|V klein|A und|x schnell|A', 'Wir|P sehen|V einen|D hohen|A Berg|N',
+    'Der|D Lehrer|N erklärt|V uns|P die|D schwere|A Aufgabe|N',
+  ].map((z) => { const t = z.split(' ').map((w) => w.split('|')); return { w: t.map((x) => x[0]), tag: t.map((x) => x[1]) }; });
+  const waTokens = (z) => z.w.map((w, i) => (i === z.w.length - 1 ? w + '.' : w));
+  function waBestimmen() {
+    const z = pick(SATZ_WA), i = pick(z.tag.map((t, k) => (t !== 'x' ? k : -1)).filter((k) => k >= 0));
+    const arten = Object.keys(WA);
+    return {
+      prompt: `Welche Wortart hat das markierte Wort?<br><span class="bsp">${z.w.map((w, k) => (k === i ? `<u>${w}</u>` : w)).join(' ')}.</span>`,
+      choices: arten.map((a) => WA[a]), correct: arten.indexOf(z.tag[i]),
+      hint: 'Mach die Proben: Passt ein Artikel davor (Substantiv)? Ändert es sich mit der Person (Verb)? Kann man es steigern (Adjektiv)? Begleitet es ein Substantiv (Artikel)? Steht es für ein Substantiv (Pronomen)?',
+      solution: `<b>${z.w[i]}</b> ist ein <b>${WA[z.tag[i]]}</b>. ${WAPROBE[z.tag[i]]}`,
+      ex: { mode: 'wa', art: 'waBestimmen', w: z.w, tag: z.tag, ziel: z.tag[i], idx: [i] },
+    };
+  }
+  function waAntippen() {
+    const z = pick(SATZ_WA), ziel = pick([...new Set(z.tag.filter((t) => t !== 'x'))]);
+    const correct = z.tag.map((t, k) => (t === ziel ? k : -1)).filter((k) => k >= 0);
+    return {
+      prompt: `Tippe <b>alle ${WAPL[ziel]}</b> an.`,
+      tap: { tokens: waTokens(z), correct }, answerText: correct.map((k) => z.w[k]).join(', '),
+      hint: WAPROBE[ziel],
+      solution: `${WAPL[ziel]}: <b>${correct.map((k) => z.w[k]).join(', ')}</b>. ${WAPROBE[ziel]}`,
+      ex: { mode: 'wa', art: 'waAntippen', w: z.w, tag: z.tag, ziel, idx: correct },
+    };
+  }
+  function waWort() {
+    const ziel = pick(['N', 'V', 'A', 'P']);
+    const quelle = { N: () => pick(N).sg, V: () => pick(V).inf, A: () => pick(ADJ.filter((a) => !['viel', 'gern'].includes(a.pos))).pos, P: () => pick(['ich', 'du', 'wir', 'ihr', 'mein', 'dein', 'unser', 'ihm', 'uns', 'euch']) };
+    const tags = shuffle(['N', 'V', 'A', 'P']);
+    const w = tags.map((t) => quelle[t]());
+    return {
+      prompt: `Welches Wort ist ein <b>${WA[ziel]}</b>?`,
+      choices: w, correct: tags.indexOf(ziel),
+      hint: WAPROBE[ziel],
+      solution: `<b>${w[tags.indexOf(ziel)]}</b> ist ein ${WA[ziel]}. ${WAPROBE[ziel]}<br>Die anderen: ${tags.map((t, k) => (t === ziel ? '' : `${w[k]} (${WA[t]})`)).filter(Boolean).join(', ')}.`,
+      ex: { mode: 'wa', art: 'waWort', w, tag: tags, ziel, idx: [tags.indexOf(ziel)], liste: true },
+    };
+  }
+  const wortarten = () => U.wahl([[40, waBestimmen], [36, waAntippen], [24, waWort]]);
+
   D.daten = { V, SUBJ, HILF, ZEITEN, ZNAME, ZDEUTSCH, satz, text, bauplan, subjFuer, praesens, praeteritum,
-    N, GENUS, substSatz, FAELLE, FNAME, FFRAGE, ARTIKEL, pluralBau, pluralSatz, gruppe, fallSatz };
+    N, GENUS, substSatz, markSatz, WA, WAPL, WAPROBE, FAELLE, FNAME, FFRAGE, ARTIKEL, pluralBau, pluralSatz, gruppe, fallSatz };
   D.arten = { // für Tests
     'd5-substantive': { artikelWahl, mehrzahl, einzahl, einOderMehr, substAntippen },
     'd5-faelle': { fallBestimmen, fallArtikel, fallBilden, fallAntippen },
+    'd5-pronomen': { pronWahl, pronTippen, possessiv, pronBezug, pronAntippen },
+    'd5-adjektive': { adjKomp, adjSup, adjStufe, adjSatz, alsWie },
+    'd5-verbformen': { persForm, persWahl, partizip, imperativ, formArt },
+    'd5-wortarten': { waBestimmen, waAntippen, waWort },
     'd5-zeitformen': { erkennen, einsetzen, bilden, antippen, hilfsverb, grundform, welcherSatz },
   };
 
@@ -477,7 +794,11 @@
       { id: 'd5-wortarten', nr: 1, title: 'Wortarten', topics: [
         { id: 'd5-substantive', title: 'Substantive: Geschlecht und Mehrzahl', icon: '🏷', gen: substantive },
         { id: 'd5-faelle', title: 'Die vier Fälle', icon: '❓', gen: faelle },
+        { id: 'd5-pronomen', title: 'Pronomen', icon: '👉', gen: pronomen },
+        { id: 'd5-adjektive', title: 'Adjektive steigern', icon: '📶', gen: adjektive },
+        { id: 'd5-verbformen', title: 'Verbformen: Person, Partizip, Aufforderung', icon: '🧩', gen: verbformen },
         { id: 'd5-zeitformen', title: 'Zeitformen', icon: '⏳', gen: zeitformen },
+        { id: 'd5-wortarten', title: 'Wortarten erkennen', icon: '🔎', gen: wortarten },
       ] },
     ],
   };
