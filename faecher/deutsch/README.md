@@ -1,18 +1,19 @@
 # DeDax (Deutsch) – Startpunkt
 
-Stand 12.11.2026: **noch nichts gebaut.** Schritt 1 ist erledigt, Schritt 2 wartet auf das Inhaltsverzeichnis des
-Schulbuchs, für Schritt 3 liegt ein Vorschlag vor. Diese Datei sagt, was feststeht, was zu klären ist und wie man anfängt.
+Stand 12.11.2026 (`lerndax-v54`): **Klasse 5 ist gebaut** (30 Themen in 5 Bereichen, „Entdecken“, Knobel-Aufgaben) und steht
+auf der Startseite. Offen: Abgleich mit dem Schulbuch (ISBN und Inhaltsverzeichnis fehlen) und der Test mit dem Kind.
+Die Abschnitte unten ab „Vorgehen“ beschreiben den Weg dorthin und sind als Vorbild für das nächste Fach stehen geblieben.
 
 | Schritt | Stand | Datei |
 |---|---|---|
 | 1 Lehrplan auswerten | ✅ 12.11.2026 | `lehrplan/sachsen-gymnasium.md` |
 | 2 Schulbuch abgleichen | wartet: ISBN und Foto des Inhaltsverzeichnisses | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | Vorschlag (5 Bereiche, 31 Themen), noch nicht entschieden | `themenplan.md` |
-| 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. **Bereich Satzbau und Satzzeichen fertig (8 Themen).** **Alle fünf Bereiche sind gebaut (30 Themen).** **„Entdecken“ hat sechs Entdeckungen.** Offen: Knobeln, Schulbuch-Abgleich | `web/deutsch/`, Test `tests/dedax.py` |
+| 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. **Bereich Satzbau und Satzzeichen fertig (8 Themen).** **Alle fünf Bereiche sind gebaut (30 Themen).** **„Entdecken“ hat sechs Entdeckungen.** Knobel-Aufgaben zu allen Themen. Offen: Schulbuch-Abgleich | `web/deutsch/`, Test `tests/dedax.py` |
 
 **Entschieden am 12.11.2026:** Start mit dem Bereich **Wortarten**. Es heißt **„Substantiv“** (nicht „Nomen“). Die gemeinsamen Teile wurden **sofort** aus der
 Mathe-Seite herausgezogen (`web/plattform/fach.js` und `fach.css`); beide Fächer nutzen sie.
-DeDax ist unter `…/lerndax/deutsch/` erreichbar, steht auf der Startseite aber noch unter „Kommt bald“.
+DeDax ist unter `…/lerndax/deutsch/` erreichbar und steht seit v48 als große Kachel auf der Startseite.
 Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`.
 
 ## Was feststeht

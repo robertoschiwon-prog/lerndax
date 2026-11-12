@@ -1,6 +1,6 @@
 # Fächerplan LernDax
 
-Stand: 11.11.2026 · Die technische Liste aller Fächer steht in `web/plattform/faecher.js`.
+Stand: 12.11.2026 · Die technische Liste aller Fächer steht in `web/plattform/faecher.js`.
 Diese Datei erklärt, welche Fächer es gibt, wie sie heißen und in welcher Reihenfolge sie kommen.
 
 ## Namensschema
@@ -29,14 +29,14 @@ Startseite und App-Icon.
 | Fach | Hut | Datei |
 |---|---|---|
 | MaDax | Papierhut aus Karopapier mit + − × ÷ | `madax.svg` ✅ eingebaut |
-| DeDax | aufgeschlagenes Buch als Dach, mit Lesezeichen | `dedax.svg` (liegt bereit) |
+| DeDax | aufgeschlagenes Buch als Dach, mit Lesezeichen | `dedax.svg` ✅ eingebaut |
 | EnDax | Strickmütze mit Union Jack | `endax.svg` (liegt bereit) |
 | BioDax | Fliegenpilz als Hut | `biodax.svg` (liegt bereit) |
 | GeDax | Pharaonen-Kopftuch | `gedax.svg` (liegt bereit) |
 | GeoDax | Globus als Mütze | `geodax.svg` (liegt bereit) |
 | TecDax | Headset mit Mikrofon | `tecdax.svg` (liegt bereit) |
 
-Alle sieben stehen auf der Startseite (MaDax als große Kachel, die übrigen unter „Kommt bald“).
+Alle sieben stehen auf der Startseite (MaDax und DeDax als große Kacheln, die übrigen unter „Kommt bald“).
 Ideen für später: PhDax/ChDax Schutzbrille auf der Stirn.
 
 Regeln für neue Hüte: gleicher Rahmen `viewBox="-20 -32.75 140 140"`, Kopf unverändert an derselben
@@ -50,8 +50,8 @@ Klassen laut Stundentafel Sachsen (Grundschule Kl. 1–4, Gymnasium Sekundarstuf
 | Name | Fach | Kürzel | Klassen | Gruppe | Stand |
 |---|---|---|---|---|---|
 | **MaDax** | Mathe | Ma | 1–10 | Hauptfach | ✅ Klasse 5 |
-| **DeDax** | Deutsch | De | 1–10 | Hauptfach | geplant |
-| **EnDax** | Englisch | En | 3–10 | Hauptfach | geplant |
+| **DeDax** | Deutsch | De | 1–10 | Hauptfach | ✅ Klasse 5 |
+| **EnDax** | Englisch | En | 3–10 | Hauptfach | **als Nächstes** |
 | **SuDax** | Sachunterricht | Su | 1–4 | Sachfach | geplant |
 | **BioDax** | Biologie | Bio | 5–10 | Sachfach | geplant |
 | **GeDax** | Geschichte | Ge | 5–10 | Sachfach | geplant |
@@ -73,10 +73,11 @@ Das kann später neu entschieden werden.
 
 **Phase 1: Klasse 5 fertig bauen, alle Fächer**
 1. MaDax ✅ inhaltlich fertig (36 Themen, Knobel-Stufe, Abgleich mit Buch und Lehrplan; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
-2. **DeDax: als Nächstes, Startpunkt `faecher/deutsch/README.md`** (Deutschbuch 5, Cornelsen), danach EnDax (Green Line 1, Klett)
-3. BioDax (Linder 5), GeoDax (Terra 5), GeDax (Anno 1)
-4. TecDax (Technik/Computer)
-5. Vielleicht: MuDax, KuDax, EthDax
+2. DeDax ✅ gebaut (30 Themen, Entdecken, Knobeln; Schulbuch-Abgleich und Test mit dem Kind stehen aus)
+3. **EnDax: als Nächstes, Startpunkt `faecher/englisch/README.md`** (Schulbuch vermutlich Green Line 1, Klett; nicht geprüft)
+4. BioDax (Linder 5), GeoDax (Terra 5), GeDax (Anno 1)
+5. TecDax (Technik/Computer)
+6. Vielleicht: MuDax, KuDax, EthDax
 
 **Phase 2: die Nachbarklassen 4 und 6 in allen Fächern**
 - Klasse 6: dazu PhDax und die 2. Fremdsprache, die das Kind wählt
@@ -90,7 +91,7 @@ Das kann später neu entschieden werden.
 1. Lehrplan Sachsen auswerten, in `faecher/<id>/lehrplan/` ablegen (Vorbild:
    `faecher/mathe/lehrplan/sachsen-gymnasium.md`; Lehrpläne unter https://www.schulportal.sachsen.de/lplandb/).
 2. Mit dem Schulbuch abgleichen (Reihenfolge, Begriffe). Aufgaben werden nicht abgeschrieben.
-3. Ordner `web/<id>/` anlegen und die Schritte unter „Ein neues Fach hinzufügen“ in der `README.md` befolgen.
+3. Ordner `web/<id>/` anlegen (Vorbild `web/deutsch/`) und die Schritte unter „Ein neues Fach hinzufügen“ in der `README.md` befolgen.
 4. In `faecher.js` beim Fach `status: 'fertig'`, `fertig: [Klasse]`, `href`, `key` und `themen` setzen.
    Dann erscheint es auf der Startseite als große Kachel statt unter „Kommt bald“.
 

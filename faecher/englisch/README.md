@@ -1,0 +1,107 @@
+# EnDax (Englisch) – Startpunkt
+
+Stand 12.11.2026: **noch nichts gebaut.** Diese Datei sagt, was feststeht, was zu klären ist und wie man anfängt.
+Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. Vorbild für alles: DeDax
+(`faecher/deutsch/README.md`, `web/deutsch/`).
+
+| Schritt | Stand | Datei |
+|---|---|---|
+| 1 Lehrplan auswerten | offen | `lehrplan/sachsen-gymnasium.md` (anlegen) |
+| 2 Schulbuch abgleichen | offen: Titel, Ausgabe, ISBN und Foto des Inhaltsverzeichnisses fehlen | `lehrplan/schulbuch-abgleich.md` (anlegen) |
+| 3 Themenplan | offen | `themenplan.md` (anlegen) |
+| 4 Themen bauen | offen | `web/englisch/` (anlegen), Test nach Vorbild `tests/dedax.py` |
+
+## Was feststeht
+
+| | |
+|---|---|
+| Name | **EnDax** (sichtbar), Fach-ID `englisch`, Kürzel `En` |
+| Maskottchen | Dachs mit **Strickmütze mit Union Jack**: `web/icons/endax.svg` (fertig) |
+| Farbe | `#14a06c` (Eintrag in `web/plattform/faecher.js`, bisher `status: 'geplant'`, Klassen 3–10) |
+| Ordner | `web/englisch/` (anzulegen), Lernstand im Browser unter eigenem Schlüssel, Vorschlag `endax.v1`, Namensraum `window.EnDax` |
+| Zuerst | Klasse 5, Gymnasium Sachsen; später Klasse 4 und 6, dann 3–10 |
+| Leitidee | verstehen statt pauken; anschauliche, animierte Erklärungen; nach jeder Antwort die Lösung; „Entdecken“ zum Neugierigwerden |
+| Schulbuch | laut Fächerplan „Green Line 1“ (Klett). **Titel, Ausgabe und ISBN sind nicht geprüft**, das ist nur eine Annahme. |
+| Datenbank | keine Änderung nötig: Der Lernstand wird je Fach gespeichert (`subject = 'englisch'`, ist im Schema schon erlaubt) |
+
+Regeln wie bei MaDax und DeDax: genau der sächsische Lehrplan, alles darüber hinaus in „Entdecken“; keine Namen von
+Schule, Lehrkraft oder Kind im öffentlichen Code; nichts aus dem Schulbuch abschreiben (auch keine Vokabellisten
+in der Reihenfolge des Buchs übernehmen, sondern eigene Wortlisten nach Themen schreiben).
+
+## Vorgehen (so hat es bei Mathe und Deutsch funktioniert)
+
+1. **Lehrplan Englisch Gymnasium Sachsen, Klasse 5, am Originaltext auswerten**
+   (https://www.schulportal.sachsen.de/lplandb/) und als `faecher/englisch/lehrplan/sachsen-gymnasium.md` ablegen:
+   Lernbereiche, Inhalte, was davon am Bildschirm übbar ist. Nicht aus dem Gedächtnis.
+2. **Mit dem Schulbuch abgleichen**, sobald ISBN und Inhaltsverzeichnis da sind (Reihenfolge der Units, Grammatik je
+   Unit, Wortfelder). Ohne Buch trotzdem anfangen: Der Lehrplan reicht für den Themenplan.
+3. **Themenplan vorlegen**: Bereiche und Themen als Liste, dazu je Thema 2–3 Beispiel-Aufgaben. Der Auftraggeber
+   entscheidet anhand von Optionen (**Fragen einzeln stellen**).
+4. **Erst ein Thema ganz fertig bauen** (Aufgaben, Tipp, Lösungsweg, Erklärung, Symbol, Test) und zeigen, dann die übrigen.
+5. Danach „Entdecken“ und Knobel-Aufgaben. Zum Schluss `faecher.js` auf `status: 'fertig'` (erst wenn der
+   Auftraggeber es auf der Startseite haben will).
+6. Tests, Version, GitHub, `STAND.md`, OneDrive wie in `STAND.md` Abschnitt 0 beschrieben.
+
+## Was vor dem Bauen zu klären ist (mit dem Auftraggeber, einzeln)
+
+1. **Welches Englischbuch genau** (Titel, Ausgabe, ISBN auf der Rückseite, Foto des Inhaltsverzeichnisses)?
+2. **Womit anfangen**: Welche Unit ist gerade dran, steht eine Arbeit oder ein Vokabeltest an, was fällt schwer?
+3. **Sprache der App**: Aufgabenstellung, Tipp und Lösungsweg auf Deutsch (Vorschlag für Klasse 5) oder teils Englisch?
+4. **Vokabeln**: eigene Wortlisten nach Themen (Vorschlag), oder will er die Vokabeln der aktuellen Unit selbst
+   eintragen können? Das wäre eine neue Funktion.
+5. **Ton**: Soll EnDax Wörter und Sätze **vorlesen** (Aussprache, Hörverstehen)? Das gibt es in LernDax noch nicht
+   und muss erst ausprobiert werden (siehe unten).
+6. Britisches Englisch als Standard (passt zum Dachs-Hut); bei Wörtern mit zwei Schreibweisen beide zulassen?
+
+## Technik: was schon da ist
+
+Die App selbst wird **nicht** kopiert. `web/plattform/fach.js` und `fach.css` sind die gemeinsame Fach-App
+(Startseite des Fachs, Übungsrunde, Tipp, Lösungsweg, Sterne, Tagesziel, Gemischt, Fehler-Training, Knobeln,
+Erklär-Player, Elternansicht, Synchronisation). Ein Fach liefert nur:
+
+| Datei (Vorbild in `web/deutsch/`) | Inhalt |
+|---|---|
+| `index.html` | kurze Hülle: `window.LERNDAX_SUBJECT = 'englisch'`, Skripte einbinden, `window.LERNDAX_FACH = { id, name, fach, key, app, icons, dachs, entdecken, entdeckenText, entdeckenKurz, andereKlassen }`, dann `../plattform/fach.js` |
+| `themen/klasse5.js` | Wortlisten und Aufgaben; `window.EnDax = { util, daten, arten, grades: { 5: { lbs: [{ id, nr, title, topics: [{ id, title, icon, gen }] }] } }, explainers }` |
+| `themen/klasse5-knobel.js` | Knobel-Aufgaben: `topic.knobel()` je Thema |
+| `erklaerungen/klasse5.js`, `entdecken.js` | Animationen: `{ title, viewBox, create(api, ctx) → { reset(), play() } }` |
+| `symbole.js` | eigenes SVG-Symbol je Thema (`window.EnDaxIcons`) |
+
+Dazu: Dateien in `web/sw.js` (Liste `SHELL`) aufnehmen und `VERSION` erhöhen; in `web/plattform/faecher.js`
+`status`, `fertig`, `href`, `key`, `themen`, `entdecken` setzen. Die Elternübersicht der Startseite nimmt ein
+fertiges Fach von selbst auf.
+
+**Aufgabenformen, die die App schon kann** (alle mit `prompt`, `hint`, `solution`, optional `answerText`, `ex`):
+- Auswahl: `choices`, `correct`
+- Zahl eintippen: `fields: [{ answer }]`
+- Wort oder Satz eintippen: `fields: [{ type: 'text', answer: 'Wort' oder ['Wort', 'andere Schreibweise'], ci: true }]`
+- Satz mit Lücken: `layout: 'satz'`, Felder mit `prefix` und `suffix`
+- Wörter antippen: `tap: { tokens, correct: [Nummern] }`; Stellen zwischen Wörtern antippen: `tap: { …, gaps: true, mark: ',' }`
+
+**Was für Englisch wahrscheinlich neu gebraucht wird** (erst klären, dann bauen, danach alle Tests für Mathe und
+Deutsch laufen lassen, weil es die gemeinsame App betrifft):
+- **Apostroph**: Das iPhone tippt „’“ statt „'“ (don’t). Die Prüfung in `fach.js` (`normText`) muss beide gleich
+  behandeln, sonst wird „don’t“ als falsch gewertet. Das ist noch **nicht** eingebaut.
+- **Autokorrektur und Großschreibung** des Handys: Die Textfelder schalten beides schon ab (`autocapitalize="none"`,
+  `autocorrect="off"`).
+- **Vorlesen**: Der Browser kann Text vorlesen (Sprachausgabe des Geräts). Ob das auf dem iPhone der Familie gut
+  genug klingt und offline geht, ist **nicht ausprobiert**. Erst einen kleinen Versuch bauen und dem Auftraggeber zeigen.
+- **Vokabeltraining**: deutsch → englisch und umgekehrt, mit mehreren richtigen Antworten je Wort. Vielleicht
+  Karteikasten-Prinzip (falsche Wörter kommen öfter wieder); das Fehler-Training der App sammelt bisher Themen, keine
+  einzelnen Wörter.
+- **Zuordnen** (Paare verbinden) und **Wörter in die richtige Reihenfolge bringen** (Satzbau: he / plays / football)
+  gibt es noch nicht als Aufgabenform.
+
+## Lehren aus DeDax (bitte von Anfang an beachten)
+
+1. **Jede Lücke braucht genau eine richtige Lösung, sonst alle richtigen Antworten zulassen.** (Rückmeldung des
+   Auftraggebers: „Sie trinkt/trinken ein Glas Wasser“ war zweideutig.) Bei Auswahl-Lücken darf kein falsches Angebot
+   ein anderes richtiges Wort oder einen anderen richtigen Satz ergeben. In Englisch besonders heikel: Kurz- und
+   Langformen (isn’t / is not), britisch/amerikanisch, some/any, mehrere mögliche Zeitformen ohne Signalwort.
+2. Jede neue Aufgabenart braucht eine passende Animation für „Lösung zu deiner Aufgabe“, sonst zeigt der Player
+   etwas Unpassendes. Die Animation muss die richtige Antwort nennen (das prüft der Test).
+3. Alle Sätze und Texte **selbst schreiben**. Fakten (Landeskunde, Wortherkunft) nachschlagen oder als unsicher kennzeichnen.
+4. Vor dem Hochladen erzeugte Aufgaben massenhaft prüfen (Node: jede Aufgabenart einige hundert Mal erzeugen, auf
+   `undefined`, doppelte Auswahl, leere Antworten prüfen) **und** in der App durchspielen (`tests/dedax.py` als Vorbild).
+5. Bildschirmfotos ansehen, nicht nur Tests lesen: lange Wörter und Sätze laufen auf dem Handy (390 px) schnell über den Rand.
+6. In SVG-Animationen: Elemente mit den Klassen `ex-b`/`ex-s` bekommen ihre Farbe über `style.fill`, nicht über das Attribut.

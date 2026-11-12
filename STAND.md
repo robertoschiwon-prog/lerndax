@@ -21,7 +21,20 @@ Weitere Dokumente:
 
 ---
 
-## 0. Übergabe vom 12.11.2026: Stand und nächster Schritt (DeDax)
+## 0. Übergabe vom 12.11.2026: Stand und nächster Schritt (EnDax)
+
+**Kurz für den neuen Chat (Stand `lerndax-v54`, Abend des 12.11.2026)**
+- **MaDax Klasse 5** (36 Themen) und **DeDax Klasse 5** (30 Themen, 6 Entdeckungen, Knobel-Aufgaben zu allen Themen)
+  sind gebaut und live. Die Startseite hat eine Elternübersicht für alle Fächer.
+- **Jetzt beginnt EnDax (Englisch, Klasse 5).** Startpunkt mit Vorgehen, offenen Fragen, Technik und den Lehren aus
+  DeDax: **`faecher/englisch/README.md`**. Für Englisch ist noch nichts gebaut und nichts ausgewertet.
+- Erster Schritt: Lehrplan Englisch Klasse 5 am Originaltext auswerten, dann dem Auftraggeber die offenen Fragen
+  **einzeln** stellen (Schulbuch, womit anfangen, Sprache der App, Vokabeln, Vorlesen), dann Themenplan vorlegen.
+- Wartet auf den Auftraggeber: ISBN und Foto des Inhaltsverzeichnisses vom **Deutschbuch** (Schulbuch-Abgleich DeDax),
+  Rückmeldungen aus dem Test mit dem Kind (MaDax am 13.11.2026 geplant; DeDax hat außer „Zeitformen“ noch niemand
+  durchgespielt, die Knobel-Aufgaben und ihre Texte hat noch kein Mensch gegengelesen).
+- Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
+
 
 **Wo wir stehen**
 - **MaDax Klasse 5 ist inhaltlich fertig** (Version `lerndax-v43`, live). 36 Themen in 5 Lernbereichen, in der
@@ -1015,3 +1028,6 @@ Infos zur ersten Arbeit:
   Lücken die Leerzeichen (betraf auch die normalen Deutsch-Aufgaben).
   Geprüft: 34 400 erzeugte Aufgaben ohne Fehler; `tests/dedax_knobel.py` spielt jede Aufgabenart in der App
   (430 Aufgaben: richtige Antwort angenommen, falsche führt zur Lösung, nichts ragt über den Rand, Sterne unverändert).
+- **Übergabe für EnDax vorbereitet** (12.11.2026, keine Änderung an der App, Version bleibt `lerndax-v54`): neuer
+  Startpunkt `faecher/englisch/README.md`; Abschnitt 0 beginnt jetzt mit der Kurzfassung für den neuen Chat;
+  `faecher/README.md` und `faecher/deutsch/README.md` auf den heutigen Stand gebracht.
