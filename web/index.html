@@ -152,10 +152,10 @@ a{color:inherit}
             <span class="go">→</span></a>`).join('')}
         ${bald.length ? `<div class="soonbox"><small>Kommt bald</small><div class="chips">${bald.map((f) => `<span class="chip" title="${esc(fachname(f, k))}"><i style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.dachs ? `<img src="${f.dachs}" alt="">` : f.icon}</i><span><b>${f.name}</b><em>${esc(fachname(f, k))}</em></span></span>`).join('')}</div></div>` : ''}
       </div>
-      <a class="disc" href="mathe/#entdecken">
+      ${aktiv.filter((f) => f.entdecken).map((f) => `<a class="disc" href="${f.href}#entdecken">
         <span class="ic">✦</span>
-        <span><b>Entdecken</b><small>Mathe zum Staunen: Gedankenlesen, das Galton-Brett, π und mehr</small></span>
-      </a>
+        <span><b>Entdecken${aktiv.filter((x) => x.entdecken).length > 1 ? ' in ' + f.name : ''}</b><small>${esc(f.entdecken)}</small></span>
+      </a>`).join('')}
       <div class="foot">
         <a href="mathe/#eltern">Für Eltern: Fortschritt &amp; Geräte</a>
         <p>LernDax · ein Familienprojekt · nach dem Lehrplan Sachsen</p>

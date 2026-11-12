@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v51`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v52`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -78,13 +78,15 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
   „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
   27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
+- **Gebaut (v52): „Entdecken“ für Deutsch** mit sechs Entdeckungen (`web/deutsch/erklaerungen/entdecken.js`). Auf der
+  Startseite gibt es jetzt je Fach eine „Entdecken“-Karte (`entdecken` in `faecher.js`).
 - **Gebaut (v51): Bereich 4 „Wörter bauen und Wortschatz“ (4 Themen) und Bereich 5 „Texte verstehen“ (5 Themen).**
   **Damit ist der Themenplan Klasse 5 vollständig gebaut: 30 Themen in 5 Bereichen.**
 - **Gebaut (v50): Bereich 3 „Rechtschreibung“ ist vollständig** (6 Themen).
 - **Gebaut (v49): Bereich 2 „Satzbau und Satzzeichen“ ist vollständig** (8 Themen).
 - **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 30 Themen).
   Die Zahl `themen` dort bei jedem neuen Thema mitzählen.
-- **Als Nächstes:** „Entdecken“ für Deutsch (Ideen im Themenplan), Knobel-Aufgaben, „Gemischt“-Prüfung über alle Bereiche ansehen, Schulbuch-Abgleich (ISBN und Inhaltsverzeichnis fehlen), Rückmeldung des Auftraggebers und Test mit Bruno.
+- **Als Nächstes:** Elternbereich für beide Fächer auf die Startseite, Knobel-Aufgaben für Deutsch, „Gemischt“-Prüfung über alle Bereiche ansehen, Schulbuch-Abgleich (ISBN und Inhaltsverzeichnis fehlen), Rückmeldung des Auftraggebers und Test mit Bruno.
   ISBN und Inhaltsverzeichnis des Deutschbuchs,
   Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
@@ -374,7 +376,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v51`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v52`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -973,3 +975,13 @@ Infos zur ersten Arbeit:
   Neue Animationen: Wortliste mit farbigem Wortstamm, Reimschema in Farben, wachsendes Balken-Schaubild.
   `tests/dedax.py`: 30 Themen, 1080 richtige Antworten angenommen, 360 Lösungs-Animationen; 240 000 erzeugte Aufgaben
   ohne Fehler.
+- **DeDax: „Entdecken“** (Version `lerndax-v52`): sechs Entdeckungen auf dunkler Bühne.
+  „Cäsars Geheimschrift“ (Alphabet verschieben, Wort verschlüsseln, Knacken über den häufigsten Buchstaben E),
+  „Rückwärts-Wörter“ (Palindrome: Buchstaben tauschen die Plätze), „Wie lang kann ein Wort werden?“ (Donau… bis
+  Donaudampfschifffahrtsgesellschaftskapitänsmütze, 48 Buchstaben, der Artikel wechselt mit dem letzten Wort),
+  „Woher kommen die Familiennamen?“ (Beruf, Aussehen, Herkunft, Vater), „Wörter auf Wanderschaft“ (Fenster, Mauer, Keks,
+  Zucker, Joghurt; umgekehrt Kindergarten, Rucksack, buterbrod, arubaito, vasistas), „Sächsisch“ (k/t/p werden weich,
+  dazu Bemme, nu, Plinsen, Mutschekiebchen, Hitsche; passt zum Lehrplan-Punkt Dialekt und Hochsprache).
+  Geprüft: alle Palindrome per Programm, Buchstabenzahl per Programm. „vasistas von ‚Was ist das?‘“ ist als Erzählung
+  formuliert („man erzählt“), weil die Herkunft nicht ganz sicher ist. Sächsische Schreibweisen sind Lautschrift.
+  Startseite: „Entdecken in MaDax“ und „Entdecken in DeDax“. `tests/dedax.py` spielt jetzt auch alle Entdeckungen durch.

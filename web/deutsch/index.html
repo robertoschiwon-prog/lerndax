@@ -29,13 +29,15 @@
 <script src="themen/klasse5.js"></script>
 <script src="symbole.js"></script>
 <script src="erklaerungen/klasse5.js"></script>
+<script src="erklaerungen/entdecken.js"></script>
 <script>
 /* DeDax: Das Fach beschreibt sich, die App selbst steckt in ../plattform/fach.js (gemeinsam für alle Fächer). */
 window.LERNDAX_FACH = {
   id: 'deutsch', name: 'DeDax', fach: 'Deutsch', key: 'dedax.v1',
   app: window.DeDax, icons: window.DeDaxIcons,
   dachs: '../icons/dedax.svg',
-  entdecken: [], entdeckenText: 'Sprache zum Staunen.', entdeckenKurz: 'Sprache zum Staunen',
+  entdecken: ['caesar', 'palindrom', 'langwort', 'namen', 'wandern', 'saechsisch'],
+  entdeckenText: 'Sprache zum Staunen: Geheimschrift, Riesenwörter und Wörter auf Reisen.', entdeckenKurz: 'Sprache zum Staunen',
   andereKlassen: {},
 };
 </script>

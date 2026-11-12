@@ -14,7 +14,7 @@ TASK = """() => { const t = window.__lerndax.round().cur.task;
     vals: t.fields ? t.fields.map(f => 'fixed' in f ? null : [].concat(f.answer)[0]) : null, answer: (t.answerText || ''), fields: t.fields ? t.fields.map(f => [].concat(f.answer)[0]) : [] }; }"""
 FAST = "() => { const o = requestAnimationFrame; let t = performance.now(); window.requestAnimationFrame = (f) => o(() => { t += 240; f(t); }); }"
 OUT = """() => { const svg = document.querySelector('.exstage svg'); if (!svg) return []; const r = svg.getBoundingClientRect(); const bad = [];
-  svg.querySelectorAll('text').forEach(e => { const b = e.getBoundingClientRect(); if (b.width && e.textContent.trim() && (b.left < r.left - 1 || b.right > r.right + 1 || b.top < r.top - 1 || b.bottom > r.bottom + 1)) bad.push(e.textContent); }); return bad; }"""
+  svg.querySelectorAll('text').forEach(e => { const b = e.getBoundingClientRect(); if (b.width && e.textContent.trim() && e.getAttribute('opacity') !== '0' && (b.left < r.left - 1 || b.right > r.right + 1 || b.top < r.top - 1 || b.bottom > r.bottom + 1)) bad.push(e.textContent); }); return bad; }"""
 
 async def answer(pg, a, wrong=False):
     if a['choice'] is not None:
@@ -84,6 +84,17 @@ async def main():
             for x in await pg.evaluate(OUT): meld.append(f'{t}: Text ragt aus dem Bild (frei): {x}')
             await pg.screenshot(path=str(SHOTS / f'dedax-frei-{t}.png'))
             await pg.click('[data-exclose]')
+        # Entdecken: jede Entdeckung läuft bis zum Ende, kein Text ragt aus dem Bild
+        await pg.evaluate("() => document.querySelectorAll('[data-lbopen]').forEach(b => b.click())")
+        discs = await pg.eval_on_selector_all('.disc[data-explain]', 'els=>els.map(e=>e.dataset.explain)')
+        for d in discs:
+            await pg.click(f'.disc[data-explain="{d}"]')
+            await pg.wait_for_function("() => { const b = document.getElementById('exPlay'); return b && /Nochmal/.test(b.textContent); }", timeout=180000)
+            for x in await pg.evaluate(OUT): meld.append(f'Entdecken {d}: Text ragt aus dem Bild: {x}')
+            await pg.wait_for_timeout(2600)   # der Begrüßungs-Dachs blendet nach echter Zeit aus
+            await pg.screenshot(path=str(SHOTS / f'dedax-entdecken-{d}.png'))
+            await pg.click('[data-exclose]')
+        print('Entdeckungen:', discs)
         await pg.click('[data-go="parents"]'); await pg.screenshot(path=str(SHOTS / 'dedax-eltern.png'), full_page=True)
         print(f'{len(ids)} Themen, {n} richtige Antworten geprüft, {bad} nicht angenommen, {anim} Lösungs-Animationen')
         for m in meld[:30]: print(' -', m)

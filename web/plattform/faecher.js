@@ -18,13 +18,14 @@
  *   status:  'fertig' | 'geplant' | 'vielleicht'
  *   fertig:  Klassenstufen, die in LernDax schon fertig sind
  *   href, key, themen: nur für fertige Fächer (Link, Lernstand im Browser, Anzahl Themen)
+ *   entdecken: Text der „Entdecken“-Karte auf der Startseite (nur wenn das Fach Entdeckungen hat)
  *
  * Nicht vorgesehen: Sport, Werken, Religion, Profil (lassen sich kaum sinnvoll am Bildschirm üben).
  */
 window.LERNDAX_FAECHER = [
   // Hauptfächer
-  { id: 'mathe', dachs: 'icons/madax.svg',    kuerzel: 'Ma',  name: 'MaDax',  fach: 'Mathe',    icon: '×',  farbe: '#ff6b3d', klassen: [1, 10], gruppe: 'kern', status: 'fertig',  fertig: [5], href: 'mathe/', key: 'mathelix.v1', themen: 36 },
-  { id: 'deutsch', dachs: 'icons/dedax.svg',  kuerzel: 'De',  name: 'DeDax',  fach: 'Deutsch',  icon: 'De', farbe: '#3d7bff', klassen: [1, 10], gruppe: 'kern', status: 'fertig',  fertig: [5], href: 'deutsch/', key: 'dedax.v1', themen: 30 },
+  { id: 'mathe', dachs: 'icons/madax.svg',    kuerzel: 'Ma',  name: 'MaDax',  fach: 'Mathe',    icon: '×',  farbe: '#ff6b3d', klassen: [1, 10], gruppe: 'kern', status: 'fertig',  fertig: [5], href: 'mathe/', key: 'mathelix.v1', themen: 36, entdecken: 'Mathe zum Staunen: Gedankenlesen, das Galton-Brett, π und mehr' },
+  { id: 'deutsch', dachs: 'icons/dedax.svg',  kuerzel: 'De',  name: 'DeDax',  fach: 'Deutsch',  icon: 'De', farbe: '#3d7bff', klassen: [1, 10], gruppe: 'kern', status: 'fertig',  fertig: [5], href: 'deutsch/', key: 'dedax.v1', themen: 30, entdecken: 'Sprache zum Staunen: Geheimschrift, Riesenwörter, Sächsisch und mehr' },
   { id: 'englisch', dachs: 'icons/endax.svg', kuerzel: 'En',  name: 'EnDax',  fach: 'Englisch', icon: 'En', farbe: '#14a06c', klassen: [3, 10], gruppe: 'kern', status: 'geplant', fertig: [] },
 
   // Sachfächer
