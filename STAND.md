@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v44`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v45`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -362,7 +362,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v44`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v45`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -890,3 +890,6 @@ Infos zur ersten Arbeit:
   `ex_aufgabe.py`, `bild_audit.py` ohne Auffälligkeit, `design_audit.py` nur die bekannten Deko-Meldungen,
   `gen-test.js` 75 000 Aufgaben ohne Fehler). DeDax: 20 000 erzeugte Aufgaben ohne Fehler, in der App alle richtigen
   Antworten angenommen, alle Lösungs-Animationen nennen die Antwort.
+- Rückmeldung Auftraggeber zu „Zeitformen“ (Version `lerndax-v45`): Der Satzanfang „Sie“ war mehrdeutig (eine Person oder
+  mehrere, also „trinkt“ oder „trinken“). „Sie“ allein kommt als Subjekt nicht mehr vor. **Lehre für alle Sprach-Aufgaben:**
+  Jede Lücke muss genau eine richtige Lösung haben; sonst alle richtigen Antworten zulassen.

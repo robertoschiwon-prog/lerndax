@@ -83,7 +83,8 @@
     return { 0: v.praet, 2: v.praet, 3: v.praet + (schwach ? 'n' : 'en'), 5: v.praet + (schwach ? 'n' : 'en') }[p];
   }
   const SUBJ = [
-    { t: 'Ich', p: 0 }, { t: 'Du', p: 1 }, { t: 'Er', p: 2 }, { t: 'Sie', p: 2 }, { t: 'Wir', p: 3 }, { t: 'Ihr', p: 4 },
+    // „Sie“ allein fehlt mit Absicht: Es kann eine Person oder mehrere meinen (sie trinkt / sie trinken).
+    { t: 'Ich', p: 0 }, { t: 'Du', p: 1 }, { t: 'Er', p: 2 }, { t: 'Wir', p: 3 }, { t: 'Ihr', p: 4 },
     { t: 'Lina', p: 2 }, { t: 'Emil', p: 2 }, { t: 'Mein Bruder', p: 2 }, { t: 'Die Lehrerin', p: 2 }, { t: 'Unser Nachbar', p: 2 }, { t: 'Das Mädchen', p: 2 },
     { t: 'Die Kinder', p: 5 }, { t: 'Meine Eltern', p: 5 }, { t: 'Mia und Ben', p: 5 }, { t: 'Die Nachbarn', p: 5 },
   ];
