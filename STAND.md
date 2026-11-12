@@ -128,7 +128,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern · Gemischte Zahlen ·
     Bruch · Dezimal · Prozent · Mit Dezimalzahlen rechnen · Dezimalzahlen runden · Zahlen vergleichen · Arithmetisches Mittel
   - LB 3 Geometrie: Koordinatensystem · Winkelarten · Winkel an Geraden · Symmetrie & Spiegeln
-  - LB 4 Rechtecke & Quader: Umfang & Fläche · Volumen & Oberfläche · Würfelnetze & Baupläne
+  - LB 4 Rechtecke & Quader: Umfang & Fläche · Volumen & Oberfläche · Netze & Schrägbilder
   - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld · Schätzen wie Fermi
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
@@ -446,7 +446,7 @@ Infos zur ersten Arbeit:
 - [x] Nach der Arbeit (24.11.): Trainingsseite **bleibt stehen** (Entscheidung Auftraggeber, 10.11.), auch
       als Beispiel für spätere Jahrgänge bzw. eine mögliche öffentliche Version.
 - [x] Lehrplan-Lücken Klasse 5 geschlossen (11.11.2026, `lerndax-v34`): sieben neue Themen, siehe Verlauf.
-      Noch nicht abgedeckt: Schrägbilder zeichnen, Drehungen, Quadernetze (nur Würfelnetze).
+      Seit `lerndax-v35` auch Quadernetze, Drehungen und Schrägbilder (lesen und verstehen; das Zeichnen selbst übt man im Heft).
 
 **Entscheidungen des Auftraggebers zur Komplett-Prüfung (11.11.2026, umgesetzt mit `lerndax-v21`)**
 - Raten: mehr Aufgaben zum Eintippen, Ja/Nein höchstens bei etwa einem Viertel je Thema.
@@ -685,3 +685,11 @@ Infos zur ersten Arbeit:
   Alles jenseits des Lehrplans gehört in den Bereich „Entdecken“. Idee, nicht beschlossen: je Thema eine freiwillige
   Stufe „Knobeln“ mit schwereren Aufgaben, die nicht für die Sterne zählt. Ein späteres „Bundesland wählen“ wäre nur
   eine zusätzliche Zuordnung der vorhandenen Themen zu Klassenstufen und braucht keinen Umbau.
+- **Lehrplan-Reste Klasse 5** (Version `lerndax-v35`): Das Thema „Würfelnetze & Baupläne“ heißt jetzt **„Netze & Schrägbilder“**
+  und hat neue Aufgabenarten: Quadernetz (markierte Fläche, ganzes Netz = Oberfläche) und Schrägbild (schräge Kante halb
+  so lang, echte Tiefe, welche Kanten echt/verkürzt/gestrichelt, Ecken/Kanten/Flächen). „Symmetrie & Spiegeln“ hat zusätzlich
+  **Drehungen** um einen Punkt (Vierteldrehung links/rechts, halbe Drehung). Alle mit eigener Animation.
+  Annahme zum Schrägbild: Kanten nach hinten unter 45° und halb so lang (übliche Schul-Konvention; bei Gelegenheit mit dem
+  Schulbuch abgleichen). Elternbereich: je Lernbereich eine Zeile „x von y Themen geübt · Sterne“.
+  Langer Animations-Test über alle 32 Themen gelaufen (`tests/loesung.py 5`). Die Trainingsseite für den 24.11. bleibt
+  unverändert: Ihre Themen stammen aus der Themenliste der Schule; Überschlagen und schriftliches Rechnen stehen dort nicht.

@@ -264,6 +264,7 @@ th{text-align:left;font-size:12px;color:var(--soft);text-transform:uppercase;let
 td{padding:8px 4px;border-bottom:1px solid var(--tint);vertical-align:middle}
 td small.when{display:block;font-size:12px;color:var(--soft);font-weight:600}
 .tablecard{padding:12px}
+.lbsum{display:block;margin:4px 0 0;font-size:13px;font-weight:700;color:var(--soft)}
 .tablecard table{table-layout:fixed}
 .tablecard th:nth-child(2),.tablecard td:nth-child(2){width:44px}
 .tablecard th:nth-child(3),.tablecard td:nth-child(3){width:64px}
@@ -1233,7 +1234,7 @@ body.noscroll{overflow:hidden}
       </div>
       <div class="card tablecard">
         ${grade().lbs.map((lb) => `
-          <h3 class="lbt"><span class="tag bg${lb.nr}" style="margin:0 6px 0 0">LB ${lb.nr}</span>${lb.title}</h3>
+          <h3 class="lbt"><span class="tag bg${lb.nr}" style="margin:0 6px 0 0">LB ${lb.nr}</span>${lb.title}<small class="lbsum">${lb.topics.filter((t) => mastery(t.id).n > 0).length} von ${lb.topics.length} Themen geübt · ★ ${lb.topics.reduce((n, t) => n + mastery(t.id).stars, 0)} von ${lb.topics.length * 3}</small></h3>
           <table><thead><tr><th>Thema</th><th class="n">Aufg.</th><th>Quote*</th><th>Sterne</th></tr></thead><tbody>
           ${lb.topics.map((t) => { const m = mastery(t.id); const st = S.stats[t.id];
             const col = m.avg >= 0.75 ? 'var(--ok)' : m.avg >= 0.5 ? 'var(--c5)' : 'var(--bad)';

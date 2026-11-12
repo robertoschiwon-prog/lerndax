@@ -271,7 +271,7 @@
   // =====================================================
   reg('k5-symmetrie', {
     title: 'Spiegeln: gleich weit auf die andere Seite',
-    titleFor: (ctx) => (ctx && ctx.mode === 'achsen' ? 'Symmetrieachsen finden' : ctx && ctx.mode === 'punkt' ? 'Punktspiegelung: durch Z hindurch' : ctx && ctx.mode === 'schieb' ? 'Verschieben' : 'Spiegeln: gleich weit auf die andere Seite'),
+    titleFor: (ctx) => (ctx && ctx.mode === 'achsen' ? 'Symmetrieachsen finden' : ctx && ctx.mode === 'punkt' ? 'Punktspiegelung: durch Z hindurch' : ctx && ctx.mode === 'schieb' ? 'Verschieben' : ctx && ctx.mode === 'dreh' ? 'Drehen um einen Punkt' : 'Spiegeln: gleich weit auf die andere Seite'),
     viewBox: '0 0 300 245',
     create(api, ctx) {
       ctx = ctx || {};
@@ -313,6 +313,12 @@
           } else if (c.mode === 'punkt') {
             c.nx = 2 * c.zx - c.x; c.ny = 2 * c.zy - c.y;
             g.w1 = weg(c.x, c.y, c.zx, c.zy); g.w2 = weg(c.zx, c.zy, c.nx, c.ny);
+            g.p = punkt(c.x, c.y, 'P'); g.zp = punkt(c.zx, c.zy, 'Z', 'z'); g.q = punkt(c.nx, c.ny, 'P′', '', 0);
+          } else if (c.mode === 'dreh') {
+            [c.nx, c.ny] = M.drehe90(c.x, c.y, c.zx, c.zy, c.art);
+            const arm = `${kx(c.zx)},${ky(c.zy)} ${kx(c.x)},${ky(c.zy)} ${kx(c.x)},${ky(c.y)}`;
+            el('polyline', { points: arm, class: 'dash', style: 'fill:none' }, api.svg); // Ausgangslage bleibt als Schatten stehen
+            g.arm = el('polyline', { points: arm, class: 'arcG', opacity: 0 }, api.svg);
             g.p = punkt(c.x, c.y, 'P'); g.zp = punkt(c.zx, c.zy, 'Z', 'z'); g.q = punkt(c.nx, c.ny, 'P′', '', 0);
           } else {
             g.w1 = weg(c.x, c.y, c.x + c.dx, c.y); g.w2 = weg(c.x + c.dx, c.y, c.x + c.dx, c.y + c.dy);
@@ -360,6 +366,18 @@
             await api.wait(2400);
             await api.tw(400, (t) => show(g.q, t));
             api.say(`Dort liegt <b>P′(${c.nx} | ${c.ny})</b>.<br><small>Z liegt genau in der Mitte zwischen P und P′. Eine Punktspiegelung ist dasselbe wie eine halbe Drehung um Z.</small>`);
+          } else if (c.mode === 'dreh') {
+            const grad = c.art === 'halb' ? 180 : 90, svgGrad = c.art === 'links' ? -90 : c.art === 'rechts' ? 90 : 180;
+            api.say(`Der Punkt P(${c.x} | ${c.y}) wird um <b>Z(${c.zx} | ${c.zy})</b> gedreht: ${grad}°${c.art === 'links' ? ' nach links (gegen den Uhrzeigersinn)' : c.art === 'rechts' ? ' nach rechts (im Uhrzeigersinn)' : ', eine halbe Drehung'}.`);
+            await api.wait(3400);
+            await api.tw(400, (t) => show(g.arm, t));
+            api.say(`Merke dir den Weg von Z zu P wie einen Winkelhaken: <b>${M.richt(c.x - c.zx, c.y - c.zy)}</b>.`);
+            await api.wait(3200);
+            await api.tw(1800, (t) => g.arm.setAttribute('transform', `rotate(${svgGrad * t} ${kx(c.zx)} ${ky(c.zy)})`));
+            api.say(`Der ganze Haken dreht sich um Z. Jetzt zeigt er: <b>${M.richt(c.nx - c.zx, c.ny - c.zy)}</b>.`);
+            await api.wait(3000);
+            await api.tw(400, (t) => show(g.q, t));
+            api.say(`An seinem Ende liegt <b>P′(${c.nx} | ${c.ny})</b>.<br><small>Beim Drehen bleibt der Abstand zu Z gleich. ${c.art === 'halb' ? 'Eine halbe Drehung ist dasselbe wie eine Punktspiegelung an Z.' : 'Bei einer Vierteldrehung tauschen „rechts/links“ und „oben/unten“ die Rollen.'}</small>`);
           } else {
             api.say(`Der Punkt A(${c.x} | ${c.y}) wandert nach A′(${c.x + c.dx} | ${c.y + c.dy}). Wir zerlegen den Weg in <b>rechts/links</b> und <b>oben/unten</b>.`);
             await api.wait(3200);
@@ -381,15 +399,15 @@
   const PAAR = ['#ff9f6b', '#ff9f6b', '#7fb0ff', '#7fb0ff', '#7bd3a6', '#7bd3a6']; // gleiche Farbe = gegenüber
   reg('k5-netze', {
     title: 'Würfelnetz: in Gedanken falten',
-    titleFor: (ctx) => (ctx && ctx.mode === 'bau' ? 'Würfelgebäude: Bauplan lesen' : 'Würfelnetz: in Gedanken falten'),
+    titleFor: (ctx) => (ctx && ctx.mode === 'bau' ? 'Würfelgebäude: Bauplan lesen' : ctx && ctx.mode === 'qnetz' ? 'Quadernetz: sechs Rechtecke' : ctx && ctx.mode === 'schraeg' ? 'Schrägbild: so wird ein Quader räumlich' : 'Würfelnetz: in Gedanken falten'),
     viewBox: '0 0 360 200',
     create(api, ctx) {
       ctx = ctx || {};
       let c;
-      const neu = () => { c = aehnlich('k5-netze', { mode: 'netz' }); };
+      const neu = (m) => { c = aehnlich('k5-netze', { mode: m || 'netz' }); };
       if (ctx.mode && ctx.post) c = ctx;
       else if (ctx.mode && ctx.pre) c = aehnlich('k5-netze', ctx);
-      else { neu(); api.chips([{ label: 'Anderes Netz', onClick() { neu(); api.replay(); } }]); }
+      else { neu(); api.chips([{ label: 'Würfelnetz', onClick() { neu('netz'); api.replay(); } }, { label: 'Quadernetz', onClick() { neu('qnetz'); api.replay(); } }, { label: 'Schrägbild', onClick() { neu('schraeg'); api.replay(); } }]); }
       let g;
       return {
         reset() {
@@ -400,6 +418,28 @@
             el('text', { class: 'ex-s f6', x: ox + 60, y: oy + 3 * s + 18, 'text-anchor': 'middle', text: 'vorn' }, api.svg);
             g.out = el('text', { class: 'ex-b f1', x: 270, y: 96, 'text-anchor': 'middle', text: '' }, api.svg);
             g.lbl = el('text', { class: 'ex-s', x: 270, y: 70, 'text-anchor': 'middle', text: c.vorn ? 'von vorn' : 'Würfel' }, api.svg);
+            return;
+          }
+          if (c.mode === 'qnetz') {
+            const { F, s, ox, oy } = M.qnetzFlaechen(c.a, c.b, c.c);
+            const grp = el('g', { transform: 'translate(24 6)' }, api.svg);
+            g.f = {};
+            F.forEach((f) => { g.f[f.id] = el('rect', { class: 'netz', x: f.px, y: f.py, width: f.pw, height: f.ph }, grp); });
+            el('text', { class: 'tick b', x: ox + (c.c + c.a / 2) * s, y: oy - 5, 'text-anchor': 'middle', text: c.a + ' cm' }, grp);
+            el('text', { class: 'tick b', x: ox + c.c * s - 5, y: oy + (c.c / 2) * s + 4, 'text-anchor': 'end', text: c.c + ' cm' }, grp);
+            el('text', { class: 'tick b', x: ox - 5, y: oy + (c.c + c.b / 2) * s + 4, 'text-anchor': 'end', text: c.b + ' cm' }, grp);
+            return;
+          }
+          if (c.mode === 'schraeg') {
+            const { a, b } = c, t = c.c;
+            const s = Math.min(24, 170 / (a + t * 0.36), 130 / (b + t * 0.36)), dx = t * s * 0.5 * Math.SQRT1_2;
+            const x0 = (360 - (a * s + dx)) / 2, y0 = (200 + (b * s + dx)) / 2 - 6;
+            const P = (x, y, z) => [x0 + x * s + (z ? dx : 0), y0 - y * s - (z ? dx : 0)];
+            const L = (p, q, cls) => el('line', { x1: p[0], y1: p[1], x2: q[0], y2: q[1], class: cls, opacity: 0 }, api.svg);
+            g.vorn = el('polygon', { class: 'wf', opacity: 0, points: [P(0, 0, 0), P(a, 0, 0), P(a, b, 0), P(0, b, 0)].map((q) => q.join(',')).join(' ') }, api.svg);
+            g.schraeg = [L(P(a, 0, 0), P(a, 0, 1), 'ray'), L(P(a, b, 0), P(a, b, 1), 'ray'), L(P(0, b, 0), P(0, b, 1), 'ray'), L(P(0, 0, 0), P(0, 0, 1), 'dash')];
+            g.hinten = [L(P(0, b, 1), P(a, b, 1), 'ray'), L(P(a, 0, 1), P(a, b, 1), 'ray'), L(P(0, 0, 1), P(a, 0, 1), 'dash'), L(P(0, 0, 1), P(0, b, 1), 'dash')];
+            g.txt = [el('text', { class: 'tick b', x: x0 + (a * s) / 2, y: y0 + 16, 'text-anchor': 'middle', text: a + ' cm', opacity: 0 }, api.svg), el('text', { class: 'tick b', x: x0 - 6, y: y0 - (b * s) / 2 + 4, 'text-anchor': 'end', text: b + ' cm', opacity: 0 }, api.svg), el('text', { class: 'tick b', x: x0 + a * s + dx / 2 + 8, y: y0 - dx / 2 + 6, text: fmt(t / 2) + ' cm', opacity: 0 }, api.svg)];
             return;
           }
           const rows = Math.max(...c.cells.map((p) => p[0])) + 1, cols = Math.max(...c.cells.map((p) => p[1])) + 1;
@@ -428,6 +468,49 @@
             let sum = 0;
             for (const z of g.zellen) { z.rect.setAttribute('class', 'netz on'); sum += z.v; g.out.textContent = sum; await api.wait(420); }
             api.say(`Zusammen sind es <b>${sum} Würfel</b>.<br><small>Im Schrägbild sind manche versteckt, im Bauplan nicht. Darum ist der Bauplan zum Zählen sicherer.</small>`);
+            return;
+          }
+          if (c.mode === 'qnetz') {
+            const { a, b } = c, t = c.c;
+            const paare = [['vorn', 'hinten', a, b, '#ff9f6b'], ['links', 'rechts', t, b, '#7fb0ff'], ['oben', 'unten', a, t, '#7bd3a6']];
+            if (c.id) {
+              const pr = paare.find((q) => q[0] === c.id || q[1] === c.id);
+              g.f[c.id].setAttribute('class', 'netz on');
+              api.say('Ein Quadernetz besteht aus <b>6 Rechtecken</b>. Welche Seitenlängen hat die gelbe Fläche? Kanten, die beim Falten aufeinandertreffen, sind gleich lang.');
+              await api.wait(4200);
+              api.say(`Die gelbe Fläche ist <b>${pr[2]} cm</b> und <b>${pr[3]} cm</b> lang: ${pr[2]} · ${pr[3]} = <b>${pr[2] * pr[3]} cm²</b>`);
+              await api.wait(3200);
+              g.f[pr[0] === c.id ? pr[1] : pr[0]].setAttribute('style', 'fill:#ffe1a8;opacity:.6');
+              api.say(`Ihre Partnerin liegt am Quader genau gegenüber und ist genauso groß: auch <b>${pr[2] * pr[3]} cm²</b>.`);
+              return;
+            }
+            api.say('Ein Quadernetz besteht aus <b>6 Rechtecken</b>. Immer zwei sind gleich groß: Sie liegen sich am Quader gegenüber.');
+            await api.wait(3800);
+            let sum = 0;
+            for (const [p1, p2, w, h, farbe] of paare) {
+              g.f[p1].setAttribute('style', `fill:${farbe}`); g.f[p2].setAttribute('style', `fill:${farbe}`);
+              sum += 2 * w * h;
+              api.say(`${p1[0].toUpperCase() + p1.slice(1)} und ${p2}: je ${w} · ${h} = ${w * h} cm², zusammen <b>${2 * w * h} cm²</b>.`);
+              await api.wait(2800);
+            }
+            api.say(`Alles zusammen: ${paare.map((q) => 2 * q[2] * q[3]).join(' + ')} = <b>${sum} cm²</b>. Das ist die Oberfläche des Quaders.`);
+            return;
+          }
+          if (c.mode === 'schraeg') {
+            const { a, b } = c, t = c.c;
+            api.say(`Ein Quader: ${a} cm breit, ${b} cm hoch, ${t} cm tief. Im <b>Schrägbild</b> soll er räumlich aussehen. Das geht in drei Schritten.`);
+            await api.wait(3600);
+            await api.tw(500, (k) => { show(g.vorn, k); show(g.txt[0], k); show(g.txt[1], k); });
+            api.say(`<b>1.</b> Die Vorderfläche in <b>echter Größe</b>: ${a} cm breit und ${b} cm hoch.`);
+            await api.wait(3000);
+            for (const l of g.schraeg) await api.tw(300, (k) => show(l, k));
+            show(g.txt[2], 1);
+            api.say(`<b>2.</b> Von jeder Ecke eine Kante schräg nach hinten (auf Kästchenpapier diagonal), aber nur <b>halb so lang</b>: ${t} cm : 2 = <b>${fmt(t / 2)} cm</b>.`);
+            await api.wait(4200);
+            for (const l of g.hinten) await api.tw(300, (k) => show(l, k));
+            api.say('<b>3.</b> Die vier Endpunkte verbinden: Das ist die Rückseite. Kanten, die man nicht sehen kann, werden <b>gestrichelt</b>.');
+            await api.wait(3600);
+            api.say(`Fertig. Von den 12 Kanten haben <b>8</b> ihre echte Länge (4 vorn, 4 hinten), <b>4</b> sind verkürzt und <b>3</b> gestrichelt.<br><small>Die schräge Kante ist ${fmt(t / 2)} cm lang gezeichnet, in Wirklichkeit sind es ${t} cm. Ein Quader hat 8 Ecken, 12 Kanten und 6 Flächen.</small>`);
             return;
           }
           const seiten = M.netzFalten(c.cells);

@@ -8,7 +8,7 @@ Pro Klassenstufe sind 25 Wochen Pflicht-Lernbereiche verbindlich, dazu ein Wahlb
 
 ---
 
-## Klasse 5 (umgesetzt, 32 Themen; offen: Schrägbilder zeichnen, Drehungen, Quadernetze)
+## Klasse 5 (umgesetzt, 32 Themen)
 
 ### LB 1 – Arbeiten mit natürlichen Zahlen (23 Ustd.)
 - Veranschaulichen, schätzen, runden, vergleichen, ordnen; Zahlenstrahl, Stellenwerttafel

@@ -2,8 +2,8 @@
  *
  *   LB 1: Überschlagen · Schriftlich rechnen
  *   LB 2: Dezimalzahlen runden · Gemischte Zahlen
- *   LB 3: Symmetrie & Spiegeln
- *   LB 4: Würfelnetze & Baupläne
+ *   LB 3: Symmetrie & Spiegeln (Achsen, Spiegeln, Punktspiegelung, Verschieben, Drehen)
+ *   LB 4: Netze & Schrägbilder (Würfelnetze, Quadernetze, Schrägbild, Baupläne)
  *   LB 5: Schätzen wie Fermi
  *
  * Aufbau der Aufgaben wie in klasse5.js beschrieben. Diese Datei wird NACH klasse5.js geladen und
@@ -299,7 +299,30 @@
   const spiegelLinie = (achse, k) => (achse === 'v'
     ? `<line class="symax" x1="${kx(k)}" y1="${KOY + 4}" x2="${kx(k)}" y2="${ky(8) - 6}"/><text class="tick b" x="${kx(k) + 5}" y="${ky(8) - 2}" style="fill:var(--c3)">g</text>`
     : `<line class="symax" x1="${KOX - 4}" y1="${ky(k)}" x2="${kx(10) + 6}" y2="${ky(k)}"/><text class="tick b" x="${kx(10) - 4}" y="${ky(k) - 6}" style="fill:var(--c3)">g</text>`);
+  // Drehung um Z: Vierteldrehung nach links/rechts oder halbe Drehung
+  const drehe90 = (x, y, zx, zy, art) => (art === 'links' ? [zx - (y - zy), zy + (x - zx)] : art === 'rechts' ? [zx + (y - zy), zy - (x - zx)] : [2 * zx - x, 2 * zy - y]);
+  M.drehe90 = drehe90;
+  const richt = (dx, dy) => [dx ? `${Math.abs(dx)} nach ${dx > 0 ? 'rechts' : 'links'}` : '', dy ? `${Math.abs(dy)} nach ${dy > 0 ? 'oben' : 'unten'}` : ''].filter(Boolean).join(' und ');
+  M.richt = richt;
+  function drehung() {
+    const art = pick(['links', 'links', 'rechts', 'halb']);
+    let x, y, zx, zy, nx, ny;
+    do { x = R(0, 10); y = R(0, 8); zx = R(2, 8); zy = R(2, 6); [nx, ny] = drehe90(x, y, zx, zy, art); } while (nx < 0 || nx > 10 || ny < 0 || ny > 8 || x === zx || y === zy);
+    const wort = art === 'halb' ? 'eine <b>halbe Drehung (180°)</b>' : `eine <b>Vierteldrehung (90°) nach ${art}</b>`;
+    const zusatz = art === 'links' ? ' (gegen den Uhrzeigersinn)' : art === 'rechts' ? ' (im Uhrzeigersinn)' : '';
+    return {
+      prompt: `Der Punkt <b>P(${x} | ${y})</b> wird um <b>Z(${zx} | ${zy})</b> gedreht: ${wort}${zusatz}. Welche Koordinaten hat <b>P′</b>?`,
+      figure: gitter([[x, y, 'P'], [zx, zy, 'Z', 'z']]),
+      layout: 'coord',
+      fields: [{ answer: nx, label: 'x' }, { answer: ny, label: 'y' }],
+      hint: art === 'halb' ? 'Eine halbe Drehung bringt P genau auf die andere Seite von Z: denselben Weg von Z aus noch einmal weitergehen.' : 'Merke dir den Weg von Z zu P (rechts/links und oben/unten). Dreh dein Heft in Gedanken um eine Vierteldrehung: Aus „nach rechts“ wird „nach oben“ oder „nach unten“.',
+      solution: `Weg von Z zu P: ${richt(x - zx, y - zy)}.<br>Nach der Drehung: ${richt(nx - zx, ny - zy)}.<br>→ <b>P′(${nx} | ${ny})</b><br><small>Beim Drehen bleibt der Abstand zu Z gleich.</small>`,
+      answerText: `P′(${nx} | ${ny})`,
+      ex: { mode: 'dreh', x, y, zx, zy, art },
+    };
+  }
   function symmetrie() {
+    if (R(1, 9) === 9) return drehung();
     const v = R(1, 8);
     if (v <= 2) {
       const id = pick(Object.keys(FIGUREN));
@@ -437,7 +460,112 @@
     return `<svg viewBox="0 0 300 190">${plan}${iso}</svg>`;
   }
   M.bauBild = bauBild;
+  // Quadernetz: Mittelstreifen links–vorn–rechts–hinten, Deckel über und Boden unter „vorn“
+  function qnetzFlaechen(a, b, c) {
+    const s = Math.min(16, 236 / (2 * a + 2 * c), 150 / (b + 2 * c));
+    const ox = (300 - (2 * a + 2 * c) * s) / 2 + 20, oy = (190 - (b + 2 * c) * s) / 2 + 6;
+    const F = [
+      { id: 'links', x: 0, y: c, w: c, h: b }, { id: 'vorn', x: c, y: c, w: a, h: b }, { id: 'rechts', x: c + a, y: c, w: c, h: b }, { id: 'hinten', x: 2 * c + a, y: c, w: a, h: b },
+      { id: 'oben', x: c, y: 0, w: a, h: c }, { id: 'unten', x: c, y: c + b, w: a, h: c },
+    ].map((f) => ({ ...f, px: ox + f.x * s, py: oy + f.y * s, pw: f.w * s, ph: f.h * s }));
+    return { F, s, ox, oy };
+  }
+  M.qnetzFlaechen = qnetzFlaechen;
+  function qnetzBild(a, b, c, mark) {
+    const { F, s, ox, oy } = qnetzFlaechen(a, b, c);
+    const fl = F.map((f) => `<rect class="netz${f.id === mark ? ' on' : ''}" x="${f.px}" y="${f.py}" width="${f.pw}" height="${f.ph}"/>`).join('');
+    // Maße an drei Kanten: a über dem Deckel, c links am Deckel, b links am Mittelstreifen
+    const m = `<text class="tick b" x="${ox + (c + a / 2) * s}" y="${oy - 5}" text-anchor="middle">${a} cm</text>`
+      + `<text class="tick b" x="${ox + c * s - 5}" y="${oy + (c / 2) * s + 4}" text-anchor="end">${c} cm</text>`
+      + `<text class="tick b" x="${ox - 5}" y="${oy + (c + b / 2) * s + 4}" text-anchor="end">${b} cm</text>`;
+    return `<svg viewBox="0 0 300 190">${fl}${m}</svg>`;
+  }
+  function qnetz() {
+    let a, b, c;
+    do { a = R(3, 7); b = R(2, 6); c = R(2, 4); } while (a === b || b === c || a === c);
+    if (R(0, 1)) {
+      const id = pick(['vorn', 'links', 'oben', 'hinten', 'rechts', 'unten']);
+      const [w, h] = id === 'vorn' || id === 'hinten' ? [a, b] : id === 'links' || id === 'rechts' ? [c, b] : [a, c];
+      return {
+        prompt: 'Das ist das <b>Netz eines Quaders</b>. Wie groß ist die <b>gelb markierte Fläche</b>?',
+        figure: qnetzBild(a, b, c, id),
+        fields: [{ answer: w * h, suffix: 'cm²' }],
+        hint: 'Suche die beiden Seitenlängen der gelben Fläche. Kanten, die beim Falten aufeinandertreffen, sind gleich lang.',
+        solution: `Die gelbe Fläche ist <b>${w} cm</b> und <b>${h} cm</b> lang.<br>${w} · ${h} = <b>${w * h} cm²</b><br><small>Im Quadernetz kommt jede Fläche zweimal vor: Die gegenüberliegende ist genauso groß.</small>`,
+        ex: { mode: 'qnetz', a, b, c, id },
+      };
+    }
+    const O = 2 * (a * b + c * b + a * c);
+    return {
+      prompt: 'Das ist das <b>Netz eines Quaders</b>. Wie viel Papier braucht man für das <b>ganze Netz</b>?',
+      figure: qnetzBild(a, b, c),
+      fields: [{ answer: O, suffix: 'cm²' }],
+      hint: 'Das Netz hat 6 Rechtecke, je zwei sind gleich groß. Berechne die drei verschiedenen Flächen und nimm jede doppelt.',
+      solution: `Drei verschiedene Flächen: ${a} · ${b} = ${a * b}, ${c} · ${b} = ${c * b}, ${a} · ${c} = ${a * c}<br>Jede kommt zweimal vor: 2 · (${a * b} + ${c * b} + ${a * c}) = <b>${O} cm²</b><br><small>Das ist die Oberfläche des Quaders.</small>`,
+      ex: { mode: 'qnetz', a, b, c },
+    };
+  }
+  // Schrägbild: vorn in echter Größe, Kanten nach hinten unter 45° und halb so lang
+  function schraegBild(a, b, c, text) {
+    const s = Math.min(22, 150 / (a + c * 0.36), 120 / (b + c * 0.36));
+    const dx = c * s * 0.5 * Math.SQRT1_2, dy = dx;
+    const x0 = (300 - (a * s + dx)) / 2, y0 = (190 + (b * s + dy)) / 2 - 4;
+    const P = (x, y, z) => `${(x0 + x * s + (z ? dx : 0)).toFixed(1)},${(y0 - y * s - (z ? dy : 0)).toFixed(1)}`;
+    const L = (p, q, cls) => { const [x1, y1] = p.split(','), [x2, y2] = q.split(','); return `<line class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`; };
+    let g = `<polygon class="wt" points="${P(0, b, 0)} ${P(a, b, 0)} ${P(a, b, 1)} ${P(0, b, 1)}"/><polygon class="ws" points="${P(a, 0, 0)} ${P(a, 0, 1)} ${P(a, b, 1)} ${P(a, b, 0)}"/><polygon class="wf" points="${P(0, 0, 0)} ${P(a, 0, 0)} ${P(a, b, 0)} ${P(0, b, 0)}"/>`;
+    g += L(P(0, 0, 0), P(0, 0, 1), 'dash') + L(P(0, 0, 1), P(a, 0, 1), 'dash') + L(P(0, 0, 1), P(0, b, 1), 'dash');
+    if (text) g += `<text class="tick b" x="${x0 + (a * s) / 2}" y="${y0 + 16}" text-anchor="middle">${text[0]}</text><text class="tick b" x="${x0 - 6}" y="${y0 - (b * s) / 2 + 4}" text-anchor="end">${text[1]}</text><text class="tick b" x="${x0 + a * s + dx / 2 + 8}" y="${y0 - dy / 2 + 6}">${text[2]}</text>`;
+    return `<svg viewBox="0 0 300 190">${g}</svg>`;
+  }
+  M.schraegBild = schraegBild;
+  function schraeg() {
+    const v = R(1, 4);
+    const a = R(3, 7), b = R(2, 5), c = pick([2, 3, 4, 5, 6, 8]);
+    if (v === 1) {
+      return {
+        prompt: `Ein Quader ist <b>${a} cm breit</b>, <b>${b} cm hoch</b> und <b>${c} cm tief</b>. Im <b>Schrägbild</b> zeichnest du die Kanten nach hinten schräg und nur <b>halb so lang</b>. Wie lang zeichnest du die schräge Kante?`,
+        figure: schraegBild(a, b, c, [`${a} cm`, `${b} cm`, '?']),
+        fields: [{ answer: c / 2, suffix: 'cm' }],
+        hint: 'Breite und Höhe zeichnest du in echter Länge. Nur die Tiefe wird halbiert.',
+        solution: `Die Tiefe wird halbiert: ${c} cm : 2 = <b>${fmt(c / 2)} cm</b><br><small>Breite (${a} cm) und Höhe (${b} cm) bleiben, wie sie sind. So wirkt das Bild räumlich.</small>`,
+        ex: { mode: 'schraeg', a, b, c },
+      };
+    }
+    if (v === 2) {
+      return {
+        prompt: `In einem <b>Schrägbild</b> ist die schräge Kante nach hinten <b>${fmt(c / 2)} cm</b> lang gezeichnet. Wie tief ist der Quader <b>in Wirklichkeit</b>?`,
+        figure: schraegBild(a, b, c, [`${a} cm`, `${b} cm`, `${fmt(c / 2)} cm gezeichnet`]),
+        fields: [{ answer: c, suffix: 'cm' }],
+        hint: 'Im Schrägbild werden Kanten nach hinten nur halb so lang gezeichnet. Die echte Länge ist also doppelt so groß.',
+        solution: `Gezeichnet ist die halbe Länge, also: ${fmt(c / 2)} cm · 2 = <b>${c} cm</b>`,
+        ex: { mode: 'schraeg', a, b, c },
+      };
+    }
+    if (v === 3) {
+      const frage = pick([['in echter Länge', 8, 'Die 4 Kanten vorn und die 4 Kanten hinten: 4 + 4 = <b>8</b>. Nur die 4 Kanten nach hinten sind verkürzt.'], ['verkürzt (halb so lang)', 4, 'Nur die <b>4</b> Kanten, die nach hinten laufen. Die 8 Kanten vorn und hinten haben ihre echte Länge.'], ['gestrichelt, weil man sie nicht sieht', 3, 'Die <b>3</b> Kanten, die an der hinteren unteren linken Ecke zusammenlaufen, sind verdeckt.']]);
+      return {
+        prompt: `Ein Quader hat 12 Kanten. Wie viele davon zeichnest du im <b>Schrägbild</b> <b>${frage[0]}</b>?`,
+        figure: schraegBild(a, b, c),
+        fields: [{ answer: frage[1], suffix: 'Kanten' }],
+        hint: 'Zähle im Bild nach: vorn, hinten und die Kanten, die nach hinten laufen.',
+        solution: frage[2],
+        ex: { mode: 'schraeg', a, b, c },
+      };
+    }
+    return {
+      prompt: 'Wie viele <b>Ecken</b>, <b>Kanten</b> und <b>Flächen</b> hat ein Quader?',
+      figure: schraegBild(a, b, c),
+      fields: [{ answer: 8, label: 'Ecken' }, { answer: 12, label: 'Kanten' }, { answer: 6, label: 'Flächen' }],
+      hint: 'Zähle im Schrägbild. Vergiss die gestrichelten Kanten und die verdeckte Ecke nicht.',
+      solution: '<b>8 Ecken</b> (4 vorn, 4 hinten), <b>12 Kanten</b> (4 vorn, 4 hinten, 4 nach hinten) und <b>6 Flächen</b> (vorn/hinten, links/rechts, oben/unten).',
+      answerText: '8 Ecken, 12 Kanten, 6 Flächen',
+      ex: { mode: 'schraeg', a, b, c },
+    };
+  }
   function netze() {
+    const art = R(1, 11);
+    if (art >= 10) return schraeg();
+    if (art >= 8) return qnetz();
     const v = R(1, 7);
     if (v <= 3) {
       const ja = R(0, 1) === 1;
@@ -558,7 +686,7 @@
   nach(2, 'k5-erweitern', { id: 'k5-gemischt', title: 'Gemischte Zahlen', icon: '1½', gen: gemischt });
   nach(2, 'k5-dezimal', { id: 'k5-dezrunden', title: 'Dezimalzahlen runden', icon: '≈', gen: dezRunden });
   nach(3, 'k5-winkelpaar', { id: 'k5-symmetrie', title: 'Symmetrie & Spiegeln', icon: '⇆', gen: symmetrie });
-  nach(4, 'k5-quader', { id: 'k5-netze', title: 'Würfelnetze & Baupläne', icon: '▦', gen: netze });
+  nach(4, 'k5-quader', { id: 'k5-netze', title: 'Netze & Schrägbilder', icon: '▦', gen: netze });
   nach(5, 'k5-sach', { id: 'k5-fermi', title: 'Schätzen wie Fermi', icon: '?', gen: fermi });
   M.netzTest = { NETZE_JA, NETZE_NEIN, istNetz };
 })();
