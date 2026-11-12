@@ -706,7 +706,7 @@ body.noscroll{overflow:hidden}
     10: ['Wachstum und periodische Vorgänge', 'Diskrete Zufallsgrößen', 'Algebraisches Lösen geometrischer Probleme', 'Funktionale Zusammenhänge', 'Vernetzung: Zinsrechnung'],
   };
 
-  const DISC_ORDER = ['mindread', 'gauss', 'odd', 'halves', 'sieve', 'chess', 'galton', 'pascal', 'tree', 'triangle', 'sunflower', 'pi', 'pizza', 'pythagoras'];
+  const DISC_ORDER = ['mindread', 'gauss', 'odd', 'halves', 'sieve', 'chess', 'roemisch', 'binaer', 'galton', 'pascal', 'tree', 'triangle', 'sunflower', 'pi', 'pizza', 'pythagoras'];
   function discoverHtml() {
     const ids = DISC_ORDER.filter((id) => EXP[id] && EXP[id].discover).concat(Object.keys(EXP).filter((id) => EXP[id].discover && !DISC_ORDER.includes(id)));
     if (!ids.length) return '';

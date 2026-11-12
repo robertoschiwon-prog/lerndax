@@ -24,7 +24,7 @@ Die Themen in MaDax stehen seit Version v36 (Winkel messen seit v37) **in der Re
 | 10 Schriftliches Dividieren | Division |
 | 11 Sachaufgaben systematisch lösen | Textaufgaben |
 | Erkundung: Fermi-Fragen | Schätzen wie Fermi (im Bereich Alltag) |
-| Exkursion: Römische Zahlzeichen, Zweiersystem | offen, Kandidaten für „Entdecken“ |
+| Exkursion: Römische Zahlzeichen, Zweiersystem | „Entdecken“: Römische Zahlen, Zählen wie ein Computer *(neu in v38)* |
 
 ## Kapitel II – Gemeine Brüche und Prozente
 
@@ -49,7 +49,7 @@ Die Themen in MaDax stehen seit Version v36 (Winkel messen seit v37) **in der Re
 | 5 Rechnen mit Zehnerpotenzen | Dezimalzahlen rechnen |
 | 6 Vervielfachen und teilen | Dezimalzahlen rechnen |
 | 7 Arithmetisches Mittel | Mittelwert |
-| 8 Rechengesetze, Vorteile | bisher nur mit natürlichen Zahlen |
+| 8 Rechengesetze, Vorteile | Dezimalzahlen rechnen, Aufgabenart „Rechne geschickt“ *(neu in v38)* |
 
 ## Kapitel IV – Lagebeziehungen
 
@@ -77,7 +77,7 @@ Die Themen in MaDax stehen seit Version v36 (Winkel messen seit v37) **in der Re
 
 - **Winkel zeichnen** mit dem Geodreieck: Das ist Handarbeit mit Stift und Papier. Das Ablesen am aufgelegten
   Geodreieck übt seit v37 das Thema „Winkel messen“.
-- **Rechengesetze mit Dezimalzahlen** (Kap. III, 8): könnte als weitere Aufgabenart in „Vorteilhaft rechnen“ dazukommen.
-- **Römische Zahlen, Zweiersystem**: stehen im Buch als Exkursion (kein Pflichtstoff), passen in „Entdecken“.
+- **Rechengesetze mit Dezimalzahlen** (Kap. III, 8): seit v38 als Aufgabenart in „Mit Dezimalzahlen rechnen“ (bewusst
+  nicht in „Geschickt rechnen“, weil dieses Thema zum Training für die Arbeit über natürliche Zahlen gehört).
 - Laut Plan werden Addition, Subtraktion und Multiplikation in Klasse 5 nur wiederholt (Grundschulstoff). „Gemischte Zahl“
   kommt im Plan nicht als Begriff vor, nur „echte und unechte Brüche“.

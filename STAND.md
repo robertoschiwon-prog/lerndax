@@ -714,3 +714,10 @@ Infos zur ersten Arbeit:
   mit einem Halben, größter/kleinster von drei Brüchen, Division mit Ergebnis über 1) und **Senkrecht & parallel**
   (Parallele/Senkrechte durch P trifft welchen Punkt, Abstand paralleler Geraden, Paare paralleler Seiten und rechte
   Winkel in Figuren zählen).
+- **Buch-Zusätze** (Version `lerndax-v38`): „Mit Dezimalzahlen rechnen“ hat die neue Aufgabenart **„Rechne geschickt“**
+  (z. B. 2,5 · 7 · 4 oder 3,7 + 1,8 + 6,3; etwa jede fünfte Aufgabe; Animation aus „Geschickt rechnen“ über `ex.via`).
+  Bewusst nicht in „Geschickt rechnen“ selbst eingebaut, weil dieses Thema im Training vom 24.11. steckt (dort nur
+  natürliche Zahlen). Zwei neue Entdeckungen (im Buch „Exkursion“): **Römische Zahlen** (`roemisch`, Zerlegung mit
+  größtem Stück zuerst, Abzieh-Regel) und **Zählen wie ein Computer** (`binaer`, fünf Lampen 16-8-4-2-1 mit Regler).
+  Damit ist jede Lerneinheit des Schulbuchs abgedeckt. **Knobel-Stufe: weiter nur Idee**, braucht eine Entscheidung
+  (siehe Vorschlag im Chat vom 12.11.2026): schwerere Aufgaben müssen je Thema eigens geschrieben werden.

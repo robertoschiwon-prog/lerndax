@@ -5,6 +5,7 @@
  *   Kap. II, 3–6: Brüche am Zahlenstrahl (ablesen, vergleichen, Bruch als Quotient)
  *   Kap. IV, 1:   Senkrecht & parallel
  *   Kap. IV, 4:   Winkel messen (am Geodreieck ablesen, schätzen)
+ * Dazu eine Aufgabenart für ein vorhandenes Thema: Kap. III, 8 Geschickt rechnen mit Dezimalzahlen (in k5-dezimal).
  * Außerdem bringt diese Datei alle Themen in die Reihenfolge des Schulbuchs (ganz unten).
  * Wird NACH klasse5.js und klasse5-luecken.js geladen.
  */
@@ -582,6 +583,62 @@
       hint: 'Beide Winkel zusammen ergeben einen vollen Kreis, also 360°.',
       solution: `Beide Winkel zusammen sind ein Vollwinkel: 360°.<br>360° − ${th}° = <b>${360 - th}°</b>`,
       ex: { mode: 'geo', th, links, art: 'ueber' },
+    };
+  }
+
+  // =====================================================
+  // Geschickt rechnen mit Dezimalzahlen (Buch Kap. III, 8) – als Aufgabenart in „Mit Dezimalzahlen rechnen“
+  // =====================================================
+  // Erklärung: die „Umstellen und bündeln“-Animation von „Geschickt rechnen“ (ex.via)
+  function geschicktEx(parts, i1, i2, op, glatt, erg) {
+    const tokens = []; parts.forEach((p, i) => { if (i) tokens.push(op); tokens.push(p); });
+    const idx = [i1, i2, ...parts.map((_, j) => j).filter((j) => j !== i1 && j !== i2)];
+    const nums = idx.map((j) => parts[j]);
+    const order = []; idx.forEach((j, i) => { order[2 * i] = 2 * j; if (i) order[2 * i - 1] = 2 * i - 1; });
+    return {
+      mode: 'tausch', via: 'k5-vorteil', tokens, order,
+      steps: [
+        { line: nums.join(` ${op} `), say: `Umgestellt: <b>${nums[0]} ${op} ${nums[1]}</b> stehen jetzt nebeneinander.` },
+        { line: `= ${glatt} ${op} ${nums[2]}`, say: `${nums[0]} ${op} ${nums[1]} = <b>${glatt}</b>. Das ist eine glatte Zahl, ganz ohne Komma!` },
+        { line: `= ${erg}`, say: `${glatt} ${op} ${nums[2]} = <b>${erg}</b><br><small>Auch mit Kommazahlen gilt: erst die glatten Paare suchen.</small>` },
+      ],
+    };
+  }
+  function dezGeschickt() {
+    if (R(0, 1)) {
+      const [x, y, glatt] = pick([[2.5, 4, 10], [0.5, 2, 1], [0.25, 4, 1], [1.25, 8, 10], [0.2, 5, 1], [1.5, 2, 3], [0.5, 4, 2], [2.5, 2, 5]]);
+      const k = glatt === 10 && R(0, 1) ? R(11, 99) / 10 : R(3, 29);
+      const pos = shuffle([0, 1, 2]), parts = []; parts[pos[0]] = fmt(x); parts[pos[1]] = fmt(y); parts[pos[2]] = fmt(k);
+      const erg = U.round6(glatt * k);
+      return {
+        prompt: `Rechne geschickt: <b>${parts.join(' · ')}</b>`,
+        fields: [{ answer: erg }],
+        hint: 'Welche zwei Zahlen ergeben malgenommen eine Zahl ohne Komma? Fange mit ihnen an.',
+        solution: `Erst ${fmt(x)} · ${fmt(y)} = ${glatt} (Vertauschungsgesetz).<br>${glatt} · ${fmt(k)} = <b>${fmt(erg)}</b>`,
+        ex: geschicktEx(parts, pos[0], pos[1], '·', String(glatt), fmt(erg)),
+      };
+    }
+    const st = pick([10, 100]), ganz = pick([1, 5, 10, 10]);
+    let a;
+    do a = R(1, ganz * st - 1); while (a % st === 0);
+    const c = ganz * st - a, b = R(11, 99);
+    const A = a / st, C = c / st, B = b / 10, erg = U.round6(ganz + B);
+    const pos = shuffle([0, 1, 2]), parts = []; parts[pos[0]] = fmt(A); parts[pos[1]] = fmt(C); parts[pos[2]] = fmt(B);
+    return {
+      prompt: `Rechne geschickt: <b>${parts.join(' + ')}</b>`,
+      fields: [{ answer: erg }],
+      hint: 'Suche zwei Zahlen, deren Nachkommastellen sich zu einer glatten Zahl ergänzen.',
+      solution: `Erst ${fmt(A)} + ${fmt(C)} = ${ganz} (Vertauschungsgesetz).<br>${ganz} + ${fmt(B)} = <b>${fmt(erg)}</b>`,
+      ex: geschicktEx(parts, pos[0], pos[1], '+', String(ganz), fmt(erg)),
+    };
+  }
+  {
+    const t = M.grades[5].lbs.flatMap((l) => l.topics).find((x) => x.id === 'k5-dezimal'), alt = t.gen;
+    t.gen = () => {
+      if (R(1, 5) !== 1) return alt();
+      const a = dezGeschickt();
+      a.ex.alt = dezGeschickt().ex; // „ähnliches Beispiel“ zeigt eine andere Aufgabe derselben Art
+      return a;
     };
   }
 

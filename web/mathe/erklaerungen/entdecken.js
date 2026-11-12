@@ -824,8 +824,120 @@
   // π-Rad ebenfalls in die Entdecken-Sammlung (dunkle Bühne)
   if (EX.pi) Object.assign(EX.pi, { dark: true, discover: { icon: 'π', q: 'Was ist π? Das Geheimnis des abrollenden Rads', tag: 'Vorschau Klasse 9' } });
 
+  // =====================================================
+  // Römische Zahlen (Schulbuch Klasse 5, Exkursion)
+  // =====================================================
+  reg('roemisch', {
+    title: 'Römische Zahlen: Rechnen ohne Null',
+    viewBox: '0 0 360 215',
+    discover: { icon: 'XII', q: 'Wie schrieben die Römer das Jahr 2026, ganz ohne die Null?', tag: 'Klasse 5 · Zahlen früher' },
+    create(api) {
+      let n = 2026, g;
+      const TAB = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+      const ZEICHEN = [['I', 1], ['V', 5], ['X', 10], ['L', 50], ['C', 100], ['D', 500], ['M', 1000]];
+      api.chips([2026, 1994, 49, 888].map((k) => ({ label: String(k), onClick() { n = k; api.replay(); } })).concat([{ label: 'Zufall', onClick() { n = R(11, 3999); api.replay(); } }]));
+      return {
+        reset() {
+          api.clear(); g = { z: {} };
+          ZEICHEN.forEach(([z, w], i) => {
+            const x = 36 + i * 48;
+            g.z[z] = el('rect', { x: x - 19, y: 8, width: 38, height: 44, rx: 8, style: 'fill:#1f2240;stroke:#3a3e66;stroke-width:1.5' }, api.svg);
+            el('text', { x, y: 30, 'text-anchor': 'middle', style: 'font:800 19px Nunito,system-ui,sans-serif;fill:#ffd166', text: z }, api.svg);
+            el('text', { x, y: 46, 'text-anchor': 'middle', style: 'font:700 10px Nunito,system-ui,sans-serif;fill:#b9b6d3', text: w }, api.svg);
+          });
+          g.zahl = el('text', { x: 180, y: 96, 'text-anchor': 'middle', style: 'font:800 30px Nunito,system-ui,sans-serif;fill:#ece9f7', text: n }, api.svg);
+          g.rest = el('text', { x: 180, y: 120, 'text-anchor': 'middle', style: 'font:700 13px Nunito,system-ui,sans-serif;fill:#58c4dd', text: '' }, api.svg);
+          g.rom = el('text', { x: 180, y: 172, 'text-anchor': 'middle', style: 'font:800 34px Nunito,system-ui,sans-serif;fill:#ff9f43;letter-spacing:2px', text: '' }, api.svg);
+          g.teile = el('text', { x: 180, y: 200, 'text-anchor': 'middle', style: 'font:700 12px Nunito,system-ui,sans-serif;fill:#b9b6d3', text: '' }, api.svg);
+        },
+        async play() {
+          const leuchte = (s, an) => [...s].forEach((ch) => g.z[ch].setAttribute('style', `fill:${an ? '#3b2a12' : '#1f2240'};stroke:${an ? '#ff9f43' : '#3a3e66'};stroke-width:${an ? 2.5 : 1.5}`));
+          api.say('Die Römer kannten nur <b>sieben Zeichen</b>. Eine Null gab es nicht, und auch keine Stellen wie Einer, Zehner, Hunderter.');
+          await api.wait(4200);
+          api.say(`Wie schreibt man damit <b>${n}</b>? Regel 1: Nimm immer das <b>größte Stück</b>, das noch hineinpasst.`);
+          await api.wait(3800);
+          let rest = n, out = '', minusErklaert = false; const teile = [];
+          for (const [w, s] of TAB) {
+            if (rest < w) continue;
+            const k = Math.floor(rest / w);
+            leuchte(s, true);
+            out += s.repeat(k); rest -= k * w; teile.push(k > 1 ? `${k} · ${w}` : String(w));
+            g.rom.textContent = out; g.rest.textContent = rest ? `übrig: ${rest}` : 'nichts mehr übrig'; g.teile.textContent = teile.join(' + ');
+            if (s.length === 2) {
+              api.say(`${w} passt hinein. Regel 2: Steht ein kleineres Zeichen <b>vor</b> einem größeren, wird es <b>abgezogen</b>: ${s} = ${s[1]} − ${s[0]} = ${w}.${minusErklaert ? '' : '<br><small>So spart man sich vier gleiche Zeichen hintereinander.</small>'}`);
+              minusErklaert = true; await api.wait(4200);
+            } else {
+              api.say(`${k > 1 ? `${w} passt ${k}-mal hinein` : `${w} passt hinein`}: Schreibe <b>${s.repeat(k)}</b>.${rest ? ` Übrig bleibt ${rest}.` : ''}`);
+              await api.wait(2400);
+            }
+            leuchte(s, false);
+          }
+          api.say(`<span class="exbig f1">${n} = ${out}</span><br>Mit solchen Zahlen schriftlich zu rechnen ist sehr mühsam. Erst die <b>Null</b> und die Stellenwerte aus Indien machten das Rechnen leicht.`);
+        },
+      };
+    },
+  });
+
+  // =====================================================
+  // Zweiersystem (Schulbuch Klasse 5, Exkursion)
+  // =====================================================
+  reg('binaer', {
+    title: 'Zählen wie ein Computer',
+    viewBox: '0 0 360 215',
+    discover: { icon: '01', q: 'Wie zählt ein Computer, wenn er nur 0 und 1 kennt?', tag: 'Klasse 5 · Zweiersystem' },
+    create(api) {
+      let n = 0, g, sl;
+      const W = [16, 8, 4, 2, 1];
+      function zeig(v) {
+        n = v;
+        W.forEach((w, i) => {
+          const an = (v & w) !== 0;
+          g.lampe[i].setAttribute('style', `fill:${an ? '#ffd166' : '#1f2240'};stroke:${an ? '#fff3c4' : '#3a3e66'};stroke-width:2.5`);
+          g.bit[i].textContent = an ? '1' : '0';
+          g.bit[i].setAttribute('style', `font:800 26px Nunito,system-ui,sans-serif;fill:${an ? '#ffd166' : '#6f7299'}`);
+        });
+        const teile = W.filter((w) => v & w);
+        g.summe.textContent = v === 0 ? '0' : teile.length > 1 ? `${teile.join(' + ')} = ${v}` : String(v);
+        if (sl) sl.value = v;
+      }
+      const text = (v) => `<b>${v}</b> heißt im Zweiersystem <b>${v.toString(2)}</b>.`;
+      sl = api.slider({ label: 'Zahl', min: 0, max: 31, value: 0, onInput(v) { zeig(v); api.say(text(v)); } });
+      return {
+        reset() {
+          api.clear(); g = { lampe: [], bit: [] };
+          W.forEach((w, i) => {
+            const x = 52 + i * 64;
+            el('text', { x, y: 26, 'text-anchor': 'middle', style: 'font:700 14px Nunito,system-ui,sans-serif;fill:#58c4dd', text: w }, api.svg);
+            g.lampe.push(el('circle', { cx: x, cy: 68, r: 24 }, api.svg));
+            g.bit.push(el('text', { x, y: 132, 'text-anchor': 'middle', text: '0' }, api.svg));
+          });
+          g.summe = el('text', { x: 180, y: 186, 'text-anchor': 'middle', style: 'font:800 22px Nunito,system-ui,sans-serif;fill:#ff9f43', text: '' }, api.svg);
+          zeig(0);
+        },
+        async play() {
+          api.say('Ein Computer kennt nur zwei Zustände: Strom <b>an</b> (1) oder Strom <b>aus</b> (0). Trotzdem kann er jede Zahl speichern.');
+          await api.wait(4200);
+          api.say('Der Trick: Jede Lampe ist <b>doppelt so viel</b> wert wie ihre rechte Nachbarin: 1, 2, 4, 8, 16. Wir zählen los.');
+          await api.wait(4000);
+          for (let v = 1; v <= 8; v++) {
+            zeig(v);
+            api.say(v === 2 ? '2: Die Einer-Lampe ist schon an. Also geht sie aus, und die Zweier-Lampe geht an. Das ist ein <b>Übertrag</b>, wie bei 9 + 1 = 10.' : v === 4 ? '4: Wieder ein Übertrag, diesmal gleich über zwei Lampen.' : v === 8 ? '8: Alle drei Lampen gehen aus, die Achter-Lampe geht an.' : text(v));
+            await api.wait(v === 2 ? 4200 : v === 4 || v === 8 ? 2800 : 1500);
+          }
+          zeig(13);
+          api.say('Und 13? Wir brauchen 8 + 4 + 1. Also: Achter an, Vierer an, Zweier aus, Einer an → <b>1101</b>.');
+          await api.wait(4400);
+          zeig(31);
+          api.say('Mit 5 Lampen kommt man bis <b>31</b>. Mit jeder weiteren Lampe verdoppelt sich das. Probiere es mit dem Regler aus!<br><small>Der Zahlenzauber hier bei „Entdecken“ nutzt genau diesen Trick.</small>');
+        },
+      };
+    },
+  });
+
   // ---------- Symbole der Entdecken-Kacheln: selbst gezeichnet, überall gleich groß (statt Schriftzeichen und Emojis) ----------
   const DI = {
+    roemisch: '<path d="M2.5 5h19M2.5 19h19" stroke-width="1.8"/><path d="M4.5 7.5l5 9M9.5 7.5l-5 9M13.5 7.5v9M18.5 7.5v9" stroke-width="2.2"/>',
+    binaer: '<circle cx="5.5" cy="9" r="3.4" fill="currentColor" stroke="none"/><circle cx="12" cy="9" r="3.4"/><circle cx="18.5" cy="9" r="3.4" fill="currentColor" stroke="none"/><path d="M5.5 16v4.5M4.3 17.2l1.2-1.2M18.5 16v4.5M17.3 17.2l1.2-1.2" stroke-width="1.7"/><ellipse cx="12" cy="18.3" rx="1.7" ry="2.3" stroke-width="1.7"/>',
     mindread: '<circle cx="12" cy="10" r="7.2"/><path d="M8.3 17.2 7 21h10l-1.3-3.8"/><path d="M12 5.6l1.1 3.3 3.3 1.1-3.3 1.1L12 14.4l-1.1-3.3-3.3-1.1 3.3-1.1z" fill="currentColor" stroke="none"/>',
     gauss: '<rect x="2.5" y="17" width="3.6" height="4.5" rx=".8" fill="currentColor" stroke="none"/><rect x="7.6" y="13" width="3.6" height="8.5" rx=".8" fill="currentColor" stroke="none"/><rect x="12.7" y="9" width="3.6" height="12.5" rx=".8" fill="currentColor" stroke="none"/><rect x="17.8" y="5" width="3.6" height="16.5" rx=".8" fill="currentColor" stroke="none"/><path d="M3 9.5 9.5 3" stroke-width="1.6"/><path d="M6 3h3.5v3.5" stroke-width="1.6"/>',
     odd: '<rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M3 9h12v12M3 15h6v6"/><rect x="3" y="15" width="6" height="6" fill="currentColor" stroke="none"/>',
