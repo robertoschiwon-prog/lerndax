@@ -75,8 +75,9 @@ geplante unter „Kommt bald“.
 |---|---|
 | `web/` | Alles, was online geht (wird automatisch veröffentlicht) |
 | `web/index.html` | LernDax-Startseite mit den Fächern |
-| `web/plattform/` | Gemeinsame Teile: Fächerliste (`faecher.js`), eigene Symbole statt Emojis (`symbole.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
-| `web/mathe/` | **MaDax**: App, `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
+| `web/plattform/` | Gemeinsame Teile: **die Fach-App** (`fach.js`, `fach.css`: Übungsrunde, Sterne, Tagesziel, Knobeln, Erklär-Player, Elternbereich), Fächerliste (`faecher.js`), eigene Symbole statt Emojis (`symbole.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
+| `web/mathe/` | **MaDax**: `index.html` (beschreibt nur das Fach), `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
+| `web/deutsch/` | **DeDax** (im Aufbau, noch nicht auf der Startseite): `themen/` (Wortlisten und Aufgaben), `erklaerungen/`, `symbole.js` |
 | `web/icons/` | Dachs-Logo und App-Icons |
 | `faecher/README.md` | **Fächerplan:** alle Fächer, Namen, Klassen, Fahrplan in drei Phasen |
 | `faecher/mathe/lehrplan/` | Lehrplan-Auswertung Mathe |
@@ -88,8 +89,10 @@ geplante unter „Kommt bald“.
 
 ## Ein neues Fach hinzufügen
 
-1. Ordner `web/<fach>/` mit `index.html` anlegen, nach dem Vorbild von `web/mathe/`, und
-   `window.LERNDAX_SUBJECT = '<fach>'` setzen.
+1. Ordner `web/<fach>/` mit `index.html` anlegen, nach dem Vorbild von `web/deutsch/index.html` (eine kurze Datei):
+   `window.LERNDAX_SUBJECT = '<fach>'` setzen, die eigenen Themen-Dateien einbinden, das Fach in
+   `window.LERNDAX_FACH` beschreiben (Name, Lernstand-Schlüssel, Dachs-Bild) und `../plattform/fach.js` laden.
+   Die App selbst (Übungsrunde, Sterne, Player …) wird **nicht** kopiert.
 2. In `web/plattform/faecher.js` beim Fach `status: 'fertig'`, `fertig: [Klasse]`, `href`, `key`
    und `themen` setzen (siehe `faecher/README.md`).
 3. Dateien in `web/sw.js` aufnehmen und `VERSION` erhöhen.
@@ -128,7 +131,7 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Knopf „Jetzt üben“ im Familienkalender (vom Kalender-Projekt umgesetzt, 10.11.2026)
 
 **Weitere Fächer** (Phase 1: Klasse 5)
-- [ ] DeDax (Deutsch)
+- [ ] DeDax (Deutsch): Lehrplan ausgewertet, Themenplan steht als Vorschlag, erstes Thema „Zeitformen“ gebaut (noch nicht auf der Startseite)
 - [ ] EnDax (Englisch)
 - [ ] BioDax, GeoDax, GeDax
 - [ ] TecDax (Technik/Computer)

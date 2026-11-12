@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v43`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v44`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -58,16 +58,23 @@ mit dem Schulbuch abgleichen, dem Auftraggeber einen Themenplan mit Optionen vor
 klären, wie die gemeinsamen Teile aus `web/mathe/index.html` (Übungsrunde, Sterne, Knobeln, Player, Elternbereich)
 für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 
-**Stand DeDax (12.11.2026, zweiter Chat)**
+**Stand DeDax (12.11.2026, zweiter Chat, Version `lerndax-v44`)**
 - Lehrplan Deutsch Klasse 5 am Originaltext ausgewertet: `faecher/deutsch/lehrplan/sachsen-gymnasium.md`.
 - Schulbuch-Abgleich **noch nicht möglich**: Ausgabe unklar (wahrscheinlich Deutschbuch Gymnasium, östliche
   Bundesländer, Ausgabe 2019, ISBN 978-3-06-200082-9), kein Stoffverteilungsplan im Netz. Es fehlen die ISBN und ein
   Foto des Inhaltsverzeichnisses (`faecher/deutsch/lehrplan/schulbuch-abgleich.md`).
-- Themenplan als **Vorschlag** (5 Bereiche, 31 Themen, je Thema Beispiel-Aufgaben und Animations-Idee, fünf neue
-  Aufgabenformen): `faecher/deutsch/themenplan.md`. Noch nicht entschieden.
-- Offene Entscheidungen, einzeln zu stellen: (1) womit anfangen, (2) Themenplan so in Ordnung, (3) „Nomen“ oder
-  „Substantiv“, (4) Umbau: gemeinsame Teile aus `web/mathe/index.html` nach `web/plattform/` herausziehen.
-- Am Code (`web/`) wurde nichts geändert, deshalb bleibt die Version `lerndax-v43`.
+- Themenplan als **Vorschlag** (5 Bereiche, 31 Themen): `faecher/deutsch/themenplan.md`.
+- **Entscheidungen des Auftraggebers:** (1) Start mit dem Bereich **Wortarten**. (2) Die gemeinsamen Teile **jetzt**
+  aus der Mathe-Seite herausziehen (nicht kopieren, nicht erst nach der Arbeit am 24.11.).
+- **Umbau erledigt:** Die App steckt jetzt in `web/plattform/fach.js` und `fach.css`. `web/mathe/index.html` und
+  `web/deutsch/index.html` beschreiben nur noch ihr Fach (`window.LERNDAX_FACH`). Inhaltlich wurde an MaDax nichts
+  geändert; alle Mathe-Tests sind danach gelaufen (Ergebnis im Verlauf).
+- **Erstes Thema gebaut: „Zeitformen“** (`web/deutsch/`), mit Aufgaben, Tipp, Lösungsweg, Symbol und der Animation
+  „Zeitformen am Zeitstrahl“ (frei, ähnliches Beispiel, Lösung zur Aufgabe). Erreichbar unter `…/lerndax/deutsch/`.
+  Auf der Startseite steht DeDax weiter unter „Kommt bald“ (`faecher.js` unverändert), bis mehr Themen da sind.
+- **Als Nächstes:** „Zeitformen“ vom Auftraggeber ansehen lassen, dann die übrigen Wortarten-Themen. Offen:
+  „Nomen“ oder „Substantiv“ (Lehrplan sagt Substantiv), ISBN und Inhaltsverzeichnis des Deutschbuchs,
+  Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
 **So wird hier gearbeitet (hat sich bewährt)**
 - Der Auftraggeber programmiert nicht. Antworten auf Deutsch, kurz, ohne Fachwörter. Er entscheidet gern anhand von
@@ -287,7 +294,11 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 | `web/plattform/sync.js` | Anmeldung, Profile, PIN, Synchronisation, Avatar-Sync (`window.LernDaxSync`, Alias `MathelixSync`) |
 | `web/plattform/avatare.js` | Avatar-Figuren (SVG), Farben, Auswahlfenster (`window.LernDaxAvatare`) |
 | `web/plattform/trainings.js` | Trainings für einzelne Klassenarbeiten (`window.LERNDAX_TRAININGS`), Aufruf `<fach>/?t=<id>` |
-| `web/mathe/index.html` | MaDax-App (Ansichten, Übungsrunde, Player, Elternansicht) |
+| `web/plattform/fach.js`, `fach.css` | **Die Fach-App für alle Fächer** (seit `lerndax-v44`): Startseite des Fachs, Übungsrunde, Tipp und Lösungsweg, Sterne, Tagesziel, Knobeln, Trainingsseiten, Erklär-Player, Elternansicht. Liest das Fach aus `window.LERNDAX_FACH` |
+| `web/mathe/index.html` | MaDax: bindet die Mathe-Dateien ein und beschreibt das Fach (`LERNDAX_FACH`: Name, Schlüssel `mathelix.v1`, Dachs-Bilder, Reihenfolge der Entdeckungen, geplante Lernbereiche der anderen Klassen) |
+| `web/deutsch/index.html` | DeDax: dasselbe für Deutsch (Schlüssel `dedax.v1`) |
+| `web/deutsch/themen/klasse5.js` | Wortlisten (Verben mit allen Formen) und Aufgaben Klasse 5 (`window.DeDax`) |
+| `web/deutsch/erklaerungen/klasse5.js`, `web/deutsch/symbole.js` | Animationen und Themen-Symbole für DeDax |
 | `web/mathe/generatoren/klasse5.js` | Aufgabengeneratoren Klasse 5 (`window.Mathelix.grades[5]`) |
 | `web/mathe/generatoren/klasse5-luecken.js` | 7 weitere Themen (Überschlagen, Schriftlich rechnen, Gemischte Zahlen, Dezimalzahlen runden, Symmetrie, Netze & Schrägbilder, Fermi); hängt sie in die Lernbereiche ein |
 | `web/mathe/generatoren/klasse5-buch.js` | 4 weitere Themen (Große Zahlen, Brüche am Zahlenstrahl, Senkrecht & parallel, Winkel messen), Zusatz-Aufgabenarten für vorhandene Themen und die **Reihenfolge aller Themen** (Tabelle `FOLGE`) |
@@ -306,6 +317,10 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 Jeder Generator liefert bei jedem Aufruf eine neue Aufgabe:
 `{ prompt, figure?, fields:[{answer, type, label, prefix, suffix, fixed}], layout?, choices?/correct?, check?, hint, solution, answerText, ex? }`.
 `ex: {mode, n}` verknüpft eine Aufgabe mit einer Erklär-Animation (Beispiel vorher, Lösung nachher).
+Für Sprach-Aufgaben kennt die App seit `lerndax-v44` drei weitere Formen: **Wort eintippen** (`type: 'text'`, `answer` ist
+ein Wort oder eine Liste erlaubter Wörter; Groß- und Kleinschreibung zählt, außer mit `ci: true`), **Satz mit Lücken**
+(`layout: 'satz'`, `prefix`/`suffix` sind die Satzteile) und **Antippen** (`tap: { tokens, correct, one?, gaps?, mark? }`:
+Wörter im Satz oder, mit `gaps`, Stellen zwischen den Wörtern, etwa für Kommas).
 Zahlen werden deutsch formatiert (Komma, schmales Leerzeichen ab 10 000).
 
 ### Erklär-Animationen
@@ -314,7 +329,7 @@ Jede Erklärung: `{ title, titleFor?(ctx), viewBox, dark?, discover?:{icon, q, t
 `play()` ist asynchron und nutzt `api.wait`, `api.tw` (Übergänge), `api.say` (Text),
 `api.slider`, `api.chips`. Der Player hat eine **eigene virtuelle Uhr**; dadurch funktionieren
 Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint unter Entdecken
-(Reihenfolge in `DISC_ORDER` in `web/mathe/index.html`).
+(Reihenfolge in `LERNDAX_FACH.entdecken` in `web/mathe/index.html`).
 
 ### Lernstand (pro Gerät im Browser, `localStorage`)
 - `mathelix.v1`: `{ name, grade, stats:{<themaId>:{n, hist:[letzte Ergebnisse 1 / 0,5 / 0], last}}, exSlow, days:[JJJJ-MM-TT], total, seen:{<id>:true}, rounds:{JJJJ-MM-TT: n}, knobel:{<themaId>:{n, ok}}, lastTopic, resetAt }` (`lastTopic` bleibt auf dem Gerät, alles andere außer `name`/`grade`/`exSlow` wird synchronisiert)
@@ -347,7 +362,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v21`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v44`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -859,7 +874,19 @@ Infos zur ersten Arbeit:
 - **Dokumentation für die Übergabe** (12.11.2026): Abschnitt 0 „Übergabe“ ergänzt, Abschnitte 3 und 4 auf den Stand
   v43 gebracht, `README.md` und `faecher/README.md` aktualisiert, neuer Startpunkt `faecher/deutsch/README.md` für DeDax.
   Der Auftraggeber macht in einem neuen Chat mit Deutsch weiter.
-- **DeDax begonnen** (nur Doku, Version bleibt `lerndax-v43`): Lehrplan Deutsch Klasse 5 ausgewertet, Schulbuch-Ausgaben
-  ermittelt (Abgleich wartet auf ISBN und Inhaltsverzeichnis), Themenplan mit 31 Themen in 5 Bereichen vorgeschlagen.
-  Dateien: `faecher/deutsch/lehrplan/sachsen-gymnasium.md`, `faecher/deutsch/lehrplan/schulbuch-abgleich.md`,
-  `faecher/deutsch/themenplan.md`. Stand und offene Entscheidungen in Abschnitt 0.
+- **DeDax begonnen**: Lehrplan Deutsch Klasse 5 ausgewertet, Schulbuch-Ausgaben ermittelt (Abgleich wartet auf ISBN und
+  Inhaltsverzeichnis), Themenplan mit 31 Themen in 5 Bereichen vorgeschlagen (`faecher/deutsch/`).
+- **Gemeinsame Fach-App und erstes Deutsch-Thema** (Version `lerndax-v44`, Entscheidungen des Auftraggebers: Start mit
+  Wortarten, Umbau sofort): Stil und Programm der Mathe-Seite sind unverändert nach `web/plattform/fach.css` und
+  `fach.js` gewandert; fachspezifische Stellen (Name, Bilder, Lernstand-Schlüssel, Entdecken-Reihenfolge, Texte) kommen
+  aus `window.LERNDAX_FACH`. Neu in der App: Wort eintippen, Satz mit Lücken, Wörter antippen.
+  DeDax „Zeitformen“: 39 Verben mit geprüften Formen (alle Formen ausgegeben und durchgelesen), sieben Aufgabenarten
+  (Zeitform bestimmen, Verb ins Präsens/Präteritum setzen, Perfekt/Plusquamperfekt/Futur I bilden, Verbteile antippen,
+  haben oder sein, Grundform finden, „Welcher Satz steht im …?“). Präteritum nur mit ich, er/sie/es, wir, sie
+  (keine Formen wie „du lasest“). „schwimmen“ bewusst nicht dabei (haben und sein sind beide richtig).
+  Neuer Test `tests/dedax.py`.
+  Tests nach dem Umbau: Mathe unverändert in Ordnung (`ui2.py` 576 Aufgaben gelöst, `loesung.py` 108 Animationen,
+  `knobel.py`, `training.py`, `sync_test.py`, `hub.py`, `ava_hub.py`, `ex.py`, `pause.py`, `two.py`, `pack2.py`, `prim.py`,
+  `ex_aufgabe.py`, `bild_audit.py` ohne Auffälligkeit, `design_audit.py` nur die bekannten Deko-Meldungen,
+  `gen-test.js` 75 000 Aufgaben ohne Fehler). DeDax: 20 000 erzeugte Aufgaben ohne Fehler, in der App alle richtigen
+  Antworten angenommen, alle Lösungs-Animationen nennen die Antwort.

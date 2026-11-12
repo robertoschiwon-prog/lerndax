@@ -36,3 +36,6 @@ Bildschirmfotos landen in `tests/shots/audit/`.
 Neue Themen prüfen: `python3 tests/loesung.py 12 k5-ueberschlag,k5-schriftlich,k5-dezrunden,k5-gemischt,k5-symmetrie,k5-netze,k5-fermi`
 - `knobel.py [Runden]`: Knobel-Stufe. Prüft: Balken erscheint erst ab zwei Sternen, 5 Aufgaben je Runde, jede richtige Antwort wird angenommen, Sterne-Statistik bleibt unverändert, Zähler `S.knobel` stimmt, Knopf „Jetzt knobeln“ nach guter Runde.
 - `bild_audit.py [Aufgaben je Thema] [Themen]`: Bilder aller Aufgaben (normal und Knobeln). Meldet Beschriftungen, die aus dem Bild ragen, sich überdecken oder von einer farbigen Linie durchkreuzt werden. `loesung.py` prüft dasselbe „ragt aus dem Bild“ für die Animationen.
+- `dedax.py [Runden]`: **DeDax (Deutsch).** Spielt jedes Thema in der App durch: jede richtige Antwort wird angenommen (Auswahl, Wort eintippen, Satz mit Lücken, Wörter antippen), falsche Antworten führen zur Lösung, die Lösungs-Animation läuft zu Ende, nennt die Antwort und kein Text ragt aus dem Bild.
+
+Seit `lerndax-v44` steckt die App in `web/plattform/fach.js`; die Mathe-Tests laufen unverändert über `web/mathe/index.html`.
