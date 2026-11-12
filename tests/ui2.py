@@ -21,6 +21,7 @@ async def main():
         ids = await pg.eval_on_selector_all('[data-topic]', 'els=>els.map(e=>e.dataset.topic)')
         for rnd in range(2):
           for t in ids:
+            for zu in await pg.query_selector_all('[data-lbopen]'): await pg.evaluate("() => { const b = document.querySelector('[data-lbopen]'); if (b) b.click(); }")  # fertige Lernbereiche sind eingeklappt
             await pg.click(f'[data-topic="{t}"]')
             for k in range(8):
                 a = await pg.evaluate(FILL)
@@ -39,7 +40,9 @@ async def main():
             await pg.click('[data-go="home"]')
         await pg.screenshot(path=f'{SHOTS}/r_home.png', full_page=True)
         await pg.click('[data-go="parents"]'); await pg.screenshot(path=f'{SHOTS}/r_parents.png', full_page=True)
-        await pg.click('[data-go="home"]'); await pg.click('[data-topic="k5-rechteck"]')
+        await pg.click('[data-go="home"]')
+        for zu in await pg.query_selector_all('[data-lbopen]'): await pg.evaluate("() => { const b = document.querySelector('[data-lbopen]'); if (b) b.click(); }")
+        await pg.click('[data-topic="k5-rechteck"]')
         await pg.screenshot(path=f'{SHOTS}/r_rect.png')
         print('tasks', n, 'not ok', bad, 'errors', errs)
         await b.close()

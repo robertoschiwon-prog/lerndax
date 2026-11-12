@@ -743,3 +743,11 @@ Infos zur ersten Arbeit:
   Tests nach der Prüfung: 576 Aufgaben in der App gelöst, 546 Lösungs-Animationen gelaufen. Dabei gab es in einem von
   vier Läufen eine einzelne Meldung (1 von 108), die sich in 546 weiteren Animationen nicht wiederholt hat; Ursache offen,
   vermutlich Zeitüberschreitung im Test bei hoher Last. Beim Test mit Bruno darauf achten, ob eine Animation hängen bleibt.
+- **Lesbarkeit und Übersicht** (Version `lerndax-v41`, vom Auftraggeber ausgewählt; die Klassen-Leiste 1–10 bleibt bewusst
+  unverändert): Sterne mit dunklem Rand (leere Sterne weiß mit grauem Rand, volle goldgelb), dadurch auf Weiß gut sichtbar.
+  Geodreieck als vergrößerter Ausschnitt (Spitzen abgeschnitten, Zahlen rund ein Drittel größer; viewBox `42 46 256 142`).
+  Kleingedrucktes in Lösungsweg, Tipp und Animationstext größer und dunkler. Brüche im Fließtext etwas kleiner, damit die
+  Zeilen ruhiger stehen. Puzzle-Symbol mit weißem Rand. Startseite: neuer Knopf **„Weiter üben“** (zuletzt geübtes Thema,
+  `S.lastTopic`, nur auf diesem Gerät gemerkt); „Entdecken“ und „Knobeln“ stehen nebeneinander in einer Zeile; je
+  Lernbereich eine Zeile „x von y geübt“; ein Lernbereich, in dem **alle** Themen drei Sterne haben, ist eingeklappt
+  („Geschafft! Themen anzeigen“). `tests/ui2.py` klappt eingeklappte Bereiche vor dem Klick auf.

@@ -499,6 +499,8 @@
   // =====================================================
   // Winkel messen (am Geodreieck ablesen, schätzen)
   // =====================================================
+  // Das Bild zeigt einen vergrößerten Ausschnitt (viewBox 42 46 256 142): Die Spitzen des Geodreiecks sind abgeschnitten,
+  // dafür sind die Zahlen der Skala auf dem Handy gut lesbar.
   // Geodreieck mit Scheitel in der Mitte der langen Kante. Äußere Skala: 0° rechts → 180° links, innere Skala umgekehrt.
   const GEO = { cx: 170, cy: 178, r: 160 };
   M.GEO = GEO;
@@ -523,8 +525,8 @@
   function winkelSchenkel(th, links, mitBogen) {
     const { cx, cy } = GEO;
     const a0 = links ? 180 : 0, a1 = links ? 180 - th : th;
-    const [x0, y0] = gpt(a0, 150), [x1, y1] = gpt(a1, 150);
-    let g = `<line class="ray" x1="${cx}" y1="${cy}" x2="${x0.toFixed(1)}" y2="${y0.toFixed(1)}" style="stroke:var(--c2)"/><line class="ray" x1="${cx}" y1="${cy}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" style="stroke:var(--c1)"/>`;
+    const [x0, y0] = gpt(a0, 122), [x1, y1] = gpt(a1, 122);
+    let g = `<line class="ray" x1="${cx}" y1="${cy}" x2="${x0.toFixed(1)}" y2="${y0.toFixed(1)}" style="stroke:var(--c2);stroke-width:5"/><line class="ray" x1="${cx}" y1="${cy}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" style="stroke:var(--c1)"/>`;
     if (mitBogen) {
       const [bx0, by0] = gpt(Math.min(a0, a1), 26), [bx1, by1] = gpt(Math.max(a0, a1), 26), [tx, ty] = gpt((a0 + a1) / 2, th < 40 ? 44 : 15);
       g += `<path d="M${bx0.toFixed(1)} ${by0.toFixed(1)} A26 26 0 0 0 ${bx1.toFixed(1)} ${by1.toFixed(1)}" style="fill:none;stroke:var(--c1);stroke-width:2.2"/><text class="tick b" x="${tx.toFixed(1)}" y="${(ty + 4).toFixed(1)}" text-anchor="middle" style="fill:var(--c1)">α</text>`;
@@ -532,7 +534,7 @@
     return g;
   }
   M.winkelSchenkel = winkelSchenkel;
-  const geoBild = (th, links, mitGeo) => `<svg viewBox="0 0 340 196">${winkelSchenkel(th, links, !mitGeo)}${mitGeo ? geoDreieck() : ''}</svg>`;
+  const geoBild = (th, links, mitGeo) => `<svg viewBox="42 46 256 142">${winkelSchenkel(th, links, !mitGeo)}${mitGeo ? geoDreieck() : ''}</svg>`;
   M.geoBild = geoBild;
   const winkelArt = (th) => (th < 90 ? 'spitz' : th === 90 ? 'ein rechter Winkel' : 'stumpf');
   function winkelMessen() {

@@ -449,7 +449,7 @@
   reg('k5-winkelmessen', {
     title: 'Winkel messen mit dem Geodreieck',
     titleFor: (ctx) => (ctx && ctx.art === 'ueber' ? 'Überstumpfe Winkel: Rest zum vollen Kreis' : ctx && ctx.art === 'schaetz' ? 'Winkel schätzen und nachmessen' : 'Winkel messen mit dem Geodreieck'),
-    viewBox: '0 0 340 196',
+    viewBox: '42 46 256 142',
     create(api, ctx) {
       ctx = ctx || {};
       const frei = () => ({ mode: 'geo', th: 55, links: false, art: 'lesen' });
@@ -469,26 +469,26 @@
         api.clear(); g = {};
         if (c.art === 'ueber') {
           // eigenes Bild: Scheitel in der Mitte
-          const cx = 170, cy = 104, r = 78, P = (grad, rr) => [cx + rr * Math.cos((grad * Math.PI) / 180), cy - rr * Math.sin((grad * Math.PI) / 180)];
+          const cx = 170, cy = 112, r = 62, P = (grad, rr) => [cx + rr * Math.cos((grad * Math.PI) / 180), cy - rr * Math.sin((grad * Math.PI) / 180)];
           const kreis = (von, bis, rr) => { let d = ''; const n = Math.ceil((bis - von) / 4); for (let i = 0; i <= n; i++) { const [x, y] = P(von + ((bis - von) * i) / n, rr); d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return d; };
           g.kreis = kreis;
           el('line', { x1: cx, y1: cy, x2: P(0, r)[0], y2: P(0, r)[1], class: 'ray', style: 'stroke:var(--c2)' }, api.svg);
           el('line', { x1: cx, y1: cy, x2: P(c.th, r)[0], y2: P(c.th, r)[1], class: 'ray', style: 'stroke:var(--c1)' }, api.svg);
-          g.klein = el('path', { d: kreis(0, c.th, 30), style: 'fill:none;stroke:var(--c3);stroke-width:3', opacity: 0 }, api.svg);
+          g.klein = el('path', { d: kreis(0, c.th, 26), style: 'fill:none;stroke:var(--c3);stroke-width:3', opacity: 0 }, api.svg);
           g.gross = el('path', { d: '', style: 'fill:none;stroke:var(--c1);stroke-width:3' }, api.svg);
-          const m = P(c.th / 2, 48), m2 = P(c.th + (360 - c.th) / 2, 62);
+          const m = P(c.th / 2, 42), m2 = P(c.th + (360 - c.th) / 2, 54);
           g.tk = el('text', { x: m[0], y: m[1] + 5, class: 'ex-s f3', 'text-anchor': 'middle', opacity: 0, text: c.th + '°' }, api.svg);
           g.tg = el('text', { x: m2[0], y: m2[1] + 5, class: 'ex-b f1', 'text-anchor': 'middle', text: '?' }, api.svg);
-          g.info = el('text', { x: 170, y: 190, class: 'ex-b f1', 'text-anchor': 'middle', text: '' }, api.svg);
+          g.info = el('text', { x: 170, y: 184, class: 'ex-s f1', 'text-anchor': 'middle', text: '' }, api.svg);
           return;
         }
-        g.recht = el('line', { x1: GEO.cx, y1: GEO.cy, x2: GEO.cx, y2: GEO.cy - 150, class: 'dash', opacity: 0 }, api.svg);
+        g.recht = el('line', { x1: GEO.cx, y1: GEO.cy, x2: GEO.cx, y2: GEO.cy - 122, class: 'dash', opacity: 0 }, api.svg);
         g.schenkel = el('g', {}, api.svg);
         g.schenkel.innerHTML = M.winkelSchenkel(c.th, c.links, !mitGeo);
         g.geo = el('g', { opacity: mitGeo ? 1 : 0 }, api.svg);
         g.geo.innerHTML = M.geoDreieck();
         g.sweep = el('path', { d: '', style: 'fill:none;stroke:var(--c1);stroke-width:5;stroke-linecap:round;opacity:.75' }, api.svg);
-        g.info = el('text', { x: c.links ? 332 : 8, y: 20, class: 'ex-b f1', 'text-anchor': c.links ? 'end' : 'start', text: mitGeo ? c.th + '°' : '' }, api.svg);
+        g.info = el('text', { x: c.links ? 292 : 48, y: 62, class: 'ex-b f1', 'text-anchor': c.links ? 'end' : 'start', text: mitGeo ? c.th + '°' : '' }, api.svg);
       }
       return {
         reset() { api.sub(subText(ctx)); zeichne(false); },
@@ -499,7 +499,7 @@
             show(g.klein, 1); show(g.tk, 1);
             api.say(`Der Trick: Wir messen den Winkel auf der <b>anderen Seite</b>. Er ist ${c.th}° groß.`);
             await api.wait(3400);
-            await api.tw(1400, (t) => { g.gross.setAttribute('d', g.kreis(c.th, c.th + (360 - c.th) * t, 40)); });
+            await api.tw(1400, (t) => { g.gross.setAttribute('d', g.kreis(c.th, c.th + (360 - c.th) * t, 34)); });
             g.tg.textContent = 360 - c.th + '°';
             g.info.textContent = `360° − ${c.th}° = ${360 - c.th}°`;
             api.say(`Beide Winkel zusammen sind ein voller Kreis, also 360°.<br>360° − ${c.th}° = <b>${360 - c.th}°</b>`);

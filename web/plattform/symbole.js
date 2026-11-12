@@ -10,7 +10,7 @@
  */
 (function () {
   const SYMBOLE = {
-    puzzle: '<path d="M3 7.5h4.6a2.6 2.6 0 1 1 4.8 0H17v4.6a2.6 2.6 0 1 1 0 4.8V21H3z" fill="#8b5cf6"/><circle cx="7" cy="14.5" r="1.9" fill="#fff" opacity=".55"/>',
+    puzzle: '<path d="M3.5 8h4.3a2.7 2.7 0 1 1 5 0H17v4.3a2.7 2.7 0 1 1 0 5V21H3.5z" fill="#8b5cf6" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" paint-order="stroke fill"/><circle cx="7.5" cy="15" r="1.7" fill="#fff" opacity=".7"/>',
     ziel: '<circle cx="12" cy="12" r="10.5" fill="#e5383b"/><circle cx="12" cy="12" r="7.3" fill="#fff"/><circle cx="12" cy="12" r="4.2" fill="#e5383b"/><circle cx="12" cy="12" r="1.5" fill="#fff"/>',
     flamme: '<path d="M12.5 1.5c.6 4.2 6 6.3 6 12.4a6.5 6.5 0 0 1-13 0c0-3 1.7-4.7 3-7.3.8 1.9 2 2.3 2.2.9.2-1.8.8-3.9 1.8-6z" fill="#ff6b3d"/><path d="M12 11.5c1.8 2 3.2 3.6 3.2 5.4a3.2 3.2 0 0 1-6.4 0c0-2.1 1.9-3.3 3.2-5.4z" fill="#ffd166"/>',
     stern: '<polygon points="12.0,1.6 14.7,8.9 22.5,9.2 16.4,14.0 18.5,21.5 12.0,17.2 5.5,21.5 7.6,14.0 1.5,9.2 9.3,8.9" fill="#f5b301"/>',

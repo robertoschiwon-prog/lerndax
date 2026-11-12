@@ -76,6 +76,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .later p b{font-weight:800;color:var(--ink)}
 .jump{width:100%;display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:9px 12px;border:2px solid var(--ink);border-radius:14px;background:#141628;color:#ece9f7;font:inherit;font-weight:800;font-size:15px;text-align:left;box-shadow:3px 3px 0 var(--c1);cursor:pointer}
 .jump:active{transform:translate(3px,3px);box-shadow:none}
+.jumps{display:grid;grid-template-columns:1fr 1fr;gap:10px}.jumps .jump{font-size:15px;padding:9px 10px;gap:7px}
+.weiter{width:100%;display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border:2px solid var(--ink);border-radius:14px;background:var(--c1);color:#1c1a33;font:inherit;font-weight:800;font-size:16px;text-align:left;box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+.weiter:active{transform:translate(3px,3px);box-shadow:none}.weiter span{flex:1;min-width:0}.weiter small{display:block;font-size:12.5px;font-weight:800;opacity:.8}.weiter b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.weiter .stars{font-size:14px;background:#fff;border:2px solid var(--ink);border-radius:99px;padding:1px 7px 2px}
+.lbp{display:block;font:800 12.5px Nunito,system-ui,sans-serif;color:var(--soft);margin-top:1px}
+.lbzu{width:100%;justify-content:flex-start;font-size:15px;background:#eaf7f0;border-color:var(--c3)}
 .jump.kn{background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--c4)}.jump.kn small{color:#7443e6}
 .knz{display:inline-flex;align-items:center;gap:3px;margin-left:6px;font-size:12px;font-weight:800;color:#7443e6}
 .btn.knb{border-color:var(--c4)}
@@ -91,8 +96,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .topic .ti{width:44px;height:44px;border-radius:11px;padding:6px;box-sizing:border-box;display:grid;place-items:center;font:800 18px "Bricolage Grotesque",Nunito,system-ui,sans-serif;color:#fff;border:2px solid var(--ink)}
 .topic .ti svg{display:block;width:100%;height:100%}
 .topic .tt{font-weight:800;font-size:15px;line-height:1.2;flex:1}
-.stars{font-size:15px;letter-spacing:1px;color:#d8d0c2}
-.stars .on{color:var(--c5)}
+.stars{font-size:15px;letter-spacing:1px;color:#fff;-webkit-text-stroke:1px #8f8674;paint-order:stroke fill}
+.stars .on{color:#f5b301;-webkit-text-stroke:1px #6f4e00}
 .bg1{background:var(--c1)}.bg2{background:var(--c2)}.bg3{background:var(--c3)}.bg4{background:var(--c4)}.bg5{background:var(--c5)}
 /* weiße Schrift ist auf Orange und Gelb zu schwach: dort dunkle Schrift */
 .tag.bg1,.tag.bg5,.lbh .nr.bg1,.lbh .nr.bg5,.topic .ti.bg1,.topic .ti.bg5{color:var(--ink)}
@@ -183,6 +188,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;font-weight:800;line-height:1.1;font-size:.95em}
 .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 3px 1px}
 .fr>span:last-child{padding:1px 3px 0}
+.q .fr{font-size:.88em}.fb .fr,.hint .fr,.excap .fr{font-size:.8em;line-height:1.05}.fb .fr>span:first-child,.hint .fr>span:first-child,.excap .fr>span:first-child{border-bottom-width:1.5px}
 .var{font-family:Georgia,serif;font-weight:700}
 .mono{font-variant-numeric:tabular-nums}
 .cB{color:var(--c1)}
@@ -323,7 +329,8 @@ body.noscroll{overflow:hidden}
 .exstage svg{width:100%;height:auto;display:block;max-height:46vh}
 .excap{min-height:3.6em;margin:12px 2px 8px;font-size:17px;line-height:1.45}
 .excap.in{animation:pop .25s ease-out}
-.excap small{color:var(--soft)}
+.excap small{color:#4b4763;font-size:.9em}
+.fb small,.q small,.hint small{font-size:.9em;color:#4b4763}
 .exbig{font:800 24px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
 .exctl{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 .exslider{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--soft)}
@@ -819,8 +826,8 @@ body.noscroll{overflow:hidden}
       ${nameCard()}
       <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p><p class="goal${roundsToday() >= 1 ? ' done' : ''}">${goalLine()}</p></div></div>
       <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
-      <button class="jump" data-jump="entdecken"><i>✦</i>Entdecken: Mathe zum Staunen<small>↓</small></button>
-      ${knobelBar(allTopics())}
+      ${weiterBtn()}
+      ${knobelReif(allTopics()).length ? `<div class="jumps"><button class="jump" data-jump="entdecken"><i>✦</i>Entdecken<small>↓</small></button>${knobelBar(allTopics(), true)}</div>` : '<button class="jump" data-jump="entdecken"><i>✦</i>Entdecken: Mathe zum Staunen<small>↓</small></button>'}
       <div class="quick${mixOk && weak.length ? '' : mixOk || weak.length ? ' one' : ' none'}">
         ${mixOk ? `<button class="btn org" data-mix="all"><span class="ic">🎲</span>Gemischt<small>${TASKS_PER_ROUND} Aufgaben aus ${practicedTopics().length} geübten Themen</small></button>` : ''}
         ${weak.length ? `<button class="btn" data-review><span class="ic">🔁</span>Fehler-Training<small>${(weak.length === 1 ? '1 Thema' : weak.length + ' Themen')} zum Wiederholen</small></button>` : ''}
@@ -829,11 +836,11 @@ body.noscroll{overflow:hidden}
         ${mixOk ? '' : '<p>🎲 <b>Gemischt</b> kommt dazu, sobald du zwei Themen geübt hast.</p>'}
         ${weak.length ? '' : `<p>🔁 <b>Fehler-Training</b> ${S.total ? 'ist leer: gerade nichts offen.' : 'sammelt Aufgaben, die noch nicht geklappt haben.'}</p>`}
       </div>`}
-      ${grade().lbs.map((lb) => `
+      ${grade().lbs.map((lb) => { const n = lb.topics.length, geuebt = lb.topics.filter((t) => mastery(t.id).n > 0).length, fertig = lb.topics.every((t) => mastery(t.id).stars === 3), zu = fertig && !LBOFFEN.has(lb.id); return `
         <section class="lb">
-          <div class="lbh"><span class="nr bg${lb.nr}">${lb.nr}</span><h2>${lb.title}</h2><button class="btn mix" data-mix="${lb.id}">Mix</button></div>
-          <div class="topics">${lb.topics.map((t) => topicTile(t, lb.nr)).join('')}</div>
-        </section>`).join('')}
+          <div class="lbh"><span class="nr bg${lb.nr}">${lb.nr}</span><h2>${lb.title}<small class="lbp">${fertig ? `alle ${n} Themen mit drei Sternen ✓` : `${geuebt} von ${n} geübt`}</small></h2><button class="btn mix" data-mix="${lb.id}">Mix</button></div>
+          ${zu ? `<button class="btn lbzu" data-lbopen="${lb.id}">Geschafft! Themen anzeigen ↓</button>` : `<div class="topics">${lb.topics.map((t) => topicTile(t, lb.nr)).join('')}</div>`}
+        </section>`; }).join('')}
       ${discoverHtml()}
       <div class="foot"><button class="btn ghost" data-go="parents">Für Eltern: Fortschritt ansehen</button></div>`;
     bindName();
@@ -872,7 +879,10 @@ body.noscroll{overflow:hidden}
   // Knobeln: schwerere, freiwillige Aufgaben (topic.knobel). Zählen nicht für die Sterne. Frei ab zwei Sternen im Thema.
   const KNOBEL_N = 5;
   const knobelReif = (topics) => topics.filter((t) => t.knobel && mastery(t.id).stars >= 2);
-  const knobelBar = (topics) => { const k = knobelReif(topics); return k.length ? `<button class="jump kn" data-knobel="${k.map((t) => t.id).join(',')}"><i>🧩</i>Knobeln: harte Nüsse aus ${k.length === 1 ? 'einem Thema' : k.length + ' Themen'}<small>→</small></button>` : ''; };
+  const knobelBar = (topics, kurz) => { const k = knobelReif(topics); return k.length ? `<button class="jump kn" data-knobel="${k.map((t) => t.id).join(',')}"><i>🧩</i>${kurz ? 'Knobeln' : `Knobeln: harte Nüsse aus ${k.length === 1 ? 'einem Thema' : k.length + ' Themen'}`}<small>→</small></button>` : ''; };
+  // „Weiter üben“: das zuletzt geübte Thema (nur auf diesem Gerät gemerkt)
+  const weiterBtn = () => { const t = S.lastTopic && findTopic(S.lastTopic); return t ? `<button class="weiter" data-topic="${t.id}"><span><small>▶ Weiter üben</small><b>${t.title}</b></span>${starHtml(mastery(t.id).stars)}</button>` : ''; };
+  const LBOFFEN = new Set(); // fertige Lernbereiche (alles drei Sterne), die gerade aufgeklappt sind
   function weightedPick(topics) {
     const w = topics.map((t) => { const m = mastery(t.id); return m.n === 0 ? 1 : 1.25 - m.avg; });
     let r = Math.random() * w.reduce((a, b) => a + b, 0);
@@ -1050,6 +1060,7 @@ body.noscroll{overflow:hidden}
     } else {
       const st = S.stats[id] || (S.stats[id] = { n: 0, hist: [], last: '' });
       st.n++; st.hist.push(score); if (st.hist.length > 10) st.hist.shift(); st.last = today();
+      S.lastTopic = id;
     }
     if (!S.days.includes(today())) S.days.push(today());
     if (S.days.length > 400) S.days = S.days.slice(-400);
@@ -1412,6 +1423,7 @@ body.noscroll{overflow:hidden}
     else if (d.sync) syncAction(d.sync, b);
     else if (d.topic) { start('topic', d.topic); window.scrollTo(0, 0); }
     else if (d.knobel) { start('knobel', d.knobel); window.scrollTo(0, 0); }
+    else if (d.lbopen) { LBOFFEN.add(d.lbopen); const y = window.scrollY; home(); window.scrollTo(0, y); }
     else if (d.mix) { start('mix', d.mix); window.scrollTo(0, 0); }
     else if (d.tr) { start('tr', d.tr); window.scrollTo(0, 0); }
     else if ('review' in d) { start('review'); window.scrollTo(0, 0); }
