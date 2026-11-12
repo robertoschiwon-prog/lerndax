@@ -58,6 +58,17 @@ mit dem Schulbuch abgleichen, dem Auftraggeber einen Themenplan mit Optionen vor
 klären, wie die gemeinsamen Teile aus `web/mathe/index.html` (Übungsrunde, Sterne, Knobeln, Player, Elternbereich)
 für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 
+**Stand DeDax (12.11.2026, zweiter Chat)**
+- Lehrplan Deutsch Klasse 5 am Originaltext ausgewertet: `faecher/deutsch/lehrplan/sachsen-gymnasium.md`.
+- Schulbuch-Abgleich **noch nicht möglich**: Ausgabe unklar (wahrscheinlich Deutschbuch Gymnasium, östliche
+  Bundesländer, Ausgabe 2019, ISBN 978-3-06-200082-9), kein Stoffverteilungsplan im Netz. Es fehlen die ISBN und ein
+  Foto des Inhaltsverzeichnisses (`faecher/deutsch/lehrplan/schulbuch-abgleich.md`).
+- Themenplan als **Vorschlag** (5 Bereiche, 31 Themen, je Thema Beispiel-Aufgaben und Animations-Idee, fünf neue
+  Aufgabenformen): `faecher/deutsch/themenplan.md`. Noch nicht entschieden.
+- Offene Entscheidungen, einzeln zu stellen: (1) womit anfangen, (2) Themenplan so in Ordnung, (3) „Nomen“ oder
+  „Substantiv“, (4) Umbau: gemeinsame Teile aus `web/mathe/index.html` nach `web/plattform/` herausziehen.
+- Am Code (`web/`) wurde nichts geändert, deshalb bleibt die Version `lerndax-v43`.
+
 **So wird hier gearbeitet (hat sich bewährt)**
 - Der Auftraggeber programmiert nicht. Antworten auf Deutsch, kurz, ohne Fachwörter. Er entscheidet gern anhand von
   **Optionen**; Fragen einzeln stellen (mehrere auf einmal gingen schief). Bilder zeigen statt beschreiben.
@@ -848,3 +859,7 @@ Infos zur ersten Arbeit:
 - **Dokumentation für die Übergabe** (12.11.2026): Abschnitt 0 „Übergabe“ ergänzt, Abschnitte 3 und 4 auf den Stand
   v43 gebracht, `README.md` und `faecher/README.md` aktualisiert, neuer Startpunkt `faecher/deutsch/README.md` für DeDax.
   Der Auftraggeber macht in einem neuen Chat mit Deutsch weiter.
+- **DeDax begonnen** (nur Doku, Version bleibt `lerndax-v43`): Lehrplan Deutsch Klasse 5 ausgewertet, Schulbuch-Ausgaben
+  ermittelt (Abgleich wartet auf ISBN und Inhaltsverzeichnis), Themenplan mit 31 Themen in 5 Bereichen vorgeschlagen.
+  Dateien: `faecher/deutsch/lehrplan/sachsen-gymnasium.md`, `faecher/deutsch/lehrplan/schulbuch-abgleich.md`,
+  `faecher/deutsch/themenplan.md`. Stand und offene Entscheidungen in Abschnitt 0.
