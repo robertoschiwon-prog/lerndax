@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v48`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v49`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -78,9 +78,10 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
   „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
   27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
-- **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, 7 Themen).
+- **Gebaut (v49): Bereich 2 „Satzbau und Satzzeichen“ ist vollständig** (8 Themen). DeDax hat damit 15 Themen.
+- **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 15 Themen).
   Die Zahl `themen` dort bei jedem neuen Thema mitzählen.
-- **Als Nächstes:** Bereich 2 (Satzbau und Satzzeichen) oder Bereich 3 (Rechtschreibung), siehe Themenplan. Offen:
+- **Als Nächstes:** Bereich 3 (Rechtschreibung), dann 4 (Wörter bauen) und 5 (Texte verstehen), siehe Themenplan.
   ISBN und Inhaltsverzeichnis des Deutschbuchs,
   Knobel-Aufgaben für Zeitformen, Elternbereich auf die Startseite (jetzt gibt es zwei Fächer).
 
@@ -370,7 +371,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v48`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v49`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -925,3 +926,17 @@ Infos zur ersten Arbeit:
   140 000 erzeugte Aufgaben ohne Fehler (keine doppelten Auswahl-Antworten).
 - **DeDax auf der Startseite** (Version `lerndax-v48`): zweite Kachel neben MaDax. „Entdecken“ und „Für Eltern“ auf der
   Startseite führen weiter zu MaDax (offen: Elternbereich für beide Fächer).
+- **DeDax: Bereich 2 „Satzbau und Satzzeichen“ fertig** (Version `lerndax-v49`): acht Themen.
+  „Satzglieder und Umstellprobe“ (Grenzen antippen, zählen, richtige Umstellung wählen), „Subjekt und Prädikat“
+  (antippen, bestimmen, passende Verbform), „Dativ- und Akkusativobjekt“, „Attribute“ (antippen, Weglassprobe, zu
+  welchem Substantiv), „Hauptsatz und Nebensatz“ (Personalform antippen, richtig gebauter Nebensatz), „Satzarten und
+  Satzschlusszeichen“, „Komma: Aufzählung und Satzgefüge“ (Kommastellen antippen), „Wörtliche Rede“ (richtige
+  Schreibung, fehlendes Zeichen, Begleitsatz und Rede).
+  Wortlisten: 18 Sätze mit Satzgliedern und Rollen, 14 Sätze mit Attributen, 14 Satzgefüge, je 8 Sätze pro Satzart,
+  8 Aufzählungen, 12 Redesätze. Eindeutigkeit: Bei der Umstellprobe ist „Die Kinder im Garten spielen“ keine falsche
+  Antwort mehr (das wäre ein richtiger Satz), falsch ist nur „Im Garten die Kinder spielen“. Bei der Weglassprobe sind
+  Artikel keine falschen Antworten („Sie trinkt heißen Tee“ ist richtig). Satzzeichen-Auswahl nur Punkt oder
+  Fragezeichen (ein Aussagesatz mit Ausrufezeichen wäre auch richtig).
+  Neue Animationen: Satzglieder als Wagen, die die Plätze tauschen; Kommas, die an ihrer Stelle erscheinen.
+  `tests/dedax.py` misst jetzt echte Bildschirmpositionen (vorher Fehlalarm bei verschobenen Gruppen): 15 Themen,
+  540 richtige Antworten angenommen, 180 Lösungs-Animationen; 150 000 erzeugte Aufgaben ohne Fehler.

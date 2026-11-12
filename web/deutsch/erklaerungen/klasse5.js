@@ -287,11 +287,16 @@
   // „Ähnliches Beispiel“ = dieselbe Aufgabenart erzeugt eine neue Aufgabe; frei = irgendeine Aufgabe des Themas.
   const WFARBE = { N: '#1f55d6', V: '#c62f4b', A: '#0a7d57', D: '#c2410c', P: '#7c3aed' };
   const fit = (t, maxW, von) => { try { for (let fs = von; fs >= 10 && t.getBBox().width > maxW; fs--) t.setAttribute('style', `font-size:${fs}px`); } catch (e) {} };
-  function zeile(api, teile, y, sep) {
+  // umbruch: lange Sätze stehen in zwei Zeilen (Trennung an einer Wortgrenze nahe der Mitte)
+  function zeile(api, teile, y, sep, umbruch) {
     const t = el('text', { x: 180, y, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
-    const ts = teile.map((w, i) => el('tspan', { text: (sep && i ? ' ' : '') + w }, t));
+    const lang = teile.join(' ').length;
+    let br = -1;
+    if (umbruch && sep && lang > 30 && teile.length > 3) { let c = 0; for (let i = 0; i < teile.length; i++) { c += teile[i].length + 1; if (c >= lang / 2) { br = i + 1; break; } } if (br >= teile.length) br = -1; }
+    const ts = teile.map((w, i) => { const e = el('tspan', { text: (sep && i && i !== br ? ' ' : '') + w }, t); if (i === br) { e.setAttribute('x', 180); e.setAttribute('dy', 26); } return e; });
+    if (br > 0) t.setAttribute('y', y - 13);
     fit(t, 336, 19);
-    return { t, ts };
+    return { t, ts, br };
   }
   const mitteX = (t, teile, idx, sep) => { // Mitte eines Teils in x (für Pfeile)
     try { let a = 0; for (let i = 0; i < idx; i++) a += teile[i].length + (sep && i ? 1 : 0); if (sep && idx) a += 1;
@@ -314,10 +319,68 @@
     },
     // Wörter im Satz nacheinander markieren
     async marken(api, x) {
-      const a = zeile(api, x.tokens, 70, true);
+      const a = zeile(api, x.tokens, 66, !x.dicht, true);
+      api.say(x.s1); await api.wait(2600);
+      for (const i of x.correct) { a.ts[i].setAttribute('fill', x.dicht ? ORANGE : BLAU); await api.wait(x.dicht ? 700 : 1100); }
+      api.say(x.merk || `${x.was}: <b>${x.correct.map((i) => x.tokens[i].replace(/[.,!?]/g, '')).join(', ')}</b>.`);
+    },
+    // Kommas erscheinen nacheinander an ihren Stellen
+    async komma(api, x) {
+      const t = el('text', { x: 180, y: 66, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
+      const lang = x.tokens.join(' ').length; let br = -1;
+      if (lang > 30) { let c = 0; for (let i = 0; i < x.tokens.length; i++) { c += x.tokens[i].length + 1; if (c >= lang / 2) { br = i + 1; break; } } if (br >= x.tokens.length) br = -1; }
+      const ks = {};
+      x.tokens.forEach((w, i) => {
+        const e = el('tspan', { text: (i && i !== br ? ' ' : '') + w }, t);
+        if (i === br) { e.setAttribute('x', 180); e.setAttribute('dy', 26); }
+        if (x.gaps.includes(i)) ks[i] = el('tspan', { text: ',', fill: ORANGE, 'fill-opacity': 0 }, t);
+      });
+      if (br > 0) t.setAttribute('y', 53);
+      fit(t, 336, 19);
+      api.say(x.s1); await api.wait(3200);
+      for (const i of x.gaps) { await api.tw(350, (k) => ks[i].setAttribute('fill-opacity', k)); await api.wait(900); }
+      api.say(`<b>${x.tokens.map((w, i) => w + (x.gaps.includes(i) ? ',' : '')).join(' ')}</b>`);
+    },
+    // Satzglieder als Wagen: markieren, benennen und (bei um) umstellen
+    async glieder(api, x) {
+      const n = x.teile.length, pad = 14, luecke = 6;
+      let fs = 16, ws = [];
+      const mess = el('text', { x: 0, y: -50, class: 'ex-b' }, api.svg);
+      for (; fs >= 9; fs--) {
+        mess.setAttribute('style', `font-size:${fs}px`);
+        ws = x.teile.map((t) => { mess.textContent = t; try { return mess.getBBox().width + pad; } catch (e) { return t.length * fs * 0.6 + pad; } });
+        if (ws.reduce((a, b) => a + b, 0) + luecke * (n - 1) <= 344) break;
+      }
+      mess.remove();
+      const gesamt = ws.reduce((a, b) => a + b, 0) + luecke * (n - 1);
+      const xs = (order) => { const pos = []; let cx = 180 - gesamt / 2; order.forEach((k) => { pos[k] = cx; cx += ws[k] + luecke; }); return pos; };
+      let pos = xs(x.teile.map((_, k) => k));
+      const wagen = x.teile.map((t, k) => {
+        const g = el('g', { transform: `translate(${pos[k]},0)` }, api.svg);
+        const r = el('rect', { x: 0, y: 28, width: ws[k], height: 34, rx: 9, fill: x.rollen[k] === 'P' ? '#ffe3d6' : 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2 }, g);
+        el('text', { x: ws[k] / 2, y: 50, 'text-anchor': 'middle', class: 'ex-b', text: t, style: `font-size:${fs}px` }, g);
+        const lab = el('text', { x: ws[k] / 2, y: 80, 'text-anchor': 'middle', class: 'ex-s', text: '', style: 'font-size:10.5px;fill:#6b6680' }, g);
+        return { g, r, lab };
+      });
       api.say(x.s1); await api.wait(2400);
-      for (const i of x.correct) { a.ts[i].setAttribute('fill', BLAU); await api.wait(1100); }
-      api.say(`${x.was}: <b>${x.correct.map((i) => x.tokens[i].replace(/[.,!?]/g, '')).join(', ')}</b>.`);
+      if (x.um) {
+        const ziel = xs(x.um), start = pos.slice();
+        await api.tw(1100, (t) => wagen.forEach((w, k) => w.g.setAttribute('transform', `translate(${lerp(start[k], ziel[k], t)},${Math.sin(t * Math.PI) * (k === x.um[0] ? -14 : k === x.um[1] ? 0 : 14)})`)));
+        pos = ziel;
+        api.say('Ganze Wagen tauschen die Plätze. Der helle Wagen ist das <b>Prädikat</b>: Es bleibt an 2. Stelle.');
+        await api.wait(2800);
+      }
+      const zeig = x.idx && x.idx.length ? x.idx : x.teile.map((_, k) => k);
+      for (const k of zeig) {
+        if (x.idx && x.idx.length) { wagen[k].r.setAttribute('stroke', BLAU); wagen[k].r.setAttribute('fill', '#dfe9ff'); wagen[k].lab.setAttribute('style', `font-size:11.5px;fill:${BLAU}`); }
+        const name = x.rollen[k] === 'x' ? '' : T.ROLLE[x.rollen[k]];
+        wagen[k].lab.textContent = name;
+        // Beschriftung bleibt im Bild, auch unter schmalen Wagen am Rand
+        const halb = name.length * 3.4 + 3, mitte = Math.max(halb, Math.min(360 - halb, pos[k] + ws[k] / 2));
+        wagen[k].lab.setAttribute('x', mitte - pos[k]);
+        await api.wait(x.idx && x.idx.length ? 900 : 350);
+      }
+      api.say(x.merk);
     },
     // Wortarten: Zielwörter in der Farbe ihrer Wortart, unten die Legende
     async wa(api, x) {
@@ -388,4 +451,12 @@
   thema('d5-adjektive', 'Adjektive steigern', '0 0 360 180');
   thema('d5-verbformen', 'Verbformen: ein Verb, viele Formen', '0 0 360 150');
   thema('d5-wortarten', 'Wortarten erkennen', '0 0 360 156');
+  thema('d5-satzglieder', 'Satzglieder: der Satz als Zug', '0 0 360 100');
+  thema('d5-subjekt', 'Subjekt und Prädikat', '0 0 360 150');
+  thema('d5-objekte', 'Objekte: Wem? Wen oder was?', '0 0 360 100');
+  thema('d5-attribute', 'Attribute: genauer beschreiben', '0 0 360 120');
+  thema('d5-nebensatz', 'Hauptsatz und Nebensatz', '0 0 360 150');
+  thema('d5-satzarten', 'Satzarten', '0 0 360 120');
+  thema('d5-komma', 'Das Komma', '0 0 360 120');
+  thema('d5-rede', 'Wörtliche Rede', '0 0 360 120');
 })();

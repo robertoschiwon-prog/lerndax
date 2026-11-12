@@ -13,8 +13,8 @@ TASK = """() => { const t = window.__lerndax.round().cur.task;
   return { choice: t.choices ? t.correct : null, tap: t.tap ? t.tap.correct : null, ntok: t.tap ? t.tap.tokens.length : 0,
     vals: t.fields ? t.fields.map(f => 'fixed' in f ? null : [].concat(f.answer)[0]) : null, answer: (t.answerText || ''), fields: t.fields ? t.fields.map(f => [].concat(f.answer)[0]) : [] }; }"""
 FAST = "() => { const o = requestAnimationFrame; let t = performance.now(); window.requestAnimationFrame = (f) => o(() => { t += 240; f(t); }); }"
-OUT = """() => { const svg = document.querySelector('.exstage svg'); if (!svg) return []; const vb = svg.viewBox.baseVal; const bad = [];
-  svg.querySelectorAll('text').forEach(e => { try { const b = e.getBBox(); if (b.width && (b.x < vb.x - 0.5 || b.x + b.width > vb.x + vb.width + 0.5 || b.y < vb.y - 0.5 || b.y + b.height > vb.y + vb.height + 0.5)) bad.push(e.textContent); } catch (x) {} }); return bad; }"""
+OUT = """() => { const svg = document.querySelector('.exstage svg'); if (!svg) return []; const r = svg.getBoundingClientRect(); const bad = [];
+  svg.querySelectorAll('text').forEach(e => { const b = e.getBoundingClientRect(); if (b.width && e.textContent.trim() && (b.left < r.left - 1 || b.right > r.right + 1 || b.top < r.top - 1 || b.bottom > r.bottom + 1)) bad.push(e.textContent); }); return bad; }"""
 
 async def answer(pg, a, wrong=False):
     if a['choice'] is not None:

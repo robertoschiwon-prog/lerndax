@@ -773,8 +773,411 @@
   }
   const wortarten = () => U.wahl([[40, waBestimmen], [36, waAntippen], [24, waWort]]);
 
+
+  // =====================================================
+  // Bereich 2: Satzbau und Satzzeichen
+  // =====================================================
+  // Sätze, in Satzglieder geteilt. Rolle: S Subjekt, P Prädikat, D Dativobjekt, A Akkusativobjekt, x weiteres Satzglied
+  const ROLLE = { S: 'Subjekt', P: 'Prädikat', D: 'Dativobjekt', A: 'Akkusativobjekt', x: 'weiteres Satzglied' };
+  const RFRAGE = { S: 'Wer oder was?', P: 'Was tut jemand? Was geschieht?', D: 'Wem?', A: 'Wen oder was?' };
+  const SG = [
+    'Der Lehrer|S zeigt|P den Kindern|D das Bild|A', 'Am Abend|x liest|P die Schwester|S ein Buch|A', 'Emil|S schenkt|P seiner Freundin|D eine Blume|A',
+    'Im Garten|x spielen|P die Kinder|S', 'Der Kater|S fängt|P eine Maus|A', 'Heute|x hilft|P Lina|S dem Nachbarn|D', 'Der Hund|S folgt|P dem Mädchen|D',
+    'Nach der Schule|x besucht|P Mia|S ihre Oma|A', 'Der Bäcker|S gibt|P dem Kind|D ein Brötchen|A', 'Unser Nachbar|S repariert|P das Fahrrad|A',
+    'Morgen|x schreibt|P die Klasse|S einen Test|A', 'Die Kinder|S danken|P der Lehrerin|D', 'Ben|S leiht|P seinem Bruder|D den Roller|A',
+    'Auf dem Hof|x füttert|P der Bauer|S die Hühner|A', 'Die Mutter|S erzählt|P den Kindern|D eine Geschichte|A', 'Am Wochenende|x baut|P Paul|S ein Vogelhaus|A',
+    'Der Wind|S schüttelt|P die Bäume|A', 'Das Pferd|S gehört|P dem Bauern|D',
+  ].map((z) => { const t = z.split(/\|(\w) ?/).filter((x) => x !== ''); const g = [], r = []; for (let i = 0; i < t.length; i += 2) { g.push(t[i]); r.push(t[i + 1]); } return { g, r }; });
+  const EIGEN = ['Emil', 'Lina', 'Mia', 'Ben', 'Paul', 'Nora'];
+  const klein = (t) => (EIGEN.includes(t.split(' ')[0]) ? t : t.charAt(0).toLowerCase() + t.slice(1));
+  const sgText = (z, mark, i) => z.g.map((t, k) => (k === i && mark ? mark(t) : t)).join(' ') + '.';
+  // Reihenfolge umstellen: order = Liste von Satzglied-Nummern
+  const umgestellt = (z, order) => gross(order.map((k) => klein(z.g[k])).join(' ')) + '.';
+  const glTokens = (z) => z.g.map((t, i) => (i === z.g.length - 1 ? t + '.' : t));
+  const exGl = (art, z, idx, s1, merk, um) => ({ mode: 'glieder', art, teile: z.g, rollen: z.r, idx, s1, merk, um });
+
+  // ---------- Thema: Satzglieder und Umstellprobe ----------
+  function sgTrennen() {
+    const z = pick(SG);
+    const tokens = [], correct = [];
+    z.g.forEach((t, k) => { t.split(' ').forEach((w) => tokens.push(w)); if (k < z.g.length - 1) correct.push(tokens.length - 1); });
+    tokens[tokens.length - 1] += '.';
+    return {
+      prompt: 'Trenne den Satz in seine <b>Satzglieder</b>: Tippe alle Grenzen an.',
+      tap: { tokens, correct, gaps: true, mark: '|' }, answerText: z.g.join(' | '),
+      hint: 'Mach die <b>Umstellprobe</b>: Stelle den Satz um. Wörter, die dabei immer zusammenbleiben, bilden ein Satzglied.',
+      solution: `<b>${z.g.join(' | ')}</b>.<br>Das sind ${z.g.length} Satzglieder. Umgestellt: ${umgestellt(z, probe(z))} Die Wörter eines Satzglieds bleiben zusammen.`,
+      ex: exGl('sgTrennen', z, [], 'Umstellprobe: Was beim Umstellen zusammenbleibt, ist ein Satzglied.', `<b>${z.g.join(' | ')}</b>: ${z.g.length} Satzglieder.`, probe(z)),
+    };
+  }
+  // eine richtige Umstellung: anderes Satzglied nach vorn, Prädikat bleibt an 2. Stelle
+  function probe(z) {
+    const p = z.r.indexOf('P');
+    const vorn = z.r.indexOf('x') === 0 ? z.r.indexOf('S') : (z.r.indexOf('D') >= 0 ? z.r.indexOf('D') : z.r.indexOf('A'));
+    return [vorn, p, ...z.g.map((_, k) => k).filter((k) => k !== vorn && k !== p)];
+  }
+  function sgZaehlen() {
+    const z = pick(SG);
+    return {
+      prompt: `Wie viele <b>Satzglieder</b> hat der Satz?<br><span class="bsp">${sgText(z)}</span>`,
+      choices: ['2', '3', '4', '5'], correct: z.g.length - 2,
+      hint: 'Stelle den Satz um. Zähle dann die Teile, die du verschieben kannst. Das Verb (Prädikat) zählt als ein Satzglied mit.',
+      solution: `<b>${z.g.join(' | ')}</b>.<br>Das sind <b>${z.g.length}</b> Satzglieder.`,
+      ex: exGl('sgZaehlen', z, [], 'Umstellprobe: Was beim Umstellen zusammenbleibt, ist ein Satzglied.', `<b>${z.g.join(' | ')}</b>: <b>${z.g.length}</b> Satzglieder.`, probe(z)),
+    };
+  }
+  function sgUmstellen() {
+    const z = pick(SG), ok = probe(z), p = z.r.indexOf('P');
+    const rest = z.g.map((_, k) => k).filter((k) => k !== ok[0] && k !== p);
+    // falsch, weil das Verb nicht an 2. Stelle steht. Bei Sätzen mit Orts- oder Zeitangabe rückt das Verb ans Ende
+    // der ursprünglichen Reihenfolge („Im Garten die Kinder spielen“); „Die Kinder im Garten spielen“ wäre nämlich richtig.
+    const verbDritte = z.r.includes('x')
+      ? gross([...z.g.filter((_, k) => k !== p), z.g[p]].join(' ')) + '.'
+      : gross([klein(z.g[ok[0]]), ...rest.slice(0, 1).map((k) => klein(z.g[k])), z.g[p], ...rest.slice(1).map((k) => klein(z.g[k]))].join(' ')) + '.';
+    const mehr = z.g.map((t, k) => k).filter((k) => z.g[k].includes(' ') && k !== 0);
+    const gk = pick(mehr.length ? mehr : [0]), w = z.g[gk].split(' ');
+    const zerrissen = gross([w[0], z.g[p], ...z.g.map((t, k) => (k === p ? null : k === gk ? w.slice(1).join(' ') : klein(t))).filter((t) => t !== null)].join(' ')) + '.';
+    const richtig = umgestellt(z, ok);
+    const wahl = shuffle([richtig, verbDritte, zerrissen]);
+    return {
+      prompt: `Welche Umstellung ist richtig?<br><span class="bsp">${sgText(z)}</span>`,
+      choices: wahl, correct: wahl.indexOf(richtig),
+      hint: 'Zwei Regeln der Umstellprobe: Die Wörter eines Satzglieds bleiben <b>zusammen</b>. Und die Personalform des Verbs bleibt an <b>2. Stelle</b>.',
+      solution: `<b>${richtig}</b><br>„${verbDritte}“ ist falsch: Das Verb steht nicht mehr an 2. Stelle.<br>„${zerrissen}“ ist falsch: Ein Satzglied wurde auseinandergerissen.`,
+      ex: exGl('sgUmstellen', z, [], 'Beim Umstellen wandern ganze Satzglieder. Das Prädikat bleibt an 2. Stelle.', `Richtig umgestellt: <b>${richtig}</b>`, ok),
+    };
+  }
+  const satzglieder = () => U.wahl([[42, sgTrennen], [22, sgZaehlen], [36, sgUmstellen]]);
+
+  // ---------- Thema: Subjekt und Prädikat ----------
+  function glAntippen(art, rollen, mitFrage) {
+    const z = pick(SG.filter((x) => rollen.some((r) => x.r.includes(r))));
+    const r = pick(rollen.filter((x) => z.r.includes(x))), i = z.r.indexOf(r);
+    const warum = { S: 'Das Subjekt sagt, wer oder was etwas tut.', P: 'Das Prädikat ist das Verb. Es sagt, was geschieht, und steht an 2. Stelle.', D: 'Das Dativobjekt antwortet auf „Wem?“.', A: 'Das Akkusativobjekt antwortet auf „Wen oder was?“.' }[r];
+    return {
+      prompt: `Tippe das <b>${ROLLE[r]}</b> an.`,
+      tap: { tokens: glTokens(z), correct: [i], one: true }, answerText: z.g[i],
+      hint: `Frage: <b>${RFRAGE[r]}</b>`,
+      solution: `${sgText(z, (t) => `<b class="vb">${t}</b>`, i)}<br>${RFRAGE[r]} → <b>${z.g[i]}</b>. ${warum}`,
+      ex: exGl(art, z, [i], `Frage: <b>${RFRAGE[r]}</b>`, `${RFRAGE[r]} → <b>${z.g[i]}</b>: ${ROLLE[r]}.`),
+    };
+  }
+  function glBestimmen(art, rollen, nachFrage) {
+    const z = pick(SG.filter((x) => rollen.some((r) => x.r.includes(r))));
+    const r = pick(rollen.filter((x) => z.r.includes(x))), i = z.r.indexOf(r);
+    const alle = ['S', 'P', 'D', 'A'];
+    return {
+      prompt: `${nachFrage ? 'Mit welcher <b>Frage</b> findest du das markierte Satzglied?' : 'Welches <b>Satzglied</b> ist markiert?'}<br><span class="bsp">${sgText(z, (t) => `<u>${t}</u>`, i)}</span>`,
+      choices: alle.map((k) => (nachFrage ? RFRAGE[k] : ROLLE[k])), correct: alle.indexOf(r),
+      hint: 'Subjekt: Wer oder was? · Prädikat: Was tut jemand? (das Verb) · Dativobjekt: Wem? · Akkusativobjekt: Wen oder was?',
+      solution: `${sgText(z, (t) => `<b class="vb">${t}</b>`, i)}<br>${RFRAGE[r]} → <b>${z.g[i]}</b>. Das ist das <b>${ROLLE[r]}</b>.`,
+      ex: exGl(art, z, [i], `Frage: <b>${RFRAGE[r]}</b>`, `${RFRAGE[r]} → <b>${z.g[i]}</b>: ${ROLLE[r]}.`),
+    };
+  }
+  const spAntippen = () => glAntippen('spAntippen', ['S', 'P']);
+  const spBestimmen = () => glBestimmen('spBestimmen', ['S', 'P'], Math.random() < 0.5);
+  // Subjekt und Prädikat passen zusammen (Kongruenz)
+  function kongruenz() {
+    const v = pick(V.filter((x) => x.du !== x.er)), su = pick(SUBJ.filter((x) => [1, 2, 3, 5].includes(x.p)));
+    const formen = shuffle([v.du, v.er, v.inf]), ok = praesens(v, su.p);
+    return {
+      prompt: `Welche Verbform passt zum Subjekt?<br><span class="bsp">${su.t} ___ ${v.rest}.</span>`,
+      choices: formen, correct: formen.indexOf(ok),
+      hint: 'Subjekt und Prädikat müssen zusammenpassen: Ist das Subjekt <b>eine</b> Person oder Sache oder sind es <b>mehrere</b>? Ersetze es zur Probe durch er, sie oder du.',
+      solution: `${su.t} <b class="vb">${ok}</b> ${v.rest}.<br>Das Subjekt „${su.t}“ ${su.p === 5 || su.p === 3 ? 'steht in der Mehrzahl' : su.p === 1 ? 'ist die 2. Person (du)' : 'steht in der Einzahl'}, also heißt das Prädikat <b>${ok}</b>.`,
+      ex: zz('kongruenz', [su.t, ' ___ ' + v.rest + '.'], 0, [su.t + ' ', ok, ' ' + v.rest + '.'], 1, `Schau auf das Subjekt: <b>${su.t}</b>. Einzahl oder Mehrzahl? Welche Person?`, 'Das Prädikat richtet sich nach dem Subjekt. Beide passen in Person und Zahl zusammen.', `${su.t} <b>${ok}</b> ${v.rest}.`),
+    };
+  }
+  const subjektPraedikat = () => U.wahl([[38, spAntippen], [30, spBestimmen], [32, kongruenz]]);
+
+  // ---------- Thema: Dativ- und Akkusativobjekt ----------
+  const objAntippen = () => glAntippen('objAntippen', ['D', 'A']);
+  const objBestimmen = () => glBestimmen('objBestimmen', ['D', 'A', 'S'], false);
+  const objFrage = () => glBestimmen('objFrage', ['D', 'A'], true);
+  const objekte = () => U.wahl([[40, objAntippen], [32, objBestimmen], [28, objFrage]]);
+
+  // ---------- Thema: Attribute ----------
+  // Attribute (vorangestellte Adjektive und Partizipien) sind mit * markiert
+  const SATZ_ATTR = [
+    'Der *kleine Hund bringt den *roten Ball.', 'Die *alte Katze schläft auf dem *weichen Kissen.', 'Das *lachende Kind winkt der *netten Nachbarin.',
+    'Der *neue Lehrer liest eine *spannende Geschichte.', 'Die *fröhlichen Kinder bauen eine *große Hütte.', 'Der *bellende Hund jagt die *schnelle Katze.',
+    'Lina trägt einen *schweren Koffer.', 'Emil findet einen *glänzenden Stein.', 'Die *müde Lehrerin trinkt einen *heißen Tee.', 'Im Garten blühen *bunte Blumen.',
+    'Der *alte Baum verliert seine *gelben Blätter.', 'Mia füttert das *hungrige Pferd.', 'Das *spielende Mädchen wirft den *kleinen Ball.', 'Der Zug fährt über die *lange Brücke.',
+  ];
+  const TIPP_ATTR = 'Ein Attribut beschreibt ein Substantiv genauer und steht direkt davor. <b>Weglassprobe:</b> Lässt du es weg, bleibt der Satz trotzdem richtig.';
+  function attrAntippen() {
+    const { tokens, correct } = markSatz(SATZ_ATTR);
+    const liste = correct.map((i) => tokens[i]);
+    const ohne = tokens.filter((_, i) => !correct.includes(i)).join(' ');
+    return {
+      prompt: 'Tippe <b>alle Attribute</b> an.', tap: { tokens, correct }, answerText: liste.join(', '),
+      hint: TIPP_ATTR,
+      solution: `Attribute: <b>${liste.join(', ')}</b>.<br>Weglassprobe: „${ohne}“ Der Satz stimmt immer noch.`,
+      ex: { mode: 'marken', art: 'attrAntippen', tokens, correct, was: 'Attribute', s1: 'Ein Attribut steht vor einem Substantiv und beschreibt es genauer. Ohne Attribut bleibt der Satz richtig.' },
+    };
+  }
+  function attrWeglassen() {
+    const { tokens, correct } = markSatz(SATZ_ATTR);
+    const a = pick(correct);
+    // falsche Antworten: nur Wörter, die sicher nicht fehlen dürfen (Satzanfang, Verb, Präposition).
+    // Artikel sind keine guten falschen Antworten: „Sie trinkt heißen Tee“ ist auch ohne Artikel richtig.
+    const FEST = ['bringt', 'schläft', 'winkt', 'liest', 'bauen', 'jagt', 'trägt', 'findet', 'trinkt', 'blühen', 'verliert', 'füttert', 'wirft', 'fährt', 'auf', 'über'];
+    const andere = shuffle(tokens.map((w, i) => i).filter((i) => !correct.includes(i) && (i === 0 || FEST.includes(tokens[i])))).slice(0, 3);
+    const wahlIdx = shuffle([a, ...andere]);
+    const ohne = tokens.filter((_, i) => i !== a).join(' ');
+    return {
+      prompt: `Welches Wort kann man <b>weglassen</b>, ohne dass der Satz falsch wird?<br><span class="bsp">${tokens.join(' ')}</span>`,
+      choices: wahlIdx.map((i) => cleanW(tokens[i])), correct: wahlIdx.indexOf(a),
+      hint: TIPP_ATTR,
+      solution: `<b>${tokens[a]}</b> ist ein Attribut. Ohne es heißt der Satz: „${gross(ohne)}“ Das ist immer noch ein richtiger Satz.`,
+      ex: { mode: 'marken', art: 'attrWeglassen', tokens, correct: [a], was: 'Attribut', s1: 'Weglassprobe: Welches Wort darf fehlen, ohne dass der Satz falsch wird?' },
+    };
+  }
+  function attrBezug() {
+    let m; do { m = markSatz(SATZ_ATTR); } while (m.tokens.filter((w, i) => i > 0 && /^[A-ZÄÖÜ]/.test(w)).length + (EIGEN.includes(m.tokens[0]) ? 1 : 0) < 2);
+    const { tokens, correct } = m, a = pick(correct);
+    const subst = tokens.map((w, i) => i).filter((i) => (i > 0 && /^[A-ZÄÖÜ]/.test(tokens[i])) || (i === 0 && EIGEN.includes(tokens[0])));
+    return {
+      prompt: `Welches Substantiv beschreibt das markierte Attribut genauer?<br><span class="bsp">${tokens.map((w, i) => (i === a ? `<u>${w}</u>` : w)).join(' ')}</span>`,
+      choices: subst.map((i) => cleanW(tokens[i])), correct: subst.indexOf(a + 1),
+      hint: 'Ein Attribut steht direkt <b>vor</b> seinem Substantiv. Frage: „Was für ein …?“',
+      solution: `<b>${tokens[a]} ${cleanW(tokens[a + 1])}</b>: Das Attribut „${tokens[a]}“ steht direkt vor „${cleanW(tokens[a + 1])}“ und beschreibt es genauer.`,
+      ex: { mode: 'marken', art: 'attrBezug', tokens, correct: [a, a + 1], was: 'Attribut und Substantiv', s1: 'Ein Attribut steht direkt vor seinem Substantiv. Frage: Was für ein …?' },
+    };
+  }
+  const attribute = () => U.wahl([[40, attrAntippen], [32, attrWeglassen], [28, attrBezug]]);
+
+  // ---------- Thema: Hauptsatz und Nebensatz ----------
+  // [Subjekt, Verb, Rest] des Hauptsatzes, Einleitewort, [Subjekt, Rest, Verb] des Nebensatzes
+  const GEF = [
+    [['Lina', 'bleibt', 'zu Hause'], 'weil', ['sie', 'krank', 'ist']], [['Emil', 'jubelt', 'laut'], 'weil', ['die Ferien', '', 'beginnen']],
+    [['Wir', 'gehen', 'ins Schwimmbad'], 'wenn', ['die Sonne', '', 'scheint']], [['Mia', 'nimmt', 'einen Schirm mit'], 'weil', ['es', '', 'regnet']],
+    [['Der Hund', 'bellt', 'laut'], 'wenn', ['jemand', '', 'klingelt']], [['Ben', 'weiß', ''], 'dass', ['der Bus', 'bald', 'kommt']],
+    [['Die Kinder', 'spielen', 'draußen'], 'obwohl', ['es', 'kalt', 'ist']], [['Paul', 'macht', 'das Licht an'], 'weil', ['es', 'dunkel', 'wird']],
+    [['Ich', 'rufe', 'dich an'], 'wenn', ['ich', 'zu Hause', 'bin']], [['Nora', 'hofft', ''], 'dass', ['ihre Freundin', '', 'kommt']],
+    [['Der Lehrer', 'wartet', ''], 'bis', ['alle Kinder', '', 'sitzen']], [['Emil', 'liest', 'noch'], 'obwohl', ['er', 'müde', 'ist']],
+    [['Die Katze', 'schnurrt', ''], 'wenn', ['Mia', 'sie', 'streichelt']], [['Wir', 'bleiben', 'drinnen'], 'weil', ['der Wind', 'stark', 'weht']],
+  ].map(([hs, k, ns]) => ({ hs, k, ns }));
+  const j = (a) => a.filter(Boolean).join(' ');
+  // Wörter des ganzen Satzgefüges; nsVorn: Nebensatz zuerst (dann dreht sich der Hauptsatz um)
+  function gefuege(nsVorn) {
+    const g = pick(GEF.filter((x) => !nsVorn || x.k !== 'dass' && x.k !== 'bis'));
+    const hs = j(g.hs).split(' '), ns = [g.k, ...j(g.ns).split(' ')];
+    const hsUm = [g.hs[1], ...klein(g.hs[0]).split(' '), ...(g.hs[2] ? g.hs[2].split(' ') : [])];
+    const w = nsVorn ? [gross(ns[0]), ...ns.slice(1), ...hsUm] : [...hs, ...ns];
+    const komma = nsVorn ? ns.length - 1 : hs.length - 1;
+    const hsVerb = nsVorn ? ns.length : g.hs[0].split(' ').length, nsVerb = nsVorn ? ns.length - 1 : w.length - 1;
+    const mitKomma = w.map((x, i) => x + (i === komma ? ',' : '') + (i === w.length - 1 ? '.' : ''));
+    return { g, w, komma, hsVerb, nsVerb, mitKomma, nsVorn, hsT: nsVorn ? hsUm.join(' ') : hs.join(' '), nsT: ns.join(' ') };
+  }
+  const REGEL_NS = 'Im <b>Nebensatz</b> steht die Personalform des Verbs am <b>Ende</b>. Im <b>Hauptsatz</b> steht sie an 2. Stelle (oder ganz vorn, wenn der Nebensatz zuerst kommt).';
+  function nsVerb() {
+    const x = gefuege(Math.random() < 0.3), imNS = Math.random() < 0.6;
+    const i = imNS ? x.nsVerb : x.hsVerb;
+    return {
+      prompt: `Tippe die <b>Personalform des Verbs</b> im <b>${imNS ? 'Nebensatz' : 'Hauptsatz'}</b> an.`,
+      tap: { tokens: x.mitKomma, correct: [i], one: true }, answerText: x.w[i],
+      hint: `Finde zuerst den Nebensatz: Er beginnt mit einem Einleitewort wie <i>weil, wenn, dass, obwohl, bis</i>. ${REGEL_NS}`,
+      solution: `${x.mitKomma.map((t, k) => (k === i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Nebensatz: „${x.nsT}“. Hauptsatz: „${x.hsT}“. ${REGEL_NS}`,
+      ex: { mode: 'marken', art: 'nsVerb', tokens: x.mitKomma, correct: [i], was: `Personalform im ${imNS ? 'Nebensatz' : 'Hauptsatz'}`, s1: REGEL_NS },
+    };
+  }
+  function nsBau() {
+    const g = pick(GEF.filter((x) => x.ns[1]));
+    const ok = `${g.k} ${j(g.ns)}`, f1 = `${g.k} ${g.ns[0]} ${g.ns[2]} ${g.ns[1]}`, f2 = `${g.k} ${g.ns[2]} ${g.ns[0]} ${g.ns[1]}`;
+    const wahl = shuffle([ok, f1, f2]);
+    return {
+      prompt: `Welcher Nebensatz ist richtig gebaut?<br><span class="bsp">${j(g.hs)}, …</span>`,
+      choices: wahl.map((t) => '… ' + t + '.'), correct: wahl.indexOf(ok),
+      hint: 'Im Nebensatz wandert die Personalform des Verbs ganz ans <b>Ende</b>.',
+      solution: `${j(g.hs)}, <b class="vb">${ok}</b>.<br>Im Nebensatz steht das Verb am Ende: … ${g.ns[1]} <b>${g.ns[2]}</b>.`,
+      ex: zz('nsBau', [`${g.ns[0]} `, g.ns[2], ` ${g.ns[1]}.`], 1, [`${g.k} ${g.ns[0]} ${g.ns[1]} `, g.ns[2], '.'], 1, `Als Hauptsatz steht das Verb an 2. Stelle: ${gross(g.ns[0])} <b>${g.ns[2]}</b> ${g.ns[1]}.`, `Mit „${g.k}“ wird daraus ein Nebensatz. Das Verb wandert ans Ende.`, `… <b>${ok}</b>.`),
+    };
+  }
+  function hsOderNs() {
+    const ns = Math.random() < 0.5, g = pick(GEF.filter((x) => ns || x.hs[2]));
+    const t = ns ? `${g.k} ${j(g.ns)}` : j(g.hs);
+    return {
+      prompt: `Hauptsatz oder Nebensatz?<br><span class="bsp">${t}</span>`,
+      choices: ['Hauptsatz', 'Nebensatz'], correct: ns ? 1 : 0,
+      hint: 'Kann der Satz <b>allein</b> stehen? Dann ist es ein Hauptsatz. Ein Nebensatz beginnt mit einem Einleitewort (weil, wenn, dass …), und sein Verb steht am Ende.',
+      solution: ns ? `„${t}“ ist ein <b>Nebensatz</b>: Er beginnt mit „${g.k}“, das Verb „${g.ns[2]}“ steht am Ende, und allein ergibt er keinen vollständigen Satz.` : `„${t}“ ist ein <b>Hauptsatz</b>: Er kann allein stehen, und das Verb „${g.hs[1]}“ steht an 2. Stelle.`,
+      ex: { mode: 'marken', art: 'hsOderNs', tokens: t.split(' '), correct: ns ? [0, t.split(' ').length - 1] : [g.hs[0].split(' ').length], was: ns ? 'Nebensatz: Einleitewort und Verb am Ende' : 'Hauptsatz: Verb an 2. Stelle', s1: 'Schau auf das Verb: Wo steht die Personalform? Und beginnt der Satz mit einem Einleitewort?' },
+    };
+  }
+  const nebensatz = () => U.wahl([[42, nsVerb], [30, nsBau], [28, hsOderNs]]);
+
+  // ---------- Thema: Satzarten ----------
+  // Personalform des Verbs ist mit * markiert
+  const SARTEN = {
+    aussage: ['Der Bus *kommt um acht', 'Wir *haben heute Sport', 'Die Katze *liegt auf dem Sofa', 'Morgen *schreiben wir einen Test', 'Lina *hat einen neuen Roller', 'Im Winter *wird es früh dunkel', 'Emil *spielt gern Fußball', 'Das Buch *gehört meiner Schwester'],
+    frage: ['*Kommst du heute mit ins Kino', 'Wo *liegt mein Heft', 'Wann *beginnt der Film', '*Hast du den Hund gefüttert', 'Warum *lachst du', 'Wie spät *ist es', '*Darf ich das Fenster öffnen', 'Wer *hat die Tür zugemacht'],
+    aufforderung: ['*Komm bitte sofort her', '*Pass auf', '*Gib mir bitte den Stift', '*Hört gut zu', '*Räum bitte dein Zimmer auf', '*Sei leise', '*Lauf schneller', '*Macht bitte die Tür zu'],
+  };
+  const SNAME = { aussage: 'Aussagesatz', frage: 'Fragesatz', aufforderung: 'Aufforderungssatz' };
+  const SZEICHEN = { aussage: '.', frage: '?', aufforderung: '!' };
+  const SWARUM = {
+    aussage: 'Ein Aussagesatz teilt etwas mit. Das Verb steht an 2. Stelle, am Ende steht ein Punkt.',
+    frage: 'Ein Fragesatz will etwas wissen. Er beginnt mit einem Fragewort (dann steht das Verb an 2. Stelle) oder gleich mit dem Verb. Am Ende steht ein Fragezeichen.',
+    aufforderung: 'Ein Aufforderungssatz sagt jemandem, was er tun soll. Das Verb steht ganz vorn, am Ende steht meistens ein Ausrufezeichen.',
+  };
+  function sartSatz(art) {
+    art = art || pick(Object.keys(SARTEN));
+    const roh = pick(SARTEN[art]).split(' ');
+    const verb = roh.findIndex((w) => w[0] === '*');
+    const w = roh.map((x) => x.replace('*', ''));
+    return { art, w, verb, text: w.join(' ') + SZEICHEN[art], tokens: w.map((x, i) => (i === w.length - 1 ? x + SZEICHEN[art] : x)) };
+  }
+  const exSart = (name, x) => ({ mode: 'marken', art: name, tokens: x.tokens, correct: [x.verb], was: `${SNAME[x.art]}, Verb`, s1: SWARUM[x.art] });
+  function sartBestimmen() {
+    const x = sartSatz(), arten = Object.keys(SARTEN);
+    return {
+      prompt: `Welche Satzart ist das?<br><span class="bsp">${x.text}</span>`,
+      choices: arten.map((a) => SNAME[a]), correct: arten.indexOf(x.art),
+      hint: 'Was will der Satz? Etwas <b>mitteilen</b>, etwas <b>wissen</b> oder jemanden zu etwas <b>auffordern</b>? Schau auch, wo das Verb steht.',
+      solution: `„${x.text}“ ist ein <b>${SNAME[x.art]}</b>. ${SWARUM[x.art]}`, ex: exSart('sartBestimmen', x),
+    };
+  }
+  function sartWelcher() {
+    const arten = shuffle(Object.keys(SARTEN)), ziel = pick(arten);
+    const xs = arten.map((a) => sartSatz(a));
+    return {
+      prompt: `Welcher Satz ist ein <b>${SNAME[ziel]}</b>?`,
+      choices: xs.map((x) => x.text), correct: arten.indexOf(ziel),
+      hint: 'Aussagesatz: teilt etwas mit. Fragesatz: will etwas wissen. Aufforderungssatz: sagt jemandem, was er tun soll.',
+      solution: `<b>${xs[arten.indexOf(ziel)].text}</b><br>${SWARUM[ziel]}`, ex: exSart('sartWelcher', xs[arten.indexOf(ziel)]),
+    };
+  }
+  function sartZeichen() {
+    const x = sartSatz(pick(['aussage', 'frage']));
+    return {
+      prompt: `Punkt oder Fragezeichen?<br><span class="bsp">${x.w.join(' ')} ___</span>`,
+      choices: ['. (Punkt)', '? (Fragezeichen)'], correct: x.art === 'frage' ? 1 : 0,
+      hint: 'Will der Satz etwas wissen? Achte auf den Anfang: Ein Fragewort (wo, wann, warum …) oder das Verb ganz vorn zeigen eine Frage.',
+      solution: `<b>${x.text}</b><br>${SWARUM[x.art]}`, ex: exSart('sartZeichen', x),
+    };
+  }
+  function sartVerb() {
+    const x = sartSatz();
+    return {
+      prompt: 'Tippe die <b>Personalform des Verbs</b> an.',
+      tap: { tokens: x.tokens, correct: [x.verb], one: true }, answerText: x.w[x.verb],
+      hint: 'Im Aussagesatz steht das Verb an 2. Stelle. In der Aufforderung und in Fragen ohne Fragewort steht es ganz vorn.',
+      solution: `${x.tokens.map((t, k) => (k === x.verb ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>${SNAME[x.art]}: Das Verb „${x.w[x.verb]}“ steht ${x.verb === 0 ? 'ganz vorn' : 'an 2. Stelle'}. ${SWARUM[x.art]}`,
+      ex: exSart('sartVerb', x),
+    };
+  }
+  const satzarten = () => U.wahl([[32, sartBestimmen], [22, sartWelcher], [14, sartZeichen], [32, sartVerb]]);
+
+  // ---------- Thema: Komma bei Aufzählung und Satzgefüge ----------
+  const AUFZ = [
+    ['Im Korb liegen', ['Äpfel', 'Birnen', 'Pflaumen', 'Nüsse', 'Trauben']], ['Lina packt', ['Hefte', 'Stifte', 'Bücher', 'ein Lineal', 'eine Schere']],
+    ['Im Zoo sehen wir', ['Löwen', 'Affen', 'Zebras', 'Giraffen', 'Elefanten']], ['Emil mag', ['Pizza', 'Nudeln', 'Pfannkuchen', 'Eis']],
+    ['Auf dem Tisch stehen', ['Teller', 'Tassen', 'Gläser', 'Schüsseln']], ['Der Hund ist', ['klein', 'frech', 'schnell', 'verspielt']],
+    ['Wir brauchen', ['Mehl', 'Eier', 'Zucker', 'Butter', 'Milch']], ['Im Garten wachsen', ['Tomaten', 'Gurken', 'Bohnen', 'Kürbisse']],
+  ];
+  function aufzaehlung() {
+    const [vor, alle] = pick(AUFZ), n = R(3, 4), it = shuffle(alle).slice(0, n);
+    const w = vor.split(' '), komma = [];
+    it.forEach((x, i) => { if (i === n - 1) w.push('und'); x.split(' ').forEach((y) => w.push(y)); if (i < n - 2) komma.push(w.length - 1); });
+    const mit = (ks) => w.map((x, i) => x + (ks.includes(i) ? ',' : '')).join(' ') + '.';
+    return { w, komma, mit, richtig: mit(komma), vorUnd: w.indexOf('und') - 1 };
+  }
+  const REGEL_AUFZ = 'Bei einer <b>Aufzählung</b> steht zwischen den Teilen ein Komma. Vor <b>und</b> steht kein Komma: Das „und“ ersetzt es.';
+  const exKomma = (art, w, komma, s1) => ({ mode: 'komma', art, tokens: w.map((x, i) => (i === w.length - 1 ? x + '.' : x)), gaps: komma, s1 });
+  function kommaAufz() {
+    const a = aufzaehlung();
+    return {
+      prompt: 'Setze die fehlenden <b>Kommas</b>: Tippe die Stellen an.',
+      tap: { tokens: a.w.map((x, i) => (i === a.w.length - 1 ? x + '.' : x)), correct: a.komma, gaps: true }, answerText: a.richtig,
+      hint: REGEL_AUFZ, solution: `<b>${a.richtig}</b><br>${REGEL_AUFZ}`, ex: exKomma('kommaAufz', a.w, a.komma, REGEL_AUFZ),
+    };
+  }
+  function kommaWahl() {
+    const a = aufzaehlung();
+    const f1 = a.mit([...a.komma, a.vorUnd]), f2 = a.mit(a.komma.slice(1));
+    const wahl = shuffle([a.richtig, f1, f2]);
+    return {
+      prompt: 'In welchem Satz stehen die Kommas richtig?',
+      choices: wahl, correct: wahl.indexOf(a.richtig),
+      hint: REGEL_AUFZ,
+      solution: `<b>${a.richtig}</b><br>${REGEL_AUFZ}`, ex: exKomma('kommaWahl', a.w, a.komma, REGEL_AUFZ),
+    };
+  }
+  const REGEL_GEF = 'Zwischen <b>Hauptsatz</b> und <b>Nebensatz</b> steht immer ein Komma. Der Nebensatz beginnt mit einem Einleitewort (weil, wenn, dass, obwohl, bis), sein Verb steht am Ende.';
+  function kommaGef() {
+    const x = gefuege(Math.random() < 0.35);
+    return {
+      prompt: 'Setze das fehlende <b>Komma</b>: Tippe die Stelle an.',
+      tap: { tokens: x.w.map((t, i) => (i === x.w.length - 1 ? t + '.' : t)), correct: [x.komma], gaps: true, one: true }, answerText: x.mitKomma.join(' '),
+      hint: 'Wo endet der eine Satz und wo beginnt der andere? Suche das Einleitewort (weil, wenn, dass, obwohl, bis) und die beiden Verben.',
+      solution: `<b>${x.mitKomma.join(' ')}</b><br>${REGEL_GEF}`, ex: exKomma('kommaGef', x.w, [x.komma], REGEL_GEF),
+    };
+  }
+  const komma = () => U.wahl([[34, kommaAufz], [22, kommaWahl], [44, kommaGef]]);
+
+  // ---------- Thema: Wörtliche Rede ----------
+  // [Wer, Verb des Sagens, was gesagt wird, Schlusszeichen]
+  const REDE = [
+    ['Lina', 'sagt', 'Ich komme gleich', '.'], ['Emil', 'fragt', 'Wo ist mein Ball', '?'], ['Die Lehrerin', 'ruft', 'Kommt bitte herein', '!'],
+    ['Mia', 'flüstert', 'Das ist ein Geheimnis', '.'], ['Ben', 'fragt', 'Darf ich mitspielen', '?'], ['Der Trainer', 'ruft', 'Lauft schneller', '!'],
+    ['Nora', 'antwortet', 'Ich habe keine Zeit', '.'], ['Paul', 'fragt', 'Wann fängt der Film an', '?'], ['Die Mutter', 'sagt', 'Das Essen ist fertig', '.'],
+    ['Der Vater', 'ruft', 'Pass auf', '!'], ['Mia', 'meint', 'Morgen wird es regnen', '.'], ['Emil', 'ruft', 'Ich habe gewonnen', '!'],
+  ].map(([wer, verb, rede, z]) => ({ wer, verb, rede, z }));
+  const redeVorn = (r) => `${r.wer} ${r.verb}: „${r.rede}${r.z}“`;
+  const redeHinten = (r) => `„${r.rede}${r.z === '.' ? '' : r.z}“, ${r.verb} ${klein(r.wer)}.`;
+  const REGEL_VORN = 'Begleitsatz <b>vorn</b>: Danach steht ein <b>Doppelpunkt</b>. Die wörtliche Rede steht in Anführungszeichen, ihr Schlusszeichen steht <b>vor</b> dem letzten Anführungszeichen.';
+  const REGEL_HINTEN = 'Begleitsatz <b>hinten</b>: Nach der wörtlichen Rede steht ein <b>Komma</b>. Ein Punkt in der Rede fällt weg, Fragezeichen und Ausrufezeichen bleiben. Der Punkt steht ganz am Ende.';
+  // zerlegt den richtigen Satz in Stücke und merkt sich, welche Stücke Satzzeichen sind (für die Animation)
+  function redeTeile(r, vorn) {
+    const t = vorn ? [`${r.wer} ${r.verb}`, ':', ' ', '„', r.rede, r.z, '“'] : ['„', r.rede, r.z === '.' ? '' : r.z, '“', ',', ` ${r.verb} ${klein(r.wer)}`, '.'];
+    return { tokens: t, correct: t.map((x, i) => (/^[:„“,.?!]$/.test(x) ? i : -1)).filter((i) => i >= 0) };
+  }
+  const exRede = (art, r, vorn) => Object.assign({ mode: 'marken', art, dicht: true, was: 'Richtig', s1: vorn ? REGEL_VORN : REGEL_HINTEN, merk: `<b>${vorn ? redeVorn(r) : redeHinten(r)}</b>` }, redeTeile(r, vorn));
+  function redeRichtig() {
+    const r = pick(REDE), vorn = Math.random() < 0.5;
+    const ok = vorn ? redeVorn(r) : redeHinten(r);
+    const falsch = vorn
+      ? [`${r.wer} ${r.verb} „${r.rede}${r.z}“`, `${r.wer} ${r.verb}: „${r.rede}“${r.z}`, `${r.wer} ${r.verb}: ${r.rede}${r.z}`]
+      : [r.z === '.' ? `„${r.rede}.“, ${r.verb} ${klein(r.wer)}.` : `„${r.rede}“, ${r.verb} ${klein(r.wer)}${r.z}`, `„${r.rede}${r.z === '.' ? '' : r.z}“ ${r.verb} ${klein(r.wer)}.`, `„${r.rede}${r.z === '.' ? '' : r.z}, ${r.verb} ${klein(r.wer)}.“`];
+    const wahl = shuffle([ok, ...shuffle(falsch).slice(0, 2)]);
+    return {
+      prompt: 'Welcher Satz ist richtig geschrieben?',
+      choices: wahl, correct: wahl.indexOf(ok),
+      hint: vorn ? REGEL_VORN : REGEL_HINTEN,
+      solution: `<b>${ok}</b><br>${vorn ? REGEL_VORN : REGEL_HINTEN}`, ex: exRede('redeRichtig', r, vorn),
+    };
+  }
+  function redeZeichen() {
+    const r = pick(REDE), vorn = Math.random() < 0.5;
+    const ZW = [': (Doppelpunkt)', ', (Komma)', '. (Punkt)', '? (Fragezeichen)'];
+    let text, z;
+    if (vorn && r.z !== '!' && Math.random() < 0.4) { text = `${r.wer} ${r.verb}: „${r.rede}<u>▢</u>“`; z = r.z === '.' ? 2 : 3; }
+    else if (vorn) { text = `${r.wer} ${r.verb}<u>▢</u> „${r.rede}${r.z}“`; z = 0; }
+    else { text = `„${r.rede}${r.z === '.' ? '' : r.z}“<u>▢</u> ${r.verb} ${klein(r.wer)}.`; z = 1; }
+    return {
+      prompt: `Welches Satzzeichen fehlt an der markierten Stelle?<br><span class="bsp">${text}</span>`,
+      choices: ZW, correct: z,
+      hint: vorn ? REGEL_VORN : REGEL_HINTEN,
+      solution: `<b>${vorn ? redeVorn(r) : redeHinten(r)}</b><br>${vorn ? REGEL_VORN : REGEL_HINTEN}`, ex: exRede('redeZeichen', r, vorn),
+    };
+  }
+  function redeTeil() {
+    const r = pick(REDE), vorn = Math.random() < 0.5, begleit = Math.random() < 0.5;
+    const tokens = vorn ? [`${r.wer} ${r.verb}:`, `„${r.rede}${r.z}“`] : [`„${r.rede}${r.z === '.' ? '' : r.z}“,`, `${r.verb} ${klein(r.wer)}.`];
+    const i = begleit === vorn ? 0 : 1;
+    return {
+      prompt: `Tippe ${begleit ? 'den <b>Begleitsatz</b>' : 'die <b>wörtliche Rede</b>'} an.`,
+      tap: { tokens, correct: [i], one: true }, answerText: begleit ? `${r.wer} ${r.verb}` : r.rede,
+      hint: 'Die <b>wörtliche Rede</b> ist das, was jemand genau sagt. Sie steht in Anführungszeichen. Der <b>Begleitsatz</b> sagt, wer spricht.',
+      solution: `Wörtliche Rede: <b>„${r.rede}${r.z}“</b><br>Begleitsatz: <b>${r.wer} ${r.verb}</b>. Er sagt, wer spricht.`,
+      ex: Object.assign(exRede('redeTeil', r, vorn), { merk: `Begleitsatz: <b>${r.wer} ${r.verb}</b> · wörtliche Rede: <b>${r.rede}</b>` }),
+    };
+  }
+  const rede = () => U.wahl([[44, redeRichtig], [32, redeZeichen], [24, redeTeil]]);
+
   D.daten = { V, SUBJ, HILF, ZEITEN, ZNAME, ZDEUTSCH, satz, text, bauplan, subjFuer, praesens, praeteritum,
-    N, GENUS, substSatz, markSatz, WA, WAPL, WAPROBE, FAELLE, FNAME, FFRAGE, ARTIKEL, pluralBau, pluralSatz, gruppe, fallSatz };
+    N, GENUS, substSatz, markSatz, WA, WAPL, WAPROBE, ROLLE, RFRAGE, FAELLE, FNAME, FFRAGE, ARTIKEL, pluralBau, pluralSatz, gruppe, fallSatz };
   D.arten = { // für Tests
     'd5-substantive': { artikelWahl, mehrzahl, einzahl, einOderMehr, substAntippen },
     'd5-faelle': { fallBestimmen, fallArtikel, fallBilden, fallAntippen },
@@ -782,6 +1185,14 @@
     'd5-adjektive': { adjKomp, adjSup, adjStufe, adjSatz, alsWie },
     'd5-verbformen': { persForm, persWahl, partizip, imperativ, formArt },
     'd5-wortarten': { waBestimmen, waAntippen, waWort },
+    'd5-satzglieder': { sgTrennen, sgZaehlen, sgUmstellen },
+    'd5-subjekt': { spAntippen, spBestimmen, kongruenz },
+    'd5-objekte': { objAntippen, objBestimmen, objFrage },
+    'd5-attribute': { attrAntippen, attrWeglassen, attrBezug },
+    'd5-nebensatz': { nsVerb, nsBau, hsOderNs },
+    'd5-satzarten': { sartBestimmen, sartWelcher, sartZeichen, sartVerb },
+    'd5-komma': { kommaAufz, kommaWahl, kommaGef },
+    'd5-rede': { redeRichtig, redeZeichen, redeTeil },
     'd5-zeitformen': { erkennen, einsetzen, bilden, antippen, hilfsverb, grundform, welcherSatz },
   };
 
@@ -799,6 +1210,16 @@
         { id: 'd5-verbformen', title: 'Verbformen: Person, Partizip, Aufforderung', icon: '🧩', gen: verbformen },
         { id: 'd5-zeitformen', title: 'Zeitformen', icon: '⏳', gen: zeitformen },
         { id: 'd5-wortarten', title: 'Wortarten erkennen', icon: '🔎', gen: wortarten },
+      ] },
+      { id: 'd5-satz', nr: 2, title: 'Satzbau und Satzzeichen', topics: [
+        { id: 'd5-satzglieder', title: 'Satzglieder und Umstellprobe', icon: '🚃', gen: satzglieder },
+        { id: 'd5-subjekt', title: 'Subjekt und Prädikat', icon: '👤', gen: subjektPraedikat },
+        { id: 'd5-objekte', title: 'Dativ- und Akkusativobjekt', icon: '🎁', gen: objekte },
+        { id: 'd5-attribute', title: 'Attribute', icon: '🎨', gen: attribute },
+        { id: 'd5-nebensatz', title: 'Hauptsatz und Nebensatz', icon: '🔗', gen: nebensatz },
+        { id: 'd5-satzarten', title: 'Satzarten und Satzschlusszeichen', icon: '❔', gen: satzarten },
+        { id: 'd5-komma', title: 'Komma: Aufzählung und Satzgefüge', icon: '❜', gen: komma },
+        { id: 'd5-rede', title: 'Wörtliche Rede', icon: '💬', gen: rede },
       ] },
     ],
   };
