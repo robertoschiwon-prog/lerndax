@@ -562,7 +562,11 @@ body.noscroll{overflow:hidden}
 }
 
 /* ---------- Sprach-Aufgaben: Wörter eintippen, Satz mit Lücken, Wörter oder Stellen antippen ---------- */
-.answer input.txt{width:auto;max-width:100%;font-size:22px;padding:6px 10px}
+.answer input.txt{width:auto;max-width:calc(100% - 10px);font-size:22px;padding:6px 10px}
+.answer .fld:has(input.txt){max-width:100%;min-width:0}
+.answer .fld:has(input.txt) .row{max-width:100%}
+.answer.satz .nw{white-space:nowrap}
+.answer.satz .nw input.txt{max-width:calc(100% - 26px)}
 .answer.satz{display:block;line-height:2.6;font-size:20px;font-weight:700}
 .answer.satz input{display:inline-block;margin:0 4px;vertical-align:middle}
 .tapline{display:flex;flex-wrap:wrap;gap:8px 6px;margin:6px 0 16px;align-items:center}

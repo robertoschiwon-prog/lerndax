@@ -40,3 +40,4 @@ Neue Themen prüfen: `python3 tests/loesung.py 12 k5-ueberschlag,k5-schriftlich,
 
 Seit `lerndax-v44` steckt die App in `web/plattform/fach.js`; die Mathe-Tests laufen unverändert über `web/mathe/index.html`.
 - `eltern.py`: **Elternübersicht auf der Startseite.** Legt einen Lernstand für Mathe und Deutsch an und prüft: beide Fächer mit richtigen Zahlen, der Knopf führt in die Elternansicht des Fachs, „Zurück“ führt zur Startseite. Startet dafür selbst einen kleinen Webserver.
+- `dedax_knobel.py [Runden]`: **Knobel-Aufgaben in DeDax.** Balken erst ab zwei Sternen; jede Aufgabenart jedes Themas wird als Knobel-Runde gespielt (richtige Antwort angenommen, falsche führt zur Lösung, nichts ragt über den Rand), Sterne-Statistik bleibt unverändert, Zähler stimmt. Bildschirmfotos in `tests/shots/knobel/`.

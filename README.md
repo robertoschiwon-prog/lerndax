@@ -77,7 +77,7 @@ geplante unter „Kommt bald“.
 | `web/index.html` | LernDax-Startseite mit den Fächern |
 | `web/plattform/` | Gemeinsame Teile: **die Fach-App** (`fach.js`, `fach.css`: Übungsrunde, Sterne, Tagesziel, Knobeln, Erklär-Player, Elternbereich), Fächerliste (`faecher.js`), eigene Symbole statt Emojis (`symbole.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
 | `web/mathe/` | **MaDax**: `index.html` (beschreibt nur das Fach), `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
-| `web/deutsch/` | **DeDax** (im Aufbau, noch nicht auf der Startseite): `themen/` (Wortlisten und Aufgaben), `erklaerungen/`, `symbole.js` |
+| `web/deutsch/` | **DeDax** (Klasse 5: 30 Themen, Entdecken, Knobeln): `themen/` (Wortlisten, Aufgaben, Knobel-Aufgaben), `erklaerungen/`, `symbole.js` |
 | `web/icons/` | Dachs-Logo und App-Icons |
 | `faecher/README.md` | **Fächerplan:** alle Fächer, Namen, Klassen, Fahrplan in drei Phasen |
 | `faecher/mathe/lehrplan/` | Lehrplan-Auswertung Mathe |
@@ -131,7 +131,8 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Knopf „Jetzt üben“ im Familienkalender (vom Kalender-Projekt umgesetzt, 10.11.2026)
 
 **Weitere Fächer** (Phase 1: Klasse 5)
-- [ ] DeDax (Deutsch): Lehrplan ausgewertet, Themenplan steht als Vorschlag, erstes Thema „Zeitformen“ gebaut (noch nicht auf der Startseite)
+- [x] DeDax (Deutsch) Klasse 5: 30 Themen in 5 Bereichen, „Entdecken“ (6), Knobel-Aufgaben zu allen Themen; auf der Startseite
+- [ ] DeDax: Abgleich mit dem Schulbuch (ISBN und Inhaltsverzeichnis fehlen), Test mit Bruno
 - [ ] EnDax (Englisch)
 - [ ] BioDax, GeoDax, GeDax
 - [ ] TecDax (Technik/Computer)

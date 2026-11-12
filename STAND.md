@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v53`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 12.11.2026, Version `lerndax-v54`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -78,6 +78,9 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
   „Verbformen: Person, Partizip, Aufforderung“ und „Wortarten erkennen“. Wortlisten: 34 Adjektive mit Steigerung,
   27 Aufforderungsformen, 16 Sätze mit Wortart je Wort, 12 Sätze mit markierten Pronomen.
+- **Gebaut (v54): Knobel-Aufgaben für Deutsch**, alle 30 Themen, 86 Aufgabenarten (`web/deutsch/themen/klasse5-knobel.js`).
+  Gleiche Regeln wie in MaDax: ab zwei Sternen im Thema, 5 Aufgaben je Runde, zählen nicht für die Sterne, keine Animation.
+  Neuer Test `tests/dedax_knobel.py`. Noch von niemandem durchgespielt; die Texte hat nur das Programm und ich geprüft.
 - **Gebaut (v53): Elternübersicht auf der Startseite** (`web/index.html`, Adresse `…/lerndax/#eltern`, Link „Für Eltern“
   ganz unten). Je fertigem Fach eine Karte: Aufgaben, Übungstage, geübte Themen, Trefferquote, Sterne, zuletzt geübt.
   Knopf „Alle Themen in MaDax/DeDax ansehen“ führt in die ausführliche Elternansicht des Fachs (`mathe/#eltern`,
@@ -91,7 +94,7 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Gebaut (v49): Bereich 2 „Satzbau und Satzzeichen“ ist vollständig** (8 Themen).
 - **DeDax steht seit v48 auf der Startseite** (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, jetzt 30 Themen).
   Die Zahl `themen` dort bei jedem neuen Thema mitzählen.
-- **Als Nächstes:** Knobel-Aufgaben für Deutsch, „Gemischt“-Prüfung über alle Bereiche ansehen, Schulbuch-Abgleich (ISBN und Inhaltsverzeichnis fehlen), Rückmeldung des Auftraggebers und Test mit Bruno.
+- **Als Nächstes:** „Gemischt“-Prüfung über alle Bereiche ansehen, Schulbuch-Abgleich (ISBN und Inhaltsverzeichnis fehlen), Rückmeldung des Auftraggebers und Test mit Bruno.
 
 **So wird hier gearbeitet (hat sich bewährt)**
 - Der Auftraggeber programmiert nicht. Antworten auf Deutsch, kurz, ohne Fachwörter. Er entscheidet gern anhand von
@@ -315,6 +318,7 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
 | `web/mathe/index.html` | MaDax: bindet die Mathe-Dateien ein und beschreibt das Fach (`LERNDAX_FACH`: Name, Schlüssel `mathelix.v1`, Dachs-Bilder, Reihenfolge der Entdeckungen, geplante Lernbereiche der anderen Klassen) |
 | `web/deutsch/index.html` | DeDax: dasselbe für Deutsch (Schlüssel `dedax.v1`) |
 | `web/deutsch/themen/klasse5.js` | Wortlisten (Verben mit allen Formen) und Aufgaben Klasse 5 (`window.DeDax`) |
+| `web/deutsch/themen/klasse5-knobel.js` | Knobel-Aufgaben zu allen 30 Deutsch-Themen (`topic.knobel`, Varianten in `DeDax.knobelVarianten`) |
 | `web/deutsch/erklaerungen/klasse5.js`, `web/deutsch/symbole.js` | Animationen und Themen-Symbole für DeDax |
 | `web/mathe/generatoren/klasse5.js` | Aufgabengeneratoren Klasse 5 (`window.Mathelix.grades[5]`) |
 | `web/mathe/generatoren/klasse5-luecken.js` | 7 weitere Themen (Überschlagen, Schriftlich rechnen, Gemischte Zahlen, Dezimalzahlen runden, Symmetrie, Netze & Schrägbilder, Fermi); hängt sie in die Lernbereiche ein |
@@ -379,7 +383,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Service Worker & Aktualisierung
 - Eigene Dateien: **erst Netz, dann Zwischenspeicher** (`cache: 'no-cache'`), offline Rückfall
   auf gespeicherte Kopie. Schriften und jsDelivr: erst Zwischenspeicher.
-- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v53`**) und neue
+- Bei jeder Änderung `VERSION` in `web/sw.js` erhöhen (aktuell **`lerndax-v54`**) und neue
   Dateien in die `SHELL`-Liste aufnehmen.
 
 ### App-Icons
@@ -994,3 +998,20 @@ Infos zur ersten Arbeit:
   Fachs und einer zu „Geräte & Konto“. Die Zahlen kommen aus dem Lernstand im Browser (`mathelix.v1`, `dedax.v1`),
   nichts Neues in der Datenbank. `tests/eltern.py` prüft Zahlen, Links und den Zurück-Knopf über einen kleinen
   Webserver (Links wie `deutsch/#eltern` öffnen als Datei keine `index.html`).
+- **DeDax: Knobel-Aufgaben** (Version `lerndax-v54`): zu jedem der 30 Themen zwei oder drei schwerere Aufgabenarten
+  (zusammen 86), alle mit Tipp und Lösungsweg. Ideen: Fallen (wird/hat/ist als einziges Verb, „das Laufen“ als
+  Substantiv, Adjektiv hinter „ist“ ist kein Attribut), zwei Regeln auf einmal (Komma bei Aufzählung **und** Nebensatz),
+  längere Sätze (Satzglieder mit Attributen, Subjekt in der Satzmitte, zweiteiliges Prädikat), Rückwärts-Aufgaben
+  (Grundform zu „saß“, verwandtes Wort als Beweis für „Gebäude“), Neues am Rand des Stoffs (Fälle nach mit/für/wegen,
+  Wo?/Wohin?, das/dass, eingeschobener Begleitsatz, Metapher, Redewendungen, Brückenwörter, Märchen-Rätsel).
+  Eindeutigkeit: Bei Lücken ergibt kein falsches Angebot ein anderes Wort; wo zwei echte Wörter zur Wahl stehen
+  (Wal/Wahl, mahlen/malen, das/dass), entscheidet der Satz. Mehrere richtige Schreibweisen sind alle zugelassen
+  (Atlanten/Atlasse, Fahr/Fahre, gesünder/gesunder). Weggelassen: Gang (Gong), Biss, Schuss, Fluss als Lückenwort;
+  Herz (Hertz); klingt (klinkt); Missgeschick/Missgunst (Ungeschick, Ungunst gibt es auch); Zeuge bei „ziehen“ und
+  Wachs bei „wachsen“ (Herkunft strittig); „Sie“-Bezüge mit zwei möglichen Personen.
+  Die drei kurzen Sachtexte (Dachs, Igel, Biber) sind selbst geschrieben, die Tier-Angaben aus meinem Wissen, nicht nachgeschlagen.
+  Nebenbei an der gemeinsamen App (`fach.js`, `fach.css`): Ein Satzzeichen nach einer Lücke bleibt am Feld (rutschte
+  allein in die nächste Zeile); lange Eingabefelder ragten über den Rand; in „Richtig ist: …“ fehlten bei Sätzen mit
+  Lücken die Leerzeichen (betraf auch die normalen Deutsch-Aufgaben).
+  Geprüft: 34 400 erzeugte Aufgaben ohne Fehler; `tests/dedax_knobel.py` spielt jede Aufgabenart in der App
+  (430 Aufgaben: richtige Antwort angenommen, falsche führt zur Lösung, nichts ragt über den Rand, Sterne unverändert).

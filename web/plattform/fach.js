@@ -113,7 +113,7 @@
     if (t.answerText) return t.answerText;
     if (t.choices) return t.choices[t.correct];
     if (t.tap) return t.tap.correct.map((i) => (t.tap.gaps ? `nach „${cleanTok(t.tap.tokens[i])}“` : cleanTok(t.tap.tokens[i]))).join(', ');
-    if (t.layout === 'satz') return t.fields.map((f) => `${f.prefix || ''}${'fixed' in f ? f.fixed : `<u>${textAnswers(f)[0]}</u>`}${f.suffix || ''}`).join('').replace(/\s+/g, ' ').trim();
+    if (t.layout === 'satz') return t.fields.map((f) => `${f.prefix || ''} ${'fixed' in f ? f.fixed : `<u>${textAnswers(f)[0]}</u>`}${f.suffix && !/^[.,!?]/.test(f.suffix) ? ' ' : ''}${f.suffix || ''}`).join(' ').replace(/\s+/g, ' ').trim();
     const parts = t.fields.filter((f) => !('fixed' in f)).map((f) => `${f.prefix ? f.prefix + ' ' : ''}${f.type === 'text' ? textAnswers(f)[0] : U.fmt(f.answer)}${f.suffix ? ' ' + f.suffix : ''}`);
     return parts.join(', ');
   }
@@ -364,7 +364,8 @@
         inputs = `<div class="answer coord"><span class="sym">P(</span>${inp(task.fields[0], 0)}<span class="sym">|</span>${inp(task.fields[1], 1)}<span class="sym">)</span></div>`;
       } else if (L === 'satz') {
         // Satz mit Lücken: Text und Felder laufen wie ein Satz hintereinander
-        inputs = `<div class="answer satz">${task.fields.map((f, i) => `${f.prefix ? `<span>${f.prefix}</span>` : ''}${inp(f, i)}${f.suffix ? `<span>${f.suffix}</span>` : ''}`).join(' ')}</div>`;
+        // Ein Satzzeichen direkt nach der Lücke bleibt am Feld kleben (sonst rutscht der Punkt allein in die nächste Zeile)
+        inputs = `<div class="answer satz">${task.fields.map((f, i) => { const z = f.suffix && /^[.,!?]/.test(f.suffix) ? f.suffix[0] : '', rest = f.suffix ? f.suffix.slice(z.length) : ''; return `${f.prefix ? `<span>${f.prefix}</span>` : ''}<span class="nw">${inp(f, i)}${z}</span>${rest ? `<span>${rest}</span>` : ''}`; }).join(' ')}</div>`;
       } else if (L === 'time') {
         inputs = `<div class="answer time">${inp(task.fields[0], 0)}<span class="sym">:</span>${inp(task.fields[1], 1)}<span class="sym">Uhr</span></div>`;
       } else {

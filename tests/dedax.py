@@ -101,4 +101,4 @@ async def main():
         for e in errs[:10]: print(' ! Seitenfehler:', e)
         await b.close()
         sys.exit(1 if (bad or meld or errs) else 0)
-asyncio.run(main())
+if __name__ == '__main__': asyncio.run(main())
