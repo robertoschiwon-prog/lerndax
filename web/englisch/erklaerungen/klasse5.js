@@ -1483,4 +1483,259 @@
       };
     },
   };
+
+  // =====================================================
+  // present progressive: am/is/are + Verb + ing
+  // =====================================================
+  //   ctx: { mode:'form'|'neg'|'frage', subj, be, base, ing, rest, sig, de, g } | { mode:'ing', base, ing }
+  const GRAU = '#8a8477';
+  EX['e5-pp'] = {
+    title: 'present progressive: is playing',
+    titleFor: (ctx) => (ctx && ctx.mode === 'ing' ? 'Die -ing-Form' : ctx && ctx.mode === 'neg' ? 'Verneinen: isn’t playing' : ctx && ctx.mode === 'frage' ? 'Fragen: Is he playing?' : 'present progressive: is playing'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      const art = (b, i) => (i === b + 'ing' ? 0 : b.endsWith('e') && i === b.slice(0, -1) + 'ing' ? 1 : 2);
+      let S0 = null, Z = null, punkt = null, reihen = [];
+      const nimm = () => {
+        if (mode === 'frei') return U.pick(T.PP);
+        if (mode === 'ing') return ctx.post ? T.PP.find((s) => s.base === ctx.base) : U.pick(T.PP.filter((s) => s.base !== ctx.base && art(s.base, s.ing) === art(ctx.base, ctx.ing)));
+        if (ctx.post) return T.PP.find((s) => s.subj === ctx.subj && s.base === ctx.base);
+        return U.pick((mode === 'frage' ? T.PPQ : T.PP).filter((s) => s.g === ctx.g && (s.subj !== ctx.subj || s.base !== ctx.base)));
+      };
+      S0 = nimm();
+      if (mode === 'frei') api.chips([{ label: 'Anderes Beispiel', onClick() { S0 = nimm(); api.replay(); } }]);
+      const satz = (teile) => { if (Z) Z.g.remove(); Z = zeile(api, teile, 56, 19); return Z; };
+      function zeitstrahl() {
+        el('line', { x1: 30, y1: 140, x2: 330, y2: 140, stroke: '#cfc8ba', 'stroke-width': 3, 'stroke-linecap': 'round' }, api.svg);
+        el('text', { x: 56, y: 166, 'text-anchor': 'middle', class: 'ex-s', text: 'vorhin', style: `font-size:11px;fill:${GRAU}` }, api.svg);
+        el('text', { x: 304, y: 166, 'text-anchor': 'middle', class: 'ex-s', text: 'später', style: `font-size:11px;fill:${GRAU}` }, api.svg);
+        punkt = el('circle', { cx: 180, cy: 140, r: 9, fill: ORANGE }, api.svg);
+        el('text', { x: 180, y: 168, 'text-anchor': 'middle', class: 'ex-b', text: 'jetzt', style: `font-size:14px;fill:${ORANGE}` }, api.svg);
+        el('text', { x: 180, y: 198, 'text-anchor': 'middle', class: 'ex-b', text: 'am / is / are + Verb + ing', style: `font-size:14px;fill:${BLAU}` }, api.svg);
+      }
+      const pulse = () => api.tw(1400, (t) => punkt.setAttribute('r', 9 + 5 * Math.abs(Math.sin(t * Math.PI * 2))));
+      function regeln() {
+        reihen = [['play → playing', 'einfach ing anhängen'], ['make → making', 'das e fällt weg'], ['sit → sitting', 'letzter Buchstabe doppelt']].map(([a, b], k) => {
+          const y = 96 + k * 37;
+          const r = el('rect', { x: 14, y, width: 332, height: 31, rx: 9, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+          el('text', { x: 28, y: y + 21, class: 'ex-b', text: a, style: `font-size:15px;fill:${BLAU}` }, api.svg);
+          el('text', { x: 332, y: y + 21, 'text-anchor': 'end', class: 'ex-s', text: b, style: 'font-size:12px' }, api.svg);
+          return r;
+        });
+      }
+      async function form(s) {
+        satz([{ t: s.subj }, { t: `(${s.base})`, c: GRAU }, { t: `${s.rest} ${s.sig}.` }]);
+        api.say(`<b>${s.sig}</b> zeigt: Das passiert <b>gerade jetzt</b>, in diesem Moment.`);
+        await pulse(); await api.wait(1500);
+        satz([{ t: s.subj }, { t: s.be, c: BLAU }, { t: s.ing, c: BLAU }, { t: `${s.rest} ${s.sig}.` }]);
+        return `${s.subj} <b>${s.be} ${s.ing}</b> ${s.rest} ${s.sig}. ${U.say(s.text)}<br>Zu ${s.subj} gehört <b>${s.be}</b>, und das Verb bekommt <b>-ing</b>. ${T.ingRegel(s.base, s.ing)}<br><small>${s.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); Z = null;
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'ing') { regeln(); satz([{ t: S0.base }, { t: '+ ing', c: GRAU }]); return; }
+          zeitstrahl();
+          if (mode === 'neg' || mode === 'frage') satz([{ t: S0.subj }, { t: S0.be }, { t: S0.ing }, { t: `${S0.rest} ${S0.sig}.` }]);
+          else satz([{ t: S0.subj }, { t: `(${S0.base})`, c: GRAU }, { t: `${S0.rest} ${S0.sig}.` }]);
+        },
+        async play() {
+          const s = S0;
+          if (mode === 'ing') {
+            api.say(`Wie hängt man <b>-ing</b> an <b>${s.base}</b>? Es gibt drei Fälle.`);
+            await api.wait(2400);
+            reihen.forEach((r, k) => r.setAttribute('fill', k === art(s.base, s.ing) ? '#dfe9ff' : '#fff'));
+            await api.wait(900);
+            satz([{ t: s.base }, { t: '→', c: GRAU }, { t: s.ing, c: BLAU }]);
+            api.say(`${s.base} → <b>${s.ing}</b><br>${T.ingRegel(s.base, s.ing)}<br><small>${s.text} ${U.say(s.text)}</small>`);
+            return;
+          }
+          if (mode === 'neg') {
+            api.say(`Im Satz steckt schon <b>${s.be}</b>. Verneint wird deshalb wie bei to be.`);
+            await pulse(); await api.wait(1400);
+            const a = Z, b = zeile(api, [{ t: s.subj }, { t: s.be, c: BLAU }, { t: 'not', c: ORANGE }, { t: s.ing }, { t: `${s.rest} ${s.sig}.` }], 56, 19);
+            await gleite(api, a, b, [[a.els[0], b.els[0]], [a.els[1], b.els[1]], [a.els[2], b.els[3]], [a.els[3], b.els[4]]]);
+            Z = b;
+            api.say(`<b>not</b> kommt hinter ${s.be}. Meist sagt man die Kurzform:<br><b>${s.neg}</b> ${U.say(s.neg)}<br><small>don’t und doesn’t braucht man hier nicht.</small>`);
+            return;
+          }
+          if (mode === 'frage') {
+            const kl = s.frage.slice(s.be.length + 1, s.be.length + 1 + s.subj.length), gr = s.be[0].toUpperCase() + s.be.slice(1);
+            api.say(`Im Satz steckt schon <b>${s.be}</b>. Für die Frage rückt es nach vorn.`);
+            await pulse(); await api.wait(1400);
+            const a = Z, b = zeile(api, [{ t: gr, c: BLAU }, { t: kl }, { t: s.ing }, { t: `${s.rest} ${s.sig}?` }], 56, 19);
+            await gleite(api, a, b, [[a.els[0], b.els[1]], [a.els[1], b.els[0]], [a.els[2], b.els[2]], [a.els[3], b.els[3]]]);
+            Z = b;
+            api.say(`<b>${s.frage}</b> ${U.say(s.frage)}<br>${gr} und ${kl} tauschen die Plätze. Kein do oder does.`);
+            return;
+          }
+          if (mode === 'frei') { api.say('Das present progressive sagt, was <b>gerade jetzt</b> passiert.'); await api.wait(2600); }
+          api.say(await form(s));
+          if (mode === 'frei') {
+            await api.wait(5200);
+            api.say(`Verneinen und fragen wie bei to be:<br><b>${s.neg}</b>${s.subj === 'I' ? '' : `<br><b>${s.frage}</b>`}`);
+          }
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // simple oder progressive? Zwei Kästen: immer wieder – gerade jetzt
+  // =====================================================
+  //   ctx: { mode:'satz', subj, rest, form, sig, prog, de, andere } | { mode:'signal', wort, prog }
+  EX['e5-sp'] = {
+    title: 'simple oder progressive?',
+    titleFor: (ctx) => (ctx && ctx.mode === 'satz' && ctx.post ? `Warum „${ctx.form}“?` : 'simple oder progressive?'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, W0 = null, oben = null, kaesten = [];
+      const aus = (s, prog) => ({ subj: s.subj, rest: s.rest, prog, form: prog ? s.prog : s.sf, sig: prog ? s.sigP : s.sigS, de: prog ? s.deP : s.deS });
+      const text = (v) => `${v.subj} ${v.form} ${v.rest} ${v.sig}.`;
+      const nimm = () => U.pick(T.SP.filter((s) => s.subj !== ctx.subj));
+      if (mode === 'satz') S0 = ctx.post ? ctx : aus(nimm(), ctx.prog);
+      if (mode === 'signal') W0 = ctx.post ? ctx.wort : U.pick((ctx.prog ? T.SIG_P : T.SIG_S).filter((w) => w !== ctx.wort));
+      if (mode === 'frei') { S0 = nimm(); api.chips([{ label: 'Anderes Beispiel', onClick() { S0 = nimm(); api.replay(); } }]); }
+      const zeig = (teile) => { if (oben) oben.remove(); oben = tzeile(api, teile, 40, 18); };
+      function bild() {
+        kaesten = [
+          { x: 14, titel: 'immer wieder', bau: 'play / plays', w: ['every day · every week', 'on Mondays · always', 'often · usually', 'sometimes · never'] },
+          { x: 186, titel: 'gerade jetzt', bau: 'am / is / are + ing', w: ['now · right now', 'at the moment', 'Look! · Listen!'] },
+        ].map((k) => {
+          const r = el('rect', { x: k.x, y: 66, width: 160, height: 136, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: k.x + 80, y: 88, 'text-anchor': 'middle', class: 'ex-b', text: k.titel, style: 'font-size:15px' }, api.svg);
+          el('text', { x: k.x + 80, y: 109, 'text-anchor': 'middle', class: 'ex-b', text: k.bau, style: `font-size:14px;fill:${BLAU}` }, api.svg);
+          el('line', { x1: k.x + 14, y1: 119, x2: k.x + 146, y2: 119, stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+          k.w.forEach((z, i) => el('text', { x: k.x + 80, y: 138 + i * 17, 'text-anchor': 'middle', class: 'ex-s', text: z, style: 'font-size:11.5px' }, api.svg));
+          return r;
+        });
+      }
+      const leuchte = (i) => kaesten.forEach((r, k) => r.setAttribute('fill', k === i ? '#dfe9ff' : '#fff'));
+      async function loese(v, pause) {
+        leuchte(-1);
+        zeig([[`${v.subj} ___ ${v.rest} `], [v.sig, ORANGE], ['.']]);
+        api.say(`Schau zuerst auf das Signalwort: <b>${v.sig}</b>.`);
+        await api.wait(pause);
+        leuchte(v.prog ? 1 : 0);
+        api.say(v.prog ? `<b>${v.sig}</b> heißt: Es passiert <b>gerade jetzt</b>. Rechter Kasten.` : `<b>${v.sig}</b> heißt: Es passiert <b>immer wieder</b>. Linker Kasten.`);
+        await api.wait(pause);
+        zeig([[`${v.subj} `], [v.form, BLAU], [` ${v.rest} `], [v.sig, ORANGE], ['.']]);
+        return `${v.subj} <b>${v.form}</b> ${v.rest} ${v.sig}. ${U.say(text(v))}<br>${v.prog ? 'Gerade jetzt: am, is oder are + Verb mit -ing.' : 'Immer wieder: das einfache Verb, bei he, she, it mit s.'}<br><small>${v.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; bild();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'signal') zeig([[W0, ORANGE]]);
+          else if (mode === 'satz') zeig([[`${S0.subj} ___ ${S0.rest} `], [S0.sig, ORANGE], ['.']]);
+          else zeig([['immer wieder oder gerade jetzt?', BLAU]]);
+        },
+        async play() {
+          if (mode === 'signal') {
+            api.say(`Wozu gehört <b>${W0}</b>? Sagt es „immer wieder“ oder „in diesem Moment“?`);
+            await api.wait(2600);
+            leuchte(ctx.prog ? 1 : 0);
+            api.say(`<b>${W0}</b> gehört zum <b>${ctx.prog ? 'present progressive' : 'present simple'}</b>: ${ctx.prog ? 'Es passiert gerade jetzt.' : 'Es passiert immer wieder.'}`);
+            return;
+          }
+          if (mode === 'satz') { api.say(await loese(S0, 2600)); return; }
+          api.say('Englisch hat zwei Formen für die Gegenwart. Das <b>Signalwort</b> verrät, welche passt.');
+          await api.wait(3200);
+          api.say(await loese(aus(S0, false), 2200)); await api.wait(4200);
+          api.say(await loese(aus(S0, true), 2200));
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // me, him, her, us, them: vorn oder hinten im Satz
+  // =====================================================
+  //   ctx: { mode:'satz', vor, wen, pron, end, de } | { mode:'paar', pron } | { mode:'vh', satz, richtig, hinten, de }
+  const OB_VORN = ['I', 'you', 'he', 'she', 'it', 'we', 'they'], OB_HINTEN = ['me', 'you', 'him', 'her', 'it', 'us', 'them'];
+  EX['e5-obj'] = {
+    title: 'me, him, her, us, them',
+    titleFor: (ctx) => (ctx && ctx.post && ctx.mode === 'satz' ? `Warum „${ctx.pron}“?` : ctx && ctx.post && ctx.mode === 'vh' ? `Warum „${ctx.richtig}“?` : 'me, him, her, us, them'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, Z = null, oben = null, zellen = [];
+      const nimm = () => {
+        if (mode === 'satz') { const p = T.OS.filter((s) => s.pron === ctx.pron && s.wen !== ctx.wen); return U.pick(p.length ? p : T.OS.filter((s) => s.wen !== ctx.wen)); }
+        if (mode === 'vh') return U.pick(T.OSO.filter((s) => s.hinten === ctx.hinten && s.satz !== ctx.satz));
+        if (mode === 'paar') return U.pick(['I', 'He', 'She', 'We', 'They'].filter((p) => p !== ctx.pron));
+        return U.pick(T.OS);
+      };
+      S0 = mode !== 'frei' && ctx.post ? (mode === 'paar' ? ctx.pron : ctx) : nimm();
+      if (mode === 'frei') api.chips([{ label: 'Anderes Beispiel', onClick() { S0 = nimm(); api.replay(); } }]);
+      function tafel() {
+        zellen = [[], []];
+        [['vorn', OB_VORN, 104], ['hinten', OB_HINTEN, 150]].forEach(([name, liste, y], r) => {
+          el('text', { x: 16, y: y + 22, class: 'ex-s', text: name, style: `font-size:12px;fill:${GRAU}` }, api.svg);
+          liste.forEach((w, i) => {
+            const x = 66 + i * 40;
+            zellen[r].push(el('rect', { x, y, width: 38, height: 34, rx: 8, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg));
+            el('text', { x: x + 19, y: y + 22, 'text-anchor': 'middle', class: 'ex-b', text: w, style: `font-size:13px;${r ? `fill:${BLAU}` : ''}` }, api.svg);
+          });
+        });
+        el('text', { x: 180, y: 202, 'text-anchor': 'middle', class: 'ex-s', text: 'vorn: wer tut etwas? · hinten: nach dem Verb oder to, at, for, with', style: 'font-size:10px' }, api.svg);
+      }
+      const leuchte = (r, i) => zellen.forEach((reihe, a) => reihe.forEach((z, b) => z.setAttribute('fill', (r === a || r === 2) && (i === b || i === -1) ? '#dfe9ff' : '#fff')));
+      const zeig = (teile) => { if (oben) oben.remove(); oben = tzeile(api, teile, 54, 19); };
+      async function ersetze(s, pause) {
+        const i = OB_HINTEN.indexOf(s.pron);
+        leuchte(-1, -1);
+        zeig([[`${s.vor} `], [s.wen, ORANGE], [s.end]]);
+        api.say(`<b>${s.wen}</b> steht <b>hinter</b> dem Verb. Welches kurze Wort passt dafür?`);
+        await api.wait(pause);
+        leuchte(2, i);
+        api.say(`<b>${s.wen}</b>: ${T.OBJ_ART[s.pron]}. Vorn hieße es ${OB_VORN[i]}, hinten heißt es <b>${s.pron}</b>.`);
+        await api.wait(pause);
+        leuchte(1, i);
+        zeig([[`${s.vor} `], [s.pron, BLAU], [s.end]]);
+        return `${s.vor} <b>${s.pron}</b>${s.end} ${U.say(`${s.vor} ${s.pron}${s.end}`)}<br>Hinter dem Verb steht die zweite Form: <b>${s.pron}</b>.<br><small>${s.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; tafel();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'paar') zeig([[S0 === 'I' ? 'I' : S0.toLowerCase()], [' → ?', GRAU]]);
+          else if (mode === 'vh') zeig([[S0.satz]]);
+          else zeig([[`${S0.vor} `], [S0.wen, ORANGE], [S0.end]]);
+        },
+        async play() {
+          if (mode === 'paar') {
+            const o = T.OBJ[S0], i = OB_HINTEN.indexOf(o), v = OB_VORN[i];
+            api.say('Jedes Pronomen hat zwei Formen: eine für <b>vorn</b> im Satz und eine für <b>hinten</b>.');
+            await api.wait(2600);
+            leuchte(2, i);
+            zeig([[v], [' → ', GRAU], [o, BLAU]]);
+            api.say(`${v} → <b>${o}</b> (${T.OBJ_DE[o]})<br>Vorn im Satz: ${S0} … Hinter dem Verb: … ${o}.`);
+            return;
+          }
+          if (mode === 'vh') {
+            const s = S0, kl = s.richtig === 'I' ? 'I' : s.richtig.toLowerCase(), i = s.hinten ? OB_HINTEN.indexOf(kl) : OB_VORN.indexOf(kl);
+            api.say('Wo steht die Lücke: <b>vorn</b> im Satz oder <b>hinter</b> dem Verb?');
+            await api.wait(2600);
+            leuchte(s.hinten ? 1 : 0, -1);
+            api.say(s.hinten ? 'Die Lücke steht <b>hinten</b>. Dort stehen me, him, her, us, them.' : 'Die Lücke steht <b>vorn</b>: Wer tut etwas? Dort stehen I, he, she, we, they.');
+            await api.wait(2800);
+            leuchte(s.hinten ? 1 : 0, i);
+            const [a, b] = s.satz.split('___');
+            zeig([[a], [s.richtig, BLAU], [b]]);
+            const voll = s.satz.replace('___', s.richtig);
+            api.say(`${a}<b>${s.richtig}</b>${b} ${U.say(voll)}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (mode === 'frei') { api.say('Pronomen haben zwei Formen: eine für <b>vorn</b> im Satz, eine für <b>hinten</b>.'); await api.wait(3000); }
+          api.say(await ersetze(S0, mode === 'frei' ? 2400 : 2800));
+        },
+      };
+    },
+  };
 })();

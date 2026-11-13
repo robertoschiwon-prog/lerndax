@@ -40,6 +40,9 @@ window.EnDaxIcons = (function () {
     'e5-satzbau': `<rect x="2" y="9" width="3.4" height="6" rx=".8" ${F}/><rect x="6.2" y="9" width="3.4" height="6" rx=".8"/><rect x="10.4" y="9" width="3.4" height="6" rx=".8"/><rect x="14.6" y="9" width="3.4" height="6" rx=".8"/><rect x="18.8" y="9" width="3.4" height="6" rx=".8"/>`,
     // Wie oft: eine Leiter mit fünf Punkten, einer gefüllt
     'e5-oft': `<path d="M3 12h18"/><circle cx="3.5" cy="12" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="12.5" cy="12" r="1.6" ${F}/><circle cx="17" cy="12" r="1.6"/><circle cx="21" cy="12" r="1.6"/>`,
+    'e5-pp': `<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z" ${F}/>`,
+    'e5-sp': `<path d="M12 4v16M7 20h10M4 7h16"/><path d="M4 7l-2.5 6h5zM20 7l-2.5 6h5z"/>`,
+    'e5-obj': `<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" ${F}/>`,
   };
   function svg(id) {
     const body = I[id];

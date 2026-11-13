@@ -1849,6 +1849,280 @@
   });
 
   // =====================================================
+  // present progressive: am/is/are + -ing
+  // =====================================================
+  // [Subjekt, am/is/are, Grundform, -ing-Form, Rest, Signalwort, Deutsch, Pronomen]
+  const PP = [
+    ['I', 'am', 'read', 'reading', 'a book', 'now', 'Ich lese gerade ein Buch.'],
+    ['I', 'am', 'do', 'doing', 'my homework', 'at the moment', 'Ich mache gerade meine Hausaufgaben.'],
+    ['You', 'are', 'listen', 'listening', 'to music', 'now', 'Du hörst gerade Musik.'],
+    ['He', 'is', 'play', 'playing', 'football', 'at the moment', 'Er spielt gerade Fußball.', 'he'],
+    ['She', 'is', 'make', 'making', 'a cake', 'now', 'Sie backt gerade einen Kuchen.', 'she'],
+    ['She', 'is', 'ride', 'riding', 'her bike', 'right now', 'Sie fährt gerade Fahrrad.', 'she'],
+    ['We', 'are', 'watch', 'watching', 'a film', 'at the moment', 'Wir schauen gerade einen Film.'],
+    ['We', 'are', 'have', 'having', 'lunch', 'now', 'Wir essen gerade zu Mittag.'],
+    ['They', 'are', 'swim', 'swimming', 'in the lake', 'right now', 'Sie schwimmen gerade im See.', 'they'],
+    ['Tom', 'is', 'write', 'writing', 'an email', 'now', 'Tom schreibt gerade eine E-Mail.', 'he'],
+    ['Lisa', 'is', 'sit', 'sitting', 'on the sofa', 'at the moment', 'Lisa sitzt gerade auf dem Sofa.', 'she'],
+    ['My brother', 'is', 'sleep', 'sleeping', 'in his room', 'now', 'Mein Bruder schläft gerade in seinem Zimmer.', 'he'],
+    ['The dog', 'is', 'run', 'running', 'in the garden', 'right now', 'Der Hund rennt gerade im Garten.', 'it'],
+    ['My parents', 'are', 'cook', 'cooking', 'dinner', 'at the moment', 'Meine Eltern kochen gerade das Abendessen.', 'they'],
+    ['The children', 'are', 'dance', 'dancing', 'in the kitchen', 'now', 'Die Kinder tanzen gerade in der Küche.', 'they'],
+  ].map(([subj, be, base, ing, rest, sig, de, pr]) => {
+    const nb = be === 'is' ? 'isn’t' : 'aren’t';
+    return { subj, be, base, ing, rest, sig, de, pr: pr || '', g: be === 'am' ? 0 : be === 'is' ? 1 : 2,
+      text: `${subj} ${be} ${ing} ${rest} ${sig}.`,
+      neg: be === 'am' ? `I’m not ${ing} ${rest} ${sig}.` : `${subj} ${nb} ${ing} ${rest} ${sig}.`,
+      frage: `${gross(be)} ${subjKlein(subj)} ${ing} ${rest} ${sig}?` };
+  });
+  const PPQ = PP.filter((s) => s.subj !== 'I');
+  const INGS = [...new Map(PP.map((s) => [s.base, s.ing])).entries()];
+  const ingRegel = (base, ing) => (ing === base + 'ing' ? `Einfach <b>-ing</b> anhängen: ${ing}.`
+    : base.endsWith('e') && ing === base.slice(0, -1) + 'ing' ? `Das <b>e</b> am Ende fällt weg: ${base} → ${ing}.`
+      : `Kurzer Vokal und ein Konsonant am Ende: Der letzte Buchstabe wird <b>verdoppelt</b>: ${base} → ${ing}.`);
+  const ppMark = (s) => `<span lang="en">${s.subj} <b class="vb">${s.be} ${s.ing}</b> ${s.rest} ${s.sig}.</span>`;
+  const ppLoesung = (s) => `${ppMark(s)} ${U.say(s.text)}<br>Was <b>gerade jetzt</b> passiert, sagt man mit <b>${s.be}</b> + Verb + <b>-ing</b>. ${GRUPPE_TEXT[s.g]} ${ingRegel(s.base, s.ing)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const PP_TIPP = 'Was <b>gerade jetzt</b> passiert: <b>am, is</b> oder <b>are</b> + Verb mit <b>-ing</b>. Signalwörter: now, at the moment, right now.';
+  const PPEX = (s, mode) => ({ mode: mode || 'form', subj: s.subj, be: s.be, base: s.base, ing: s.ing, rest: s.rest, sig: s.sig, de: s.de, g: s.g });
+  // A: am, is oder are
+  function ppBe() {
+    const s = pick(PP);
+    return { prompt: `Was gehört in die Lücke?${en(`${s.subj} ___ ${s.ing} ${s.rest} ${s.sig}.`)}`, choices: FORM.slice(), correct: s.g, hint: PP_TIPP, solution: ppLoesung(s), ex: PPEX(s) };
+  }
+  // B: die -ing-Form im Satz
+  function ppIng() {
+    const s = pick(PP);
+    return {
+      prompt: `Setze das Verb <b lang="en">${s.base}</b> in der -ing-Form ein.`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.ing, prefix: `${s.subj} ${s.be}`, suffix: `${s.rest} ${s.sig}.`, label: '-ing-Form' }],
+      hint: 'Meistens hängst du nur -ing an. Ein <b>e</b> am Ende fällt weg (make → making). Nach kurzem Vokal wird der letzte Konsonant verdoppelt (sit → sitting).',
+      solution: ppLoesung(s), ex: PPEX(s),
+    };
+  }
+  // C: nur die -ing-Form
+  function ppIngForm() {
+    const [base, ing] = pick(INGS), s = PP.find((x) => x.base === base);
+    const falsch = ing === base + 'ing' ? [base + 'eing', base + base.slice(-1) + 'ing'] : base.endsWith('e') ? [base + 'ing', base.slice(0, -1) + base.slice(-2, -1) + 'ing'] : [base + 'ing', base + 'eing'];
+    const ch = shuffle([ing, ...falsch]);
+    return {
+      prompt: `Wie schreibt man die <b>-ing-Form</b> von <b lang="en">${base}</b>?`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(ing),
+      hint: 'Meistens hängst du nur -ing an. Ein <b>e</b> am Ende fällt weg (make → making). Nach kurzem Vokal wird der letzte Konsonant verdoppelt (sit → sitting).',
+      solution: `<span lang="en">${base} → <b class="vb">${ing}</b></span><br>${ingRegel(base, ing)}<br>Ein Beispiel: ${ppMark(s)} ${U.say(s.text)}`,
+      ex: { mode: 'ing', base, ing },
+    };
+  }
+  // D: beide Teile eintippen
+  function ppBeides() {
+    const s = pick(PP);
+    return {
+      prompt: `Was passiert gerade? Setze <b lang="en">${s.base}</b> in der richtigen Form ein (zwei Wörter).`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.be, prefix: s.subj, label: 'am, is oder are' }, { type: 'text', ci: true, answer: s.ing, suffix: `${s.rest} ${s.sig}.`, label: '-ing-Form' }],
+      hint: PP_TIPP, solution: ppLoesung(s), ex: PPEX(s),
+    };
+  }
+  // E: Satz ordnen
+  function ppOrdnen() {
+    const s = pick(PP);
+    return {
+      prompt: `Bilde den Satz: <b>${s.de}</b>`,
+      order: U.ordne([s.subj, s.be, s.ing, s.rest, s.sig], '.', [`${s.sig} ${s.subj} ${s.be} ${s.ing} ${s.rest}`]),
+      hint: 'Reihenfolge: wer – am/is/are – Verb mit -ing – Rest – Signalwort.', solution: ppLoesung(s), ex: PPEX(s),
+    };
+  }
+  // F: verneinen
+  function ppNeg() {
+    const s = pick(PP), richtig = s.neg;
+    const ch = shuffle([richtig, s.be === 'am' ? `I don’t ${s.ing} ${s.rest} ${s.sig}.` : `${s.subj} ${s.be === 'is' ? 'doesn’t' : 'don’t'} ${s.ing} ${s.rest} ${s.sig}.`, `${s.subj} not ${s.be} ${s.ing} ${s.rest} ${s.sig}.`]);
+    return {
+      prompt: `Verneine den Satz. Welcher Satz ist richtig?${en(s.text)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: 'Hier steckt schon <b>am, is</b> oder <b>are</b> im Satz. Verneint wird deshalb wie bei to be: mit <b>not</b> dahinter (isn’t, aren’t, I’m not). Kein don’t.',
+      solution: `<span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>Verneint wird wie bei to be: <b>not</b> kommt hinter ${s.be}. don’t und doesn’t braucht man hier nicht.`,
+      ex: PPEX(s, 'neg'),
+    };
+  }
+  // G: Frage ordnen
+  function ppFrage() {
+    const s = pick(PPQ);
+    return {
+      prompt: `Bilde die Frage zu diesem Satz.${en(s.text)}`,
+      order: U.ordne([gross(s.be), subjKlein(s.subj), s.ing, s.rest, s.sig], '?'),
+      hint: 'Wie bei to be: <b>Is</b> oder <b>Are</b> rückt nach vorn, dann die Person, dann das Verb mit -ing.',
+      solution: `<span lang="en">${s.text}</span> → <span lang="en"><b class="vb">${gross(s.be)}</b> ${subjKlein(s.subj)} ${s.ing} ${s.rest} ${s.sig}?</span> ${U.say(s.frage)}<br>${gross(s.be)} und die Person tauschen die Plätze. Kein do oder does.`,
+      ex: PPEX(s, 'frage'),
+    };
+  }
+  const progressive = () => U.wahl([[18, ppBe], [18, ppIng], [14, ppIngForm], [16, ppBeides], [12, ppOrdnen], [11, ppNeg], [11, ppFrage]]);
+
+  // =====================================================
+  // simple oder progressive?
+  // =====================================================
+  // [Subjekt, Gruppe für das s, am/is/are, Grundform, -ing-Form, Rest, Signal „immer wieder“, Signal „gerade jetzt“, Deutsch immer wieder, Deutsch gerade]
+  const SP = [
+    ['Tom', 1, 'is', 'play', 'playing', 'football', 'every Saturday', 'now', 'Tom spielt jeden Samstag Fußball.', 'Tom spielt gerade Fußball.'],
+    ['She', 1, 'is', 'read', 'reading', 'a book', 'every evening', 'at the moment', 'Sie liest jeden Abend ein Buch.', 'Sie liest gerade ein Buch.'],
+    ['We', 0, 'are', 'watch', 'watching', 'TV', 'on Sundays', 'right now', 'Wir sehen sonntags fern.', 'Wir sehen gerade fern.'],
+    ['I', 0, 'am', 'do', 'doing', 'my homework', 'after school', 'now', 'Ich mache nach der Schule meine Hausaufgaben.', 'Ich mache gerade meine Hausaufgaben.'],
+    ['They', 0, 'are', 'swim', 'swimming', 'in the lake', 'every summer', 'at the moment', 'Sie schwimmen jeden Sommer im See.', 'Sie schwimmen gerade im See.'],
+    ['My mum', 1, 'is', 'make', 'making', 'a cake', 'on Fridays', 'now', 'Meine Mama backt freitags einen Kuchen.', 'Meine Mama backt gerade einen Kuchen.'],
+    ['He', 1, 'is', 'ride', 'riding', 'his bike', 'every day', 'at the moment', 'Er fährt jeden Tag Fahrrad.', 'Er fährt gerade Fahrrad.'],
+    ['The children', 0, 'are', 'dance', 'dancing', 'in the kitchen', 'on Saturdays', 'right now', 'Die Kinder tanzen samstags in der Küche.', 'Die Kinder tanzen gerade in der Küche.'],
+    ['Lisa', 1, 'is', 'write', 'writing', 'an email', 'every week', 'now', 'Lisa schreibt jede Woche eine E-Mail.', 'Lisa schreibt gerade eine E-Mail.'],
+    ['My dad', 1, 'is', 'cook', 'cooking', 'dinner', 'on Sundays', 'at the moment', 'Mein Papa kocht sonntags das Abendessen.', 'Mein Papa kocht gerade das Abendessen.'],
+  ].map(([subj, g, be, base, ing, rest, sigS, sigP, deS, deP]) => {
+    const sf = g ? sForm(base) : base;
+    return { subj, g, be, base, ing, rest, sigS, sigP, deS, deP, sf, prog: `${be} ${ing}`,
+      textS: `${subj} ${sf} ${rest} ${sigS}.`, textP: `${subj} ${be} ${ing} ${rest} ${sigP}.` };
+  });
+  const SIG_S = ['every day', 'every week', 'on Mondays', 'always', 'often', 'usually', 'sometimes', 'never'];
+  const SIG_P = ['now', 'right now', 'at the moment', 'Look!', 'Listen!'];
+  const spVar = (s, prog) => ({ prog, form: prog ? s.prog : s.sf, sig: prog ? s.sigP : s.sigS, text: prog ? s.textP : s.textS, de: prog ? s.deP : s.deS });
+  const spWarum = (s, v) => (v.prog
+    ? `<b>${v.sig}</b> zeigt: Es passiert <b>gerade jetzt</b>. Dann heißt es ${s.be} + -ing: <b>${s.prog}</b>.`
+    : `<b>${v.sig}</b> zeigt: Es passiert <b>immer wieder</b>. Dann steht das einfache Verb: <b>${s.sf}</b>${s.g ? ' (mit s bei he, she, it)' : ''}.`);
+  const spLoesung = (s, v) => `<span lang="en">${s.subj} <b class="vb">${v.form}</b> ${s.rest} ${v.sig}.</span> ${U.say(v.text)}<br>${spWarum(s, v)}<br><small>Auf Deutsch: ${v.de}</small>`;
+  const SP_TIPP = 'Passiert es <b>immer wieder</b> (every day, on Mondays, often, never)? Dann das einfache Verb: plays. Passiert es <b>gerade jetzt</b> (now, at the moment, Look!)? Dann is + -ing: is playing.';
+  const SPEX = (s, v) => ({ mode: 'satz', subj: s.subj, rest: s.rest, form: v.form, sig: v.sig, prog: v.prog, de: v.de, andere: v.prog ? s.sf : s.prog });
+  // A: richtige Form auswählen
+  function spWahl() {
+    const s = pick(SP), v = spVar(s, Math.random() < 0.5), ch = shuffle([s.sf, s.prog, s.ing]);
+    return { prompt: `Was gehört in die Lücke?${en(`${s.subj} ___ ${s.rest} ${v.sig}.`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(v.form), hint: SP_TIPP, solution: spLoesung(s, v), ex: SPEX(s, v) };
+  }
+  // B: Form eintippen
+  function spTippen() {
+    const s = pick(SP), v = spVar(s, Math.random() < 0.5);
+    return {
+      prompt: `Setze <b lang="en">${s.base}</b> in der richtigen Form ein. Achte auf das Signalwort.`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: v.form, prefix: s.subj, suffix: `${s.rest} ${v.sig}.`, label: 'Verbform' }],
+      hint: SP_TIPP, solution: spLoesung(s, v), ex: SPEX(s, v),
+    };
+  }
+  // C: passendes Signalwort
+  function spSignal() {
+    const s = pick(SP), v = spVar(s, Math.random() < 0.5), ch = shuffle([s.sigS, s.sigP]);
+    return {
+      prompt: `Wie geht der Satz weiter?${en(`${s.subj} ${v.form} ${s.rest} …`)}`,
+      choices: ch.map((c) => `<span lang="en">… ${c}.</span>`), correct: ch.indexOf(v.sig),
+      hint: 'Schau auf das Verb: <b>is/are + -ing</b> heißt „gerade jetzt“. Das einfache Verb heißt „immer wieder“.',
+      solution: spLoesung(s, v), ex: SPEX(s, v),
+    };
+  }
+  // D: Signalwörter sortieren
+  function spSortieren() {
+    const prog = Math.random() < 0.5, w = pick(prog ? SIG_P : SIG_S);
+    return {
+      prompt: `Zu welcher Zeitform gehört das Signalwort <b lang="en">${w}</b>?`,
+      choices: ['present simple (immer wieder)', 'present progressive (gerade jetzt)'], correct: prog ? 1 : 0,
+      hint: 'Sagt das Wort „regelmäßig, immer wieder“ oder „in diesem Moment“?',
+      solution: `<b class="vb" lang="en">${w}</b> gehört zum <b>${prog ? 'present progressive' : 'present simple'}</b>.<br>Immer wieder: <span lang="en">${SIG_S.join(', ')}</span>.<br>Gerade jetzt: <span lang="en">${SIG_P.join(', ')}</span>.`,
+      ex: { mode: 'signal', wort: w, prog },
+    };
+  }
+  // E: Was bedeutet der Satz?
+  function spBedeutung() {
+    const s = pick(SP), prog = Math.random() < 0.5;
+    const satz = prog ? `${s.subj} ${s.prog} ${s.rest}.` : `${s.subj} ${s.sf} ${s.rest}.`;
+    return {
+      prompt: `Was sagt dieser Satz?${en(satz)}`,
+      choices: ['Das passiert gerade jetzt, in diesem Moment.', 'Das passiert regelmäßig, immer wieder.'], correct: prog ? 0 : 1,
+      hint: 'Schau auf das Verb: <b>is/are + -ing</b> heißt „gerade jetzt“. Das einfache Verb heißt „immer wieder“.',
+      solution: `<span lang="en">${s.subj} <b class="vb">${prog ? s.prog : s.sf}</b> ${s.rest}.</span><br>${prog ? `<b>${s.prog}</b> (${s.be} + -ing): Es passiert gerade jetzt.` : `<b>${s.sf}</b> (einfaches Verb): Es passiert regelmäßig.`}<br>Zum Vergleich: ${`<span lang="en">${s.textS}</span> ${U.say(s.textS)}`} · ${`<span lang="en">${s.textP}</span> ${U.say(s.textP)}`}`,
+      ex: SPEX(s, spVar(s, prog)),
+    };
+  }
+  const simpleProg = () => U.wahl([[26, spWahl], [22, spTippen], [18, spSignal], [18, spSortieren], [16, spBedeutung]]);
+
+  // =====================================================
+  // me, you, him, her, it, us, them
+  // =====================================================
+  const OBJ = { I: 'me', You: 'you', He: 'him', She: 'her', It: 'it', We: 'us', They: 'them' };
+  const OBJ_DE = { me: 'mich, mir', you: 'dich, dir (auch: euch)', him: 'ihn, ihm', her: 'sie, ihr (eine)', it: 'es', us: 'uns', them: 'sie, ihnen (mehrere)' };
+  const ALLE_OBJ = ['me', 'him', 'her', 'it', 'us', 'them'];
+  // [Satzanfang, wen oder was, Pronomen, Satzzeichen, Deutsch]
+  const OS = [
+    ['I like', 'Ben', 'him', '.', 'Ich mag ihn.'], ['I like', 'Lisa', 'her', '.', 'Ich mag sie.'],
+    ['We help', 'our parents', 'them', '.', 'Wir helfen ihnen.'], ['She loves', 'her bike', 'it', '.', 'Sie liebt es.'],
+    ['Can you see', 'Tom and me', 'us', '?', 'Kannst du uns sehen?'], ['Tom knows', 'my sister', 'her', '.', 'Tom kennt sie.'],
+    ['I often meet', 'my friends', 'them', '.', 'Ich treffe sie oft.'], ['Please help', 'my brother', 'him', '.', 'Bitte hilf ihm.'],
+    ['Look at', 'the birds', 'them', '.', 'Schau sie an.'], ['I can’t find', 'my book', 'it', '.', 'Ich kann es nicht finden.'],
+    ['Listen to', 'Mrs Green', 'her', '.', 'Hör ihr zu.'], ['The teacher likes', 'Ben and me', 'us', '.', 'Der Lehrer mag uns.'],
+    ['Do you know', 'Mr Brown', 'him', '?', 'Kennst du ihn?'], ['We visit', 'our grandparents', 'them', '.', 'Wir besuchen sie.'],
+  ].map(([vor, wen, pron, end, de]) => ({ vor, wen, pron, end, de, alt: `${vor} ${wen}${end}`, text: `${vor} ${pron}${end}` }));
+  const OBJ_ART = { him: 'ein Junge oder Mann', her: 'ein Mädchen oder eine Frau', it: 'eine Sache', them: 'mehrere', us: 'mehrere, und ich bin dabei' };
+  const obLoesung = (s) => `<span lang="en">${s.vor} <b>${s.wen}</b>${s.end}</span> → <span lang="en">${s.vor} <b class="vb">${s.pron}</b>${s.end}</span> ${U.say(s.text)}<br><b>${s.wen}</b>: ${OBJ_ART[s.pron]}. Hinter dem Verb heißt es dann <b>${s.pron}</b>.<br><small>Auf Deutsch: ${s.de}</small>`;
+  const OB_TIPP = 'Steht das Pronomen <b>hinter</b> dem Verb oder hinter einem kleinen Wort wie to, at, for, with? Dann brauchst du die zweite Form: I → me · he → him · she → her · we → us · they → them. Nur you und it bleiben gleich.';
+  // A: ersetzen (Auswahl)
+  function obWahl() {
+    const s = pick(OS), ch = shuffle([s.pron, ...shuffle(ALLE_OBJ.filter((x) => x !== s.pron)).slice(0, 3)]);
+    return { prompt: `Welches Wort kann für den <b>fett</b> gedruckten Teil stehen?${en(`${s.vor} <b>${s.wen}</b>${s.end}`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.pron), hint: OB_TIPP, solution: obLoesung(s), ex: { mode: 'satz', vor: s.vor, wen: s.wen, pron: s.pron, end: s.end, de: s.de } };
+  }
+  // B: ersetzen (tippen)
+  function obTippen() {
+    const s = pick(OS);
+    return {
+      prompt: `Ersetze <b lang="en">${s.wen}</b> durch ein Pronomen.${en(s.alt)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.pron, prefix: s.vor, suffix: s.end, label: 'Pronomen' }],
+      hint: OB_TIPP, solution: obLoesung(s), ex: { mode: 'satz', vor: s.vor, wen: s.wen, pron: s.pron, end: s.end, de: s.de },
+    };
+  }
+  // C: die Paare I – me, he – him …
+  function obPaar() {
+    const p = pick(['I', 'He', 'She', 'We', 'They']), hin = Math.random() < 0.5, o = OBJ[p];
+    if (hin) {
+      const ch = shuffle([o, ...shuffle(ALLE_OBJ.filter((x) => x !== o)).slice(0, 3)]);
+      return { prompt: `Welche Form gehört zu <b lang="en">${klein(p)}</b>, wenn sie hinter dem Verb steht?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(o), hint: OB_TIPP, solution: `${klein(p)} → <b class="vb" lang="en">${o}</b> (${OBJ_DE[o]})<br>Vorn im Satz: <span lang="en">${p} …</span> Hinter dem Verb: <span lang="en">… ${o}.</span>`, ex: { mode: 'paar', pron: p } };
+    }
+    const ps = ['I', 'He', 'She', 'We', 'They'], ch = shuffle(ps).slice(0, 4); if (!ch.includes(p)) ch[0] = p;
+    const c2 = shuffle(ch);
+    return { prompt: `Zu welchem Wort gehört <b lang="en">${o}</b>?`, choices: c2.map((c) => `<span lang="en">${klein(c)}</span>`), correct: c2.indexOf(p), hint: OB_TIPP, solution: `<b class="vb" lang="en">${o}</b> gehört zu ${klein(p)} (${OBJ_DE[o]})<br>Vorn im Satz: <span lang="en">${p} …</span> Hinter dem Verb: <span lang="en">… ${o}.</span>`, ex: { mode: 'paar', pron: p } };
+  }
+  // D: vorn oder hinten? (I oder me, he oder him …)
+  const OSO = [
+    ['___ am tired.', 'I', 'Me', 0, 'Ich bin müde.'], ['Can you help ___?', 'me', 'I', 1, 'Kannst du mir helfen?'],
+    ['___ lives in London.', 'He', 'Him', 0, 'Er wohnt in London.'], ['I know ___.', 'him', 'he', 1, 'Ich kenne ihn.'],
+    ['___ is my sister.', 'She', 'Her', 0, 'Sie ist meine Schwester.'], ['This present is for ___.', 'her', 'she', 1, 'Dieses Geschenk ist für sie.'],
+    ['___ are friends.', 'We', 'Us', 0, 'Wir sind Freunde.'], ['Come with ___.', 'us', 'we', 1, 'Komm mit uns.'],
+    ['___ play football.', 'They', 'Them', 0, 'Sie spielen Fußball.'], ['I like ___.', 'them', 'they', 1, 'Ich mag sie.'],
+  ].map(([satz, richtig, falsch, hinten, de]) => ({ satz, richtig, falsch, hinten, de, text: satz.replace('___', richtig) }));
+  function obVornHinten() {
+    const s = pick(OSO), ch = shuffle([s.richtig, s.falsch]);
+    return {
+      prompt: `Was gehört in die Lücke?${en(s.satz)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.richtig),
+      hint: '<b>Vorn</b> im Satz (wer tut etwas?) stehen I, he, she, we, they. <b>Hinter</b> dem Verb oder hinter to, at, for, with stehen me, him, her, us, them.',
+      solution: `<span lang="en">${s.satz.replace('___', `<b class="vb">${s.richtig}</b>`)}</span> ${U.say(s.text)}<br>${s.hinten ? `Die Lücke steht <b>hinten</b>: Dort braucht man <b>${s.richtig}</b>, nicht ${s.falsch}.` : `Die Lücke steht <b>vorn</b>: Wer tut etwas? Dort braucht man <b>${s.richtig}</b>, nicht ${s.falsch}.`}<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: { mode: 'vh', satz: s.satz, richtig: s.richtig, hinten: s.hinten, de: s.de },
+    };
+  }
+  // E: Deutsch → Englisch
+  function obDeutsch() {
+    const [de, o] = pick([['mich', 'me'], ['mir', 'me'], ['ihn', 'him'], ['ihm', 'him'], ['uns', 'us'], ['sie (ein Mädchen)', 'her'], ['sie (mehrere)', 'them'], ['ihnen', 'them']]);
+    const ch = shuffle([o, ...shuffle(ALLE_OBJ.filter((x) => x !== o && x !== 'it')).slice(0, 3)]);
+    return {
+      prompt: `Wie heißt <b>${de}</b> auf Englisch?`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(o),
+      hint: 'me = mich, mir · him = ihn, ihm · her = sie, ihr · us = uns · them = sie, ihnen.',
+      solution: `${de} = <b class="vb" lang="en">${o}</b><br>Das Englische macht hier keinen Unterschied: <b>${o}</b> heißt ${OBJ_DE[o]}.`,
+      ex: { mode: 'paar', pron: Object.keys(OBJ).find((k) => OBJ[k] === o) },
+    };
+  }
+  const objektPron = () => U.wahl([[26, obWahl], [22, obTippen], [16, obPaar], [22, obVornHinten], [14, obDeutsch]]);
+
+  Object.assign(D.daten, { PP, PPQ, INGS, ingRegel, SP, SIG_S, SIG_P, OBJ, OBJ_DE, OS, OSO, OBJ_ART });
+  const themenVorPP = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorPP(), {
+    'e5-pp': [...PP.map((s) => s.text), ...PP.map((s) => s.neg), ...PPQ.map((s) => s.frage)],
+    'e5-sp': SP.flatMap((s) => [s.textS, s.textP]),
+    'e5-obj': [...OS.map((s) => s.text), ...OSO.map((s) => s.text)],
+  });
+  Object.assign(D.arten, {
+    'e5-pp': { ppBe, ppIng, ppIngForm, ppBeides, ppOrdnen, ppNeg, ppFrage },
+    'e5-sp': { spWahl, spTippen, spSignal, spSortieren, spBedeutung },
+    'e5-obj': { obWahl, obTippen, obPaar, obVornHinten, obDeutsch },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -1875,6 +2149,9 @@
         { id: 'e5-fragewort', title: 'Fragewörter: who, what, where …', icon: '🔎', gen: fragewoerter },
         { id: 'e5-satzbau', title: 'Satzbau: wer – tut – was – wo – wann', icon: '🧱', gen: satzbau },
         { id: 'e5-oft', title: 'Wie oft? always, often, never', icon: '📅', gen: wieOft },
+        { id: 'e5-pp', title: 'present progressive: is playing', icon: '⏱️', gen: progressive },
+        { id: 'e5-sp', title: 'simple oder progressive?', icon: '⚖️', gen: simpleProg },
+        { id: 'e5-obj', title: 'me, him, her, us, them', icon: '🎯', gen: objektPron },
       ] },
     ],
   };
