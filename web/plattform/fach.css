@@ -603,3 +603,8 @@ body.noscroll{overflow:hidden}
 .akzent span{margin-right:2px}
 .akzent button{font:inherit;padding:7px 14px;border:2px solid var(--ink);border-radius:999px;background:var(--card);color:var(--ink)}
 .akzent button.on{background:var(--ink);color:#fff}
+/* Wörter in Reihenfolge bringen (fach.js, task.order) */
+.ordziel{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:64px;padding:8px;margin:10px 0 8px;border:2px dashed #cfc8ba;border-radius:14px;background:#fffdf8}
+.ordleer{color:#8b8577;font-size:14px;font-weight:700;padding:0 4px}
+.ordpool{display:flex;flex-wrap:wrap;gap:6px;min-height:52px;margin:0 0 6px}
+.ordziel .tok{border-color:var(--ink);background:#dfe9ff}

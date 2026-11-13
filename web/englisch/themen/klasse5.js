@@ -6,6 +6,7 @@
  *   fields            Eingabefelder; type:'text' = Wort eintippen (answer: Wort oder Liste erlaubter Wörter)
  *   layout:'satz'     Felder stehen als Lücken in einem Satz (prefix/suffix sind die Satzteile)
  *   tap               Wörter antippen: { tokens:[…], correct:[Index …] }
+ *   order             Wörter in Reihenfolge bringen: U.ordne([Teile in richtiger Reihenfolge], Satzzeichen)
  * Erklärt wird auf Deutsch, nur die Übungssätze sind englisch. Britische Schreibweise.
  * Alle Sätze sind selbst geschrieben (nichts aus dem Schulbuch) und stehen in festen Listen, damit es zu jedem
  * Satz eine Aufnahme gibt. Die Aufnahmen liegen in Sammeldateien je Thema (audio/us/, audio/gb/), erzeugt mit
@@ -1391,6 +1392,213 @@
   });
 
   // =====================================================
+  // Bereich 2: present simple (Aussage, Verneinung, Frage)
+  // =====================================================
+  // Wörter in Reihenfolge bringen: teile in richtiger Reihenfolge → gemischt (nie schon richtig sortiert)
+  U.ordne = (teile, end, auch) => {
+    let w = teile.slice();
+    for (let k = 0; k < 20 && w.join(' ') === teile.join(' '); k++) w = shuffle(teile);
+    return { words: w, answer: [teile.join(' '), ...(auch || [])], end: end || '.' };
+  };
+  // he/she/it-Form: have → has, do → does, go → goes, sonst wie bei der Mehrzahl (-s, -es, -ies); „get up“ → „gets up“
+  const sForm = (v) => { const [a, ...r] = v.split(' '); const f = a === 'have' ? 'has' : mitS(a); return [f, ...r].join(' '); };
+  const sFalsch = (v) => { const [a, ...r] = v.split(' '); const f = a === 'have' ? 'haves' : /(s|sh|ch|x|o)$/.test(a) ? a + 's' : /[^aeiou]y$/.test(a) ? a + 's' : a + 'es'; return [f, ...r].join(' '); };
+  // [Subjekt, Gruppe (0 = I/you/we/they, 1 = he/she/it), Verb in der Grundform, Rest, Deutsch, Pronomen]
+  const PSS = [
+    ['I', 0, 'play', 'football on Saturdays', 'Ich spiele samstags Fußball.'],
+    ['I', 0, 'get up', 'at seven o’clock', 'Ich stehe um sieben Uhr auf.'],
+    ['You', 0, 'like', 'pizza', 'Du magst Pizza.'],
+    ['We', 0, 'live', 'in Dresden', 'Wir wohnen in Dresden.'],
+    ['We', 0, 'have', 'lunch at school', 'Wir essen in der Schule zu Mittag.'],
+    ['They', 0, 'go', 'to school by bus', 'Sie fahren mit dem Bus zur Schule.', 'they'],
+    ['My friends', 0, 'watch', 'TV in the evening', 'Meine Freunde sehen abends fern.', 'they'],
+    ['Tom and Lisa', 0, 'walk', 'to school', 'Tom und Lisa gehen zu Fuß zur Schule.', 'they'],
+    ['He', 1, 'play', 'the piano', 'Er spielt Klavier.', 'he'],
+    ['He', 1, 'do', 'his homework after school', 'Er macht nach der Schule seine Hausaufgaben.', 'he'],
+    ['She', 1, 'like', 'dogs', 'Sie mag Hunde.', 'she'],
+    ['She', 1, 'go', 'to bed at nine', 'Sie geht um neun ins Bett.', 'she'],
+    ['She', 1, 'carry', 'her bag to school', 'Sie trägt ihre Tasche zur Schule.', 'she'],
+    ['It', 1, 'rain', 'a lot in England', 'In England regnet es viel.', 'it'],
+    ['Tom', 1, 'live', 'in London', 'Tom wohnt in London.', 'he'],
+    ['Lisa', 1, 'tidy', 'her room on Fridays', 'Lisa räumt freitags ihr Zimmer auf.', 'she'],
+    ['My brother', 1, 'watch', 'football on TV', 'Mein Bruder schaut Fußball im Fernsehen.', 'he'],
+    ['My mum', 1, 'have', 'breakfast at six', 'Meine Mama frühstückt um sechs.', 'she'],
+    ['My dad', 1, 'wash', 'the car on Sundays', 'Mein Papa wäscht sonntags das Auto.', 'he'],
+    ['The dog', 1, 'sleep', 'in the kitchen', 'Der Hund schläft in der Küche.', 'it'],
+  ].map(([subj, g, base, rest, de, pr]) => {
+    const form = g ? sForm(base) : base, dn = g ? 'doesn’t' : 'don’t', dd = g ? 'Does' : 'Do';
+    return { subj, g, base, form, rest, de, pr: pr || '', dn, dd, text: `${subj} ${form} ${rest}.`, neg: `${subj} ${dn} ${base} ${rest}.`, frage: `${dd} ${subjKlein(subj)} ${base} ${rest}?` };
+  });
+  const PS1 = PSS.filter((s) => s.g === 1), PS0 = PSS.filter((s) => s.g === 0);
+  const PSQ = PSS.filter((s) => s.subj !== 'I');       // Fragen ohne „I“
+  const PSKA = PSQ.filter((s) => s.pr);                 // Kurzantworten: he, she, it, they
+  const VERBEN = [...new Set(PSS.map((s) => s.base))];
+  const sRegel = (v) => { const a = v.split(' ')[0];
+    return a === 'have' ? 'have ist unregelmäßig: <b>has</b>.' : a === 'do' || a === 'go' ? `Nach o kommt <b>-es</b>: ${sForm(a)}.` : /(s|sh|ch|x)$/.test(a) ? `Nach einem Zischlaut (${a.slice(-2).replace(/^[^sc]/, '')}) kommt <b>-es</b>: ${sForm(a)}.`
+      : /[^aeiou]y$/.test(a) ? `Konsonant + y: Aus y wird <b>-ies</b>: ${sForm(a)}.` : `Einfach <b>-s</b> anhängen: ${sForm(a)}.`; };
+  const psMark = (s) => `<span lang="en">${s.subj} <b class="vb">${s.form}</b> ${s.rest}.</span>`;
+  const psWarum = (s) => (s.g === 0
+    ? `${s.pr && s.subj.toLowerCase() !== s.pr ? `<b>${s.subj}</b> sind mehrere (they). ` : ''}Bei I, you, we, they bleibt das Verb, wie es ist: <b>${s.base}</b>.`
+    : `${s.subj.toLowerCase() !== s.pr ? `<b>${s.subj}</b> ist eine Person oder Sache (${s.pr}). ` : ''}Bei he, she, it bekommt das Verb ein <b>s</b>. ${sRegel(s.base)}`);
+  const psLoesung = (s) => `${psMark(s)} ${U.say(s.text)}<br>${psWarum(s)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const PS_TIPP = 'Das present simple sagt, was jemand <b>regelmäßig</b> tut. Merksatz: <b>he, she, it – das s muss mit</b>. Bei I, you, we, they bleibt das Verb ohne s.';
+  const PSEX = (s, mode, ja) => ({ mode: mode || 'form', subj: s.subj, g: s.g, base: s.base, form: s.form, rest: s.rest, de: s.de, pr: s.pr, ja: !!ja });
+  // A: Form auswählen
+  function psLuecke() {
+    const s = pick(PSS);
+    const be = s.g ? 'is' : s.subj === 'I' ? 'am' : 'are', einfach = sForm(s.base) === s.base.replace(/^(\S+)/, '$1s');
+    const ch = shuffle([s.base, sForm(s.base), einfach ? `${be} ${s.base}` : sFalsch(s.base)]);
+    return { prompt: `Was gehört in die Lücke?${en(`${s.subj} ___ ${s.rest}.`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.form), hint: PS_TIPP, solution: psLoesung(s), ex: PSEX(s) };
+  }
+  // B: Form eintippen
+  function psTippen() {
+    const s = pick(PSS);
+    return {
+      prompt: `Setze das Verb <b lang="en">${s.base}</b> in der richtigen Form ein.`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.form, prefix: s.subj, suffix: `${s.rest}.`, label: 'Verb' }],
+      hint: PS_TIPP, solution: psLoesung(s), ex: PSEX(s),
+    };
+  }
+  // C: die he/she/it-Form eines Verbs
+  function psSForm() {
+    const v = pick(VERBEN), s = PS1.find((x) => x.base === v) || pick(PS1);
+    return {
+      prompt: `Wie heißt die Form für <b>he, she, it</b>?${en(`I ${v} → he …`)}`,
+      fields: [{ type: 'text', ci: true, answer: sForm(v), label: 'he/she/it-Form' }],
+      hint: 'Meistens kommt nur -s dazu. Nach Zischlaut (s, sh, ch, x) und nach o: -es. Konsonant + y wird zu -ies. Und have wird zu has.',
+      solution: `<span lang="en">I ${v} → he <b class="vb">${sForm(v)}</b></span><br>${sRegel(v)}${s.base === v ? `<br>Ein Beispiel: ${psMark(s)} ${U.say(s.text)}` : ''}`,
+      ex: { mode: 'sform', base: v },
+    };
+  }
+  // D: Wer passt zur Verbform?
+  function psWer() {
+    const s = pick(PSS.filter((x) => ['I', 'You', 'We', 'They', 'He', 'She', 'It'].includes(x.subj)));
+    const gegen = shuffle((s.g ? ['I', 'You', 'We', 'They'] : ['He', 'She']).filter((x) => x !== s.subj)).slice(0, 2);
+    const ch = shuffle([s.subj, ...gegen]);
+    return {
+      prompt: `Wer passt an den Anfang?${en(`___ ${s.form} ${s.rest}.`)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.subj),
+      hint: 'Schau auf das Verb: Hat es ein <b>s</b> am Ende? Dann passt nur he, she oder it. Ohne s: I, you, we oder they.',
+      solution: `${psMark(s)} ${U.say(s.text)}<br>${s.g ? `<b>${s.form}</b> hat das s: Das passt nur zu he, she, it.` : `<b>${s.form}</b> hat kein s: Das passt zu I, you, we, they, aber nicht zu he oder she.`}<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: PSEX(s),
+    };
+  }
+  // E: Wörter ordnen (wer – tut – was)
+  function psOrdnen() {
+    const s = pick(PSS);
+    return {
+      prompt: `Bilde den Satz: <b>${s.de}</b>`,
+      order: U.ordne([s.subj, s.form, s.rest]),
+      hint: 'Im englischen Satz steht zuerst, <b>wer</b> etwas tut, dann das <b>Verb</b>, dann der Rest. Das Verb steht nie am Ende.',
+      solution: `${psMark(s)} ${U.say(s.text)}<br>Die Reihenfolge ist fest: wer – tut – was. ${psWarum(s)}`,
+      ex: PSEX(s),
+    };
+  }
+  const presentSimple = () => U.wahl([[26, psLuecke], [26, psTippen], [18, psSForm], [16, psWer], [14, psOrdnen]]);
+
+  // ----- verneinen: don’t / doesn’t -----
+  const DN = { 'don’t': ['don’t', 'don\'t', 'do not'], 'doesn’t': ['doesn’t', 'doesn\'t', 'does not'] };
+  const pnWarum = (s) => (s.g
+    ? `Bei he, she, it heißt es <b>doesn’t</b>. Das s steckt jetzt in doe<b>s</b>n’t, deshalb steht das Verb wieder in der Grundform: <b>${s.base}</b> (nicht ${s.form}).`
+    : `Bei I, you, we, they heißt es <b>don’t</b>. Das Verb bleibt in der Grundform: <b>${s.base}</b>.`);
+  const pnLoesung = (s) => `<span lang="en">${s.subj} <b class="vb">${s.dn} ${s.base}</b> ${s.rest}.</span> ${U.say(s.neg)}<br>${pnWarum(s)}`;
+  const PN_TIPP = 'Verneint wird mit <b>don’t</b> (I, you, we, they) oder <b>doesn’t</b> (he, she, it). Dahinter steht das Verb in der <b>Grundform</b>, ohne s.';
+  function pnWahl() {
+    const s = pick(PSS), ch = shuffle(['don’t', 'doesn’t', s.g ? 'isn’t' : 'aren’t']);
+    return { prompt: `Verneine den Satz. Was gehört in die Lücke?${en(s.text)}${en(`${s.subj} ___ ${s.base} ${s.rest}.`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.dn), hint: PN_TIPP, solution: pnLoesung(s), ex: PSEX(s, 'neg') };
+  }
+  function pnTippen() {
+    const s = pick(PSS);
+    return {
+      prompt: `Verneine den Satz: <b>don’t</b> oder <b>doesn’t</b>?${en(s.text)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: DN[s.dn], prefix: s.subj, suffix: `${s.base} ${s.rest}.`, label: 'don’t oder doesn’t' }], answerText: s.dn,
+      hint: PN_TIPP, solution: pnLoesung(s), ex: PSEX(s, 'neg'),
+    };
+  }
+  // das Verb hinter doesn’t verliert sein s
+  function pnVerb() {
+    const s = pick(PS1), ch = shuffle([s.base, s.form, `${s.base.split(' ')[0]}ing`.replace(/eing$/, 'ing').replace(/^(get)ing$/, 'getting') + (s.base.includes(' ') ? ' ' + s.base.split(' ').slice(1).join(' ') : '')]);
+    return {
+      prompt: `Verneine den Satz. Was gehört in die Lücke?${en(s.text)}${en(`${s.subj} doesn’t ___ ${s.rest}.`)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.base),
+      hint: 'Das s gibt es in jedem Satz nur <b>einmal</b>. Es steckt schon in doe<b>s</b>n’t.', solution: pnLoesung(s), ex: PSEX(s, 'neg'),
+    };
+  }
+  function pnSatz() {
+    const s = pick(PS1), ch = shuffle([s.neg, `${s.subj} doesn’t ${s.form} ${s.rest}.`, `${s.subj} don’t ${s.base} ${s.rest}.`]);
+    return { prompt: `Verneine den Satz. Welcher Satz ist richtig?${en(s.text)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.neg), hint: PN_TIPP, solution: pnLoesung(s), ex: PSEX(s, 'neg') };
+  }
+  function pnOrdnen() {
+    const s = pick(PSS);
+    return {
+      prompt: `Bilde den verneinten Satz.${en(s.text)}`,
+      order: U.ordne([s.subj, s.dn, s.base, s.rest]),
+      hint: 'Reihenfolge: wer – don’t/doesn’t – Verb – Rest.', solution: pnLoesung(s), ex: PSEX(s, 'neg'),
+    };
+  }
+  const psNeg = () => U.wahl([[22, pnWahl], [24, pnTippen], [20, pnVerb], [18, pnSatz], [16, pnOrdnen]]);
+
+  // ----- fragen: Do / Does -----
+  const pfWarum = (s) => (s.g
+    ? `Bei he, she, it beginnt die Frage mit <b>Does</b>. Das s steckt in Doe<b>s</b>, deshalb steht das Verb in der Grundform: <b>${s.base}</b>.`
+    : `Bei you, we, they beginnt die Frage mit <b>Do</b>. Das Verb bleibt in der Grundform: <b>${s.base}</b>.`);
+  const pfLoesung = (s) => `<span lang="en">${s.text}</span> → <span lang="en"><b class="vb">${s.dd}</b> ${subjKlein(s.subj)} <b class="vb">${s.base}</b> ${s.rest}?</span> ${U.say(s.frage)}<br>${pfWarum(s)} Anders als im Deutschen rückt das Verb selbst nicht nach vorn.`;
+  const PF_TIPP = 'Fragen im present simple beginnen mit <b>Do</b> (you, we, they) oder <b>Does</b> (he, she, it). Danach: wer – Verb in der Grundform – Rest.';
+  function pfWahl() {
+    const s = pick(PSQ), ch = shuffle(['Do', 'Does', s.g ? 'Is' : 'Are']);
+    return { prompt: `Mache aus dem Satz eine Frage. Was gehört an den Anfang?${en(s.text)}${en(`___ ${subjKlein(s.subj)} ${s.base} ${s.rest}?`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.dd), hint: PF_TIPP, solution: pfLoesung(s), ex: PSEX(s, 'frage') };
+  }
+  function pfTippen() {
+    const s = pick(PSQ);
+    return {
+      prompt: `Mache aus dem Satz eine Frage: <b>Do</b> oder <b>Does</b>?${en(s.text)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.dd, suffix: `${subjKlein(s.subj)} ${s.base} ${s.rest}?`, label: 'Do oder Does' }],
+      hint: PF_TIPP, solution: pfLoesung(s), ex: PSEX(s, 'frage'),
+    };
+  }
+  function pfSatz() {
+    const s = pick(PSQ.filter((x) => x.g === 1));
+    const ch = shuffle([s.frage, `Does ${subjKlein(s.subj)} ${s.form} ${s.rest}?`, `${gross(s.form)} ${subjKlein(s.subj)} ${s.rest}?`]);
+    return { prompt: `Mache aus dem Satz eine Frage. Welche ist richtig?${en(s.text)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.frage), hint: PF_TIPP, solution: pfLoesung(s), ex: PSEX(s, 'frage') };
+  }
+  function pfOrdnen() {
+    const s = pick(PSQ);
+    return {
+      prompt: `Bilde die Frage zu diesem Satz.${en(s.text)}`,
+      order: U.ordne([s.dd, subjKlein(s.subj), s.base, s.rest], '?'),
+      hint: 'Reihenfolge: Do/Does – wer – Verb – Rest.', solution: pfLoesung(s), ex: PSEX(s, 'frage'),
+    };
+  }
+  function pfAntwort() {
+    const s = pick(PSKA), ja = Math.random() < 0.5, d = s.g ? 'does' : 'do', dn = s.dn;
+    const richtig = ja ? `Yes, ${s.pr} ${d}.` : `No, ${s.pr} ${dn}.`;
+    const be = s.pr === 'they' ? 'are' : 'is';
+    const falsch = ja ? [`Yes, ${s.pr} ${s.g ? 'do' : 'does'}.`, `Yes, ${s.pr} ${be}.`] : [`No, ${s.pr} ${s.g ? 'don’t' : 'doesn’t'}.`, `No, ${s.pr} ${be}n’t.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Antworte kurz mit <b>${ja ? 'Ja' : 'Nein'}</b>.${en(s.frage)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: 'Die Kurzantwort nimmt <b>do</b> oder <b>does</b> aus der Frage wieder auf, nicht das Verb: Yes, she does. / No, she doesn’t.',
+      solution: `<span lang="en">${s.frage}</span><br><span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>${s.subj.toLowerCase() !== s.pr ? `Für <b>${s.subj}</b> steht in der Antwort <b>${s.pr}</b>. ` : ''}In der Kurzantwort steht ${ja ? d : dn}, nicht das Verb ${s.base}.`,
+      ex: PSEX(s, 'kurz', ja),
+    };
+  }
+  const psFrage = () => U.wahl([[22, pfWahl], [22, pfTippen], [18, pfSatz], [18, pfOrdnen], [20, pfAntwort]]);
+
+  Object.assign(D.daten, { PSS, PS0, PS1, PSQ, PSKA, VERBEN, sForm, sRegel });
+  const themenVorPS = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorPS(), {
+    'e5-ps': PSS.map((s) => s.text),
+    'e5-ps-neg': PSS.map((s) => s.neg),
+    'e5-ps-frage': [...PSQ.map((s) => s.frage), ...['he', 'she', 'it'].flatMap((p) => [`Yes, ${p} does.`, `No, ${p} doesn’t.`]), 'Yes, they do.', 'No, they don’t.'],
+  });
+  Object.assign(D.arten, {
+    'e5-ps': { psLuecke, psTippen, psSForm, psWer, psOrdnen },
+    'e5-ps-neg': { pnWahl, pnTippen, pnVerb, pnSatz, pnOrdnen },
+    'e5-ps-frage': { pfWahl, pfTippen, pfSatz, pfOrdnen, pfAntwort },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -1409,6 +1617,11 @@
         { id: 'e5-gen', title: 'Wem gehört es? ’s und of', icon: '🏷️', gen: genitiv },
         { id: 'e5-imp', title: 'Aufforderungen: Open … / Don’t …', icon: '📣', gen: imperativ },
         { id: 'e5-can', title: 'can und must', icon: '💪', gen: canMust },
+      ] },
+      { id: 'e5-gegenwart', nr: 2, title: 'Sätze in der Gegenwart', topics: [
+        { id: 'e5-ps', title: 'present simple: he, she, it – das s muss mit', icon: '🔁', gen: presentSimple },
+        { id: 'e5-ps-neg', title: 'present simple: don’t und doesn’t', icon: '🚫', gen: psNeg },
+        { id: 'e5-ps-frage', title: 'present simple: Fragen mit do und does', icon: '❔', gen: psFrage },
       ] },
     ],
   };

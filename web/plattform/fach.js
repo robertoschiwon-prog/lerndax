@@ -9,6 +9,8 @@
  *   dachs, dachsKlein, dachsStaunt: Bilder des Fach-Dachses
  *   entdecken:     Reihenfolge der Entdeckungen; entdeckenText, entdeckenKurz: Texte dazu
  *   andereKlassen: { 6: ['Lernbereich …'] } für „Klasse 6 kommt bald“
+ *   (Aufgabenformen der Themen: choices/correct, fields, layout:'satz', tap, und seit v63
+ *    order: { words:[…gemischt], answer:'richtiger Satz' oder Liste, end:'.' } = Wörter in Reihenfolge antippen)
  *   audio:         Ordner mit Aufnahmen (optional, z. B. 'audio/us/'): darin index.json und je Thema eine Sammeldatei
  *                  <thema>.bin. Knöpfe mit data-say="name" spielen die Aufnahme mit diesem Namen.
  *                  Oder eine Liste zur Auswahl [{ id, name, pfad }]: dann zeigt die Startseite des Fachs einen Umschalter „Aussprache“.
@@ -116,6 +118,7 @@
   function answerText(t) {
     if (t.answerText) return t.answerText;
     if (t.choices) return t.choices[t.correct];
+    if (t.order) return `${[].concat(t.order.answer)[0]}${t.order.end || ''}`;
     if (t.tap) return t.tap.correct.map((i) => (t.tap.gaps ? `nach „${cleanTok(t.tap.tokens[i])}“` : cleanTok(t.tap.tokens[i]))).join(', ');
     if (t.layout === 'satz') return t.fields.map((f) => `${f.prefix || ''} ${'fixed' in f ? f.fixed : `<u>${textAnswers(f)[0]}</u>`}${f.suffix && !/^[.,!?]/.test(f.suffix) ? ' ' : ''}${f.suffix || ''}`).join(' ').replace(/\s+/g, ' ').trim();
     const parts = t.fields.filter((f) => !('fixed' in f)).map((f) => `${f.prefix ? f.prefix + ' ' : ''}${f.type === 'text' ? textAnswers(f)[0] : U.fmt(f.answer)}${f.suffix ? ' ' + f.suffix : ''}`);
@@ -358,6 +361,11 @@
       inputs = `<div class="tapline${T.gaps ? ' gaps' : ''}${T.eng ? ' eng' : ''}">${T.tokens.map((w, i) => (T.gaps
         ? `<span class="tw">${w}</span>${i < T.tokens.length - 1 ? `<button class="gap" data-tok="${i}" data-mark="${T.mark || ','}" aria-label="Stelle nach ${esc(cleanTok(w))}"></button>` : ''}`
         : `<button class="tok" data-tok="${i}">${w}</button>`)).join('')}</div>`;
+    } else if (task.order) {
+      // Wörter in die richtige Reihenfolge bringen: antippen legt ein Wort in die Satzzeile, nochmal antippen holt es zurück
+      R.cur.ord = [];
+      inputs = `<div class="ordziel" id="ordZiel" aria-label="Dein Satz"><span class="ordleer">Tippe die Wörter in der richtigen Reihenfolge an.</span></div>
+        <div class="ordpool" id="ordPool">${task.order.words.map((w, i) => `<button class="tok" data-ord="${i}">${w}</button>`).join('')}</div>`;
     } else if (task.choices) {
       inputs = `<div class="choices ${task.choices.length === 2 && task.choices.every((c) => String(c).replace(/<[^>]+>/g, '').length <= 22) ? 'two' : ''}">${task.choices.map((c, i) => `<button class="choice" data-choice="${i}">${c}</button>`).join('')}</div>`;
     } else {
@@ -418,6 +426,11 @@
       const want = t.tap.correct.slice().sort((a, b) => a - b);
       ok = sel.length === want.length && sel.every((v, i) => v === want[i]);
       if (!ok && c.attempt === 1 && want.length > 1) { const hit = sel.filter((v) => want.includes(v)).length; note = sel.length !== want.length ? `Gesucht ${want.length === 1 ? 'ist 1 Stelle' : `sind ${want.length} Stellen`}.` : `${hit} von ${want.length} ${hit === 1 ? 'stimmt' : 'stimmen'} schon.`; }
+    } else if (t.order) {
+      const O = t.order, ord = c.ord || [];
+      if (ord.length < O.words.length) { const card = document.querySelector('.card'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); return; }
+      const got = ord.map((i) => O.words[i]).join(' '), f = { ci: true };
+      ok = [].concat(O.answer).some((a) => normText(a, f) === normText(got, f));
     } else if (t.choices) {
       ok = choiceIdx === t.correct;
     } else {
@@ -462,6 +475,7 @@
       finish(score);
       if (t.choices) markChoices(choiceIdx);
       if (t.tap) markTap();
+      if (t.order) markOrd(true);
       const msg = c.attempt === 1 ? U.pick(['Richtig! 🎉', 'Stark! 💪', 'Genau so! ✨', 'Volltreffer! 🎯', 'Super gemacht! 🌟']) : 'Jetzt passt’s! 👍';
       fb.innerHTML = `<div class="fb ok"><h3>${msg}</h3>${note ? `<div>${note}</div>` : ''}<div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${t.ex && EXP[exId(c.topic, t)] ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ Lösung als Animation</button>` : ''}</div>`;
     } else if (c.attempt === 1 && !fewChoices) {
@@ -477,6 +491,7 @@
       finish(0);
       if (t.choices) markChoices(choiceIdx);
       if (t.tap) markTap();
+      if (t.order) markOrd(false);
       fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[exId(c.topic, t)] && !R.knobel ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
     }
     document.getElementById('acts').innerHTML = `<button class="btn pri wide" id="nextB">${R.idx + 1 < R.seq.length ? 'Weiter →' : 'Fertig →'}</button>`;
@@ -484,6 +499,16 @@
     fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  function markOrd(ok) {
+    document.querySelectorAll('[data-ord]').forEach((b) => { b.disabled = true; b.classList.add(ok ? 'g' : 'w'); });
+  }
+  function ordTok(b) {
+    if (!R || !R.cur || R.cur.done || !R.cur.task.order) return;
+    const i = +b.dataset.ord, ord = R.cur.ord, k = ord.indexOf(i);
+    const ziel = document.getElementById('ordZiel'), pool = document.getElementById('ordPool');
+    if (k >= 0) { ord.splice(k, 1); pool.appendChild(b); } else { ord.push(i); ziel.appendChild(b); }
+    const leer = ziel.querySelector('.ordleer'); if (leer) leer.style.display = ord.length ? 'none' : '';
+  }
   function markTap() {
     const want = R.cur.task.tap.correct;
     document.querySelectorAll('[data-tok]').forEach((b) => {
@@ -973,6 +998,7 @@
     if (!b) return;
     const d = b.dataset;
     if (d.say) { say(d.say, b); return; }
+    if (d.ord) { ordTok(b); return; }
     setTimeout(sayVorladen, 0); // nach diesem Klick können neue Lautsprecher-Knöpfe zu sehen sein
     if (d.akzent) { try { localStorage.setItem(AKZENT_KEY, d.akzent); } catch (e) {} sayStop(); home(); return; }
     if (d.go === 'home' && b.classList.contains('x') && VIEW === 'task' && R && (R.results.length || (R.cur && (R.cur.done || R.cur.attempt > 1)))) quitAsk();

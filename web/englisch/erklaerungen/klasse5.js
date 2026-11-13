@@ -1179,4 +1179,120 @@
       };
     },
   };
+
+  // =====================================================
+  // present simple: das s gibt es nur einmal
+  // =====================================================
+  //   ctx: { mode:'form'|'neg'|'frage'|'kurz', subj, g, base, form, rest, de, pr, ja } | { mode:'sform', base }
+  const PSFACH = [{ x: 14, w: 160, wer: 'I · you · we · they' }, { x: 186, w: 160, wer: 'he · she · it' }];
+  function psErklaerung(titel, grund) {
+    return {
+      title: titel,
+      titleFor: (ctx) => ({ form: ctx && ctx.form ? `Warum „${ctx.form}“?` : '', sform: 'Die Form für he, she, it', neg: 'Verneinen: so geht’s', frage: 'Fragen: so geht’s', kurz: 'Kurzantwort: so geht’s' }[(ctx && ctx.mode) || ''] || titel),
+      viewBox: '0 0 360 210',
+      create(api, ctx) {
+        ctx = ctx || {};
+        const mode = ctx.mode || 'frei';
+        let S0 = null, frei = null, Z = [], kaesten = [];
+        if (mode === 'sform') S0 = { base: ctx.post ? ctx.base : U.pick(T.VERBEN.filter((v) => v !== ctx.base)) };
+        else if (mode !== 'frei') {
+          if (ctx.post) S0 = ctx;
+          else {
+            const pool = (mode === 'kurz' ? T.PSKA : mode === 'frage' ? T.PSQ : T.PSS).filter((s) => s.g === ctx.g && (s.subj !== ctx.subj || s.base !== ctx.base));
+            S0 = Object.assign({}, U.pick(pool), { ja: ctx.ja });
+          }
+        }
+        const neuFrei = () => { frei = U.pick(T.PSKA.filter((s) => s.g === 1)); };
+        if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Anderes Beispiel', onClick() { neuFrei(); api.replay(); } }]); }
+        const weg = () => { Z.forEach((z) => z.remove()); Z = []; };
+        const zeig = (teile, y, fs) => { const t = tzeile(api, teile, y, fs || 21); Z.push(t); return t; };
+        // Verb so zerlegen, dass die Endung (s, es, ies) einzeln gefärbt werden kann
+        const endung = (base, form) => { const a = base.split(' ')[0], f = form.split(' ')[0], rest = form.split(' ').slice(1).join(' '); let n = 0; while (n < a.length && a[n] === f[n]) n++; return [f.slice(0, n), f.slice(n), rest ? ' ' + rest : '']; };
+        const mitEndung = (s) => { const [st, en, r] = endung(s.base, s.form); return [[s.subj + ' '], [st], [en, ORANGE], [r + ' ' + s.rest + '.']]; };
+        function faecher(v) {
+          kaesten = PSFACH.map((f, k) => {
+            const r = el('rect', { x: f.x, y: 122, width: f.w, height: 76, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+            el('text', { x: f.x + f.w / 2, y: 146, 'text-anchor': 'middle', class: 'ex-s', text: f.wer, style: 'font-size:13px' }, api.svg);
+            el('line', { x1: f.x + 14, y1: 156, x2: f.x + f.w - 14, y2: 156, stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+            el('text', { x: f.x + f.w / 2, y: 184, 'text-anchor': 'middle', class: 'ex-b', text: k ? T.sForm(v) : v, style: `fill:${BLAU};font-size:21px` }, api.svg);
+            return r;
+          });
+        }
+        const leuchte = (g) => kaesten.forEach((k, i) => k.setAttribute('fill', i === g ? '#dfe9ff' : '#fff'));
+        async function aussage(s, y) {
+          zeig(mitEndung(s), y);
+          api.say(s.g ? `Der Satz heißt: ${s.subj} <b>${s.form}</b> ${s.rest}. Das Verb trägt das <b>s</b> für he, she, it.` : `Der Satz heißt: ${s.subj} <b>${s.form}</b> ${s.rest}.`);
+          await api.wait(2800);
+        }
+        async function verneinen(s) {
+          await aussage(s, 56);
+          zeig(s.g ? [[s.subj + ' '], ['doe', BLAU], ['s', ORANGE], ['n’t', BLAU], [' ' + s.base + ' ' + s.rest + '.']] : [[s.subj + ' '], ['don’t', BLAU], [' ' + s.base + ' ' + s.rest + '.']], 104);
+          return s.g
+            ? `Zum Verneinen kommt <b>doesn’t</b> vor das Verb. Das s gibt es nur <b>einmal</b>: Es steckt jetzt in doe<b>s</b>n’t, das Verb steht wieder in der Grundform (<b>${s.base}</b>). ${U.say(`${s.subj} doesn’t ${s.base} ${s.rest}.`)}`
+            : `Zum Verneinen kommt <b>don’t</b> vor das Verb. Das Verb bleibt in der Grundform (<b>${s.base}</b>). ${U.say(`${s.subj} don’t ${s.base} ${s.rest}.`)}`;
+        }
+        async function fragen(s, y1, y2) {
+          await aussage(s, y1);
+          zeig(s.g ? [['Doe', BLAU], ['s', ORANGE], [' ' + T.subjKlein(s.subj) + ' ' + s.base + ' ' + s.rest + '?']] : [['Do', BLAU], [' ' + T.subjKlein(s.subj) + ' ' + s.base + ' ' + s.rest + '?']], y2);
+          return s.g
+            ? `Die Frage beginnt mit <b>Does</b>. Auch hier wandert das s zu Doe<b>s</b>, das Verb steht in der Grundform (<b>${s.base}</b>). ${U.say(`Does ${T.subjKlein(s.subj)} ${s.base} ${s.rest}?`)}`
+            : `Die Frage beginnt mit <b>Do</b>, dann kommen Person und Verb in der Grundform (<b>${s.base}</b>). ${U.say(`Do ${T.subjKlein(s.subj)} ${s.base} ${s.rest}?`)}`;
+        }
+        function antwort(s, ja, y) {
+          const d = s.g ? 'does' : 'do', dn = s.g ? 'doesn’t' : 'don’t', t = ja ? `Yes, ${s.pr} ${d}.` : `No, ${s.pr} ${dn}.`;
+          zeig(ja ? [['Yes, ' + s.pr + ' '], [d + '.', BLAU]] : [['No, ' + s.pr + ' '], [dn + '.', BLAU]], y);
+          return `<b>${t}</b> Die Kurzantwort nimmt ${d} aus der Frage wieder auf, nicht das Verb ${s.base}. ${U.say(t)}`;
+        }
+        return {
+          reset() {
+            api.clear(); Z = []; kaesten = [];
+            api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+            const s = S0 || frei;
+            if (mode === 'form') { faecher(s.base); zeig([[s.subj + ' ___ ' + s.rest + '.']], 50); }
+            else if (mode === 'sform') zeig([['I ' + s.base + ' → he …']], 80, 24);
+            else if (mode === 'kurz') zeig([[s.g ? 'Does' : 'Do', BLAU], [' ' + T.subjKlein(s.subj) + ' ' + s.base + ' ' + s.rest + '?']], 56);
+            else zeig([[s.subj + ' ' + s.form + ' ' + s.rest + '.']], 56);
+          },
+          async play() {
+            const s = S0;
+            if (mode === 'form') {
+              api.say(s.pr && s.subj.toLowerCase() !== s.pr ? `Wer tut es? <b>${s.subj}</b>. Dafür kannst du <b>${s.pr}</b> sagen.` : `Wer tut es? <b>${s.subj}</b>.`);
+              await api.wait(2600);
+              leuchte(s.g);
+              api.say(s.g ? 'Bei <b>he, she, it</b> bekommt das Verb ein <b>s</b>. Merksatz: he, she, it – das s muss mit.' : 'Bei <b>I, you, we, they</b> bleibt das Verb, wie es ist.');
+              await api.wait(3000);
+              weg(); zeig(s.g ? mitEndung(s) : [[s.subj + ' '], [s.form, BLAU], [' ' + s.rest + '.']], 50);
+              api.say(`Also: ${s.subj} <b>${s.form}</b> ${s.rest}. ${s.g ? T.sRegel(s.base) : ''} ${U.say(`${s.subj} ${s.form} ${s.rest}.`)}<br><small>${s.de}</small>`);
+              return;
+            }
+            if (mode === 'sform') {
+              const v = s.base, [st, en, r] = endung(v, T.sForm(v));
+              api.say(`Für he, she, it braucht <b>${v}</b> ein s. Schau auf das <b>Ende</b> des Verbs.`);
+              await api.wait(2800);
+              weg(); zeig([['I ' + v + ' → he '], [st], [en, ORANGE], [r]], 80, 24);
+              api.say(`I ${v} → he <b>${T.sForm(v)}</b>. ${T.sRegel(v)}`);
+              return;
+            }
+            if (mode === 'neg') { weg(); api.say(await verneinen(s)); return; }
+            if (mode === 'frage') { weg(); api.say(await fragen(s, 56, 104)); return; }
+            if (mode === 'kurz') {
+              api.say(`Die Frage beginnt mit <b>${s.g ? 'Does' : 'Do'}</b>. Genau dieses Wort kommt in der Antwort wieder${s.subj.toLowerCase() !== s.pr ? ` (und für ${s.subj}: <b>${s.pr}</b>)` : ''}.`);
+              await api.wait(3000);
+              api.say(antwort(s, s.ja, 104));
+              return;
+            }
+            const f = frei;
+            api.say(grund);
+            await api.wait(3200);
+            weg(); api.say(await verneinen(f)); await api.wait(4200);
+            weg(); api.say(await fragen(f, 44, 84)); await api.wait(4000);
+            api.say(antwort(f, true, 124) + '<br>Merke: Das s gibt es in jedem Satz nur einmal: likes, doesn’t like, Does … like?');
+          },
+        };
+      },
+    };
+  }
+  EX['e5-ps'] = psErklaerung('present simple: he, she, it – das s muss mit', 'Das present simple sagt, was jemand <b>regelmäßig</b> tut. Bei he, she, it bekommt das Verb ein <b>s</b>.');
+  EX['e5-ps-neg'] = psErklaerung('present simple: don’t und doesn’t', 'Verneint wird mit <b>don’t</b> oder <b>doesn’t</b>. Dahinter steht das Verb in der Grundform.');
+  EX['e5-ps-frage'] = psErklaerung('present simple: Fragen mit do und does', 'Fragen beginnen mit <b>Do</b> oder <b>Does</b>. Dahinter stehen die Person und das Verb in der Grundform.');
 })();

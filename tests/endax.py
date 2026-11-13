@@ -18,6 +18,7 @@ CLIPS = {o: json.loads((AUDIO / o / 'index.json').read_text(encoding='utf-8'))['
 SAY = "() => [...document.querySelectorAll('[data-say]')].map(b => b.dataset.say)"
 TASK = """() => { const t = window.__lerndax.round().cur.task;
   return { choice: t.choices ? t.correct : null, tap: t.tap ? t.tap.correct : null, ntok: t.tap ? t.tap.tokens.length : 0,
+    order: t.order ? { words: t.order.words, richtig: [].concat(t.order.answer)[0] } : null,
     vals: t.fields ? t.fields.map(f => 'fixed' in f ? null : [].concat(f.answer)[0]) : null, answer: (t.answerText || ''), fields: t.fields ? t.fields.map(f => [].concat(f.answer)[0]) : [] }; }"""
 FAST = "() => { const o = requestAnimationFrame; let t = performance.now(); window.requestAnimationFrame = (f) => o(() => { t += 240; f(t); }); }"
 OUT = """() => { const svg = document.querySelector('.exstage svg'); if (!svg) return []; const r = svg.getBoundingClientRect(); const bad = [];
@@ -31,6 +32,15 @@ async def answer(pg, a, wrong=False):
         for b in await pg.query_selector_all('[data-tok].sel'): await b.click()
         want = [i for i in range(a['ntok']) if i not in a['tap']][:1] if wrong else a['tap']
         for i in want: await pg.click(f'[data-tok="{i}"]')
+        await pg.click('#checkB')
+    elif a.get('order') is not None:
+        # Wörter in Reihenfolge antippen: erst alles zurücklegen, dann der Reihe nach (falsch = verkehrt herum)
+        for b in await pg.query_selector_all('#ordZiel [data-ord]'): await b.click()
+        words = a['order']['words']; rest = a['order']['richtig']; folge = []; frei = list(range(len(words)))
+        while rest:
+            i = max((k for k in frei if rest.startswith(words[k]) and (len(rest) == len(words[k]) or rest[len(words[k])] == ' ')), key=lambda k: len(words[k]))
+            folge.append(i); frei.remove(i); rest = rest[len(words[i]):].lstrip()
+        for i in (folge[::-1] if wrong else folge): await pg.click(f'#ordPool [data-ord="{i}"]')
         await pg.click('#checkB')
     else:
         inputs = await pg.query_selector_all('.answer input')

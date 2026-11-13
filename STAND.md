@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v62`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v63`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -103,6 +103,17 @@ Weitere Dokumente:
   Der Test `tests/endax.py` dauert mit 8 Runden jetzt gut 10 Minuten: mit 3 bis 4 Runden laufen lassen oder im Hintergrund.
   Als Nächstes: Bereich 2 (present simple und progressive), dafür die neue Aufgabenform „Wörter in Reihenfolge bringen“
   in `fach.js`. Vorher fragen, ob EnDax jetzt auf die Startseite soll (`faecher.js`: Status „fertig“).
+- **EnDax v63 (13.11.2026): auf der Startseite, neue Aufgabenform, Bereich 2 begonnen**, auf GitHub und live.
+  **Startseite:** EnDax ist dritte Kachel (Entscheidung des Auftraggebers; `faecher.js`: Status „fertig“, `themen: 15`).
+  **Die Zahl `themen` in `faecher.js` bei jedem neuen Thema mitzählen** (Startseite und Elternübersicht rechnen damit).
+  **Neue Aufgabenform „Wörter in Reihenfolge bringen“** in `fach.js` (für alle Fächer): `order: { words, answer, end }`,
+  in EnDax über `U.ordne([Teile in richtiger Reihenfolge], Satzzeichen)`. Antippen legt ein Wort in die Satzzeile,
+  nochmal antippen holt es zurück.
+  **Bereich 2 „Sätze in der Gegenwart“:** `e5-ps` (he, she, it – das s muss mit; 20 Sätze, 14 Verben mit -s, -es, -ies, has),
+  `e5-ps-neg` (don’t / doesn’t, das Verb verliert sein s), `e5-ps-frage` (Do / Does, Kurzantwort). Eine gemeinsame
+  Animation „das s gibt es nur einmal“ (likes → doesn’t like → Does … like?). Jetzt 15 Themen, 577 Aufnahmen je Aussprache.
+  Auftrag des Auftraggebers: **ohne Rückfragen weiterbauen** („einfach bauen“). Als Nächstes laut Themenplan:
+  Fragewörter, Satzbau, Häufigkeitsadverbien, present progressive, simple oder progressive, Objektpronomen.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1136,3 +1147,7 @@ Infos zur ersten Arbeit:
   Geprüft: 19 500 erzeugte Aufgaben der beiden Themen ohne Fehler, Auswahl-Angebote durchgesehen; `tests/endax.py`
   8 Runden (12 Themen, 576 Antworten, 192 Animationen, 95 Lautsprecher angetippt) ohne Fehler.
   Die neuen Aufnahmen hat noch niemand angehört.
+- **v63: EnDax auf der Startseite, Aufgabenform „Wörter ordnen“, Themen 13 bis 15** (13.11.2026). Geändert: `fach.js`,
+  `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
+  ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
+  `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.

@@ -28,6 +28,12 @@ window.EnDaxIcons = (function () {
     'e5-imp': `<path d="M4 5h16v11H11l-4 3.5V16H4z"/><path d="M12 7.8v4.2"/><circle cx="12" cy="13.9" r=".9" ${F}/>`,
     // can / must / mustn’t: Haken, Ausrufezeichen, Verbot
     'e5-can': `<path d="M2.5 12.5l2.4 2.6 4-5.2"/><path d="M12 8v5"/><circle cx="12" cy="15.6" r=".9" ${F}/><circle cx="18.5" cy="12" r="3.4"/><path d="M16.2 14.4l4.6-4.8"/>`,
+    // present simple: ein Kreislauf (jeden Tag wieder)
+    'e5-ps': `<path d="M19 12a7 7 0 0 1-12.2 4.7"/><path d="M5 12a7 7 0 0 1 12.2-4.7"/><path d="M17.6 3.6v3.9h-3.9"/><path d="M6.4 20.4v-3.9h3.9"/>`,
+    // verneinen: ein Kreislauf mit Strich
+    'e5-ps-neg': `<circle cx="12" cy="12" r="7.5"/><path d="M6.8 17.2L17.2 6.8"/>`,
+    // fragen: ein Fragezeichen in einer Sprechblase
+    'e5-ps-frage': `<path d="M4 5h16v11H11l-4 3.5V16H4z"/><path d="M9.8 9a2.3 2.3 0 1 1 3.3 2.1c-.7.4-1.1.8-1.1 1.6"/><circle cx="12" cy="14.3" r=".8" ${F}/>`,
   };
   function svg(id) {
     const body = I[id];
