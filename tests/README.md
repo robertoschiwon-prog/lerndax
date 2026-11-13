@@ -50,3 +50,4 @@ Seit `lerndax-v44` steckt die App in `web/plattform/fach.js`; die Mathe-Tests la
 - `endax_audio.py [Modell-Ordner] [--alle]`: erzeugt fehlende Aufnahmen (Kokoro: amerikanisch `af_bella`, britisch `bm_fable`)
   und packt sie in Sammeldateien `web/englisch/audio/us/` und `gb/` (`index.json` und je Thema `<thema>.bin`).
   Kein Test, sondern das Werkzeug dazu; Einrichtung steht im Kopf der Datei.
+- `endax_knobel.py`: EnDax-Knobel-Aufgaben, jede Variante jedes Themas eine Runde (wie `dedax_knobel.py`). Alltag-Themen haben keine Knobel-Aufgaben.

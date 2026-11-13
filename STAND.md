@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v72`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v73`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -174,6 +174,12 @@ Weitere Dokumente:
   aber a house?“ (es zählt der Laut), British oder American English (biscuit/cookie …), stumme Buchstaben (knight – Knecht),
   Pfund und Pence (£ von libra, 100 Pence, bis 1971 waren es 240), Schule in England (mit 10–11 wäre man in Year 6).
   `index.html` (Reihenfolge, Texte), `faecher.js` (Entdecken-Karte auf der Startseite), `sw.js`. 1561 Aufnahmen je Aussprache.
+- **EnDax v73 (13.11.2026): Knobel-Aufgaben für Englisch** (`web/englisch/themen/klasse5-knobel.js`, Aufbau wie DeDax: `K(id, …Varianten)`,
+  frei ab zwei Sternen, zählen nicht für die Sterne). 40 Themen mit je 2 Varianten: Fehler finden (ein falsches Wort antippen),
+  zwei Regeln in einem Satz (z. B. „Tom usually walks …, but today he is taking …“), Ausnahmen (some in Angeboten, an hour,
+  homework = much, lying, stayed), längere Sätze ordnen, kleine Rätsel (Datum morgen, Uhrzeit plus 30 Minuten, wer sitzt wo).
+  Wortfelder: Buchstabensalat und Lückensatz ohne Auswahl. **Bewusst ohne Knobeln:** die 5 Alltag-Themen (`e5-a-…`).
+  Neuer Test `tests/endax_knobel.py` (spielt jede Variante: 400 Aufgaben, keine Fehler). `index.html` und `sw.js` laden die Datei.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1211,6 +1217,8 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v73: EnDax Knobel-Aufgaben** (13.11.2026): neu `web/englisch/themen/klasse5-knobel.js`, `tests/endax_knobel.py`; geändert
+  `web/englisch/index.html`, `web/sw.js`. Test `endax_knobel.py` ohne Meldung.
 - **v72: EnDax „Entdecken“** (13.11.2026): neu `web/englisch/erklaerungen/entdecken.js`; geändert `web/englisch/index.html`,
   `web/englisch/themen/klasse5.js` (ENT, Aufnahmen „e5-entdecken“), Aufnahmen-Pakete, `web/plattform/faecher.js`, `web/sw.js`.
   Tests `endax.py 3` und `hub.py` (nur Netzfehler der Sandbox) ohne Meldung.
