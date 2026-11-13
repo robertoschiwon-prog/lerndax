@@ -3168,6 +3168,28 @@
   D.arten['e5-a-lesen'] = { lesen };
 
   // =====================================================
+  // Daten für „Entdecken“ (Animationen in erklaerungen/entdecken.js)
+  // =====================================================
+  const ENT = {
+    an: [['an hour', 'an', 'Das h spricht man nicht. Es beginnt mit „au“.'], ['a house', 'a', 'Das h spricht man. Es beginnt mit „h“.'],
+      ['an umbrella', 'an', 'Das u klingt wie „a“: ein Vokal-Laut.'], ['a uniform', 'a', 'Das u klingt wie „ju“: ein j-Laut.'],
+      ['an egg', 'an', 'Das e ist ein Vokal-Laut.'], ['a unicorn', 'a', 'Das u klingt wie „ju“: ein j-Laut.']],
+    freunde: [['gift', 'Gift', 'Geschenk', 'This is a gift for you.'], ['become', 'bekommen', 'werden', 'I want to become a vet.'],
+      ['chef', 'Chef', 'Koch, Köchin', 'My uncle is a chef.'], ['brave', 'brav', 'mutig', 'The firefighter is very brave.'],
+      ['who', 'wo', 'wer', 'Who is your teacher?'], ['also', 'also', 'auch', 'I also like pasta.'], ['map', 'Mappe', 'Landkarte', 'Look at the map.'],
+      ['handy', 'Handy', 'praktisch', 'This bag is very handy.']],
+    britam: [['biscuit', 'cookie', 'Keks'], ['trousers', 'pants', 'Hose'], ['flat', 'apartment', 'Wohnung'], ['autumn', 'fall', 'Herbst'],
+      ['holiday', 'vacation', 'Ferien, Urlaub'], ['football', 'soccer', 'Fußball'], ['rubber', 'eraser', 'Radiergummi'], ['mum', 'mom', 'Mama'],
+      ['lift', 'elevator', 'Aufzug'], ['sweets', 'candy', 'Süßigkeiten']],
+    stumm: [['knight', 'k', 'Knecht'], ['knee', 'k', 'Knie'], ['climb', 'b', 'klimmen (wie im Klimmzug)'], ['lamb', 'b', 'Lamm'], ['Wednesday', 'd', 'Wodans Tag']],
+  };
+  Object.assign(D.daten, { ENT });
+  const themenVorEnt = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorEnt(), {
+    'e5-entdecken': [...ENT.an.map((x) => x[0]), ...ENT.freunde.flatMap((x) => [x[0], x[3]]), ...ENT.britam.flatMap((x) => [x[0], x[1]]), ...ENT.stumm.map((x) => x[0]), 'one pound', 'one hundred pence'],
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};

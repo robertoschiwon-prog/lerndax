@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v71`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v72`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -169,6 +169,11 @@ Weitere Dokumente:
   ui2 und eltern danach ohne Fehler.
   45 Themen, 1525 Aufnahmen je Aussprache. **Damit ist der Themenplan Klasse 5 (Bereiche 1 bis 6) gebaut.** Offen: Alphabet und
   Buchstabieren, Lautschrift (die Stimme spricht einzelne Buchstaben nicht sicher richtig), „Entdecken“ und Knobeln für Englisch.
+- **EnDax v72 (13.11.2026): „Entdecken“ für Englisch** (6 Entdeckungen in `web/englisch/erklaerungen/entdecken.js`, dunkle Bühne wie
+  in MaDax/DeDax, Wörter mit Aufnahme aus `D.daten.ENT` in `themen/klasse5.js`): falsche Freunde (gift, become, chef …), „an hour,
+  aber a house?“ (es zählt der Laut), British oder American English (biscuit/cookie …), stumme Buchstaben (knight – Knecht),
+  Pfund und Pence (£ von libra, 100 Pence, bis 1971 waren es 240), Schule in England (mit 10–11 wäre man in Year 6).
+  `index.html` (Reihenfolge, Texte), `faecher.js` (Entdecken-Karte auf der Startseite), `sw.js`. 1561 Aufnahmen je Aussprache.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1206,6 +1211,9 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v72: EnDax „Entdecken“** (13.11.2026): neu `web/englisch/erklaerungen/entdecken.js`; geändert `web/englisch/index.html`,
+  `web/englisch/themen/klasse5.js` (ENT, Aufnahmen „e5-entdecken“), Aufnahmen-Pakete, `web/plattform/faecher.js`, `web/sw.js`.
+  Tests `endax.py 3` und `hub.py` (nur Netzfehler der Sandbox) ohne Meldung.
 - **v71: EnDax, Themen 41 bis 45 (Im Alltag)** (13.11.2026): neuer Bereich `e5-alltag`. Geändert: `web/englisch/` (Themen, Erklärungen,
   Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (45 Themen), `web/plattform/fach.css` (Farben bg6–bg8), `web/sw.js`.
   Tests `endax.py 3`, `ui2.py`, `eltern.py` ohne Meldung.

@@ -79,7 +79,7 @@ Eigene Wortlisten nach Themen, nichts aus dem Schulbuch übernommen. **Geklärt 
 Sich vorstellen, begrüßen, danken, im Klassenraum, einkaufen, nach dem Weg fragen, telefonieren (passende Antwort
 wählen, Dialog ordnen) · kurze selbst geschriebene Texte mit Fragen · Alphabet und Buchstabieren · Lautschrift lesen.
 
-## „Entdecken“ (Ideen)
+## „Entdecken“ (Ideen) – gebaut in v72: falsche Freunde, an hour, British/American, stumme Buchstaben, Pfund und Pence, Schule in England
 
 Warum heißt es „an hour“? · Englische Wörter im Deutschen · Falsche Freunde (become, gift, chef) · Warum schreibt man
 „knight“ mit k? · British und American English · Pfund und Pence · Schule in Großbritannien · Feiertage.
