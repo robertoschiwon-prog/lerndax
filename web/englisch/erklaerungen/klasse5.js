@@ -1995,4 +1995,120 @@
       };
     },
   };
+
+  // =====================================================
+  // Zahlen, Ordnungszahlen, Datum, Uhrzeit
+  // =====================================================
+  //   ctx: { mode:'zahl'|'hoeren'|'ord', n, paar? } | { mode:'datum', t, m, monat? } | { mode:'uhr', h, m }
+  EX['e5-zahl'] = {
+    title: 'Zahlen, Datum und Uhrzeit',
+    titleFor: (ctx) => ({ zahl: 'Zahlen auf Englisch', hoeren: '-teen oder -ty?', ord: 'Ordnungszahlen: first, second, third', datum: 'Das Datum', uhr: 'Die Uhrzeit' }[ctx && ctx.mode] || 'Zahlen, Datum und Uhrzeit'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      const anders = (n, a, b) => { let k; do { k = a + Math.floor(Math.random() * (b - a + 1)); } while (k === n); return k; };
+      let S0 = ctx.post ? ctx : null, oben = null, zg = null;
+      if (!ctx.post) {
+        if (mode === 'zahl') S0 = { n: ctx.n < 13 ? anders(ctx.n, 0, 12) : ctx.n < 20 ? anders(ctx.n, 13, 19) : ctx.n % 10 ? anders(ctx.n, 21, 99) : U.pick([20, 30, 40, 50, 60, 70, 80, 90].filter((x) => x !== ctx.n)) };
+        if (mode === 'hoeren') { const p = U.pick([[13, 30], [14, 40], [15, 50], [16, 60], [17, 70], [18, 80], [19, 90]].filter((x) => x[0] !== ctx.paar[0])); S0 = { n: ctx.n < 20 ? p[0] : p[1], paar: p }; }
+        if (mode === 'ord') S0 = { n: U.pick([1, 2, 3, 5, 8, 9, 12, 20, 21, 22, 23, 4, 6, 7, 10, 11].filter((x) => x !== ctx.n)) };
+        if (mode === 'datum') { const d = U.pick(T.DATEN.filter((x) => x.m !== ctx.m)); S0 = { t: d.t, m: d.m, monat: ctx.monat }; }
+        if (mode === 'uhr') { const u = U.pick(T.UHREN.filter((x) => x.m === ctx.m && x.h !== ctx.h)); S0 = { h: u.h, m: u.m }; }
+      }
+      const zeig = (teile, y, fs) => { if (oben) oben.remove(); oben = tzeile(api, teile, y || 40, fs || 20); return oben; };
+      const txt = (x, y, t, st) => el('text', { x, y, 'text-anchor': 'middle', class: 'ex-b', text: t, style: st || '' }, api.svg);
+      const kasten = (x, y, w, h, fill) => el('rect', { x, y, width: w, height: h, rx: 10, fill: fill || '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+      // Uhr
+      const CX = 180, CY = 118, RAD = (g) => (g - 90) * Math.PI / 180;
+      function uhr() {
+        const halb = el('path', { d: '', fill: '#dfe9ff', opacity: 0 }, api.svg);
+        el('circle', { cx: CX, cy: CY, r: 82, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 4 }, api.svg);
+        for (let k = 1; k <= 12; k++) txt(CX + 66 * Math.cos(RAD(k * 30)), CY + 66 * Math.sin(RAD(k * 30)) + 6, String(k), 'font-size:16px');
+        const lang = el('line', { x1: CX, y1: CY, x2: CX, y2: CY - 64, stroke: BLAU, 'stroke-width': 4, 'stroke-linecap': 'round' }, api.svg);
+        const kurz = el('line', { x1: CX, y1: CY, x2: CX, y2: CY - 42, stroke: 'var(--ink)', 'stroke-width': 7, 'stroke-linecap': 'round' }, api.svg);
+        el('circle', { cx: CX, cy: CY, r: 5, fill: 'var(--ink)' }, api.svg);
+        const stell = (min) => { const g = min * 6, gh = (min / 60) * 30; lang.setAttribute('x2', CX + 64 * Math.cos(RAD(g))); lang.setAttribute('y2', CY + 64 * Math.sin(RAD(g))); kurz.setAttribute('x2', CX + 42 * Math.cos(RAD(gh))); kurz.setAttribute('y2', CY + 42 * Math.sin(RAD(gh))); };
+        const seite = (rechts) => { halb.setAttribute('d', `M${CX} ${CY - 80} A80 80 0 0 ${rechts ? 1 : 0} ${CX} ${CY + 80} Z`); halb.setAttribute('opacity', 1); };
+        return { stell, seite, aus: () => halb.setAttribute('opacity', 0) };
+      }
+      async function zeigeUhr(h, m, pause) {
+        const u = T.UHREN.find((x) => x.h === h && x.m === m);
+        await api.tw(1100, (t) => zg.stell(((h % 12) * 60 + m) * t + 0));
+        if (m === 0) { zg.aus(); zeig([[`${T.STUNDE(h)} `, BLAU], ['o’clock']], 28, 18); }
+        else if (m === 45) { zg.seite(false); zeig([['quarter ', BLAU], ['to ', ORANGE], [T.STUNDE(h + 1), BLAU]], 28, 18); }
+        else { zg.seite(true); zeig([[m === 15 ? 'quarter ' : 'half ', BLAU], ['past ', ORANGE], [T.STUNDE(h), BLAU]], 28, 18); }
+        api.say(`<b>${u.text}</b> ${U.say(u.text)}<br>${m === 0 ? 'Volle Stunde: <b>o’clock</b>.' : m === 45 ? 'Linke Hälfte: <b>to</b> (vor der nächsten Stunde).' : `Rechte Hälfte: <b>past</b> (nach der Stunde).${m === 30 ? ' Achtung: half past four = halb fünf!' : ''}`}<br><small>${u.de}</small>`);
+        await api.wait(pause);
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; zg = null;
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'uhr' || mode === 'frei') { zg = uhr(); zg.stell(0); zeig([['Wie spät ist es?', BLAU]], 28, 18); return; }
+          if (mode === 'zahl' || mode === 'hoeren') zeig([[String(S0.n), BLAU]], 56, 40);
+          if (mode === 'ord') zeig([[`${S0.n}`, BLAU], [T.ordEnde(S0.n), ORANGE]], 56, 40);
+          if (mode === 'datum') zeig([[`${S0.t}. ${T.MONATE_DE[S0.m - 1]}`, BLAU]], 50, 28);
+        },
+        async play() {
+          const s = S0;
+          if (mode === 'uhr') {
+            api.say('Der <b>lange</b> Zeiger zeigt die Minuten, der <b>kurze</b> die Stunde.');
+            await api.wait(2200);
+            await zeigeUhr(s.h, s.m, 0);
+            return;
+          }
+          if (mode === 'zahl') {
+            const n = s.n, w = T.zahlWort(n);
+            if (n > 20 && n < 100 && n % 10) {
+              const z = Math.floor(n / 10) * 10, e = n % 10;
+              kasten(30, 92, 130, 64); txt(95, 116, String(z), `fill:${BLAU};font-size:20px`); const a = txt(95, 144, '', 'font-size:18px');
+              kasten(200, 92, 130, 64); txt(265, 116, String(e), `fill:${BLAU};font-size:20px`); const b = txt(265, 144, '', 'font-size:18px');
+              txt(180, 132, '+', 'font-size:22px');
+              api.say(`Zerlege die Zahl: <b>${z}</b> und <b>${e}</b>.`);
+              await api.wait(2200); a.textContent = T.zahlWort(z);
+              await api.wait(1200); b.textContent = T.EINS[e];
+              await api.wait(1400);
+              txt(180, 194, w, `fill:${ORANGE};font-size:24px`);
+            } else txt(180, 140, w, `fill:${ORANGE};font-size:30px`);
+            api.say(`${n} = <b>${w}</b> ${U.say(w)}<br>${T.zahlErkl(n)}`);
+            return;
+          }
+          if (mode === 'hoeren') {
+            const [kl, gr] = s.paar;
+            kasten(24, 86, 148, 110, s.n === kl ? '#dfe9ff' : '#fff'); kasten(188, 86, 148, 110, s.n === gr ? '#dfe9ff' : '#fff');
+            txt(98, 120, String(kl), `fill:${BLAU};font-size:26px`); txt(98, 152, T.zahlWort(kl), 'font-size:17px'); txt(98, 180, `${kl - 10} + 10`, 'font-size:13px');
+            txt(262, 120, String(gr), `fill:${BLAU};font-size:26px`); txt(262, 152, T.zahlWort(gr), 'font-size:17px'); txt(262, 180, `${gr / 10} · 10`, 'font-size:13px');
+            api.say(`<b>-teen</b> klingt lang, betont wird das Ende. <b>-ty</b> ist kurz, betont wird der Anfang.<br>Gehört: <b>${s.n}</b> = ${T.zahlWort(s.n)} ${U.say(T.zahlWort(s.n))}`);
+            return;
+          }
+          if (mode === 'ord') {
+            const n = s.n, w = T.ordWort(n);
+            [[1, 'first'], [2, 'second'], [3, 'third'], [4, 'fourth']].forEach(([k, o], i) => { const x = 18 + i * 82; kasten(x, 86, 78, 50, n % 10 === k && (n < 10 || n > 20) ? '#dfe9ff' : '#fff'); txt(x + 39, 106, `${k}${T.ordEnde(k)}`, `fill:${BLAU};font-size:16px`); txt(x + 39, 127, o, 'font-size:13px'); });
+            await api.wait(1500);
+            txt(180, 182, w, `fill:${ORANGE};font-size:28px`);
+            api.say(`${n}${T.ordEnde(n)} = <b>${w}</b> ${U.say(w)}<br>${T.ordRegel(n)}`);
+            return;
+          }
+          if (mode === 'datum') {
+            const d = T.DATEN.find((x) => x.t === s.t && x.m === s.m) || { t: s.t, m: s.m, text: `the ${T.ordWort(s.t)} of ${T.MONATE[s.m - 1]}`, kurz: `${s.t}${T.ordEnde(s.t)} ${T.MONATE[s.m - 1]}` };
+            const mon = T.MONATE[s.m - 1];
+            kasten(120, 70, 120, 100); el('rect', { x: 120, y: 70, width: 120, height: 28, rx: 10, fill: ORANGE }, api.svg);
+            txt(180, 90, mon, 'fill:#fff;font-size:15px'); txt(180, 146, String(s.t), 'font-size:38px');
+            api.say(`Der Monat <b>${T.MONATE_DE[s.m - 1]}</b> heißt <b>${mon}</b>. Monate schreibt man groß.`);
+            await api.wait(2600);
+            zeig([['the '], [T.ordWort(s.t), BLAU], [' of '], [mon, ORANGE]], 196, 20);
+            api.say(`Gesagt: <b>${d.text}</b> ${U.say(d.text)}<br>Geschrieben: ${d.kurz}. Der Tag ist eine <b>Ordnungszahl</b> (${T.ordWort(s.t)}), dann kommt <b>of</b> und der Monat: ${mon}.`);
+            return;
+          }
+          api.say('Die Uhr hat zwei Hälften: rechts <b>past</b> (nach), links <b>to</b> (vor).');
+          await api.wait(2800);
+          const h = 1 + Math.floor(Math.random() * 11);
+          for (const m of [0, 15, 30, 45]) await zeigeUhr(h, m, 3600);
+          zg.aus();
+          api.say('o’clock · quarter past · half past · quarter to. Und: <b>half past</b> four ist „halb fünf“.');
+        },
+      };
+    },
+  };
 })();

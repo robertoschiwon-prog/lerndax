@@ -47,6 +47,7 @@ window.EnDaxIcons = (function () {
     'e5-much': `<path d="M7 4h10l-1.5 16h-7z"/><path d="M7.7 11h8.6"/><path d="M10 15h4"/>`,
     'e5-ort': `<path d="M3 20h18"/><rect x="5" y="11" width="9" height="9" rx="1"/><circle cx="18" cy="16.5" r="3" ${F}/>`,
     'e5-zeit': `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>`,
+    'e5-zahl': `<path d="M5 9h14M4 15h14M10 4L8 20M16 4l-2 16"/>`,
   };
   function svg(id) {
     const body = I[id];

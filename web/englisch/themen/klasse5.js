@@ -2409,6 +2409,134 @@
   });
 
   // =====================================================
+  // Zahlen, Ordnungszahlen, Datum, Uhrzeit
+  // =====================================================
+  const EINS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const ZEHN = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const zahlWort = (n) => (n < 20 ? EINS[n] : n === 100 ? 'one hundred' : ZEHN[Math.floor(n / 10)] + (n % 10 ? '-' + EINS[n % 10] : ''));
+  const ORD1 = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth'];
+  const ordWort = (n) => (n < 20 ? ORD1[n] : n % 10 === 0 ? ZEHN[n / 10].slice(0, -1) + 'ieth' : ZEHN[Math.floor(n / 10)] + '-' + ORD1[n % 10]);
+  const ordEnde = (n) => (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+  const ORD_BESONDERS = { 1: 'first', 2: 'second', 3: 'third', 5: 'fifth (v statt ve)', 8: 'eighth (nur ein t)', 9: 'ninth (ohne e)', 12: 'twelfth (f statt ve)' };
+  const ordRegel = (n) => {
+    const e = n % 10, w = ordWort(n);
+    if (n >= 20 && n % 10 === 0) return `Bei den Zehnern wird aus -ty ein <b>-tieth</b>: ${w}.`;
+    if (n > 20 && ORD_BESONDERS[e]) return `Nur der letzte Teil wird zur Ordnungszahl: ${ZEHN[Math.floor(n / 10)]}-<b>${ORD1[e]}</b>.`;
+    if (ORD_BESONDERS[n]) return `<b>${ORD_BESONDERS[n]}</b> ist eine Ausnahme. Merke: first, second, third, dann fast immer <b>-th</b>.`;
+    return `Meistens hängt man <b>-th</b> an: ${w}.`;
+  };
+  const MONATE = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const MONATE_DE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  // feste Daten mit Aufnahme (Tag, Monat 1–12)
+  const DATEN = [[1, 1], [3, 5], [12, 5], [21, 3], [2, 2], [14, 7], [5, 10], [8, 8], [9, 9], [20, 6], [22, 4], [31, 12], [23, 11], [30, 1], [11, 9], [15, 3], [24, 12], [13, 6]]
+    .map(([t, m]) => ({ t, m, kurz: `${t}${ordEnde(t)} ${MONATE[m - 1]}`, text: `the ${ordWort(t)} of ${MONATE[m - 1]}`, de: `${t}. ${MONATE_DE[m - 1]}` }));
+  // Uhrzeiten: Minute 0, 15, 30, 45
+  const UHR_ART = { 0: 'o’clock', 15: 'quarter past', 30: 'half past', 45: 'quarter to' };
+  const STUNDE = (h) => EINS[((h - 1) % 12) + 1];
+  const uhrText = (h, m) => (m === 0 ? `It’s ${STUNDE(h)} o’clock.` : m === 45 ? `It’s quarter to ${STUNDE(h + 1)}.` : `It’s ${UHR_ART[m]} ${STUNDE(h)}.`);
+  const UHR_DE = (h, m) => { const w = ['zwölf', 'eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf']; const s = (k) => w[k % 12]; return m === 0 ? `Es ist ${h % 12 === 1 ? 'ein' : s(h)} Uhr.` : m === 15 ? `Es ist Viertel nach ${s(h)}.` : m === 30 ? `Es ist halb ${s(h + 1)}.` : `Es ist Viertel vor ${s(h + 1)}.`; };
+  const UHREN = [];
+  for (let h = 1; h <= 12; h++) for (const m of [0, 15, 30, 45]) UHREN.push({ h, m, text: uhrText(h, m), de: UHR_DE(h, m), digi: `${h}:${String(m).padStart(2, '0')}` });
+  const uhrBild = (h, m) => {
+    const cx = 180, cy = 104, r = 78, rad = (g) => (g - 90) * Math.PI / 180;
+    const zeiger = (g, l, w, c) => `<line x1="${cx}" y1="${cy}" x2="${(cx + l * Math.cos(rad(g))).toFixed(1)}" y2="${(cy + l * Math.sin(rad(g))).toFixed(1)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+    let ziff = '';
+    for (let k = 1; k <= 12; k++) ziff += `<text x="${(cx + 62 * Math.cos(rad(k * 30))).toFixed(1)}" y="${(cy + 62 * Math.sin(rad(k * 30)) + 6).toFixed(1)}" text-anchor="middle" style="font:800 17px Nunito,system-ui,sans-serif;fill:#2b2440">${k}</text>`;
+    let striche = '';
+    for (let k = 0; k < 60; k++) { const a = rad(k * 6), i = k % 5 ? 74 : 70; striche += `<line x1="${(cx + i * Math.cos(a)).toFixed(1)}" y1="${(cy + i * Math.sin(a)).toFixed(1)}" x2="${(cx + 77 * Math.cos(a)).toFixed(1)}" y2="${(cy + 77 * Math.sin(a)).toFixed(1)}" stroke="#2b2440" stroke-width="${k % 5 ? 1 : 2.5}"/>`; }
+    return `<svg viewBox="0 18 360 172" role="img" aria-label="Uhr"><circle cx="${cx}" cy="${cy}" r="${r + 4}" fill="#fff" stroke="#2b2440" stroke-width="4"/>${striche}${ziff}${zeiger((h % 12) * 30 + m / 2, 40, 7, '#2b2440')}${zeiger(m * 6, 62, 4, '#1f55d6')}<circle cx="${cx}" cy="${cy}" r="5" fill="#2b2440"/></svg>`;
+  };
+  const Z_HOER = [[13, 30], [14, 40], [15, 50], [16, 60], [17, 70], [18, 80], [19, 90]];
+  const zahlErkl = (n) => (n < 13 ? `<b>${zahlWort(n)}</b> muss man auswendig wissen.`
+    : n < 20 ? `13 bis 19 enden auf <b>-teen</b>: ${zahlWort(n)}.`
+      : n === 100 ? '100 heißt <b>one hundred</b>.'
+        : n % 10 ? `Erst die Zehner, dann ein <b>Bindestrich</b>, dann die Einer: ${ZEHN[Math.floor(n / 10)]}-${EINS[n % 10]}. Anders als im Deutschen kommen die Zehner zuerst.` : `Die Zehner enden auf <b>-ty</b>: ${zahlWort(n)}.`);
+  const zahlZiel = () => pick([R(13, 19), R(20, 99), R(20, 99), R(20, 99), R(0, 12), pick([30, 40, 50, 80, 100])]);
+  const ZAHL_TIPP = 'Zehner zuerst, dann Bindestrich, dann die Einer: 47 = forty-seven. Achtung: forty ohne u, fifteen und fifty mit f.';
+  // A: Zahl als Wort eintippen
+  function zahlTippen() {
+    const n = zahlZiel(), w = zahlWort(n);
+    return {
+      prompt: `Schreibe die Zahl als englisches Wort: <b>${n}</b>`, fields: [{ type: 'text', ci: true, answer: n === 100 ? [w, 'a hundred'] : n > 20 && n % 10 ? [w, w.replace('-', ' ')] : w, label: 'Zahlwort' }],
+      hint: ZAHL_TIPP, solution: `${n} = <b class="vb" lang="en">${w}</b> ${U.say(w)}<br>${zahlErkl(n)}`, ex: { mode: 'zahl', n },
+    };
+  }
+  // B: richtiges Zahlwort wählen
+  function zahlWahl() {
+    const n = R(21, 99), z = Math.floor(n / 10), e = n % 10;
+    const w = zahlWort(n), falsch = [];
+    if (e && e !== z && e > 1) falsch.push(zahlWort(e * 10 + z));
+    if (z === 4) falsch.push('fourty-' + EINS[e]);
+    if (z === 5) falsch.push('fivety-' + EINS[e]);
+    falsch.push(`${EINS[e]}-and-${ZEHN[z]}`, `${ZEHN[z]}-${EINS[e + 1 > 9 ? 1 : e + 1]}`);
+    const ch = shuffle([w, ...[...new Set(falsch)].filter((x) => x !== w && !x.includes('zero')).slice(0, 3)]);
+    if (!e) return zahlTippen();
+    return { prompt: `Wie heißt die Zahl <b>${n}</b> auf Englisch?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(w), hint: ZAHL_TIPP, solution: `${n} = <b class="vb" lang="en">${w}</b> ${U.say(w)}<br>${zahlErkl(n)}`, ex: { mode: 'zahl', n } };
+  }
+  // C: hören – teen oder ty?
+  function zahlHoeren() {
+    const paar = pick(Z_HOER), n = pick(paar), ch = shuffle([paar[0], paar[1], paar[0] - 10]);
+    return {
+      prompt: `Hör genau hin: Welche Zahl ist das? ${U.say(zahlWort(n))}`, choices: ch.map(String), correct: ch.indexOf(n),
+      hint: '<b>-teen</b> (13 bis 19) klingt lang und betont am Ende: thir<b>teen</b>. <b>-ty</b> (30, 40 …) ist kurz und vorn betont: <b>thir</b>ty.',
+      solution: `<b class="vb">${n}</b> = <span lang="en">${zahlWort(n)}</span> ${U.say(zahlWort(n))}<br>${n < 20 ? `-teen heißt „plus zehn“: ${n} = ${n - 10} + 10.` : `-ty heißt „mal zehn“: ${n} = ${n / 10} · 10.`}`,
+      ex: { mode: 'hoeren', n, paar },
+    };
+  }
+  // D: Ordnungszahl
+  function ordTippen() {
+    const n = pick([1, 2, 3, 4, 5, 8, 9, 12, 13, 20, 21, 22, 23, 30, 31, R(6, 19), R(24, 29)]), w = ordWort(n);
+    return {
+      prompt: `Schreibe die Ordnungszahl als Wort: <b>${n}${ordEnde(n)}</b> (der ${n}.)`, fields: [{ type: 'text', ci: true, answer: n > 20 && n % 10 ? [w, w.replace('-', ' ')] : w, label: 'Ordnungszahl' }],
+      hint: 'first, second, third – danach meistens <b>-th</b>: fourth, sixth … Achtung: fifth, eighth, ninth, twelfth, twentieth.',
+      solution: `${n}${ordEnde(n)} = <b class="vb" lang="en">${w}</b> ${U.say(w)}<br>${ordRegel(n)}`, ex: { mode: 'ord', n },
+    };
+  }
+  function ordWahl() {
+    const n = pick([1, 2, 3, 5, 8, 9, 12, 20, 21, 22, 23, 31]), w = ordWort(n);
+    const falsch = { 1: ['oneth', 'firsth'], 2: ['twoth', 'secondth'], 3: ['threeth', 'thirth'], 5: ['fiveth', 'fivth'], 8: ['eightth', 'eighteth'], 9: ['nineth', 'ninthe'], 12: ['twelveth', 'twelvth'], 20: ['twentyth', 'twentith'], 21: ['twenty-oneth', 'twenty-firsth'], 22: ['twenty-twoth', 'twenty-secondth'], 23: ['twenty-threeth', 'twenty-thirdth'], 31: ['thirty-oneth', 'thirtieth-first'] }[n];
+    const ch = shuffle([w, ...falsch]);
+    return { prompt: `Wie schreibt man <b>${n}${ordEnde(n)}</b> als Wort?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(w), hint: 'first, second, third – danach meistens <b>-th</b>. Achtung: fifth, eighth, ninth, twelfth, twentieth.', solution: `${n}${ordEnde(n)} = <b class="vb" lang="en">${w}</b> ${U.say(w)}<br>${ordRegel(n)}`, ex: { mode: 'ord', n } };
+  }
+  // E: Datum sagen
+  function datumWahl() {
+    const d = pick(DATEN), w = ordWort(d.t), mon = MONATE[d.m - 1];
+    const ch = shuffle([d.text, `the ${zahlWort(d.t)} of ${mon}`, `the ${w} of ${MONATE[(d.m + (d.m === 3 ? 1 : 2)) % 12]}`]);
+    return {
+      prompt: `Wie sagt man dieses Datum? <b>${d.de}</b> (geschrieben: <span lang="en">${d.kurz}</span>)`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(d.text),
+      hint: 'Beim Datum sagt man die <b>Ordnungszahl</b>: the third of May. Monate schreibt man groß.',
+      solution: `<span lang="en">${d.kurz}</span> sagt man: <b class="vb" lang="en">${d.text}</b> ${U.say(d.text)}<br>Tag als Ordnungszahl (${w}), dann <b>of</b>, dann der Monat (${mon} = ${MONATE_DE[d.m - 1]}).`,
+      ex: { mode: 'datum', t: d.t, m: d.m },
+    };
+  }
+  function monatTippen() {
+    const m = R(1, 12), mon = MONATE[m - 1];
+    return { prompt: `Wie heißt der Monat <b>${MONATE_DE[m - 1]}</b> auf Englisch?`, fields: [{ type: 'text', ci: true, answer: mon, label: 'Monat' }], hint: 'Viele Monate sehen fast aus wie im Deutschen. Achtung: March, May, June, July, October, December.', solution: `${MONATE_DE[m - 1]} = <b class="vb" lang="en">${mon}</b> ${U.say(mon)}<br>Monate schreibt man im Englischen immer <b>groß</b>.`, ex: { mode: 'datum', t: pick(DATEN.filter((d) => d.m === m).map((d) => d.t).concat([R(1, 28)])), m, monat: true } };
+  }
+  // F: Uhr lesen
+  const UHR_TIPP = '<b>o’clock</b> = volle Stunde · <b>quarter past</b> = Viertel nach · <b>half past</b> = halb (aber: half past four = halb fünf!) · <b>quarter to</b> = Viertel vor';
+  const uhrLoesung = (u) => `<b class="vb" lang="en">${u.text}</b> ${U.say(u.text)}<br>${u.m === 30 ? `Achtung: <b>half past ${STUNDE(u.h)}</b> heißt „halb ${['zwölf', 'eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf'][(u.h + 1) % 12]}“: eine halbe Stunde <b>nach</b> ${u.h}.` : u.m === 0 ? 'Der lange Zeiger steht oben auf der 12: volle Stunde.' : u.m === 15 ? 'Der lange Zeiger steht auf der 3: eine Viertelstunde <b>nach</b> (past).' : 'Der lange Zeiger steht auf der 9: eine Viertelstunde <b>vor</b> (to) der nächsten Stunde.'}<br><small>${u.de}</small>`;
+  function uhrWahl() {
+    const u = pick(UHREN), andere = shuffle(UHREN.filter((x) => x !== u && (x.h === u.h || x.m === u.m || (x.m === 30 && u.m === 30)))).slice(0, 2);
+    if (u.m === 30) andere[0] = { text: `It’s half past ${STUNDE(u.h + 1)}.` };
+    const ch = shuffle([u.text, ...[...new Set(andere.map((x) => x.text))].filter((t) => t !== u.text)]);
+    return { prompt: 'Wie spät ist es?', figure: uhrBild(u.h, u.m), choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(u.text), hint: UHR_TIPP, solution: uhrLoesung(u), ex: { mode: 'uhr', h: u.h, m: u.m } };
+  }
+  function uhrDigital() {
+    const u = pick(UHREN.filter((x) => x.m)), ch = shuffle(['quarter past', 'half past', 'quarter to']);
+    const satz = (a) => (a === 'quarter to' ? `It’s quarter to ${STUNDE(u.h + 1)}.` : `It’s ${a} ${STUNDE(u.h)}.`);
+    return { prompt: `Es ist <b>${u.digi}</b> Uhr. Wie sagt man das?`, choices: ch.map((a) => `<span lang="en">${satz(a)}</span>`), correct: ch.indexOf(UHR_ART[u.m]), hint: UHR_TIPP, solution: uhrLoesung(u), ex: { mode: 'uhr', h: u.h, m: u.m } };
+  }
+  const zahlenZeit = () => U.wahl([[14, zahlTippen], [12, zahlWahl], [12, zahlHoeren], [10, ordTippen], [8, ordWahl], [10, datumWahl], [6, monatTippen], [16, uhrWahl], [12, uhrDigital]]);
+
+  Object.assign(D.daten, { EINS, ZEHN, zahlWort, ordWort, ordEnde, ordRegel, zahlErkl, MONATE, MONATE_DE, DATEN, UHREN, uhrBild, uhrText, STUNDE, UHR_ART });
+  const themenVorZahl = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorZahl(), {
+    'e5-zahl': [...Array.from({ length: 101 }, (_, n) => zahlWort(n)), ...Array.from({ length: 31 }, (_, n) => ordWort(n + 1)), ...MONATE, ...DATEN.map((d) => d.text), ...UHREN.map((u) => u.text)],
+  });
+  Object.assign(D.arten, { 'e5-zahl': { zahlTippen, zahlWahl, zahlHoeren, ordTippen, ordWahl, datumWahl, monatTippen, uhrWahl, uhrDigital } });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -2444,6 +2572,7 @@
         { id: 'e5-much', title: 'much, many, a lot of', icon: '🧮', gen: muchMany },
         { id: 'e5-ort', title: 'Wo? in, on, under, next to …', icon: '🐈', gen: praepOrt },
         { id: 'e5-zeit', title: 'Wann? at, on, in', icon: '🕖', gen: praepZeit },
+        { id: 'e5-zahl', title: 'Zahlen, Datum und Uhrzeit', icon: '🔢', gen: zahlenZeit },
       ] },
     ],
   };
