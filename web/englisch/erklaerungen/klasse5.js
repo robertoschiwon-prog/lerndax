@@ -2407,6 +2407,7 @@
     ['e5-w-gefuehle', 'Gefühle: happy, sad, tired …'],
     ['e5-w-party', 'Party und Geburtstag: present, candle …'],
     ['e5-w-adj', 'Beschreiben: big, old, boring …'],
+    ['e5-w-medien', 'Computer und Medien: keyboard, click …'],
   ];
   const passe = (t, maxW) => { try { let fs = parseFloat(t.style.fontSize) || 16; while (fs > 9 && t.getComputedTextLength() > maxW) { fs -= 1; t.style.fontSize = fs + 'px'; } } catch (e) {} };
   function wfKarte(api, x, y, w, h, wort, offen) {
@@ -2544,6 +2545,7 @@
     ['e5-a-klasse', 'Im Unterricht: Sorry, I don’t understand'],
     ['e5-a-laden', 'Einkaufen: How much is it?'],
     ['e5-a-weg', 'Nach dem Weg fragen'],
+    ['e5-a-meinung', 'Meinung sagen: I think … because …'],
   ];
   const alErkl = (id, titel) => ({
     title: titel,

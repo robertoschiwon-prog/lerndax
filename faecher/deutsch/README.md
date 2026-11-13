@@ -9,7 +9,7 @@ Die Abschnitte unten ab „Vorgehen“ beschreiben den Weg dorthin und sind als 
 | 1 Lehrplan auswerten | ✅ 12.11.2026 | `lehrplan/sachsen-gymnasium.md` |
 | 2 Schulbuch abgleichen | **abgeglichen (13.11.2026)**: Lücken stehen in der Datei; „Nomen“ entschieden (v78) | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | Vorschlag (5 Bereiche, 31 Themen), noch nicht entschieden | `themenplan.md` |
-| 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. **Bereich Satzbau und Satzzeichen fertig (8 Themen).** **Alle fünf Bereiche sind gebaut (30 Themen; seit v79/v80 36, nach dem Deutschbuch ergänzt: Präpositionen, Adverbien, adverbiale Bestimmungen, Satzreihe, Theater, Film).** **„Entdecken“ hat sechs Entdeckungen.** Knobel-Aufgaben zu allen Themen. Offen: Schulbuch-Abgleich | `web/deutsch/`, Test `tests/dedax.py` |
+| 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. **Bereich Satzbau und Satzzeichen fertig (8 Themen).** **Alle fünf Bereiche sind gebaut (30 Themen; seit v79–v81 37, nach dem Deutschbuch ergänzt: Präpositionen, Adverbien, adverbiale Bestimmungen, Satzreihe, Theater, Film, Konjunktionen).** **„Entdecken“ hat sechs Entdeckungen.** Knobel-Aufgaben zu allen Themen. Offen: Schulbuch-Abgleich | `web/deutsch/`, Test `tests/dedax.py` |
 
 **Entschieden am 12.11.2026:** Start mit dem Bereich **Wortarten**. Es hieß zuerst „Substantiv“; **seit 13.11.2026 (v78) „Nomen“** wie im Deutschbuch. Die gemeinsamen Teile wurden **sofort** aus der
 Mathe-Seite herausgezogen (`web/plattform/fach.js` und `fach.css`); beide Fächer nutzen sie.

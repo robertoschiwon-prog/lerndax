@@ -29,7 +29,7 @@ Bildungssprache) · 8 Sachtexte, Schaubilder, Tabellen · **9 Wortarten und Satz
 | Adverbien | 207 | `d5-adverb` ✓ **neu v79** |
 | Verben: Infinitiv und Personalformen | 208 | `d5-verbformen` ✓ |
 | Präsens, Futur, Perfekt, Präteritum, Plusquamperfekt | 210–215 | `d5-zeitformen` ✓ |
-| Wortarten unterscheiden | 216 | `d5-wortarten` ✓ (Konjunktion fehlt dort) |
+| Wortarten unterscheiden | 216 | `d5-wortarten` ✓, Konjunktionen in `d5-konj` (**neu v81**) |
 | Wortzusammensetzungen, Wörter ableiten, Wortfamilie | 218–220 | `d5-zusammen`, `d5-ableitung`, `d5-wortfamilie` ✓ |
 | Umstellprobe; Prädikat, Subjekt, Objekte | 226, 227 | `d5-satzglieder`, `d5-subjekt`, `d5-objekte` ✓ |
 | Adverbiale Bestimmungen | 228 | `d5-adverbial` ✓ **neu v79** (Zeit, Ort, Art und Weise, Grund) |

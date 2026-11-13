@@ -3032,10 +3032,26 @@
     ['Everybody knows Big Ben. It’s very ___.', 'famous', ['cheap', 'young', 'quiet'], 'Jeder kennt Big Ben. Er ist sehr berühmt.'],
     ['There are a lot of people at the market. It’s very ___.', 'busy', ['quiet', 'slow', 'cheap'], 'Auf dem Markt sind viele Leute. Es ist sehr voll.'],
   ], 'Gegensätze lernt man gut zusammen: big – small, old – new, old – young, fast – slow, loud – quiet, cheap – expensive.');
+  wfFeld('e5-w-medien', 'Computer und Medien', [
+    ['computer', 'Computer', { bild: '🖥️' }], ['laptop', 'Laptop', { bild: '💻' }], ['tablet', 'Tablet'], ['mobile phone', 'Handy', { alt: ['phone', 'mobile', 'smartphone', 'cell phone'], bild: '📱' }],
+    ['keyboard', 'Tastatur', { bild: '⌨️' }], ['mouse', 'Maus (am Computer)', { bild: '🖱️', kein: true }], ['screen', 'Bildschirm'], ['printer', 'Drucker', { bild: '🖨️' }],
+    ['internet', 'Internet'], ['website', 'Webseite', { alt: ['web page', 'webpage'] }], ['app', 'App'], ['email', 'E-Mail', { alt: ['e-mail', 'mail'] }], ['password', 'Passwort'],
+    ['message', 'Nachricht', { alt: ['text', 'text message'] }], ['photo', 'Foto', { alt: ['picture'] }], ['video', 'Video'],
+    ['click', 'klicken'], ['type', 'tippen (auf der Tastatur)'], ['print', 'drucken'], ['send', 'schicken, senden'], ['save', 'speichern'],
+  ], [
+    ['I type on the ___.', 'keyboard', ['printer', 'password', 'email'], 'Ich tippe auf der Tastatur.'],
+    ['Never tell anyone your ___.', 'password', ['keyboard', 'printer', 'screen'], 'Verrate niemandem dein Passwort.'],
+    ['I ___ the document so I don’t lose it.', 'save', ['click', 'type', 'screen'], 'Ich speichere das Dokument, damit ich es nicht verliere.'],
+    ['The ___ prints my homework.', 'printer', ['mouse', 'keyboard', 'password'], 'Der Drucker druckt meine Hausaufgaben.'],
+    ['I write an ___ to my grandma.', 'email', ['printer', 'keyboard', 'password'], 'Ich schreibe meiner Oma eine E-Mail.'],
+    ['I ___ on the link with the mouse.', 'click', ['print', 'save', 'type'], 'Ich klicke mit der Maus auf den Link.'],
+    ['My friend sends me a ___ on my phone.', 'message', ['keyboard', 'printer', 'screen'], 'Meine Freundin schickt mir eine Nachricht aufs Handy.'],
+  ], 'Geräte: computer, laptop, tablet, phone, keyboard, mouse, printer. Was man tut: click, type, print, save, send.');
   // Paare, die sich beim „passt nicht dazu“ zu nah sind
   // Tagesablauf nur mit Tieren und Farben mischen: die Ausdrücke passen sonst halb zu Haus, Schule, Essen, Kleidung, Körper …
   const WF_NAH = new Set(['e5-w-haus|e5-w-schule', 'e5-w-freizeit|e5-w-schule', 'e5-w-essen|e5-w-haus',
-    ...['e5-w-familie', 'e5-w-haus', 'e5-w-schule', 'e5-w-kleidung', 'e5-w-freizeit', 'e5-w-koerper', 'e5-w-essen', 'e5-w-zeit', 'e5-w-gefuehle', 'e5-w-party', 'e5-w-adj'].map((x) => [x, 'e5-w-tag'].sort().join('|')),
+    ...['e5-w-familie', 'e5-w-haus', 'e5-w-schule', 'e5-w-kleidung', 'e5-w-freizeit', 'e5-w-koerper', 'e5-w-essen', 'e5-w-zeit', 'e5-w-gefuehle', 'e5-w-party', 'e5-w-adj', 'e5-w-medien'].map((x) => [x, 'e5-w-tag'].sort().join('|')),
+    'e5-w-medien|e5-w-tiere', 'e5-w-freizeit|e5-w-medien', 'e5-w-medien|e5-w-schule', 'e5-w-haus|e5-w-medien',
     // Gefühle und Beschreiben sind beide Adjektive (bored – boring); die Party hat Essen, Musik, Tanzen und Monate
     'e5-w-adj|e5-w-gefuehle', 'e5-w-essen|e5-w-party', 'e5-w-freizeit|e5-w-party', 'e5-w-party|e5-w-zeit', 'e5-w-adj|e5-w-farben', 'e5-w-adj|e5-w-tiere', 'e5-w-adj|e5-w-koerper', 'e5-w-gefuehle|e5-w-koerper']);
   const wfAndere = (F, w, n, nur) => shuffle(F.W.filter((x) => x !== w && (!w.g || x.g !== w.g) && x.de !== w.de && (!nur || nur(x)))).slice(0, n);
@@ -3197,6 +3213,26 @@
     ['___ me, where is the park?', 'Excuse', 'Entschuldigung, wo ist der Park?'],
     ['Take the ___ street on the right.', ['first', 'second', 'third'], 'Nimm die erste Straße rechts.'],
   ], 'straight on = geradeaus · turn left = links abbiegen · turn right = rechts abbiegen · the first street on the left = die erste Straße links.');
+  alFeld('e5-a-meinung', 'Meinung sagen', [
+    ['What do you think of the film?', 'I think it’s great.', ['I’m eleven.', 'It’s on the left.'], 'Was hältst du von dem Film? – Ich finde ihn toll.'],
+    ['Do you like pizza?', 'Yes, I love it!', ['Yes, I am.', 'No, it isn’t far.'], 'Magst du Pizza? – Ja, ich liebe sie!'],
+    ['Why do you like Greenwich?', 'Because the park is beautiful.', ['Yes, I do.', 'It’s two pounds.'], 'Warum magst du Greenwich? – Weil der Park schön ist.'],
+    ['What’s your favourite place?', 'My favourite place is the park.', ['I’m fine, thanks.', 'It’s in May.'], 'Was ist dein Lieblingsort? – Mein Lieblingsort ist der Park.'],
+    ['Do you agree?', 'Yes, I agree.', ['Yes, I’m twelve.', 'Turn left.'], 'Stimmst du zu? – Ja, ich stimme zu.'],
+    ['I think football is boring.', 'I don’t agree. I think it’s exciting!', ['Thank you!', 'Nice to meet you.'], 'Ich finde Fußball langweilig. – Das sehe ich anders. Ich finde es spannend!'],
+  ], [
+    ['Du findest das Buch langweilig.', 'I think the book is boring.', ['I think the book is exciting.', 'The book thinks I’m boring.']],
+    ['Du sagst, warum du den Park magst: Er ist ruhig.', 'I like the park because it’s quiet.', ['I like the park, so is it quiet?', 'I like the park because quiet.']],
+    ['Du bist derselben Meinung wie dein Freund.', 'I agree with you.', ['I don’t agree with you.', 'I agree you.']],
+    ['Du fragst deine Freundin, was sie von dem Film hält.', 'What do you think of the film?', ['What do you think the film?', 'How do you think of the film?']],
+    ['Du findest etwas richtig toll.', 'I love it!', ['I hate it!', 'I don’t like it.']],
+  ], [
+    ['I ___ the film is great.', 'think', 'Ich finde, der Film ist toll.'],
+    ['I like Greenwich ___ the park is beautiful.', 'because', 'Ich mag Greenwich, weil der Park schön ist.'],
+    ['I don’t ___ with you.', 'agree', 'Ich bin nicht deiner Meinung.'],
+    ['What do you ___ of the museum?', 'think', 'Was hältst du von dem Museum?'],
+    ['My favourite ___ in Greenwich is the park.', ['place', 'spot'], 'Mein Lieblingsort in Greenwich ist der Park.'],
+  ], 'Meinung sagen: I think … · I like … because … · I don’t like … · I agree. / I don’t agree. · What do you think of …?');
   // Wege auf der Karte: Weg vom Start (unten) zum Ziel
   const WEGE = [
     { k: 'gerade', satz: 'Go straight on.', de: 'Geh geradeaus.', pfad: [[180, 200], [180, 30]] },
@@ -3392,6 +3428,7 @@
         { id: 'e5-pron', title: 'I, you, he, she, it, we, they', icon: '🧑', gen: pronomen },
         { id: 'e5-poss', title: 'my, your, his, her …', icon: '🎁', gen: possessiv },
         { id: 'e5-a-klasse', title: 'Im Unterricht: Sorry, I don’t understand', icon: '🙋', gen: alGen('e5-a-klasse', [[18, anweisung]]) },
+        { id: 'e5-w-medien', title: 'Computer und Medien: keyboard, click …', icon: '💻', gen: wfGen('e5-w-medien') },
       ] },
       { id: 'e5-u2', nr: 3, title: 'Unit 2: It’s fun at home', topics: [
         { id: 'e5-w-haus', title: 'Haus: kitchen, bedroom …', icon: '🏠', gen: wfGen('e5-w-haus') },
@@ -3413,6 +3450,7 @@
         { id: 'e5-ps-frage', title: 'present simple: Fragen mit do und does', icon: '❔', gen: psFrage },
         { id: 'e5-fragewort', title: 'Fragewörter: who, what, where …', icon: '🔎', gen: fragewoerter },
         { id: 'e5-a-weg', title: 'Nach dem Weg fragen', icon: '🧭', gen: alGen('e5-a-weg', [[22, wegBild], [12, wegHoeren]]) },
+        { id: 'e5-a-meinung', title: 'Meinung sagen: I think … because …', icon: '💬', gen: alGen('e5-a-meinung', []) },
         { id: 'e5-w-essen', title: 'Essen und Trinken: bread, milk …', icon: '🍎', gen: wfGen('e5-w-essen') },
       ] },
       { id: 'e5-u4', nr: 5, title: 'Unit 4: Happy birthday!', topics: [

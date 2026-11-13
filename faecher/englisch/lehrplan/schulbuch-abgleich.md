@@ -20,7 +20,7 @@ Seit v77 sind die EnDax-Bereiche genau diese Units. Die Themen-IDs sind gleich g
 | Station 1 | 18 | Nomen und Artikel; to be: Kurzformen, Verneinung, Fragen und Kurzantworten | `e5-a-an`, `e5-plural`, `e5-be-neg` |
 | Station 2 | 22 | Präpositionen; there is/there are: Aussagesätze, Fragen | `e5-there`, `e5-ort` |
 | Station 3 | 25 | can/can’t, Imperativ, Personalpronomen, Possessivbegleiter | `e5-can`, `e5-imp`, `e5-pron`, `e5-poss`, dazu `e5-a-klasse` |
-| Media smart | 34 | Medien | – |
+| Media smart | 34 | Medien | `e5-w-medien` (**neu v81**) |
 | **Unit 2 It’s fun at home**, Station 1 | 38 | Dinge im Haus, Zahlen 11–100, Besitzangaben mit ’s und s’ | `e5-w-haus`, `e5-zahl`, `e5-gen` |
 | Station 2 | 42 | Familie; simple present: Aussagesätze | `e5-w-familie`, `e5-ps` |
 | Station 3 | 46 | Uhrzeit, Wochentage; simple present: Bildung, Satzstellung; Objektformen der Personalpronomen; wann und wie oft | `e5-w-tag`, `e5-w-zeit`, `e5-zeit`, `e5-satzbau`, `e5-oft`, `e5-obj` |
@@ -28,7 +28,7 @@ Seit v77 sind die EnDax-Bereiche genau diese Units. Die Themen-IDs sind gleich g
 | **Unit 3 Our Greenwich**, Check-in | 60 | Adjektive zur Beschreibung, Freizeitaktivitäten | `e5-w-adj` (**neu v77**), `e5-w-freizeit` |
 | Station 1 | 63 | simple present: Fragen und Kurzantworten mit do/does, Verneinung | `e5-ps-neg`, `e5-ps-frage` |
 | Station 2 | 68 | Höflichkeitsformeln; simple present: Fragen mit Fragewörtern | `e5-fragewort`, `e5-a-weg` (höflich nach dem Weg fragen) |
-| Station 3 | 73 | Meinungsäußerung | – (noch offen) |
+| Station 3 | 73 | Meinungsäußerung | `e5-a-meinung` (**neu v81**) |
 | Across cultures 2 | 82 | Essen | `e5-w-essen` |
 | **Unit 4 Happy birthday!**, Check-in | 84 | Monate und Jahreszeiten, Datum, Party | `e5-w-party` (**neu v77**), Monate in `e5-w-zeit` (**neu v77**), Datum in `e5-zahl` |
 | Station 1 | 87 | Party, Essen; some, any; much, many, a lot of/lots of; a few, a little, a couple of; Mengenangaben mit of | `e5-some`, `e5-much`, `e5-wenig` (**neu v77**) |
@@ -47,7 +47,5 @@ Ob das Buch stattdessen „have“ benutzt, zeigt erst ein Blick in die Seiten; 
 
 ## Noch offen
 
-- Meinungsäußerung (Unit 3, Station 3): I think …, I like … because …
-- Wortfeld Medien (Media smart)
 - Den Auftraggeber fragen, welche Unit gerade dran ist (dann kann der Bereich oben stehen oder markiert werden).
 - ~~Britische oder amerikanische Stimme~~ Seit v78 britisch als Voreinstellung (Roberto, 13.11.2026).

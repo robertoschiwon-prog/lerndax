@@ -460,6 +460,15 @@
       ['Excuse *my, where is the station?', 'me', 'Entschuldigung = <b>Excuse me</b>.'],
       ['Turn left at the bank, then *turning right.', 'turn', 'Aufforderung: Grundform <b>turn</b>.']]));
 
+  K('e5-a-meinung',
+    fehlerK([['I *thinks the film is great.', 'think', 'Nach <b>I</b> kein -s: I <b>think</b>.'],
+      ['I like the park because *of it is quiet.', '', 'Vor einem Satz steht nur <b>because</b>, ohne of: because it is quiet.'],
+      ['I *am agree with you.', '', 'Auf Englisch ohne am: I agree.'],
+      ['What do you think *about of the museum?', '', 'Was hältst du von …? = What do you think of …? Das about ist zu viel.']]),
+    wahlK('Was antwortest du, wenn du <b>anderer Meinung</b> bist?', [
+      ['I think cats are better than dogs.', 'I don’t agree. I think dogs are better.', ['Yes, I agree. Cats are better.', 'I think so too.'], 'Mit <b>I don’t agree</b> sagst du freundlich, dass du es anders siehst.'],
+      ['Maths is the best subject.', 'I don’t think so. I like art more.', ['That’s right, maths is the best.', 'I agree with you.'], '<b>I don’t think so</b> = Das finde ich nicht.']], 'agree = zustimmen, I don’t agree / I don’t think so = anderer Meinung sein.'));
+
   K('e5-a-abc',
     wahlK('Geheimsprache in Nachrichten! Was bedeutet das?', [
       ['C U', 'See you.', ['Can you?', 'Call you.'], 'C klingt wie <b>see</b>, U wie <b>you</b>.'],

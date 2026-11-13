@@ -520,6 +520,7 @@
   thema('d5-adjektive', 'Adjektive steigern', '0 0 360 180');
   thema('d5-praep', 'Präpositionen: wie Dinge zueinander stehen', '0 0 360 150');
   thema('d5-adverb', 'Adverbien: wann, wo, wie, warum', '0 0 360 120');
+  thema('d5-konj', 'Konjunktionen: Bindewörter', '0 0 360 120');
   thema('d5-verbformen', 'Verbformen: ein Verb, viele Formen', '0 0 360 150');
   thema('d5-wortarten', 'Wortarten erkennen', '0 0 360 156');
   thema('d5-satzglieder', 'Satzglieder: der Satz als Zug', '0 0 360 100');

@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v80`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v81`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -220,6 +220,10 @@ Weitere Dokumente:
   (Jambus, Trochäus) in `d5-gedicht`, Metapher in `d5-bilder`. Bereich 5 heißt jetzt „Texte und Medien verstehen“. Neuer
   Erklär-Bildmodus `bild` (zeigt das SVG der Aufgabe). Damit ist alles aus dem Inhaltsverzeichnis des Deutschbuchs abgedeckt,
   was sich am Bildschirm üben lässt (Schreibaufgaben wie Brief oder Erzählung nicht).
+- **v81 (13.11.2026):** EnDax 52 Themen: `e5-w-medien` Wortfeld Computer und Medien (Unit 1, Media smart) und `e5-a-meinung`
+  Meinung sagen (Unit 3, Station 3: I think … because …, I agree / I don’t agree). DeDax 37 Themen: `d5-konj` Konjunktionen
+  (antippen, passende Konjunktion nach Verbstellung und Sinn, Wortart unterscheiden, Hauptsatz oder Nebensatz). Beide Bücher sind
+  damit vollständig abgeglichen, soweit am Bildschirm übbar.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1257,6 +1261,9 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v81: EnDax Medien und Meinung, DeDax Konjunktionen** (13.11.2026). Geändert: `web/englisch/themen/klasse5.js`, `klasse5-knobel.js`,
+  `erklaerungen/klasse5.js`, `symbole.js`, Aufnahmen-Pakete; `web/deutsch/themen/klasse5.js`, `klasse5-knobel.js`, `erklaerungen/klasse5.js`,
+  `symbole.js`; `web/plattform/faecher.js` (52 und 37 Themen), `web/sw.js`, Doku.
 - **v80: DeDax Theater und Film, Versmaß, Metapher** (13.11.2026). Geändert: `web/deutsch/themen/klasse5.js`, `klasse5-knobel.js`,
   `erklaerungen/klasse5.js` (Bildmodus `bild`), `symbole.js`, `web/plattform/faecher.js` (36 Themen), `web/sw.js`, Doku.
   Tests: `dedax.py 3` (36 Themen, 720 Antworten, 144 Animationen), `dedax_knobel.py` (510 Aufgaben), nach letzter Textänderung `dedax.py 1`.

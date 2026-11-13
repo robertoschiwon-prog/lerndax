@@ -900,6 +900,56 @@
   }
   const adverbien = () => U.wahl([[32, advAntippen], [24, advFrage], [24, advLuecke], [20, advOderAdj]]);
 
+  // ---------- Thema: Konjunktionen (Deutschbuch Kap. 9, Wortarten unterscheiden) ----------
+  const KJS = ['Lina liest *und Ben malt.', 'Willst du Tee *oder Saft?', 'Ich bin müde, *aber ich lese noch.', 'Wir bleiben drinnen, *weil es regnet.', 'Mia hofft, *dass die Sonne scheint.',
+    '*Wenn es schneit, bauen wir einen Schneemann.', 'Emil spielt draußen, *obwohl es kalt ist.', 'Paul lacht, *denn der Witz ist lustig.', 'Wir warten, *bis der Bus kommt.',
+    'Ich putze die Zähne, *bevor ich ins Bett gehe.', 'Äpfel *und Birnen liegen im Korb.'];
+  const KJ_NEBEN = ['und', 'oder', 'aber', 'denn'], KJ_UNTER = ['weil', 'dass', 'wenn', 'obwohl', 'bis', 'bevor'];
+  const KJ_TIPP = 'Konjunktionen sind Bindewörter: Sie <b>verbinden</b> Wörter oder Sätze (und, oder, aber, denn, weil, dass, wenn, obwohl).';
+  // [Satz mit ___, richtig, [falsch, falsch]]: Die Stellung des Verbs schließt die falschen Angebote aus.
+  const KJL = [['Ich nehme einen Schirm mit, ___ es regnet.', 'weil', ['aber', 'oder']], ['Wir spielen draußen, ___ es kalt ist.', 'obwohl', ['und', 'denn']],
+    ['Ich rufe dich an, ___ ich zu Hause bin.', 'wenn', ['aber', 'oder']], ['Lina weiß, ___ morgen Ferien sind.', 'dass', ['und', 'denn']],
+    ['Möchtest du Tee ___ Saft?', 'oder', ['weil', 'dass']], ['Ich bin müde, ___ ich lese noch ein Kapitel.', 'aber', ['weil', 'dass']],
+    ['Ben ist froh, ___ er hat eine Eins.', 'denn', ['weil', 'obwohl']]];
+  function kjAntippen() {
+    const roh = pick(KJS).split(' '), i = roh.findIndex((x) => x[0] === '*'), tokens = roh.map((x) => x.replace('*', '')), w = tokens[i].replace(/[.,?]/g, '');
+    return {
+      prompt: 'Tippe die <b>Konjunktion</b> an.', tap: { tokens, correct: [i], one: true }, answerText: w, hint: KJ_TIPP,
+      solution: `${tokens.map((t, k) => (k === i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br><b>${w}</b> ist eine Konjunktion: Es verbindet ${KJ_NEBEN.includes(w.toLowerCase()) ? 'zwei Wörter oder Hauptsätze' : 'einen Hauptsatz mit einem Nebensatz'}.`,
+      ex: { mode: 'marken', art: 'kjAntippen', tokens, correct: [i], was: 'Konjunktion', s1: 'Welches Wort verbindet die Teile?', merk: `Konjunktion: <b>${w}</b>` },
+    };
+  }
+  function kjLuecke() {
+    const [satz, ok, falsch] = pick(KJL), ch = shuffle([ok, ...falsch]), voll = satz.replace('___', ok);
+    return {
+      prompt: `Welche Konjunktion passt?<br><span class="bsp">${satz}</span>`, choices: ch, correct: ch.indexOf(ok),
+      hint: 'Achte auf das Verb im zweiten Teil: Steht es am <b>Ende</b>, passt nur weil, dass, wenn, obwohl. Steht es an <b>2. Stelle</b>, passt und, oder, aber, denn. Dann entscheidet der Sinn.',
+      solution: `<b>${voll}</b><br>${KJ_UNTER.includes(ok) ? `„${ok}“ leitet einen Nebensatz ein: Das Verb steht am Ende.` : `„${ok}“ verbindet gleichrangige Teile: Das Verb bleibt an seinem Platz.`}`,
+      ex: { mode: 'marken', art: 'kjLuecke', tokens: voll.split(' '), correct: [voll.split(' ').indexOf(ok)], was: 'Konjunktion', s1: 'Wo steht das Verb im zweiten Teil?', merk: `<b>${voll}</b>` },
+    };
+  }
+  function kjWortart() {
+    const art = pick(['K', 'P', 'A']), w = art === 'K' ? pick([...KJ_NEBEN, ...KJ_UNTER]) : art === 'P' ? pick(['mit', 'auf', 'für', 'unter', 'durch', 'nach']) : pick(['heute', 'dort', 'gern', 'oft', 'draußen']);
+    const ch = ['Konjunktion', 'Präposition', 'Adverb'], idx = { K: 0, P: 1, A: 2 }[art];
+    const warum = { K: 'Sie verbindet Wörter oder Sätze.', P: 'Sie steht vor einem Nomen und zeigt eine Beziehung (mit dem Bus).', A: 'Es sagt, wann, wo, wie oder warum.' }[art];
+    return {
+      prompt: `Welche Wortart ist <b>${w}</b>?`, choices: ch, correct: idx,
+      hint: 'Konjunktion: verbindet (und, weil). Präposition: steht vor einem Nomen (mit dem Rad). Adverb: sagt wann, wo, wie, warum (heute, dort).',
+      solution: `<b>${w}</b> ist ${art === 'A' ? 'ein' : 'eine'} <b>${ch[idx]}</b>. ${warum} Alle drei bleiben immer gleich, sie haben keine Endungen.`,
+      ex: { mode: 'marken', art: 'kjWortart', tokens: [w], correct: [0], was: ch[idx], s1: 'Verbindet es, steht es vor einem Nomen, oder sagt es wann, wo, wie?', merk: `<b>${w}</b>: ${ch[idx]}. ${warum}` },
+    };
+  }
+  function kjArt() {
+    const neben = Math.random() < 0.5, w = neben ? pick(KJ_NEBEN) : pick(KJ_UNTER);
+    return {
+      prompt: `Was macht die Konjunktion <b>${w}</b>, wenn sie zwei Sätze verbindet?`, choices: ['Sie verbindet zwei Hauptsätze. Das Verb bleibt an 2. Stelle.', 'Sie leitet einen Nebensatz ein. Das Verb steht am Ende.'], correct: neben ? 0 : 1,
+      hint: 'Bilde einen Satz mit dem Wort. Steht das Verb danach an 2. Stelle oder ganz am Ende?',
+      solution: neben ? `<b>${w}</b> verbindet zwei Hauptsätze, zum Beispiel: ${({ und: 'Lina liest, und Ben malt.', oder: 'Wir gehen ins Kino, oder wir bleiben zu Hause.', aber: 'Ich bin müde, aber ich lese noch.', denn: 'Ich bleibe zu Hause, denn es regnet.' })[w]}` : `<b>${w}</b> leitet einen Nebensatz ein, das Verb wandert ans Ende: ${({ weil: 'Ich bleibe zu Hause, weil es regnet.', dass: 'Ich weiß, dass es regnet.', wenn: 'Ich bleibe zu Hause, wenn es regnet.', obwohl: 'Ich gehe raus, obwohl es regnet.', bis: 'Ich warte, bis der Regen aufhört.', bevor: 'Ich gehe heim, bevor es dunkel wird.' })[w]}`,
+      ex: { mode: 'marken', art: 'kjArt', tokens: [w], correct: [0], was: neben ? 'verbindet Hauptsätze' : 'leitet einen Nebensatz ein', s1: 'Wo steht das Verb danach?', merk: neben ? `<b>${w}</b>: Hauptsatz + Hauptsatz.` : `<b>${w}</b>: Nebensatz, Verb am Ende.` },
+    };
+  }
+  const konjunktionen = () => U.wahl([[30, kjAntippen], [28, kjLuecke], [22, kjWortart], [20, kjArt]]);
+
   // =====================================================
   // Bereich 2: Satzbau und Satzzeichen
   // =====================================================
@@ -2132,7 +2182,7 @@
       prompt: 'Tippe <b>alle Regieanweisungen</b> an.', tap: { tokens: z, correct }, answerText: correct.map((i) => z[i]).join(', '),
       hint: 'Regieanweisungen werden nicht gesprochen. Sie stehen in Klammern und sagen, was eine Figur tut oder wie sie spricht.',
       solution: `${z.map((t, i) => (correct.includes(i) ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Die Teile in Klammern sind Regieanweisungen: Sie werden gespielt, nicht gesprochen.`,
-      ex: { mode: 'marken', art: 'thRegie', tokens: z, correct, klein: true, was: 'Regieanweisungen', s1: 'Was wird gesprochen, was wird gespielt?' },
+      ex: { mode: 'marken', art: 'thRegie', tokens: z, correct, klein: true, was: 'Regieanweisungen', s1: 'Was wird gesprochen, was wird gespielt?', merk: `Regieanweisungen: <b>${correct.map((i) => z[i]).join(', ')}</b>` },
     };
   }
   function thMonoDia() {
@@ -2362,6 +2412,7 @@
     'd5-adverbial': { abBestimmen, abAntippen, abFrage },
     'd5-satzreihe': { begSatz, begWort, reiheKomma, reiheOderGefuege },
     'd5-theater': { thRegie, thMonoDia, thFest, thMgs },
+    'd5-konj': { kjAntippen, kjLuecke, kjWortart, kjArt },
     'd5-kamera': { kamGroesse, kamWozu, kamPersp, kamWirkung },
   };
 
@@ -2378,6 +2429,7 @@
         { id: 'd5-adjektive', title: 'Adjektive steigern', icon: '📶', gen: adjektive },
         { id: 'd5-praep', title: 'Präpositionen: auf, unter, mit …', icon: '📍', gen: praepositionen },
         { id: 'd5-adverb', title: 'Adverbien: heute, dort, gern …', icon: '🕰', gen: adverbien },
+        { id: 'd5-konj', title: 'Konjunktionen: und, aber, weil …', icon: '🔗', gen: konjunktionen },
         { id: 'd5-verbformen', title: 'Verbformen: Person, Partizip, Aufforderung', icon: '🧩', gen: verbformen },
         { id: 'd5-zeitformen', title: 'Zeitformen', icon: '⏳', gen: zeitformen },
         { id: 'd5-wortarten', title: 'Wortarten erkennen', icon: '🔎', gen: wortarten },

@@ -70,6 +70,10 @@ window.EnDaxIcons = (function () {
     'e5-w-adj': `<rect x="3" y="6" width="11" height="13" rx="1.5"/><rect x="16.5" y="13" width="4.5" height="6" rx="1" ${F}/>`,
     // a few, a little: Flasche
     'e5-wenig': `<path d="M10 3h4v4l2 3v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l2-3z"/><path d="M8 14h8v6H8z" ${F}/>`,
+    // Medien: Laptop
+    'e5-w-medien': `<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/><rect x="7" y="8" width="10" height="5" ${F}/>`,
+    // Meinung: Sprechblase mit Daumen
+    'e5-a-meinung': `<path d="M4 4h16v11H10l-5 4v-4H4z"/><path d="M9 12V9l2-3c1 0 1.4.6 1.2 1.6L12 9h3c.6 0 1 .5.9 1.1l-.6 2.2c-.1.4-.5.7-.9.7z" ${F}/>`,
     'e5-a-hallo': `<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/>`,
     'e5-a-klasse': `<circle cx="9" cy="6" r="2.5"/><path d="M5 21v-6a4 4 0 0 1 8 0v6M15 12l3-8"/>`,
     'e5-a-laden': `<path d="M3 4h3l2 11h11l2-8H7"/><circle cx="10" cy="19" r="1.6" ${F}/><circle cx="17" cy="19" r="1.6" ${F}/>`,
