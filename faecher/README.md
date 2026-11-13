@@ -32,7 +32,7 @@ Startseite und App-Icon.
 | DeDax | aufgeschlagenes Buch als Dach, mit Lesezeichen | `dedax.svg` ✅ eingebaut |
 | EnDax | Strickmütze mit Union Jack | `endax.svg` (liegt bereit) |
 | BioDax | Fliegenpilz als Hut | `biodax.svg` (liegt bereit) |
-| GeDax | Pharaonen-Kopftuch | `gedax.svg` (liegt bereit) |
+| GeDax | Pharaonen-Kopftuch | `gedax.svg` ✅ eingebaut |
 | GeoDax | Globus als Mütze | `geodax.svg` (liegt bereit) |
 | TecDax | Headset mit Mikrofon | `tecdax.svg` (liegt bereit) |
 
@@ -54,7 +54,7 @@ Klassen laut Stundentafel Sachsen (Grundschule Kl. 1–4, Gymnasium Sekundarstuf
 | **EnDax** | Englisch | En | 3–10 | Hauptfach | ✅ Klasse 5 |
 | **SuDax** | Sachunterricht | Su | 1–4 | Sachfach | geplant |
 | **BioDax** | Biologie | Bio | 5–10 | Sachfach | geplant |
-| **GeDax** | Geschichte | Ge | 5–10 | Sachfach | **als Nächstes** |
+| **GeDax** | Geschichte | Ge | 5–10 | Sachfach | ✅ Klasse 5 |
 | **GeoDax** | Geografie | Geo | 5–10 | Sachfach | geplant |
 | **TecDax** | Technik/Computer, ab Kl. 7 Informatik | TC / Inf | 5–10 | Sachfach | geplant |
 | **PhDax** | Physik | Ph | 6–10 | Sachfach | geplant |
@@ -75,7 +75,7 @@ Das kann später neu entschieden werden.
 1. MaDax ✅ inhaltlich fertig (36 Themen, Knobel-Stufe, Abgleich mit Buch und Lehrplan; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
 2. DeDax ✅ gebaut (37 Themen, Entdecken, Knobeln; mit dem Deutschbuch abgeglichen; Test mit dem Kind steht aus)
 3. EnDax ✅ gebaut (53 Themen nach den Units des Buchs, Entdecken, Knobeln; Startpunkt `faecher/englisch/README.md`; Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
-4. **GeDax (Anno 1): als Nächstes, Startpunkt `faecher/geschichte/README.md`**; danach BioDax (Linder 5), GeoDax (Terra 5)
+4. GeDax ✅ gebaut (31 Themen nach den Kapiteln von ANNO 1, Entdecken, Knobeln; `faecher/geschichte/README.md`); **als Nächstes BioDax (Linder 5) oder GeoDax (Terra 5)**
 5. TecDax (Technik/Computer)
 6. Vielleicht: MuDax, KuDax, EthDax
 

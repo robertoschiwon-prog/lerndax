@@ -21,7 +21,21 @@ Weitere Dokumente:
 
 ---
 
-## 0. Übergabe vom 12.11.2026: Stand und nächster Schritt (EnDax)
+## 0. Übergabe vom 13.11.2026 abends: GeDax gebaut (`lerndax-v87`)
+
+- **GeDax (Geschichte) Klasse 5 ist gebaut und live** (Auftrag Roberto: „Baue alles, frage wenig nach. Wir schauen später drüber.“).
+  31 Themen in 5 Bereichen = Kapitel von ANNO 1 (Begegnungen mit Geschichte, Frühgeschichte, Ägypten, Griechische Polis,
+  Längsschnitt Mensch und Natur), Entdecken (5: Erdgeschichte als ein Tag, Steinzeit-Brunnen/Jahresringe, C-14-Uhr, wandernder
+  Kalender, Alexander der Große), Knobeln (104 Varianten). Auf der Startseite als fertiges Fach (`faecher.js`: `themen: 31`).
+- Grundlagen: `faecher/geschichte/lehrplan/sachsen-gymnasium.md` (Lehrplan 2019, Originaltext), `schulbuch-abgleich.md`
+  (Fotos Inhaltsverzeichnis 13.11.), `themenplan.md`, `fakten.md` (alle Jahreszahlen mit Quellen). Im Unterricht: Kapitel 01,
+  Höhlenmalerei (Arbeitsblatt-Foto).
+- Tests: `tests/gedax.py 2` (31 Themen, 372 Antworten, 124 Lösungs-Animationen, nichts ragt aus dem Bild), `tests/gedax_knobel.py`
+  (520 Knobel-Aufgaben), Generatoren ohne Browser je 2000-mal, `tests/hub.py`.
+- **Wartet auf Roberto:** Durchsicht von GeDax; Rechnen über Christi Geburt mit „minus 1“ so wie in der Schule?; Begriffe der
+  Quellenarten; welcher Wahlbereich; Rückmeldungen von Bruno zu allen Fächern.
+
+## 0a. Übergabe vom 12.11.2026: Stand und nächster Schritt (EnDax)
 
 **Kurz für den neuen Chat (Stand `lerndax-v54`, Abend des 12.11.2026)**
 - **MaDax Klasse 5** (36 Themen) und **DeDax Klasse 5** (30 Themen, 6 Entdeckungen, Knobel-Aufgaben zu allen Themen)

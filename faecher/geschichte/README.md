@@ -1,6 +1,19 @@
 # GeDax (Geschichte) – Startpunkt
 
-Stand 13.11.2026 (`lerndax-v86`): **noch nichts gebaut.** Diese Datei sagt, was feststeht, was zu klären ist und wie man anfängt.
+Stand 13.11.2026 (`lerndax-v87`): **Klasse 5 gebaut und live** (31 Themen in 5 Bereichen = Kapitel von ANNO 1, Entdecken mit 5 Staunen-Momenten,
+Knobel-Aufgaben zu allen Themen). Lehrplan: `lehrplan/sachsen-gymnasium.md`, Buchabgleich: `lehrplan/schulbuch-abgleich.md`,
+Themenplan: `themenplan.md`, geprüfte Fakten mit Quellen: `fakten.md`. Tests: `tests/gedax.py`, `tests/gedax_knobel.py`.
+
+**Bauweise:** `web/geschichte/themen/klasse5.js` baut die meisten Themen aus Sammlungen (`baue(id, { F, T, O, S, A, extra })`:
+Auswahlfragen, Lücken, Reihenfolgen, Sortieren in Fächer, „Was passt nicht?“, Aussagen). Zeit-Themen (Zeitstrahl, Jahrhunderte,
+Rechnen) und die Pyramide haben eigene Generatoren. Animationen (`erklaerungen/klasse5.js`): Bild-Modi `karte`, `strahl`
+(Zeitstrahl mit Jahrhundert-Block oder Abstandsbogen), `reihe`, `faecher`, `pyramide`, `bild`. Bilder in Aufgaben: `D.bilder`.
+
+**Offen (Roberto fragen):** Rechnet die Schule über Christi Geburt mit „minus 1“ (kein Jahr 0)? GeDax tut das. Heißen die Quellen im
+Unterricht „Sachquelle/Bildquelle/Textquelle“ oder „gegenständlich/bildlich/schriftlich“? Welcher Wahlbereich (Alexander) kommt dran?
+Rückmeldungen von Bruno.
+
+Der Rest dieser Datei ist der Startpunkt von vor dem Bau.
 Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. Vorbilder: DeDax (`faecher/deutsch/README.md`,
 `web/deutsch/`) für Wissens- und Textaufgaben, EnDax (`web/englisch/`) für Bilder in Aufgaben und für „Bereiche = Kapitel des Buchs“.
 

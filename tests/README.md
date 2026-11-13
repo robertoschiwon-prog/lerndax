@@ -51,3 +51,5 @@ Seit `lerndax-v44` steckt die App in `web/plattform/fach.js`; die Mathe-Tests la
   und packt sie in Sammeldateien `web/englisch/audio/us/` und `gb/` (`index.json` und je Thema `<thema>.bin`).
   Kein Test, sondern das Werkzeug dazu; Einrichtung steht im Kopf der Datei.
 - `endax_knobel.py`: EnDax-Knobel-Aufgaben, jede Variante jedes Themas eine Runde (wie `dedax_knobel.py`). Alle 46 Themen haben Knobel-Aufgaben (seit v75).
+- `gedax.py [Runden] [Themen]`: **GeDax (Geschichte).** Wie `dedax.py`, zusätzlich Reihenfolge-Aufgaben; spielt Entdecken ab. Schnelltest ohne Browser: Generatoren je 2000-mal (siehe `faecher/geschichte/README.md`).
+- `gedax_knobel.py`: Knobel-Aufgaben von GeDax (alle Varianten).
