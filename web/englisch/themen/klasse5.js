@@ -8,7 +8,8 @@
  *   tap               Wörter antippen: { tokens:[…], correct:[Index …] }
  * Erklärt wird auf Deutsch, nur die Übungssätze sind englisch. Britische Schreibweise.
  * Alle Sätze sind selbst geschrieben (nichts aus dem Schulbuch) und stehen in festen Listen, damit es zu jedem
- * Satz eine Aufnahme gibt: audio/k5/<slug>.mp3 (erzeugt mit tests/endax_audio.py, Stimme „af_bella“).
+ * Satz eine Aufnahme gibt. Die Aufnahmen liegen in Sammeldateien je Thema (audio/us/, audio/gb/), erzeugt mit
+ * tests/endax_audio.py aus der Liste D.audioThemen().
  * Regel: Jede Lücke hat genau eine richtige Lösung. Kein falsches Angebot darf einen richtigen Satz ergeben.
  */
 (function () {
@@ -390,17 +391,14 @@
   const beNeg = () => U.wahl([[18, negWahl], [20, negTippen], [18, frageWahl], [14, frageTippen], [15, kurzWahl], [15, kurzTippen]]);
 
   D.daten = { FORM, KURZ, BE, PRONS, GRUPPE_TEXT, warum, kurzText, PS, PRON_ART, PRON_WORT, ALLE_PRON, NEG, FQ, KA, negText, frageText, jaText, neinText, subjKlein, gross };
-  // alle Texte, zu denen es eine Aufnahme geben muss (für tests/endax_audio.py und den Test)
-  D.audioTexte = () => {
-    const t = new Set();
-    BE.forEach((s) => { t.add(s.text); t.add(negText(s)); });
-    PRONS.forEach((s) => t.add(kurzText(s)));
-    PS.forEach((s) => { t.add(s.neu); if (s.art === 'w') t.add(s.text); });
-    t.add('Ben and I are in the same class.');
-    FQ.forEach((s) => t.add(frageText(s)));
-    KA.forEach((s) => { t.add(jaText(s)); t.add(neinText(s)); });
-    return [...t];
-  };
+  // Alle Texte, zu denen es eine Aufnahme geben muss, nach Themen geordnet (für tests/endax_audio.py und den Test).
+  // Jedes Thema bekommt eine Sammeldatei; ein Text, der in mehreren Themen vorkommt, liegt beim ersten.
+  D.audioThemen = () => ({
+    'e5-be': [...BE.map((s) => s.text), ...PRONS.map(kurzText)],
+    'e5-pron': [...PS.map((s) => s.neu), ...PS.filter((s) => s.art === 'w').map((s) => s.text), 'Ben and I are in the same class.'],
+    'e5-be-neg': [...BE.map(negText), ...FQ.map(frageText), ...KA.map(jaText), ...KA.map(neinText)],
+  });
+  D.audioTexte = () => [...new Set(Object.values(D.audioThemen()).flat())];
   D.arten = {
     'e5-be': { beLuecke, beTippen, beSatz, beWer, beKurz, beLang, beDeutsch, beAntippen },
     'e5-pron': { pronWahl, pronTippen, pronWer, pronDeutsch, pronEnglisch, pronIch },
@@ -624,20 +622,132 @@
   const aOderAn = () => U.wahl([[30, aanWahl], [22, aanTippen], [22, aanSatz], [18, aanWelches], [8, aanWarum]]);
 
   Object.assign(D.daten, { HAVE, HKURZ, HNEG, HGRUPPE, HG, HPRON, HQ, HKA, hKurz, hNeg, hFrage, hJa, hNein, hPron, AAN });
-  const audioBisher = D.audioTexte;
-  D.audioTexte = () => {
-    const t = new Set(audioBisher());
-    HG.forEach((s) => { t.add(s.text); t.add(hNeg(s)); });
-    HPRON.forEach((s) => t.add(hKurz(s)));
-    HQ.forEach((s) => t.add(hFrage(s)));
-    HKA.forEach((s) => { t.add(hJa(s)); t.add(hNein(s)); });
-    AAN.forEach((w) => t.add(w.text));
-    return [...t];
-  };
+  const themenBisher = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenBisher(), {
+    'e5-have': [...HG.map((s) => s.text), ...HPRON.map(hKurz), ...HG.map(hNeg), ...HQ.map(hFrage), ...HKA.map(hJa), ...HKA.map(hNein)],
+    'e5-a-an': AAN.map((w) => w.text),
+  });
   Object.assign(D.arten, {
     'e5-have': { hgLuecke, hgTippen, hgSatz, hgKurz, hgNeg, hgFrageWahl, hgFrageTippen, hgAntwort },
     'e5-a-an': { aanWahl, aanTippen, aanSatz, aanWelches, aanWarum },
   });
+
+  // =====================================================
+  // Mehrzahl (Plural)
+  // =====================================================
+  const PL_REGEL = {
+    s: 'Meistens hängt man einfach <b>-s</b> an.',
+    es: 'Nach einem Zischlaut (s, ss, sh, ch, x) hängt man <b>-es</b> an.',
+    ies: 'Konsonant + y: Aus dem y wird <b>-ies</b>.',
+    ys: 'Vokal + y: Das y bleibt, man hängt nur <b>-s</b> an.',
+    irr: 'Das Wort hat eine eigene Mehrzahl, die man lernen muss.',
+    ves: 'Aus f oder fe am Ende wird <b>-ves</b>.',
+    oes: 'Bei diesem Wort auf o hängt man <b>-es</b> an.',
+  };
+  // [Einzahl, Mehrzahl, Deutsch, Regel, zwei falsche Mehrzahlen]
+  const PL = [
+    ['book', 'books', 'Buch', 's', ['bookes', 'booken']], ['dog', 'dogs', 'Hund', 's', ['doges', 'dogen']],
+    ['cat', 'cats', 'Katze', 's', ['cates', 'caten']], ['bag', 'bags', 'Tasche', 's', ['bages', 'bagen']],
+    ['chair', 'chairs', 'Stuhl', 's', ['chaires', 'chairen']], ['girl', 'girls', 'Mädchen', 's', ['girles', 'girlen']],
+    ['apple', 'apples', 'Apfel', 's', ['applees', 'applen']], ['friend', 'friends', 'Freund', 's', ['friendes', 'frienden']],
+    ['table', 'tables', 'Tisch', 's', ['tablees', 'tablen']], ['house', 'houses', 'Haus', 's', ['housees', 'housen']],
+    ['box', 'boxes', 'Kiste', 'es', ['boxs', 'boxies']], ['glass', 'glasses', 'Glas', 'es', ['glass', 'glassies']],
+    ['dish', 'dishes', 'Schüssel', 'es', ['dishs', 'dishies']], ['watch', 'watches', 'Armbanduhr', 'es', ['watchs', 'watchies']],
+    ['sandwich', 'sandwiches', 'belegtes Brot', 'es', ['sandwichs', 'sandwichies']], ['class', 'classes', 'Klasse', 'es', ['class', 'classies']],
+    ['fox', 'foxes', 'Fuchs', 'es', ['foxs', 'foxies']], ['bus', 'buses', 'Bus', 'es', ['buss', 'busies']],
+    ['baby', 'babies', 'Baby', 'ies', ['babys', 'babyes']], ['family', 'families', 'Familie', 'ies', ['familys', 'familyes']],
+    ['city', 'cities', 'Stadt', 'ies', ['citys', 'cityes']], ['story', 'stories', 'Geschichte', 'ies', ['storys', 'storyes']],
+    ['party', 'parties', 'Party', 'ies', ['partys', 'partyes']], ['hobby', 'hobbies', 'Hobby', 'ies', ['hobbys', 'hobbyes']],
+    ['boy', 'boys', 'Junge', 'ys', ['boies', 'boyes']], ['day', 'days', 'Tag', 'ys', ['daies', 'dayes']],
+    ['key', 'keys', 'Schlüssel', 'ys', ['keies', 'keyes']], ['toy', 'toys', 'Spielzeug', 'ys', ['toies', 'toyes']],
+    ['man', 'men', 'Mann', 'irr', ['mans', 'mens']], ['woman', 'women', 'Frau', 'irr', ['womans', 'womens']],
+    ['child', 'children', 'Kind', 'irr', ['childs', 'childrens']], ['foot', 'feet', 'Fuß', 'irr', ['foots', 'feets']],
+    ['tooth', 'teeth', 'Zahn', 'irr', ['tooths', 'teeths']], ['mouse', 'mice', 'Maus', 'irr', ['mouses', 'mices']],
+    ['sheep', 'sheep', 'Schaf', 'irr', ['sheeps', 'sheepes']],
+    ['knife', 'knives', 'Messer', 'ves', ['knifes', 'knifs']], ['leaf', 'leaves', 'Blatt', 'ves', ['leafs', 'leafes']],
+    ['wolf', 'wolves', 'Wolf', 'ves', ['wolfs', 'wolfes']], ['shelf', 'shelves', 'Regal', 'ves', ['shelfs', 'shelfes']],
+    ['tomato', 'tomatoes', 'Tomate', 'oes', ['tomatos', 'tomatoies']], ['potato', 'potatoes', 'Kartoffel', 'oes', ['potatos', 'potatoies']],
+  ].map(([sg, pl, de, regel, falsch]) => ({ sg, pl, de, regel, falsch, text: `one ${sg}, two ${pl}` }));
+  const istVokal = (c) => 'aeiou'.includes(c);
+  function plWarum(w) {
+    const e = w.sg.slice(-1), v = w.sg.slice(-2, -1);
+    switch (w.regel) {
+      case 's': return `Hier gilt die einfache Regel: <b>-s</b> anhängen.`;
+      case 'es': return `<b>${w.sg}</b> endet auf einen Zischlaut (${/(ss|sh|ch)$/.test(w.sg) ? w.sg.slice(-2) : e}). „${w.sg}s“ könnte man kaum sprechen, deshalb <b>-es</b>.`;
+      case 'ies': return `<b>${w.sg}</b> endet auf Konsonant + y (${v} + y). Aus dem y wird <b>-ies</b>.`;
+      case 'ys': return `<b>${w.sg}</b> endet auf Vokal + y (${v} + y). Das y bleibt, es kommt nur <b>-s</b> dazu.`;
+      case 'irr': return w.sg === w.pl ? `<b>${w.sg}</b> bleibt in der Mehrzahl gleich. Das muss man sich merken.` : `<b>${w.sg}</b> hat eine eigene Mehrzahl: <b>${w.pl}</b>. Die muss man lernen.`;
+      case 'ves': return `<b>${w.sg}</b> endet auf ${w.sg.endsWith('fe') ? 'fe' : 'f'}. Daraus wird <b>-ves</b>.`;
+      default: return `<b>${w.sg}</b> endet auf o. Bei diesem Wort kommt <b>-es</b> dazu.`;
+    }
+  }
+  const plLoesung = (w) => `<span lang="en">one ${w.sg} → two <b class="vb">${w.pl}</b></span> ${U.say(w.text)}<br>${plWarum(w)}<br><small>${w.sg} = ${w.de}</small>`;
+  const PL_TIPP = 'Schau auf das <b>Ende</b> des Wortes. Meistens kommt -s dazu. Nach einem Zischlaut (s, ss, sh, ch, x) -es. Konsonant + y wird zu -ies. Ein paar Wörter haben eine eigene Mehrzahl (man → men).';
+  const PLEX = (w, mode) => ({ mode: mode || 'pl', sg: w.sg, pl: w.pl, de: w.de, regel: w.regel });
+  // A: Mehrzahl eintippen
+  function plTippen() {
+    const w = pick(PL);
+    return {
+      prompt: `Schreibe die <b>Mehrzahl</b>.${en(`one ${w.sg}`)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: w.pl, prefix: 'two', label: 'Mehrzahl' }],
+      hint: PL_TIPP, solution: plLoesung(w), ex: PLEX(w),
+    };
+  }
+  // B: richtige Mehrzahl auswählen
+  function plWahl() {
+    const w = pick(PL);
+    const ch = shuffle([w.pl, ...w.falsch]);
+    return {
+      prompt: `Wie heißt die <b>Mehrzahl</b> von <b lang="en">${w.sg}</b>?`,
+      choices: ch.map((c) => `<span lang="en">two ${c}</span>`), correct: ch.indexOf(w.pl),
+      hint: PL_TIPP, solution: plLoesung(w), ex: PLEX(w),
+    };
+  }
+  // C: von der Mehrzahl zurück zur Einzahl
+  function plEinzahl() {
+    const w = pick(PL.filter((x) => x.regel !== 's'));
+    return {
+      prompt: `Schreibe die <b>Einzahl</b>.${en(`two ${w.pl}`)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: w.sg, prefix: 'one', label: 'Einzahl' }],
+      hint: 'Geh den Weg rückwärts: -ies wird wieder zu y, -ves wieder zu f oder fe, -es fällt weg. Bei men, children, feet, teeth, mice musst du das Wort kennen.',
+      solution: `<span lang="en">two ${w.pl} → one <b class="vb">${w.sg}</b></span> ${U.say(w.text)}<br>${plWarum(w)}<br><small>${w.sg} = ${w.de}</small>`, ex: PLEX(w, 'sg'),
+    };
+  }
+  // D: Welche Regel steckt dahinter?
+  function plRegel() {
+    const w = pick(PL);
+    // -s und „Vokal + y → -s“ nie zusammen anbieten (beide wären richtig)
+    const andere = shuffle(Object.keys(PL_REGEL).filter((r) => r !== w.regel && !(w.regel === 'ys' && r === 's') && !(w.regel === 's' && r === 'ys'))).slice(0, 2);
+    const ch = shuffle([w.regel, ...andere]);
+    return {
+      prompt: `Welche Regel passt?${en(`one ${w.sg} → two ${w.pl}`)}`,
+      choices: ch.map((r) => PL_REGEL[r]), correct: ch.indexOf(w.regel),
+      hint: 'Vergleiche Einzahl und Mehrzahl: Was ist am Ende dazugekommen, was hat sich verändert?',
+      solution: plLoesung(w), ex: PLEX(w),
+    };
+  }
+  // E: Welches Wort folgt der Regel?
+  function plWelches() {
+    const [regel, frage, gegen] = pick([
+      ['es', 'Welches Wort bekommt in der Mehrzahl <b>-es</b>?', ['s', 'ys']],
+      ['ies', 'Bei welchem Wort wird aus dem y ein <b>-ies</b>?', ['ys']],
+      ['irr', 'Welches Wort hat eine <b>eigene</b> Mehrzahl (ohne -s)?', ['s', 'es', 'ys']],
+      ['ves', 'Bei welchem Wort wird das f zu <b>-ves</b>?', ['s', 'ys', 'es']],
+    ]);
+    const w = pick(PL.filter((x) => x.regel === regel));
+    const ch = shuffle([w, ...shuffle(PL.filter((x) => gegen.includes(x.regel) && x.sg !== 'house')).slice(0, 2)]);
+    return {
+      prompt: frage,
+      choices: ch.map((c) => `<span lang="en">${c.sg}</span>`), correct: ch.indexOf(w),
+      hint: PL_TIPP,
+      solution: `${plLoesung(w)}<br>Die anderen beiden: ${ch.filter((c) => c !== w).map((c) => `<span lang="en">${c.sg} → ${c.pl}</span>`).join(', ')}.`, ex: PLEX(w),
+    };
+  }
+  const mehrzahl = () => U.wahl([[30, plTippen], [22, plWahl], [16, plEinzahl], [16, plRegel], [16, plWelches]]);
+  Object.assign(D.daten, { PL, PL_REGEL, plWarum });
+  const themenVorPlural = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorPlural(), { 'e5-plural': PL.map((w) => w.text) });
+  Object.assign(D.arten, { 'e5-plural': { plTippen, plWahl, plEinzahl, plRegel, plWelches } });
 
   // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
@@ -651,6 +761,7 @@
         { id: 'e5-be-neg', title: 'to be: verneinen und fragen', icon: '❓', gen: beNeg },
         { id: 'e5-have', title: 'have got und has got', icon: '🎒', gen: haveGot },
         { id: 'e5-a-an', title: 'a oder an', icon: '🍎', gen: aOderAn },
+        { id: 'e5-plural', title: 'Mehrzahl: one box, two boxes', icon: '📦', gen: mehrzahl },
       ] },
     ],
   };

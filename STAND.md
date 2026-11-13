@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v58`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v59`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -71,9 +71,19 @@ Weitere Dokumente:
 - **EnDax v58 (13.11.2026): Themen 4 und 5**, auf GitHub und live. `e5-have` „have got und has got“ (8 Aufgabenarten:
   Form, Satz, Kurzform, verneinen, Frage, Kurzantwort; Animation „zwei Fächer“) und `e5-a-an` „a oder an“ (5 Aufgabenarten,
   31 Wörter, mit den Sonderfällen an hour und a uniform; Animation „das n ist eine Brücke“). Jetzt 251 Aufnahmen je Aussprache.
-  **Achtung OneDrive:** Die 220 neuen MP3 von v58 (110 je Aussprache) liegen **nur auf GitHub**, nicht im OneDrive-Ordner
-  (einzeln zurückschreiben ist sehr aufwendig). Code und Doku sind in OneDrive aktuell. Wer lokal testet, holt die MP3 aus
-  dem Repository oder erzeugt sie mit `tests/endax_audio.py`. Als Nächstes laut Themenplan: Mehrzahl, there is/are.
+  (Die MP3 von v58 lagen zunächst nur auf GitHub; mit v59 erledigt, siehe nächster Punkt.)
+- **EnDax v59 (13.11.2026): Aufnahmen in Sammeldateien, Thema 6 „Mehrzahl“**, auf GitHub und live.
+  **Sammeldateien** (Entscheidung des Auftraggebers): statt hunderter MP3 je Aussprache ein Ordner `web/englisch/audio/us/`
+  bzw. `gb/` mit `index.json` und je Thema einer Datei `<thema>.bin` (alle MP3 hintereinander). `fach.js` lädt das Paket
+  eines Themas vor, sobald Lautsprecher-Knöpfe zu sehen sind, und spielt die Aufnahme als `data:`-Adresse. Ist das Paket
+  beim Antippen noch nicht da, startet zuerst ein stiller Ton (damit das iPhone den Ton erlaubt), dann die Aufnahme.
+  Die alten Ordner `audio/k5/` und `audio/k5-gb/` sind im Repository gelöscht. **Im OneDrive-Ordner liegen sie noch**
+  (Löschen geht aus der Sitzung nicht): Der Auftraggeber kann beide Ordner löschen, sie werden nicht mehr gebraucht.
+  Damit sind OneDrive und GitHub wieder gleich (bis auf diese beiden alten Ordner).
+  **Nicht auf einem iPhone geprüft**, nur im Test-Browser: Rückmeldung des Auftraggebers abwarten.
+  `e5-plural` „Mehrzahl: one box, two boxes“: 41 Wörter, 5 Aufgabenarten (Mehrzahl tippen und wählen, Einzahl, Regel
+  erkennen, passendes Wort finden), Animation „auf das Wortende kommt es an“. Jetzt 292 Aufnahmen je Aussprache.
+  Als Nächstes laut Themenplan: there is/are, this/that, my/your, ’s, Imperativ, can/must.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1091,3 +1101,9 @@ Infos zur ersten Arbeit:
 - **v58: EnDax, Themen 4 und 5** (13.11.2026): `e5-have` und `e5-a-an`. Nur `web/englisch/` und `sw.js` geändert.
   Geprüft: 10 400 erzeugte Aufgaben der beiden Themen ohne Fehler; `tests/endax.py` 10 Runden (5 Themen, 300 Antworten,
   100 Animationen) ohne Fehler. Die neuen Aufnahmen hat noch niemand angehört.
+- **v59: Sammeldateien für Aufnahmen und EnDax-Thema „Mehrzahl“** (13.11.2026). Geändert: `web/plattform/fach.js`
+  (Wiedergabe aus Sammeldateien), `web/englisch/` (Thema, Animation, Symbol, `audio/us/`, `audio/gb/`), `tests/endax.py`,
+  `tests/endax_audio.py` (packt, übernimmt vorhandene Aufnahmen, erzeugt nur fehlende), `sw.js`.
+  Geprüft: alle 251 bisherigen Aufnahmen liegen byte-gleich in den Paketen; 14 100 erzeugte Aufgaben ohne Fehler;
+  `tests/endax.py` 8 Runden (6 Themen, 288 Antworten, 96 Animationen, 46 Lautsprecher angetippt) ohne Fehler; Wiedergabe
+  im Test-Browser gemessen (Aufnahme läuft bis zum Ende, auch wenn das Paket beim Antippen noch fehlt). Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden, 360 Antworten), `eltern`, `hub`.

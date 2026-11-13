@@ -9,7 +9,7 @@ Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. 
 | 1 Lehrplan auswerten | **erledigt (12.11.2026)**. Wichtig: Klasse 5 und 6 sind gemeinsam beschrieben, die Aufteilung macht das Schulbuch | `lehrplan/sachsen-gymnasium.md` |
 | 2 Schulbuch abgleichen | offen: Titel, Ausgabe, ISBN und Foto des Inhaltsverzeichnisses fehlen | `lehrplan/schulbuch-abgleich.md` (anlegen) |
 | 3 Themenplan | **Vorschlag liegt vor (12.11.2026)**, wartet auf Zustimmung; Entscheidungen stehen dort | `themenplan.md` |
-| 4 Themen bauen | **5 Themen gebaut** (to be v55; Pronomen und „to be verneinen und fragen“ v57; have got und a/an v58), live; die übrigen offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
+| 4 Themen bauen | **6 Themen gebaut** (to be v55; Pronomen und „to be verneinen und fragen“ v57; have got und a/an v58; Mehrzahl v59), live; die übrigen offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
 
 ## Was feststeht
 
@@ -124,3 +124,14 @@ Deutsch laufen lassen, weil es die gemeinsame App betrifft):
 - Hinweis: Beim Zurückschreiben aus einer Claude-Sitzung bekommt jede MP3 automatisch einen eingebetteten Herkunftsvermerk
   (C2PA „Content Credentials“, rund 6 KB im ID3-Teil). Der Ton selbst bleibt gleich. Die Dateien im Ordner sind deshalb
   etwas größer als frisch erzeugte; das ist kein Fehler.
+
+## Aufnahmen seit v59: Sammeldateien (ersetzt die Angaben oben zu einzelnen MP3)
+
+- Ordner `web/englisch/audio/us/` (amerikanisch, `af_bella`) und `web/englisch/audio/gb/` (britisch, `bm_fable`).
+  Darin `index.json` (`clips: { name: [paket, start, laenge] }`) und je Thema eine Datei `<thema>.bin`.
+- Jeder Satz mit Lautsprecher muss in `EnDax.audioThemen()` beim passenden Thema stehen (`themen/klasse5.js`).
+  Danach `python3 tests/endax_audio.py <Modell-Ordner>`: übernimmt vorhandene Aufnahmen aus den Paketen, erzeugt nur
+  fehlende, packt neu. Ohne Modell-Ordner prüft und packt es nur. `tests/endax.py` meldet fehlende Aufnahmen.
+- Neues Thema = zwei neue `.bin` und zwei geänderte `index.json`. Ändert sich ein altes Thema, ändert sich sein Paket.
+- Die App lädt ein Paket vor, sobald Lautsprecher-Knöpfe zu sehen sind. Ohne Internet geht der Ton für alle Themen,
+  die man mit Internet schon einmal geöffnet hat (bis zur nächsten App-Version, dann einmal neu laden).

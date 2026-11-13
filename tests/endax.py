@@ -2,7 +2,7 @@
 Prüft: jede richtige Antwort wird angenommen (Auswahl, Wort eintippen, Satz mit Lücken, Wörter antippen),
 eine falsche Antwort führt über den Tipp zur Lösung, die Lösungs-Animation läuft zu Ende und nennt die Antwort,
 kein Text der Animation ragt aus dem Bild. Zusätzlich: Getippt wird mit dem geraden Apostroph (') statt (’),
-zu jedem Lautsprecher-Knopf gibt es die Aufnahme in beiden Aussprachen, der Umschalter „Aussprache“ wirkt,
+zu jedem Lautsprecher-Knopf gibt es die Aufnahme in beiden Aussprachen (in den Sammeldateien), der Umschalter „Aussprache“ wirkt,
 und ein Knopf wird angetippt. Aufruf: python3 tests/endax.py [Runden je Thema]"""
 import pathlib, os, sys, asyncio
 HERE = pathlib.Path(__file__).resolve().parent; ROOT = HERE.parent
@@ -12,7 +12,9 @@ from playwright.async_api import async_playwright
 URL = (ROOT / 'web').as_uri() + '/englisch/index.html'
 RUNDEN = int(sys.argv[1]) if len(sys.argv) > 1 else 12
 AUDIO = ROOT / 'web' / 'englisch' / 'audio'
-ORDNER = ['k5', 'k5-gb']   # amerikanisch, britisch
+ORDNER = ['us', 'gb']   # amerikanisch, britisch
+import json
+CLIPS = {o: json.loads((AUDIO / o / 'index.json').read_text(encoding='utf-8'))['clips'] for o in ORDNER}
 SAY = "() => [...document.querySelectorAll('[data-say]')].map(b => b.dataset.say)"
 TASK = """() => { const t = window.__lerndax.round().cur.task;
   return { choice: t.choices ? t.correct : null, tap: t.tap ? t.tap.correct : null, ntok: t.tap ? t.tap.tokens.length : 0,
@@ -38,20 +40,20 @@ async def answer(pg, a, wrong=False):
 
 async def main():
     async with async_playwright() as p:
-        b = await p.chromium.launch(**CHROME, args=['--no-sandbox'])
+        b = await p.chromium.launch(**CHROME, args=['--no-sandbox', '--allow-file-access-from-files'])   # Sammeldateien laden ohne Server
         pg = await b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=2)
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.add_init_script(FAST.join(['(', ')()']))
         await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')")
         await pg.fill('#nameI', 'Max'); await pg.click('#nameF button')
         # Umschalter „Aussprache“: britisch wählen, danach müssen die Aufnahmen aus k5-gb kommen
-        mp3 = []; pg.on('request', lambda r: mp3.append(r.url) if r.url.endswith('.mp3') else None)
+        mp3 = []; pg.on('request', lambda r: mp3.append(r.url) if '/audio/' in r.url else None)
         await pg.wait_for_selector('.akzent'); await pg.click('[data-akzent="gb"]')
         gewaehlt = await pg.evaluate("() => [localStorage.getItem('lerndax.englisch.akzent'), document.querySelector('.akzent button.on').dataset.akzent]")
         print('Aussprache gewählt:', gewaehlt)
         await pg.screenshot(path=str(SHOTS / 'endax-start.png'))
         ids = await pg.eval_on_selector_all('[data-topic]', 'els=>[...new Set(els.map(e=>e.dataset.topic))]')
-        bad = 0; n = 0; anim = 0; meld = []; gehoert = set()
+        bad = 0; n = 0; anim = 0; meld = []; gehoert = set(); gespielt = 0
         for t in ids:
             for rnd in range(RUNDEN):
                 await pg.evaluate("() => document.querySelectorAll('[data-lbopen]').forEach(b => b.click())")   # fertige Lernbereiche sind eingeklappt
@@ -86,9 +88,11 @@ async def main():
                     for name in await pg.evaluate(SAY):
                         gehoert.add(name)
                         for o in ORDNER:
-                            if not (AUDIO / o / (name + '.mp3')).exists(): meld.append(f'{t}: Aufnahme fehlt: {o}/{name}.mp3')
+                            if name not in CLIPS[o]: meld.append(f'{t}: Aufnahme fehlt: {o}/{name}')
                     sb = await pg.query_selector('.fb .say')
-                    if sb and k == 1: await sb.click(); await pg.wait_for_timeout(60)
+                    if sb and k == 1:
+                        await sb.click(); await pg.wait_for_timeout(250); gespielt += 1
+                        if await pg.query_selector('.say.err'): meld.append(f'{t}: Aufnahme ließ sich nicht abspielen')
                     await pg.click('#nextB')
                 await pg.click('[data-go="home"]')
         # freie Erklärung
@@ -113,9 +117,9 @@ async def main():
         print('Entdeckungen:', discs)
         await pg.click('[data-go="parents"]'); await pg.screenshot(path=str(SHOTS / 'endax-eltern.png'), full_page=True)
         if gewaehlt != ['gb', 'gb']: meld.append(f'Umschalter Aussprache: {gewaehlt}')
-        if not mp3 or not all('/k5-gb/' in u for u in mp3): meld.append(f'Aufnahmen nicht aus k5-gb: {mp3[:3]}')
-        print(len(mp3), 'Aufnahmen abgespielt, alle britisch:', bool(mp3) and all('/k5-gb/' in u for u in mp3))
-        print(len(gehoert), 'verschiedene Aufnahmen kamen vor,', [len(list((AUDIO / o).glob('*.mp3'))) for o in ORDNER], 'Dateien vorhanden (amerikanisch, britisch)')
+        if not mp3 or not all('/audio/gb/' in u for u in mp3): meld.append(f'Aufnahmen nicht aus audio/gb: {mp3[:3]}')
+        print(gespielt, 'Lautsprecher angetippt,', len(mp3), 'Sammeldateien geladen, alle britisch:', bool(mp3) and all('/audio/gb/' in u for u in mp3))
+        print(len(gehoert), 'verschiedene Aufnahmen kamen vor,', [len(CLIPS[o]) for o in ORDNER], 'Aufnahmen in den Sammeldateien (amerikanisch, britisch)')
         print(f'{len(ids)} Themen, {n} richtige Antworten geprüft, {bad} nicht angenommen, {anim} Lösungs-Animationen')
         for m in meld[:30]: print(' -', m)
         for e in errs[:10]: print(' ! Seitenfehler:', e)

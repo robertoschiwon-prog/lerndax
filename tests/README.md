@@ -44,8 +44,9 @@ Seit `lerndax-v44` steckt die App in `web/plattform/fach.js`; die Mathe-Tests la
 
 ## EnDax (Englisch)
 
-- `endax.py [Runden]`: spielt jedes Englisch-Thema in der App durch (wie `dedax.py`). Zusätzlich: tippt mit dem geraden
-  Apostroph, prüft, dass es zu jedem Lautsprecher-Knopf die Aufnahme in beiden Aussprachen gibt, stellt den Umschalter „Aussprache“
+- `endax.py [Runden]`: spielt jedes Englisch-Thema in der App durch (wie `dedax.py`). Braucht den Chrome-Schalter `--allow-file-access-from-files` (ist im Test gesetzt). Zusätzlich: tippt mit dem geraden
+  Apostroph, prüft, dass es zu jedem Lautsprecher-Knopf die Aufnahme in beiden Aussprachen gibt (in den Sammeldateien), stellt den Umschalter „Aussprache“
   auf britisch und tippt einen Knopf an.
-- `endax_audio.py <Modell-Ordner> [--alle]`: erzeugt die Aufnahmen `web/englisch/audio/k5/*.mp3` (amerikanisch, Kokoro `af_bella`) und `audio/k5-gb/*.mp3` (britisch, `bm_fable`).
+- `endax_audio.py [Modell-Ordner] [--alle]`: erzeugt fehlende Aufnahmen (Kokoro: amerikanisch `af_bella`, britisch `bm_fable`)
+  und packt sie in Sammeldateien `web/englisch/audio/us/` und `gb/` (`index.json` und je Thema `<thema>.bin`).
   Kein Test, sondern das Werkzeug dazu; Einrichtung steht im Kopf der Datei.

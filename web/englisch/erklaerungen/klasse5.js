@@ -543,4 +543,71 @@
       };
     },
   };
+
+  // =====================================================
+  // Mehrzahl: auf das Wortende kommt es an
+  // =====================================================
+  //   ctx: { mode:'pl'|'sg', sg, pl, de, regel }
+  EX['e5-plural'] = {
+    title: 'Mehrzahl: one box, two boxes',
+    titleFor: (ctx) => (ctx && ctx.sg ? `Warum „${ctx.pl}“?` : 'Mehrzahl: one box, two boxes'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!ctx.sg;
+      let W0 = null, frei = [], oben = null, unten = null;
+      if (task) W0 = ctx.post ? ctx : U.pick(T.PL.filter((w) => w.regel === ctx.regel && w.sg !== ctx.sg));
+      const neuFrei = () => { frei = ['s', 'es', 'ies', 'irr'].map((r) => U.pick(T.PL.filter((w) => w.regel === r && w.sg !== w.pl))); };
+      if (!task) { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      // gemeinsamer Anfang von Einzahl und Mehrzahl
+      const gleich = (w) => { let n = 0; while (n < w.sg.length && w.sg[n] === w.pl[n]) n++; return n; };
+      // Wie viele Buchstaben am Ende der Einzahl entscheiden?
+      function ende(w) {
+        if (w.regel === 'es') return /(ss|sh|ch)$/.test(w.sg) ? 2 : 1;
+        if (w.regel === 'ies' || w.regel === 'ys') return 2;
+        if (w.regel === 'ves') return w.sg.endsWith('fe') ? 2 : 1;
+        if (w.regel === 'oes') return 1;
+        if (w.regel === 'irr') return w.sg.length - gleich(w);
+        return 0;
+      }
+      const weg = () => { if (oben) oben.remove(); if (unten) unten.remove(); oben = unten = null; };
+      function zeigeEinzahl(w, markiert) {
+        if (oben) oben.remove();
+        const n = markiert ? ende(w) : 0;
+        oben = tzeile(api, [['one ', '#8b8577'], [w.sg.slice(0, w.sg.length - n)], [n ? w.sg.slice(-n) : '', ORANGE]], 78, 30);
+      }
+      function zeigeMehrzahl(w) {
+        if (unten) unten.remove();
+        const n = gleich(w);
+        unten = tzeile(api, [['two ', '#8b8577'], [w.pl.slice(0, n)], [w.pl.slice(n), BLAU]], 138, 30);
+      }
+      async function zeige(w, pause) {
+        weg();
+        zeigeEinzahl(w, false);
+        api.say(`Ein ${w.de}: <b>one ${w.sg}</b>. Und wenn es zwei sind? Schau auf das <b>Ende</b> des Wortes.`);
+        await api.wait(pause);
+        zeigeEinzahl(w, true);
+        api.say(T.PL_REGEL[w.regel]);
+        await api.wait(pause);
+        zeigeMehrzahl(w);
+        return `one <b>${w.sg}</b> → two <b>${w.pl}</b>. ${T.plWarum(w)} ${U.say(w.text)}`;
+      }
+      return {
+        reset() {
+          api.clear(); oben = unten = null;
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (task) zeigeEinzahl(W0, false); else oben = tzeile(api, [['one', '#8b8577'], [' → '], ['two', BLAU]], 100, 30);
+        },
+        async play() {
+          if (task) { api.say(await zeige(W0, 2600)); return; }
+          api.say('Für die Mehrzahl hängt man im Englischen meistens nur ein <b>-s</b> an. Manchmal verlangt das Wortende etwas anderes.');
+          await api.wait(3200);
+          for (const w of frei) { api.say(await zeige(w, 2200)); await api.wait(3200); }
+          weg();
+          oben = tzeile(api, [['-s', BLAU], [' · '], ['-es', BLAU], [' · '], ['-ies', BLAU]], 100, 30);
+          api.say('Merke: meistens <b>-s</b>. Nach Zischlaut <b>-es</b>. Konsonant + y wird <b>-ies</b>. Und ein paar Wörter wie man → men lernt man einzeln.');
+        },
+      };
+    },
+  };
 })();

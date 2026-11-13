@@ -14,6 +14,8 @@ window.EnDaxIcons = (function () {
     'e5-have': `<circle cx="8" cy="6.5" r="2.6"/><path d="M4 19v-4.5c0-2.4 1.8-4 4-4s4 1.6 4 4"/><path d="M12 13.5h3"/><rect x="14.5" y="13" width="6.5" height="6.5" rx="1.4" ${F}/><path d="M16.2 13v-1.2a1.6 1.6 0 0 1 3.2 0V13"/>`,
     // a oder an: zwei Kugeln, verbunden durch eine kleine Brücke (das n)
     'e5-a-an': `<circle cx="6" cy="14" r="3.4"/><circle cx="18" cy="14" r="3.4" ${F}/><path d="M6 9.5c3-4.5 9-4.5 12 0"/>`,
+    // Mehrzahl: eine Kiste links, zwei Kisten rechts
+    'e5-plural': `<rect x="2.5" y="10" width="6" height="6" rx="1.2"/><path d="M11 13h2.4"/><rect x="15" y="5.5" width="6" height="6" rx="1.2" ${F}/><rect x="15" y="13.5" width="6" height="6" rx="1.2" ${F}/>`,
   };
   function svg(id) {
     const body = I[id];

@@ -9,7 +9,8 @@
  *   dachs, dachsKlein, dachsStaunt: Bilder des Fach-Dachses
  *   entdecken:     Reihenfolge der Entdeckungen; entdeckenText, entdeckenKurz: Texte dazu
  *   andereKlassen: { 6: ['Lernbereich …'] } für „Klasse 6 kommt bald“
- *   audio:         Ordner mit Aufnahmen (optional, z. B. 'audio/k5/'); Knöpfe mit data-say="name" spielen <audio>name.mp3.
+ *   audio:         Ordner mit Aufnahmen (optional, z. B. 'audio/us/'): darin index.json und je Thema eine Sammeldatei
+ *                  <thema>.bin. Knöpfe mit data-say="name" spielen die Aufnahme mit diesem Namen.
  *                  Oder eine Liste zur Auswahl [{ id, name, pfad }]: dann zeigt die Startseite des Fachs einen Umschalter „Aussprache“.
  * Das Aussehen steht in fach.css.
  */
@@ -867,7 +868,7 @@
   });
 
   // ---------- Anhören ----------
-  // Ein Knopf mit data-say="<name>" spielt die Aufnahme <Ordner><name>.mp3 (fertige Dateien des Fachs, keine Gerätestimme).
+  // Ein Knopf mit data-say="<name>" spielt die Aufnahme <name> (fertige Aufnahmen des Fachs, keine Gerätestimme).
   // F.audio ist ein Ordner oder eine Liste zur Auswahl: [{ id:'us', name:'amerikanisch', pfad:'audio/k5/' }, …].
   // Die Wahl gilt für dieses Gerät (localStorage), der erste Eintrag ist die Voreinstellung.
   const AKZENT_KEY = 'lerndax.' + F.id + '.akzent';
@@ -884,19 +885,85 @@
     return `<div class="akzent" role="group" aria-label="Aussprache"><span>🔊 Aussprache</span>${AKZENTE.map((a) =>
       `<button type="button" class="${a.id === jetzt ? 'on' : ''}" data-akzent="${a.id}" aria-pressed="${a.id === jetzt}">${a.name}</button>`).join('')}</div>`;
   }
-  let SAYER = null, SAYBTN = null;
-  function sayStop() { if (SAYER) { try { SAYER.pause(); } catch (e) {} } if (SAYBTN) SAYBTN.classList.remove('on'); SAYBTN = null; }
+  // Die Aufnahmen liegen in Sammeldateien (wenige große statt hunderter kleiner Dateien):
+  //   <pfad>index.json   { clips: { name: [paket, start, laenge] } }
+  //   <pfad><paket>.bin  alle MP3 eines Themas hintereinander
+  // Geladen wird mit XMLHttpRequest (geht auch im Test ohne Server), abgespielt als data:-Adresse.
+  const LAGER = {};
+  const lager = (pfad) => LAGER[pfad] || (LAGER[pfad] = { index: null, clips: null, laden: {}, bin: {} });
+  function hole(url, art) {
+    return new Promise((ok) => {
+      try {
+        const x = new XMLHttpRequest();
+        x.open('GET', url); x.responseType = art;
+        x.onload = () => ok((x.status === 200 || x.status === 0) && x.response ? x.response : null);
+        x.onerror = () => ok(null);
+        x.send();
+      } catch (e) { ok(null); }
+    });
+  }
+  function ladeIndex(pfad) {
+    const L = lager(pfad);
+    return L.index || (L.index = hole(pfad + 'index.json', 'json').then((j) => { if (!j || !j.clips) { L.index = null; return null; } return (L.clips = j.clips); }));
+  }
+  function ladePaket(pfad, paket) {
+    const L = lager(pfad);
+    return L.laden[paket] || (L.laden[paket] = hole(pfad + paket + '.bin', 'arraybuffer').then((b) => { if (!b) { delete L.laden[paket]; return null; } return (L.bin[paket] = b); }));
+  }
+  // Adresse einer Aufnahme, wenn ihr Paket schon geladen ist (sonst null)
+  function clipUrl(pfad, name) {
+    const L = lager(pfad), c = L.clips && L.clips[name];
+    if (!c || !L.bin[c[0]]) return null;
+    const u = new Uint8Array(L.bin[c[0]], c[1], c[2]);
+    let t = '';
+    for (let i = 0; i < u.length; i += 8192) t += String.fromCharCode.apply(null, u.subarray(i, i + 8192));
+    return 'data:audio/mpeg;base64,' + btoa(t);
+  }
+  async function clipHolen(pfad, name) {
+    const clips = await ladeIndex(pfad), c = clips && clips[name];
+    if (!c) return null;
+    await ladePaket(pfad, c[0]);
+    return clipUrl(pfad, name);
+  }
+  // Pakete zu allen Lautsprecher-Knöpfen laden, die gerade zu sehen sind (dann spielt der Ton sofort)
+  function sayVorladen() {
+    if (!F.audio) return;
+    const namen = [...document.querySelectorAll('[data-say]')].map((b) => b.dataset.say);
+    if (!namen.length) return;
+    const pfad = audioPfad();
+    ladeIndex(pfad).then((clips) => { if (clips) new Set(namen.map((n) => clips[n] && clips[n][0]).filter(Boolean)).forEach((p) => ladePaket(pfad, p)); });
+  }
+  const STILLE = 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//OEwAAAAAAAAAAAAEluZm8AAAAPAAAABQAAAbAAjo6Ojo6Ojo6Ojo6Ojo6Ojo6Ojqqqqqqqqqqqqqqqqqqqqqqqqqqqx8fHx8fHx8fHx8fHx8fHx8fHx8fj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4///////////////////////////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQDYAAAAAAAAAGwCcJljAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//MkxAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//MkxCMAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//MkxEYAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//MkxGkAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//MkxIwAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+  let SAYER = null, SAYBTN = null, SAYSTILL = false;
+  function sayStop() { if (SAYER) { try { SAYER.pause(); } catch (e) {} } if (SAYBTN) SAYBTN.classList.remove('on'); SAYBTN = null; SAYSTILL = false; }
   function say(name, btn) {
     if (!F.audio || !/^[a-z0-9-]+$/.test(name)) return;
     const war = SAYBTN === btn;
     sayStop();
     if (war) return; // zweites Tippen hält an
     try {
-      if (!SAYER) { SAYER = new Audio(); SAYER.addEventListener('ended', sayStop); SAYER.addEventListener('error', () => { if (SAYBTN) SAYBTN.classList.add('err'); sayStop(); }); }
-      SAYER.src = audioPfad() + name + '.mp3';
+      if (!SAYER) {
+        SAYER = new Audio();
+        SAYER.addEventListener('ended', () => { if (!SAYSTILL) sayStop(); });
+        SAYER.addEventListener('error', () => { if (SAYSTILL) return; if (SAYBTN) SAYBTN.classList.add('err'); sayStop(); });
+      }
+      const pfad = audioPfad();
       SAYBTN = btn; btn.classList.remove('err'); btn.classList.add('on');
-      const p = SAYER.play();
-      if (p && p.catch) p.catch(() => { btn.classList.add('err'); sayStop(); });
+      const los = (url) => {
+        if (SAYBTN !== btn) return; // inzwischen angehalten oder etwas anderes angetippt
+        SAYSTILL = false;
+        if (!url) { btn.classList.add('err'); sayStop(); return; }
+        SAYER.src = url;
+        const p = SAYER.play();
+        if (p && p.catch) p.catch(() => { if (SAYBTN === btn) { btn.classList.add('err'); sayStop(); } });
+      };
+      const sofort = clipUrl(pfad, name);
+      if (sofort) { los(sofort); return; }
+      // Paket noch nicht geladen. Das iPhone erlaubt Ton nur direkt beim Antippen: deshalb sofort einen stillen Ton
+      // starten („aufschließen“), dann laden und im selben Player abspielen.
+      SAYSTILL = true;
+      try { SAYER.src = STILLE; const p = SAYER.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+      clipHolen(pfad, name).then(los);
     } catch (e) { sayStop(); }
   }
 
@@ -906,6 +973,7 @@
     if (!b) return;
     const d = b.dataset;
     if (d.say) { say(d.say, b); return; }
+    setTimeout(sayVorladen, 0); // nach diesem Klick können neue Lautsprecher-Knöpfe zu sehen sein
     if (d.akzent) { try { localStorage.setItem(AKZENT_KEY, d.akzent); } catch (e) {} sayStop(); home(); return; }
     if (d.go === 'home' && b.classList.contains('x') && VIEW === 'task' && R && (R.results.length || (R.cur && (R.cur.done || R.cur.attempt > 1)))) quitAsk();
     else if (d.go === 'home') { R = null; home(); window.scrollTo(0, 0); }
