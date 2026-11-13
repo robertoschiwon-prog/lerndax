@@ -2111,4 +2111,199 @@
       };
     },
   };
+
+  // =====================================================
+  // was und were: aus drei Formen werden zwei
+  // =====================================================
+  const gross = (t) => t[0].toUpperCase() + t.slice(1);
+  const subjKlein = (t) => (/^(My|The|He|She|It|We|They|You)\b/.test(t) ? t[0].toLowerCase() + t.slice(1) : t);
+  //   ctx: { mode:'form'|'umbau'|'neg'|'frage', subj, form, rest, zeit, g, jetzt, de }
+  EX['e5-was'] = {
+    title: 'was und were',
+    titleFor: (ctx) => (ctx && ctx.mode === 'neg' ? 'Verneinen: wasn’t, weren’t' : ctx && ctx.mode === 'frage' ? 'Fragen: Was …? Were …?' : ctx && ctx.post && ctx.form ? `Warum „${ctx.form}“?` : 'was und were'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, Z = null, kaesten = [], pfeile = [];
+      const nimm = (g) => U.pick((mode === 'frage' ? T.WASQ : T.WAS).filter((s) => (g === undefined || s.g === g) && s.subj !== ctx.subj));
+      S0 = mode === 'frei' ? nimm() : ctx.post ? T.WAS.find((s) => s.subj === ctx.subj) : nimm(ctx.g);
+      if (mode === 'frei') api.chips([{ label: 'Anderes Beispiel', onClick() { S0 = nimm(); api.replay(); } }]);
+      const satz = (teile) => { if (Z) Z.g.remove(); Z = zeile(api, teile, 40, 19); return Z; };
+      function bild() {
+        pfeile = [];
+        [['am', 46], ['is', 136], ['are', 262]].forEach(([w, x], i) => {
+          el('text', { x, y: 88, 'text-anchor': 'middle', class: 'ex-b', text: w, style: `font-size:20px;fill:${GRAU}` }, api.svg);
+          const ziel = i < 2 ? 92 : 262;
+          pfeile.push(el('line', { x1: x, y1: 96, x2: ziel, y2: 122, stroke: GRAU, 'stroke-width': 2.5, 'stroke-linecap': 'round' }, api.svg));
+        });
+        el('text', { x: 350, y: 88, 'text-anchor': 'end', class: 'ex-s', text: 'jetzt', style: `font-size:11px;fill:${GRAU}` }, api.svg);
+        kaesten = [[14, 'was', 'I · he · she · it'], [186, 'were', 'you · we · they']].map(([x, f, wer]) => {
+          const r = el('rect', { x, y: 126, width: 160, height: 74, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: x + 80, y: 160, 'text-anchor': 'middle', class: 'ex-b', text: f, style: `font-size:26px;fill:${BLAU}` }, api.svg);
+          el('text', { x: x + 80, y: 186, 'text-anchor': 'middle', class: 'ex-s', text: wer, style: 'font-size:12px' }, api.svg);
+          return r;
+        });
+        el('text', { x: 350, y: 120, 'text-anchor': 'end', class: 'ex-s', text: 'gestern', style: `font-size:11px;fill:${GRAU}` }, api.svg);
+      }
+      const leuchte = (g) => { kaesten.forEach((r, k) => r.setAttribute('fill', k === g ? '#dfe9ff' : '#fff')); pfeile.forEach((p, k) => p.setAttribute('stroke', (g === 0 && k < 2) || (g === 1 && k === 2) ? ORANGE : GRAU)); };
+      return {
+        reset() {
+          api.clear(); Z = null; bild();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          const s = S0;
+          if (mode === 'neg' || mode === 'frage') satz([{ t: s.subj }, { t: s.form }, { t: `${s.rest} ${s.zeit}.` }]);
+          else if (mode === 'umbau') satz([{ t: s.subj }, { t: s.jetzt, c: GRAU }, { t: `${s.rest}.` }]);
+          else satz([{ t: s.subj }, { t: '___' }, { t: `${s.rest} ${s.zeit}.` }]);
+        },
+        async play() {
+          const s = S0;
+          if (mode === 'neg') {
+            leuchte(s.g); api.say(`Im Satz steht <b>${s.form}</b>. Verneint wird wie bei am, is, are.`); await api.wait(2200);
+            const a = Z, b = zeile(api, [{ t: s.subj }, { t: `${s.form}n’t`, c: BLAU }, { t: `${s.rest} ${s.zeit}.` }], 40, 19);
+            await gleite(api, a, b, [[a.els[0], b.els[0]], [a.els[1], b.els[1]], [a.els[2], b.els[2]]]); Z = b;
+            api.say(`<b>${s.neg}</b> ${U.say(s.neg)}<br>${s.form} not = <b>${s.form}n’t</b>. Kein didn’t.`);
+            return;
+          }
+          if (mode === 'frage') {
+            leuchte(s.g); api.say(`Für die Frage rückt <b>${s.form}</b> nach vorn.`); await api.wait(2200);
+            const a = Z, b = zeile(api, [{ t: gross(s.form), c: BLAU }, { t: subjKlein(s.subj) }, { t: `${s.rest} ${s.zeit}?` }], 40, 19);
+            await gleite(api, a, b, [[a.els[0], b.els[1]], [a.els[1], b.els[0]], [a.els[2], b.els[2]]]); Z = b;
+            api.say(`<b>${s.frage}</b> ${U.say(s.frage)}<br>Wie bei am, is, are: Platz tauschen, kein did.`);
+            return;
+          }
+          if (mode === 'frei') { api.say('In der Vergangenheit hat to be nur zwei Formen: <b>was</b> und <b>were</b>.'); await api.wait(3000); }
+          if (mode === 'umbau') { api.say(`Heute: <b>${s.subj} ${s.jetzt}</b>. Wird daraus Vergangenheit, wird <b>${s.jetzt}</b> zu …`); await api.wait(2600); }
+          else { api.say(`Wer? <b>${s.subj}</b>. Welche Form gehört dazu?`); await api.wait(2200); }
+          leuchte(s.g); await api.wait(1200);
+          satz([{ t: s.subj }, { t: s.form, c: BLAU }, { t: `${s.rest} ${s.zeit}.` }]);
+          api.say(`<b>${s.text}</b> ${U.say(s.text)}<br>${T.WAS_GRUPPE[s.g]} (heute: ${s.jetzt})<br><small>${s.de}</small>`);
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // past simple mit -ed: vier Schreib-Regeln
+  // =====================================================
+  //   ctx: { mode:'form', base, past, regel } | { mode:'satz'|'neg', subj, base, past, regel, rest, zeit, de }
+  const ED_ZEILEN = [['ed', 'play → played', 'einfach -ed'], ['d', 'dance → danced', 'auf e: nur -d'], ['ied', 'carry → carried', 'Konsonant + y: -ied'], ['dopp', 'stop → stopped', 'letzter Buchstabe doppelt']];
+  EX['e5-ed'] = {
+    title: 'past simple: played, danced, stopped',
+    titleFor: (ctx) => (ctx && ctx.mode === 'neg' ? 'Verneinen: didn’t play' : ctx && ctx.post && ctx.past ? `Warum „${ctx.past}“?` : 'past simple: played, danced, stopped'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, Z = null, reihen = [];
+      if (mode === 'form') S0 = ctx.post ? ctx : U.pick(T.ED.filter((v) => v.regel === ctx.regel && v.base !== ctx.base));
+      else if (mode !== 'frei') S0 = ctx.post ? T.EDS.find((s) => s.base === ctx.base && s.subj === ctx.subj) : U.pick(T.EDS.filter((s) => s.base !== ctx.base));
+      else S0 = U.pick(T.EDS);
+      if (mode === 'frei') api.chips([{ label: 'Anderes Beispiel', onClick() { S0 = U.pick(T.EDS); api.replay(); } }]);
+      const satz = (teile) => { if (Z) Z.g.remove(); Z = zeile(api, teile, 40, 19); return Z; };
+      function regeln() {
+        reihen = ED_ZEILEN.map(([r, bsp, was], k) => {
+          const y = 62 + k * 36;
+          const rect = el('rect', { x: 14, y, width: 332, height: 31, rx: 9, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+          el('text', { x: 28, y: y + 21, class: 'ex-b', text: bsp, style: `font-size:15px;fill:${BLAU}` }, api.svg);
+          el('text', { x: 332, y: y + 21, 'text-anchor': 'end', class: 'ex-s', text: was, style: 'font-size:12px' }, api.svg);
+          return { r, rect };
+        });
+      }
+      const leuchte = (r) => reihen.forEach((x) => x.rect.setAttribute('fill', x.r === r ? '#dfe9ff' : '#fff'));
+      return {
+        reset() {
+          api.clear(); Z = null; regeln();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          const s = S0;
+          if (mode === 'form') satz([{ t: s.base }, { t: '→ ?', c: GRAU }]);
+          else if (mode === 'neg') satz([{ t: s.subj }, { t: s.past }, { t: `${s.rest} ${s.zeit}.` }]);
+          else satz([{ t: s.subj }, { t: `(${s.base})`, c: GRAU }, { t: `${s.rest} ${s.zeit}.` }]);
+        },
+        async play() {
+          const s = S0;
+          if (mode === 'neg') {
+            api.say(`Verneint wird mit <b>didn’t</b>. Das zeigt schon: vorbei.`); await api.wait(2400);
+            const a = Z, b = zeile(api, [{ t: s.subj }, { t: 'didn’t', c: ORANGE }, { t: s.base, c: BLAU }, { t: `${s.rest} ${s.zeit}.` }], 40, 19);
+            await gleite(api, a, b, [[a.els[0], b.els[0]], [a.els[1], b.els[2]], [a.els[2], b.els[3]]]); Z = b;
+            api.say(`<b>${s.neg}</b> ${U.say(s.neg)}<br>Hinter didn’t steht die Grundform: <b>${s.base}</b>, das -ed fällt weg.`);
+            return;
+          }
+          if (mode === 'frei') { api.say('Was vorbei ist (yesterday, last week …), bekommt bei regelmäßigen Verben <b>-ed</b>. Beim Schreiben gibt es vier Fälle.'); await api.wait(3400); }
+          else if (mode === 'satz') { api.say(`<b>${s.zeit}</b> zeigt: Es ist vorbei. Also past simple. Wie schreibt man es?`); await api.wait(2600); }
+          else { api.say(`Wie hängt man -ed an <b>${s.base}</b>?`); await api.wait(1800); }
+          leuchte(s.regel); await api.wait(1200);
+          if (mode === 'form') { satz([{ t: s.base }, { t: '→', c: GRAU }, { t: s.past, c: BLAU }]); api.say(`${s.base} → <b>${s.past}</b> ${U.say(`${s.base}, ${s.past}`)}<br>${T.ED_REGEL[s.regel](s)}`); return; }
+          satz([{ t: s.subj }, { t: s.past, c: BLAU }, { t: `${s.rest} ${s.zeit}.` }]);
+          api.say(`<b>${s.text}</b> ${U.say(s.text)}<br>${T.ED_REGEL[s.regel](s)} Gleich bei allen Personen.<br><small>${s.de}</small>`);
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // past simple: unregelmäßige Verben
+  // =====================================================
+  //   ctx: { mode:'form', base, past, de } | { mode:'satz'|'neg', subj, base, past, rest, zeit, de }
+  EX['e5-irr'] = {
+    title: 'past simple: went, saw, had',
+    titleFor: (ctx) => (ctx && ctx.mode === 'neg' ? 'Verneinen: didn’t go' : ctx && ctx.post && ctx.past ? `Warum „${ctx.past}“?` : 'past simple: went, saw, had'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, Z = null, karten = [], liste = [];
+      if (mode === 'form') S0 = ctx.post ? ctx : U.pick(T.IRR.filter((v) => v.base !== ctx.base && v.base !== 'read'));
+      else if (mode !== 'frei') S0 = ctx.post ? T.IRRS.find((s) => s.base === ctx.base && s.subj === ctx.subj) : U.pick(T.IRRS.filter((s) => s.base !== ctx.base));
+      else S0 = U.pick(T.IRRS);
+      const neu = () => { liste = U.shuffle(T.IRR.filter((v) => v.base !== S0.base && v.base !== 'read')).slice(0, 5); };
+      neu();
+      if (mode === 'frei') api.chips([{ label: 'Anderes Beispiel', onClick() { S0 = U.pick(T.IRRS); neu(); api.replay(); } }]);
+      const satz = (teile) => { if (Z) Z.g.remove(); Z = zeile(api, teile, 40, 19); return Z; };
+      function tafel() {
+        karten = [];
+        const v = T.IRR.find((x) => x.base === S0.base);
+        el('rect', { x: 110, y: 64, width: 140, height: 56, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+        el('text', { x: 180, y: 88, 'text-anchor': 'middle', class: 'ex-b', text: v.base, style: 'font-size:18px' }, api.svg);
+        const p = el('text', { x: 180, y: 111, 'text-anchor': 'middle', class: 'ex-b', text: '', style: `font-size:18px;fill:${BLAU}` }, api.svg);
+        karten.push(p);
+        liste.forEach((w, k) => {
+          const x = 14 + k * 67;
+          el('rect', { x, y: 140, width: 63, height: 56, rx: 9, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+          el('text', { x: x + 31.5, y: 163, 'text-anchor': 'middle', class: 'ex-s', text: w.base, style: 'font-size:12px' }, api.svg);
+          karten.push(el('text', { x: x + 31.5, y: 184, 'text-anchor': 'middle', class: 'ex-b', text: '', style: `font-size:13px;fill:${BLAU}` }, api.svg));
+        });
+      }
+      return {
+        reset() {
+          api.clear(); Z = null; tafel();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          const s = S0;
+          if (mode === 'form') satz([{ t: s.base }, { t: '→ ?', c: GRAU }]);
+          else if (mode === 'neg') satz([{ t: s.subj }, { t: s.past }, { t: `${s.rest} ${s.zeit}.` }]);
+          else satz([{ t: s.subj }, { t: `(${s.base})`, c: GRAU }, { t: `${s.rest} ${s.zeit}.` }]);
+        },
+        async play() {
+          const s = S0;
+          if (mode === 'neg') {
+            karten[0].textContent = s.past;
+            api.say(`Verneint wird mit <b>didn’t</b>. Das zeigt schon: vorbei.`); await api.wait(2400);
+            const a = Z, b = zeile(api, [{ t: s.subj }, { t: 'didn’t', c: ORANGE }, { t: s.base, c: BLAU }, { t: `${s.rest} ${s.zeit}.` }], 40, 19);
+            await gleite(api, a, b, [[a.els[0], b.els[0]], [a.els[1], b.els[2]], [a.els[2], b.els[3]]]); Z = b;
+            api.say(`<b>${s.neg}</b> ${U.say(s.neg)}<br>Hinter didn’t steht die Grundform: didn’t <b>${s.base}</b>, nicht didn’t ${s.past}.`);
+            return;
+          }
+          api.say(`<b>${s.base}</b> ist unregelmäßig: kein -ed. Die Vergangenheit sieht ganz anders aus.`);
+          await api.wait(2400);
+          karten[0].textContent = s.past;
+          if (mode === 'form') satz([{ t: s.base }, { t: '→', c: GRAU }, { t: s.past, c: BLAU }]);
+          else satz([{ t: s.subj }, { t: s.past, c: BLAU }, { t: `${s.rest} ${s.zeit}.` }]);
+          api.say(mode === 'form' ? `${s.base} → <b>${s.past}</b> ${U.say(`${s.base}, ${s.past}`)}<br>Auswendig lernen, am besten laut: ${s.base}, ${s.past}.` : `<b>${s.text}</b> ${U.say(s.text)}<br>${s.base} → <b>${s.past}</b>, bei allen Personen gleich.<br><small>${s.de}</small>`);
+          await api.wait(3600);
+          for (let k = 0; k < liste.length; k++) { karten[k + 1].textContent = liste[k].past; await api.wait(380); }
+          api.say(mode === 'form' ? `${s.base} → <b>${s.past}</b>. Noch mehr unregelmäßige Verben: ${liste.map((v) => `${v.base} → ${v.past}`).join(', ')}.` : `<b>${s.text}</b> ${U.say(s.text)}<br>Noch mehr: ${liste.map((v) => `${v.base} → ${v.past}`).join(', ')}.`);
+        },
+      };
+    },
+  };
 })();

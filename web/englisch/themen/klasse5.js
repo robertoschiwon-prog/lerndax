@@ -2537,6 +2537,205 @@
   Object.assign(D.arten, { 'e5-zahl': { zahlTippen, zahlWahl, zahlHoeren, ordTippen, ordWahl, datumWahl, monatTippen, uhrWahl, uhrDigital } });
 
   // =====================================================
+  // was und were
+  // =====================================================
+  // [Subjekt, was/were, Rest, Zeitangabe, Deutsch]
+  const WAS = [
+    ['I', 'was', 'at home', 'yesterday', 'Ich war gestern zu Hause.'],
+    ['You', 'were', 'at school', 'yesterday', 'Du warst gestern in der Schule.'],
+    ['He', 'was', 'ill', 'last week', 'Er war letzte Woche krank.'],
+    ['She', 'was', 'in London', 'last year', 'Sie war letztes Jahr in London.'],
+    ['It', 'was', 'cold', 'yesterday', 'Es war gestern kalt.'],
+    ['We', 'were', 'at the zoo', 'on Saturday', 'Wir waren am Samstag im Zoo.'],
+    ['They', 'were', 'happy', 'yesterday', 'Sie waren gestern glücklich.'],
+    ['Tom', 'was', 'late', 'this morning', 'Tom war heute Morgen zu spät.'],
+    ['My parents', 'were', 'at work', 'yesterday', 'Meine Eltern waren gestern bei der Arbeit.'],
+    ['The film', 'was', 'great', 'last night', 'Der Film war gestern Abend toll.'],
+    ['The children', 'were', 'in the garden', 'an hour ago', 'Die Kinder waren vor einer Stunde im Garten.'],
+    ['Lisa and Ben', 'were', 'at the party', 'last Friday', 'Lisa und Ben waren letzten Freitag auf der Party.'],
+    ['My cat', 'was', 'in the kitchen', 'five minutes ago', 'Meine Katze war vor fünf Minuten in der Küche.'],
+  ].map(([subj, form, rest, zeit, de]) => ({
+    subj, form, rest, zeit, de, g: form === 'was' ? 0 : 1, jetzt: subj === 'I' ? 'am' : form === 'was' ? 'is' : 'are',
+    text: `${subj} ${form} ${rest} ${zeit}.`, neg: `${subj} ${form}n’t ${rest} ${zeit}.`, frage: `${gross(form)} ${subjKlein(subj)} ${rest} ${zeit}?`,
+  }));
+  const WASQ = WAS.filter((s) => s.subj !== 'I');
+  const WAS_GRUPPE = ['<b>was</b> steht bei <b>I, he, she, it</b> und bei einer Person oder Sache.', '<b>were</b> steht bei <b>you, we, they</b> und bei mehreren.'];
+  const wasLoesung = (s) => `<span lang="en">${s.subj} <b class="vb">${s.form}</b> ${s.rest} ${s.zeit}.</span> ${U.say(s.text)}<br>${WAS_GRUPPE[s.g]} Heute hieße es ${s.jetzt}, gestern ${s.form}.<br><small>Auf Deutsch: ${s.de}</small>`;
+  const WAS_TIPP = 'Vergangenheit von to be: am und is werden zu <b>was</b>, are wird zu <b>were</b>.';
+  const WASEX = (s, mode) => ({ mode: mode || 'form', subj: s.subj, form: s.form, rest: s.rest, zeit: s.zeit, g: s.g, jetzt: s.jetzt, de: s.de });
+  function wasWahl() { const s = pick(WAS); return { prompt: `Was gehört in die Lücke?${en(`${s.subj} ___ ${s.rest} ${s.zeit}.`)}`, choices: ['was', 'were'].map((c) => `<span lang="en">${c}</span>`), correct: s.g, hint: WAS_TIPP, solution: wasLoesung(s), ex: WASEX(s) }; }
+  function wasTippen() {
+    const s = pick(WAS);
+    return { prompt: '<b>was</b> oder <b>were</b>? Tippe das passende Wort ein.', layout: 'satz', fields: [{ type: 'text', ci: true, answer: s.form, prefix: s.subj, suffix: `${s.rest} ${s.zeit}.`, label: 'was oder were' }], hint: WAS_TIPP, solution: wasLoesung(s), ex: WASEX(s) };
+  }
+  function wasUmbau() {
+    const s = pick(WAS);
+    return {
+      prompt: `Heute: <span lang="en">${s.subj} ${s.jetzt} ${s.rest}.</span> Und in der Vergangenheit?`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.form, prefix: s.subj, suffix: `${s.rest} ${s.zeit}.`, label: 'Vergangenheit' }],
+      hint: WAS_TIPP, solution: `<span lang="en">${s.subj} ${s.jetzt} …</span> → ${wasLoesung(s)}`, ex: WASEX(s, 'umbau'),
+    };
+  }
+  function wasNeg() {
+    const s = pick(WAS), ch = shuffle([s.neg, `${s.subj} didn’t ${s.form === 'was' ? 'was' : 'were'} ${s.rest} ${s.zeit}.`, `${s.subj} ${s.form === 'was' ? 'weren’t' : 'wasn’t'} ${s.rest} ${s.zeit}.`]);
+    return {
+      prompt: `Verneine den Satz. Welcher Satz ist richtig?${en(s.text)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.neg),
+      hint: 'Wie bei am, is, are: <b>not</b> kommt direkt dahinter. was not = <b>wasn’t</b>, were not = <b>weren’t</b>. Kein didn’t.',
+      solution: `<span lang="en"><b class="vb">${s.neg}</b></span> ${U.say(s.neg)}<br><b>${s.form} not</b> wird kurz zu <b>${s.form}n’t</b>. didn’t braucht man bei was und were nicht.`, ex: WASEX(s, 'neg'),
+    };
+  }
+  function wasFrage() {
+    const s = pick(WASQ);
+    return { prompt: `Bilde die Frage zu diesem Satz.${en(s.text)}`, order: U.ordne([gross(s.form), subjKlein(s.subj), s.rest, s.zeit], '?'), hint: '<b>Was</b> oder <b>Were</b> rückt nach vorn, dann kommt die Person.', solution: `<span lang="en"><b class="vb">${s.frage}</b></span> ${U.say(s.frage)}<br>${gross(s.form)} und ${subjKlein(s.subj)} tauschen die Plätze. Kein did.`, ex: WASEX(s, 'frage') };
+  }
+  const wasWere = () => U.wahl([[24, wasWahl], [22, wasTippen], [20, wasUmbau], [17, wasNeg], [17, wasFrage]]);
+
+  // =====================================================
+  // past simple: regelmäßige Verben (-ed)
+  // =====================================================
+  // [Grundform, Vergangenheit, Regel]
+  const ED = [
+    ['play', 'played', 'ed'], ['watch', 'watched', 'ed'], ['help', 'helped', 'ed'], ['visit', 'visited', 'ed'], ['cook', 'cooked', 'ed'],
+    ['clean', 'cleaned', 'ed'], ['listen', 'listened', 'ed'], ['walk', 'walked', 'ed'], ['open', 'opened', 'ed'], ['want', 'wanted', 'ed'],
+    ['dance', 'danced', 'd'], ['like', 'liked', 'd'], ['live', 'lived', 'd'], ['smile', 'smiled', 'd'], ['close', 'closed', 'd'],
+    ['carry', 'carried', 'ied'], ['study', 'studied', 'ied'], ['cry', 'cried', 'ied'], ['tidy', 'tidied', 'ied'],
+    ['stop', 'stopped', 'dopp'], ['plan', 'planned', 'dopp'], ['drop', 'dropped', 'dopp'], ['chat', 'chatted', 'dopp'],
+  ].map(([base, past, regel]) => ({ base, past, regel }));
+  const ED_REGEL = {
+    ed: (v) => `Einfach <b>-ed</b> anhängen: ${v.base} → ${v.past}.${v.base.endsWith('y') ? ' Vor dem y steht ein Vokal, deshalb bleibt das y.' : ''}`,
+    d: (v) => `Das Verb endet schon auf <b>e</b>: nur <b>-d</b> anhängen: ${v.base} → ${v.past}.`,
+    ied: (v) => `Konsonant + <b>y</b> am Ende: aus y wird <b>i</b>, dann -ed: ${v.base} → ${v.past}.`,
+    dopp: (v) => `Kurzer Vokal und ein Konsonant am Ende: der letzte Buchstabe wird <b>verdoppelt</b>: ${v.base} → ${v.past}.`,
+  };
+  const edV = (b) => ED.find((v) => v.base === b);
+  // [Subjekt, Grundform, Rest, Zeitangabe, Deutsch, Gegenwart mit Signalwort]
+  const EDS = [
+    ['I', 'play', 'football', 'yesterday', 'Ich habe gestern Fußball gespielt.', 'every day'],
+    ['We', 'visit', 'our grandma', 'last Sunday', 'Wir haben letzten Sonntag unsere Oma besucht.', 'every Sunday'],
+    ['She', 'watch', 'a film', 'last night', 'Sie hat gestern Abend einen Film geschaut.', 'every evening'],
+    ['Tom', 'help', 'his dad', 'yesterday', 'Tom hat gestern seinem Papa geholfen.', 'every day'],
+    ['My mum', 'cook', 'pasta', 'on Friday', 'Meine Mama hat am Freitag Nudeln gekocht.', 'on Fridays'],
+    ['They', 'dance', 'at the party', 'last Saturday', 'Sie haben letzten Samstag auf der Party getanzt.', 'on Saturdays'],
+    ['I', 'tidy', 'my room', 'yesterday', 'Ich habe gestern mein Zimmer aufgeräumt.', 'every week'],
+    ['Lisa', 'study', 'for the test', 'last week', 'Lisa hat letzte Woche für den Test gelernt.', 'every week'],
+    ['The bus', 'stop', 'at the school', 'ten minutes ago', 'Der Bus hielt vor zehn Minuten an der Schule.', 'every morning'],
+    ['We', 'live', 'in Berlin', 'in 2020', 'Wir haben 2020 in Berlin gewohnt.', 'now'],
+    ['He', 'carry', 'the bags', 'yesterday', 'Er hat gestern die Taschen getragen.', 'every day'],
+    ['You', 'listen', 'to music', 'last night', 'Du hast gestern Abend Musik gehört.', 'every evening'],
+    ['My friends', 'chat', 'for hours', 'yesterday', 'Meine Freunde haben gestern stundenlang geplaudert.', 'every day'],
+    ['I', 'walk', 'to school', 'this morning', 'Ich bin heute Morgen zur Schule gelaufen.', 'every morning'],
+  ].map(([subj, base, rest, zeit, de, oft]) => {
+    const v = edV(base), g3 = !['I', 'We', 'They', 'You', 'My friends'].includes(subj);
+    return { subj, base, past: v.past, regel: v.regel, rest, zeit, de, oft, text: `${subj} ${v.past} ${rest} ${zeit}.`, neg: `${subj} didn’t ${base} ${rest} ${zeit}.`,
+      jetzt: base === 'live' ? `${subj} live${g3 ? 's' : ''} in Dresden now.` : `${subj} ${g3 ? sForm(base) : base} ${rest} ${oft}.` };
+  });
+  const ED_TIPP = 'Regelmäßige Verben: <b>-ed</b> anhängen (played). Endet das Verb auf e: nur -d (danced). Konsonant + y: -ied (carried). Kurzer Vokal + Konsonant: verdoppeln (stopped).';
+  const edLoesung = (s) => `<span lang="en">${s.subj} <b class="vb">${s.past}</b> ${s.rest} ${s.zeit}.</span> ${U.say(s.text)}<br><b>${s.zeit}</b> zeigt: Es ist vorbei. ${ED_REGEL[s.regel](s)} Bei allen Personen gleich, auch bei he, she, it.<br><small>Auf Deutsch: ${s.de}</small>`;
+  const EDEX = (s, mode) => ({ mode: mode || 'satz', subj: s.subj, base: s.base, past: s.past, regel: s.regel, rest: s.rest, zeit: s.zeit, de: s.de });
+  function edForm() {
+    const v = pick(ED);
+    return { prompt: `Schreibe die Vergangenheit (past simple) von <b lang="en">${v.base}</b>.`, fields: [{ type: 'text', ci: true, answer: v.past, label: 'past simple' }], hint: ED_TIPP, solution: `<span lang="en">${v.base} → <b class="vb">${v.past}</b></span> ${U.say(`${v.base}, ${v.past}`)}<br>${ED_REGEL[v.regel](v)}`, ex: { mode: 'form', base: v.base, past: v.past, regel: v.regel } };
+  }
+  function edWahl() {
+    const v = pick(ED.filter((x) => x.regel !== 'ed' || x.base.endsWith('y'))), b = v.base;
+    const kand = { ed: [b.slice(0, -1) + 'ied', b + 'd'], d: [b + 'ed', b.slice(0, -1) + 'd'], ied: [b + 'ed', b + 'd'], dopp: [b + 'ed', b + 'd'] }[v.regel];
+    const ch = shuffle([v.past, ...kand]);
+    return { prompt: `Wie schreibt man die Vergangenheit von <b lang="en">${b}</b>?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(v.past), hint: ED_TIPP, solution: `<span lang="en">${b} → <b class="vb">${v.past}</b></span> ${U.say(`${b}, ${v.past}`)}<br>${ED_REGEL[v.regel](v)}`, ex: { mode: 'form', base: b, past: v.past, regel: v.regel } };
+  }
+  function edSatz() {
+    const s = pick(EDS);
+    return { prompt: `Setze <b lang="en">${s.base}</b> in die Vergangenheit.`, layout: 'satz', fields: [{ type: 'text', ci: true, answer: s.past, prefix: s.subj, suffix: `${s.rest} ${s.zeit}.`, label: 'past simple' }], hint: ED_TIPP, solution: edLoesung(s), ex: EDEX(s) };
+  }
+  function edUmbau() {
+    const s = pick(EDS), ch = shuffle([s.past, s.base, sForm(s.base)].filter((x, i, a) => a.indexOf(x) === i));
+    return { prompt: `Sonst: <span lang="en">${s.jetzt}</span><br>Und was war <b lang="en">${s.zeit}</b>?${en(`${s.subj} ___ ${s.rest} ${s.zeit}.`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.past), hint: `<b>${s.zeit}</b> zeigt: Es ist vorbei. Dann steht das Verb im past simple.`, solution: edLoesung(s), ex: EDEX(s) };
+  }
+  function edNeg() {
+    const s = pick(EDS), ch = shuffle([s.neg, `${s.subj} didn’t ${s.past} ${s.rest} ${s.zeit}.`, `${s.subj} not ${s.past} ${s.rest} ${s.zeit}.`]);
+    return {
+      prompt: `Verneine den Satz. Welcher Satz ist richtig?${en(s.text)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.neg),
+      hint: 'Verneint wird mit <b>didn’t</b>. Dahinter steht das Verb in der <b>Grundform</b>, ohne -ed.',
+      solution: `<span lang="en"><b class="vb">${s.neg}</b></span> ${U.say(s.neg)}<br><b>didn’t</b> zeigt schon die Vergangenheit. Deshalb fällt das -ed weg: didn’t <b>${s.base}</b>, nicht didn’t ${s.past}.`, ex: EDEX(s, 'neg'),
+    };
+  }
+  const pastEd = () => U.wahl([[20, edForm], [18, edWahl], [24, edSatz], [20, edUmbau], [18, edNeg]]);
+
+  // =====================================================
+  // past simple: unregelmäßige Verben
+  // =====================================================
+  // [Grundform, Vergangenheit, 3. Form (als falsches Angebot), Deutsch]
+  const IRR = [
+    ['go', 'went', 'gone', 'gehen'], ['come', 'came', 'comed', 'kommen'], ['see', 'saw', 'seen', 'sehen'], ['have', 'had', 'haved', 'haben'],
+    ['get', 'got', 'getted', 'bekommen'], ['eat', 'ate', 'eaten', 'essen'], ['drink', 'drank', 'drunk', 'trinken'], ['make', 'made', 'maked', 'machen'],
+    ['take', 'took', 'taken', 'nehmen'], ['write', 'wrote', 'written', 'schreiben'], ['buy', 'bought', 'buyed', 'kaufen'], ['say', 'said', 'sayed', 'sagen'],
+    ['do', 'did', 'done', 'tun, machen'], ['give', 'gave', 'given', 'geben'], ['find', 'found', 'finded', 'finden'], ['swim', 'swam', 'swum', 'schwimmen'],
+    ['run', 'ran', 'runned', 'rennen'], ['sit', 'sat', 'sitted', 'sitzen'], ['meet', 'met', 'meeted', 'treffen'], ['sing', 'sang', 'sung', 'singen'],
+    ['ride', 'rode', 'ridden', 'reiten, fahren'], ['read', 'read', 'readed', 'lesen'],
+  ].map(([base, past, p3, de]) => ({ base, past, p3, de }));
+  const irrV = (b) => IRR.find((v) => v.base === b);
+  const IRRS = [
+    ['I', 'go', 'to the cinema', 'yesterday', 'Ich bin gestern ins Kino gegangen.'],
+    ['We', 'see', 'a big ship', 'last summer', 'Wir haben letzten Sommer ein großes Schiff gesehen.'],
+    ['She', 'have', 'a cold', 'last week', 'Sie hatte letzte Woche eine Erkältung.'],
+    ['Tom', 'eat', 'three pancakes', 'this morning', 'Tom hat heute Morgen drei Pfannkuchen gegessen.'],
+    ['They', 'come', 'home late', 'last night', 'Sie sind gestern Abend spät nach Hause gekommen.'],
+    ['My dad', 'buy', 'a new bike', 'on Saturday', 'Mein Papa hat am Samstag ein neues Fahrrad gekauft.'],
+    ['I', 'write', 'a letter', 'yesterday', 'Ich habe gestern einen Brief geschrieben.'],
+    ['Lisa', 'get', 'a present', 'on her birthday', 'Lisa hat an ihrem Geburtstag ein Geschenk bekommen.'],
+    ['We', 'swim', 'in the lake', 'last summer', 'Wir sind letzten Sommer im See geschwommen.'],
+    ['He', 'make', 'a cake', 'yesterday', 'Er hat gestern einen Kuchen gebacken.'],
+    ['The dog', 'run', 'into the garden', 'five minutes ago', 'Der Hund ist vor fünf Minuten in den Garten gerannt.'],
+    ['I', 'meet', 'my friends', 'after school', 'Ich habe nach der Schule meine Freunde getroffen.'],
+    ['You', 'take', 'my pencil', 'yesterday', 'Du hast gestern meinen Bleistift genommen.'],
+    ['My grandma', 'give', 'me a book', 'last Christmas', 'Meine Oma hat mir letztes Weihnachten ein Buch geschenkt.'],
+    ['We', 'do', 'our homework', 'in the afternoon', 'Wir haben am Nachmittag unsere Hausaufgaben gemacht.'],
+    ['Ben', 'find', 'a coin', 'in the park', 'Ben hat im Park eine Münze gefunden.'],
+  ].map(([subj, base, rest, zeit, de]) => { const v = irrV(base); return { subj, base, past: v.past, p3: v.p3, rest, zeit, de, text: `${subj} ${v.past} ${rest} ${zeit}.`, neg: `${subj} didn’t ${base} ${rest} ${zeit}.` }; });
+  const IRR_TIPP = 'Unregelmäßige Verben bekommen kein -ed. Ihre Vergangenheit muss man auswendig lernen: go → went, see → saw, have → had.';
+  const irrLoesung = (s) => `<span lang="en">${s.subj} <b class="vb">${s.past}</b> ${s.rest} ${s.zeit}.</span> ${U.say(s.text)}<br><b>${s.base}</b> ist unregelmäßig: ${s.base} → <b>${s.past}</b>. Bei allen Personen gleich.<br><small>Auf Deutsch: ${s.de}</small>`;
+  const IREX = (s, mode) => ({ mode: mode || 'satz', subj: s.subj, base: s.base, past: s.past, rest: s.rest, zeit: s.zeit, de: s.de });
+  const irrFormLoesung = (v) => `<span lang="en">${v.base} → <b class="vb">${v.past}</b></span> ${v.base === 'read' ? '' : U.say(`${v.base}, ${v.past}`)}<br>${v.base} (${v.de}) ist <b>unregelmäßig</b>: kein -ed, die Form lernt man auswendig.${v.base === 'read' ? ' Geschrieben wie die Grundform, aber gesprochen wie „red“.' : ''}`;
+  function irrForm() {
+    const v = pick(IRR);
+    return { prompt: `Schreibe die Vergangenheit (past simple) von <b lang="en">${v.base}</b> (${v.de}).`, fields: [{ type: 'text', ci: true, answer: v.past, label: 'past simple' }], hint: IRR_TIPP, solution: irrFormLoesung(v), ex: { mode: 'form', base: v.base, past: v.past, de: v.de } };
+  }
+  function irrWahl() {
+    const v = pick(IRR.filter((x) => x.base !== 'read')), falsch = [v.p3, v.base.endsWith('e') ? v.base + 'd' : v.base + 'ed'].filter((x) => x !== v.past);
+    const ch = shuffle([v.past, ...[...new Set(falsch)]]);
+    return { prompt: `Wie heißt die Vergangenheit von <b lang="en">${v.base}</b>?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(v.past), hint: IRR_TIPP, solution: irrFormLoesung(v), ex: { mode: 'form', base: v.base, past: v.past, de: v.de } };
+  }
+  function irrZurueck() {
+    const v = pick(IRR.filter((x) => x.base !== 'read')), ch = shuffle([v, ...shuffle(IRR.filter((x) => x !== v && x.base !== 'read')).slice(0, 3)]);
+    return { prompt: `<b lang="en">${v.past}</b> ist die Vergangenheit von …`, choices: ch.map((x) => `<span lang="en">${x.base}</span>`), correct: ch.indexOf(v), hint: IRR_TIPP, solution: irrFormLoesung(v), ex: { mode: 'form', base: v.base, past: v.past, de: v.de } };
+  }
+  function irrSatz() {
+    const s = pick(IRRS);
+    return { prompt: `Setze <b lang="en">${s.base}</b> in die Vergangenheit.`, layout: 'satz', fields: [{ type: 'text', ci: true, answer: s.past, prefix: s.subj, suffix: `${s.rest} ${s.zeit}.`, label: 'past simple' }], hint: IRR_TIPP, solution: irrLoesung(s), ex: IREX(s) };
+  }
+  function irrNeg() {
+    const s = pick(IRRS), ch = shuffle([s.neg, `${s.subj} didn’t ${s.past} ${s.rest} ${s.zeit}.`, `${s.subj} not ${s.past} ${s.rest} ${s.zeit}.`]);
+    return {
+      prompt: `Verneine den Satz. Welcher Satz ist richtig?${en(s.text)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.neg),
+      hint: 'Verneint wird mit <b>didn’t</b>. Dahinter steht die <b>Grundform</b>: didn’t go, nicht didn’t went.',
+      solution: `<span lang="en"><b class="vb">${s.neg}</b></span> ${U.say(s.neg)}<br><b>didn’t</b> zeigt schon die Vergangenheit. Deshalb steht dahinter die Grundform: didn’t <b>${s.base}</b>, nicht didn’t ${s.past}.`, ex: IREX(s, 'neg'),
+    };
+  }
+  const pastIrr = () => U.wahl([[20, irrForm], [18, irrWahl], [14, irrZurueck], [28, irrSatz], [20, irrNeg]]);
+
+  Object.assign(D.daten, { WAS, WASQ, WAS_GRUPPE, ED, ED_REGEL, EDS, IRR, IRRS });
+  const themenVorWas = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorWas(), {
+    'e5-was': [...WAS.map((s) => s.text), ...WAS.map((s) => s.neg), ...WASQ.map((s) => s.frage)],
+    'e5-ed': [...ED.map((v) => `${v.base}, ${v.past}`), ...EDS.map((s) => s.text), ...EDS.map((s) => s.neg)],
+    'e5-irr': [...IRR.filter((v) => v.base !== 'read').map((v) => `${v.base}, ${v.past}`), ...IRRS.map((s) => s.text), ...IRRS.map((s) => s.neg)],
+  });
+  Object.assign(D.arten, {
+    'e5-was': { wasWahl, wasTippen, wasUmbau, wasNeg, wasFrage },
+    'e5-ed': { edForm, edWahl, edSatz, edUmbau, edNeg },
+    'e5-irr': { irrForm, irrWahl, irrZurueck, irrSatz, irrNeg },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -2573,6 +2772,11 @@
         { id: 'e5-ort', title: 'Wo? in, on, under, next to …', icon: '🐈', gen: praepOrt },
         { id: 'e5-zeit', title: 'Wann? at, on, in', icon: '🕖', gen: praepZeit },
         { id: 'e5-zahl', title: 'Zahlen, Datum und Uhrzeit', icon: '🔢', gen: zahlenZeit },
+      ] },
+      { id: 'e5-vergangen', nr: 4, title: 'Was war gestern?', topics: [
+        { id: 'e5-was', title: 'was und were', icon: '⏪', gen: wasWere },
+        { id: 'e5-ed', title: 'past simple: played, danced, stopped', icon: '📆', gen: pastEd },
+        { id: 'e5-irr', title: 'past simple: went, saw, had', icon: '🌀', gen: pastIrr },
       ] },
     ],
   };

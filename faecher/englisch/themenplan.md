@@ -12,7 +12,7 @@ beschreibt Klasse 5 und 6 gemeinsam. Die Auswahl für Klasse 5 ist deshalb eine 
 | Womit anfangen | **Grammatik vom Schuljahresanfang** |
 | Sprache der App | **Deutsch** (Aufgabenstellung, Tipp, Lösungsweg); nur die Übungssätze sind englisch |
 | Vorlesen | **Ja, mit fertigen Aufnahmen**, Stimme des Geräts abgelehnt. **Zwei Aussprachen zur Wahl** (Umschalter auf der Startseite): amerikanisch „Frau B“ (Kokoro `af_bella`, Voreinstellung), britisch „Mann 2“ (`bm_fable`). Einzelheiten in `README.md`, Abschnitt „Ton“. |
-| Vokabeln (eigene Listen oder selbst eintragen) | noch offen, wird vor Bereich 3 gefragt |
+| Vokabeln (eigene Listen oder selbst eintragen) | Roberto 13.11.: erst feste Listen, selbst eintragen vielleicht später |
 
 Festgelegt ohne Rückfrage (kann geändert werden): britische **Schreibweise** als Standard (gesprochen wird amerikanisch oder britisch, siehe Vorlesen); amerikanische Schreibweisen
 (color, favorite) werden beim Eintippen als richtig angenommen. Kurz- und Langform (isn’t / is not) gelten beide,
@@ -59,20 +59,20 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 | 25 | Wann? at, on, in (gebaut, v67) | „___ Monday“, „___ seven o’clock“, „___ July“ |
 | 26 | Zahlen, Ordnungszahlen, Datum, Uhrzeit (gebaut, v68) | 12 → twelve · 3rd → third · „half past four“ → Uhr mit Zeigern |
 
-## Bereich 4: Vergangenheit, erster Einstieg (3 Themen) – nur wenn das Buch es in Klasse 5 hat
+## Bereich 4: Vergangenheit, erster Einstieg (3 Themen) – Roberto 13.11.: bauen, auch ohne das Buch zu kennen
 
 | Nr. | Thema | Beispiel-Aufgaben |
 |---|---|---|
-| 27 | was und were | „Yesterday we ___ at the zoo.“ |
-| 28 | past simple: regelmäßige Verben (-ed) | play → played, stop → stopped, carry → carried |
-| 29 | past simple: wichtige unregelmäßige Verben | go → went, see → saw, have → had |
+| 27 | was und were (gebaut, v69) | „Yesterday we ___ at the zoo.“ |
+| 28 | past simple: regelmäßige Verben (-ed) (gebaut, v69) | play → played, stop → stopped, carry → carried |
+| 29 | past simple: wichtige unregelmäßige Verben (gebaut, v69) | go → went, see → saw, have → had |
 
 ## Bereich 5: Wörter (Wortfelder, im Lehrplan „bevorzugt Klasse 5“)
 
 Family · house and home · school and classroom · daily routine · clothes · free time and hobbies · pets and animals ·
 parts of the body · food and drink · colours · days, months, seasons.
 Je Wortfeld: Bedeutung wählen, Wort eintippen, Wort im Satz, was passt nicht dazu.
-Eigene Wortlisten nach Themen, nichts aus dem Schulbuch übernommen. **Vorher klären:** Vokabeln selbst eintragen können?
+Eigene Wortlisten nach Themen, nichts aus dem Schulbuch übernommen. **Geklärt (Roberto 13.11.):** erst feste Listen; selbst eintragen vielleicht später.
 
 ## Bereich 6: Sprechen im Alltag und Lesen
 
