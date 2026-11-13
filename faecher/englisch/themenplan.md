@@ -32,8 +32,8 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 | 8 | this, that, these, those (gebaut, v60) | nah oder fern, eins oder mehrere: „___ books over there“ |
 | 9 | my, your, his, her … (Possessivbegleiter) (gebaut, v61) | „Lisa has got a dog. ___ dog is black.“ · he → his, they → their · its oder it’s? |
 | 10 | Wem gehört es? ’s und of (gebaut, v61) | „the bike of Ben“ → Ben’s bike · „the girls’ room“: ein Mädchen oder mehrere? |
-| 11 | Aufforderungen (Imperativ) | „Open the window.“ verneinen → Don’t open the window. · Was passt im Klassenraum? |
-| 12 | can und must | „I ___ swim.“ (kann) · can’t oder mustn’t? · Frage bauen: „you / can / ride / a horse / ?“ |
+| 11 | Aufforderungen (Imperativ) (gebaut, v62) | „Open the window.“ verneinen → Don’t open the window. · Was passt im Klassenraum? |
+| 12 | can und must (gebaut, v62; mit mustn’t) | „I ___ swim.“ (kann) · can’t oder mustn’t? · Frage bauen: „you / can / ride / a horse / ?“ |
 
 ## Bereich 2: Sätze im present simple und present progressive (9 Themen)
 

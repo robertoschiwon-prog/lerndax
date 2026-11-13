@@ -985,4 +985,198 @@
       };
     },
   };
+
+  // =====================================================
+  // Aufforderungen: das Verb steht vorn
+  // =====================================================
+  //   ctx: { mode:'pos'|'neg', p, de } | { mode:'be', text, neg, rest, de }
+  EX['e5-imp'] = {
+    title: 'Aufforderungen: Open … / Don’t …',
+    titleFor: (ctx) => (ctx && ctx.mode === 'neg' ? 'Warum „Don’t“?' : ctx && ctx.mode === 'be' ? 'Warum „be“?' : ctx && ctx.mode === 'pos' ? 'So geht eine Aufforderung' : 'Aufforderungen: Open … / Don’t …'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, frei = null, Z = null;
+      const von = (p) => T.IMP.find((x) => x.p === p);
+      if (mode === 'pos' || mode === 'neg') S0 = ctx.post ? von(ctx.p) : U.pick(T.IMP.filter((x) => x.p !== ctx.p));
+      if (mode === 'be') S0 = ctx.post ? ctx : U.pick(T.IMPBE.filter((x) => x.neg === ctx.neg && x.text !== ctx.text));
+      const neuFrei = () => { frei = U.pick(T.IMP); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Anderes Beispiel', onClick() { neuFrei(); api.replay(); } }]); }
+      const teil = (s) => (s.rest ? [{ t: T.gross(s.verb), c: BLAU }, { t: s.rest + '.' }] : [{ t: T.gross(s.verb) + '.', c: BLAU }]);
+      async function bitte(s, y) {
+        // erst der Aussagesatz mit you, dann fällt you weg
+        const a = zeile(api, [{ t: 'You', c: '#b8b2a6' }, { t: s.verb, c: BLAU }, ...(s.rest ? [{ t: s.rest + '.' }] : [])], y);
+        api.say(`Ein gewöhnlicher Satz hat eine Person vorn: You ${s.p}.`);
+        await api.wait(2600);
+        a.g.remove();
+        Z = zeile(api, teil(s), y);
+        api.say('Bei einer <b>Aufforderung</b> fällt die Person weg. Der Satz beginnt mit dem <b>Verb</b> in der Grundform.');
+        await api.wait(2800);
+      }
+      async function verbiete(s, y) {
+        const a = Z || zeile(api, teil(s), y);
+        const b = zeile(api, [{ t: 'Don’t', c: ORANGE }, { t: s.verb, c: BLAU }, ...(s.rest ? [{ t: s.rest + '.' }] : [])], y);
+        if (!s.rest) { a.g.remove(); } else await gleite(api, a, b, [[a.els[0], b.els[1]], [a.els[1], b.els[2]]]);
+        b.g.setAttribute('opacity', 1); Z = b;
+        api.say('Soll jemand etwas <b>nicht</b> tun, kommt <b>Don’t</b> davor. Das Verb wird jetzt klein geschrieben, sonst ändert sich nichts.');
+        await api.wait(3000);
+      }
+      return {
+        reset() {
+          api.clear(); Z = null;
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'be') zeile(api, S0.neg ? [{ t: 'Don’t' }, { t: '___' }, { t: S0.rest + '.' }] : [{ t: '___' }, { t: S0.rest + '.' }], 90);
+          else zeile(api, [{ t: 'You', c: '#b8b2a6' }, { t: (S0 || frei).p + '.' }], 90);
+        },
+        async play() {
+          api.clear(); Z = null;
+          if (mode === 'pos') {
+            const s = S0;
+            await bitte(s, 90);
+            api.say(`<b>${s.pos}</b> Kein you, kein -s, kein to. ${U.say(s.pos)}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (mode === 'neg') {
+            const s = S0;
+            Z = zeile(api, teil(s), 90);
+            api.say(`Die Aufforderung heißt: <b>${s.pos}</b>`);
+            await api.wait(2200);
+            await verbiete(s, 90);
+            api.say(`<b>Don’t</b> ${s.p}. Don’t ist kurz für Do not. ${U.say(s.neg)}<br><small>${s.deNeg}</small>`);
+            return;
+          }
+          if (mode === 'be') {
+            const s = S0;
+            zeile(api, [{ t: 'am · is · are', c: '#8b8577' }], 60, 18);
+            api.say('Eine Aufforderung braucht die <b>Grundform</b> des Verbs. Wie heißt die Grundform von am, is, are?');
+            await api.wait(3000);
+            zeile(api, s.neg ? [{ t: 'Don’t', c: ORANGE }, { t: 'be', c: BLAU }, { t: s.rest + '.' }] : [{ t: 'Be', c: BLAU }, { t: s.rest + '.' }], 120);
+            api.say(`Die Grundform heißt <b>be</b>: <b>${s.text}</b> ${U.say(s.text)}<br><small>${s.de}</small>`);
+            return;
+          }
+          const s = frei;
+          api.say('Mit einer Aufforderung sagst du jemandem, was er tun soll.');
+          await api.wait(2400);
+          await bitte(s, 90);
+          api.say(`<b>${s.pos}</b> ${U.say(s.pos)}<br><small>${s.de}</small>`);
+          await api.wait(3000);
+          await verbiete(s, 90);
+          api.say(`<b>${s.neg}</b> ${U.say(s.neg)}<br><small>${s.deNeg}</small><br>Merke: Verb nach vorn. Für „nicht“ kommt Don’t davor.`);
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // can und must: drei Schilder
+  // =====================================================
+  //   ctx: { mode:'form'|'verb'|'neg'|'frage'|'kurz'|'wort', subj, vp, wort, de, pr, ja }
+  const SCHILD = [{ w: 'can', de: 'können', x: 14 }, { w: 'must', de: 'müssen', x: 126 }, { w: 'mustn’t', de: 'nicht dürfen', x: 238 }];
+  EX['e5-can'] = {
+    title: 'can und must',
+    titleFor: (ctx) => ({ form: ctx && ctx.wort ? `Warum „${ctx.wort}“ ohne s?` : '', verb: 'Das Verb dahinter', neg: 'Verneinen: so geht’s', frage: 'Fragen: so geht’s', kurz: 'Kurzantwort: so geht’s', wort: ctx && ctx.wort ? `Warum „${ctx.wort}“?` : '' }[(ctx && ctx.mode) || ''] || 'can und must'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, frei = null, Z = null, sch = {};
+      if (mode !== 'frei') {
+        if (ctx.post) S0 = ctx;
+        else {
+          const pool = (mode === 'kurz' ? T.CAN_KA : mode === 'neg' || mode === 'frage' ? T.CAN : mode === 'wort' ? T.CMM.filter((s) => s.wort === ctx.wort)
+            : [...T.CAN, ...T.MUST].filter((s) => s.wort === ctx.wort && !['I', 'You', 'We', 'They'].includes(s.subj) && s.vp.split(' ')[0] !== 'be'))
+            .filter((s) => s.subj !== ctx.subj || s.vp !== ctx.vp);
+          S0 = Object.assign({}, U.pick(pool), { ja: ctx.ja });
+        }
+      }
+      const neuFrei = () => { frei = [U.pick(T.CAN), U.pick(T.MUST), U.pick(T.MUSTNT)]; };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      function schilder() {
+        sch = {};
+        SCHILD.forEach((f) => {
+          const r = el('rect', { x: f.x, y: 122, width: 108, height: 74, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: f.x + 54, y: 154, 'text-anchor': 'middle', class: 'ex-b', text: f.w, style: `fill:${BLAU};font-size:21px` }, api.svg);
+          el('text', { x: f.x + 54, y: 180, 'text-anchor': 'middle', class: 'ex-s', text: f.de, style: 'font-size:13px' }, api.svg);
+          sch[f.w] = r;
+        });
+      }
+      const leuchte = (w) => SCHILD.forEach((f) => sch[f.w].setAttribute('fill', f.w === w ? '#dfe9ff' : '#fff'));
+      const neu = (teile, y) => { if (Z) Z.g.remove(); Z = zeile(api, teile, y || 46); return Z; };
+      const voll = (s) => neu([{ t: s.subj }, { t: s.wort, c: BLAU }, { t: s.vp + '.' }]);
+      return {
+        reset() {
+          api.clear(); Z = null; schilder();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          const s = S0 || frei[0];
+          if (mode === 'kurz') neu([{ t: 'Can', c: BLAU }, { t: T.subjKlein(s.subj) }, { t: s.vp + '?' }]);
+          else if (mode === 'neg' || mode === 'frage') voll(s);
+          else if (mode === 'frei') neu([{ t: 'can · must · mustn’t', c: BLAU }]);
+          else neu([{ t: s.subj }, { t: '___' }, { t: s.vp + '.' }]);
+        },
+        async play() {
+          const s = S0;
+          if (mode === 'form' || mode === 'verb') {
+            const v = s.vp.split(' ')[0], rest = s.vp.split(' ').slice(1).join(' ');
+            leuchte(s.wort);
+            api.say(`<b>${s.wort}</b> ist ein besonderes Verb: Es sieht bei allen Personen gleich aus. <b>Kein -s</b>, auch nicht bei he, she, it.`);
+            await api.wait(3200);
+            neu([{ t: s.subj }, { t: s.wort, c: BLAU }, { t: v, c: ORANGE }, ...(rest ? [{ t: rest + '.' }] : [])]);
+            api.say(`Dahinter steht das Verb in der <b>Grundform</b>: <b>${v}</b>. Ohne -s und ohne to.`);
+            await api.wait(3000);
+            api.say(`Also: ${s.subj} <b>${s.wort}</b> <b>${v}</b>${rest ? ' ' + rest : ''}. ${U.say(`${s.subj} ${s.wort} ${s.vp}.`)}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (mode === 'neg') {
+            leuchte('can');
+            api.say('Zum Verneinen hängt man <b>not</b> direkt an can: <b>cannot</b>, in einem Wort.');
+            await api.wait(2800);
+            neu([{ t: s.subj }, { t: 'cannot', c: BLAU }, { t: s.vp + '.' }]);
+            await api.wait(2000);
+            zeile(api, [{ t: s.subj }, { t: 'can’t', c: BLAU }, { t: s.vp + '.' }], 92);
+            api.say(`Beim Sprechen sagt man meist kurz <b>can’t</b>: ${s.subj} can’t ${s.vp}. ${U.say(`${s.subj} can’t ${s.vp}.`)}`);
+            return;
+          }
+          if (mode === 'frage') {
+            const a = voll(s);
+            api.say('Bei der Frage <b>tauschen</b> can und die Person die Plätze. Mehr braucht es nicht.');
+            await api.wait(2600);
+            const b = zeile(api, [{ t: 'Can', c: BLAU }, { t: T.subjKlein(s.subj) }, { t: s.vp + '?' }], 46);
+            await gleite(api, a, b, [[a.els[0], b.els[1]], [a.els[1], b.els[0]], [a.els[2], b.els[2]]], 1100);
+            Z = b;
+            api.say(`<b>Can ${T.subjKlein(s.subj)} ${s.vp}?</b> Kein do, kein does. ${U.say(`Can ${T.subjKlein(s.subj)} ${s.vp}?`)}`);
+            return;
+          }
+          if (mode === 'kurz') {
+            leuchte('can');
+            api.say(`Die Kurzantwort nimmt <b>can</b> aus der Frage wieder auf${s.subj.toLowerCase() !== s.pr ? ` (für ${s.subj}: <b>${s.pr}</b>)` : ''}.`);
+            await api.wait(2800);
+            const t = s.ja ? `Yes, ${s.pr} can.` : `No, ${s.pr} can’t.`;
+            zeile(api, s.ja ? [{ t: 'Yes,' }, { t: s.pr }, { t: 'can.', c: BLAU }] : [{ t: 'No,' }, { t: s.pr }, { t: 'can’t.', c: BLAU }], 92);
+            api.say(`<b>${t}</b> In der Antwort steht can, nicht do oder does. ${U.say(t)}`);
+            return;
+          }
+          if (mode === 'wort') {
+            api.say(`Was soll der Satz sagen? <b>${s.de}</b>`);
+            await api.wait(2800);
+            leuchte(s.wort);
+            api.say(`Dazu passt <b>${s.wort}</b> = ${T.CAN_DE[s.wort]}.${s.wort === 'mustn’t' ? ' Achtung: mustn’t ist ein Verbot, es heißt nicht „nicht müssen“.' : ''}`);
+            await api.wait(3000);
+            voll(s);
+            api.say(`${s.subj} <b>${s.wort}</b> ${s.vp}. ${U.say(`${s.subj} ${s.wort} ${s.vp}.`)}<br><small>${s.de}</small>`);
+            return;
+          }
+          api.say('Drei kleine Wörter sagen, was jemand <b>kann</b>, <b>muss</b> oder <b>nicht darf</b>.');
+          await api.wait(3000);
+          for (const f of frei) {
+            leuchte(f.wort); voll(f);
+            api.say(`<b>${f.wort}</b> = ${T.CAN_DE[f.wort]}: ${f.subj} <b>${f.wort}</b> ${f.vp}. ${U.say(f.text)}<br><small>${f.de}</small>`);
+            await api.wait(3600);
+          }
+          leuchte('');
+          api.say('Merke: Alle drei bleiben bei jeder Person gleich (kein -s). Dahinter steht die Grundform. Und <b>mustn’t</b> heißt „nicht dürfen“.');
+        },
+      };
+    },
+  };
 })();

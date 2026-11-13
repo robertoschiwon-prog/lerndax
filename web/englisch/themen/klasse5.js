@@ -1160,6 +1160,237 @@
   });
 
   // =====================================================
+  // Aufforderungen (Imperativ)
+  // =====================================================
+  // [Aufforderung (klein geschrieben), Deutsch, Deutsch verneint]
+  const IMP = [
+    ['open the window', 'Mach das Fenster auf.', 'Mach das Fenster nicht auf.'],
+    ['close the door', 'Mach die Tür zu.', 'Mach die Tür nicht zu.'],
+    ['sit down', 'Setz dich hin.', 'Setz dich nicht hin.'],
+    ['stand up', 'Steh auf.', 'Steh nicht auf.'],
+    ['come here', 'Komm her.', 'Komm nicht her.'],
+    ['write on the board', 'Schreib an die Tafel.', 'Schreib nicht an die Tafel.'],
+    ['open your book', 'Schlag dein Buch auf.', 'Schlag dein Buch nicht auf.'],
+    ['talk to Ben', 'Sprich mit Ben.', 'Sprich nicht mit Ben.'],
+    ['touch the dog', 'Fass den Hund an.', 'Fass den Hund nicht an.'],
+    ['eat the cake', 'Iss den Kuchen.', 'Iss den Kuchen nicht.'],
+    ['go into the garden', 'Geh in den Garten.', 'Geh nicht in den Garten.'],
+    ['take my pen', 'Nimm meinen Stift.', 'Nimm meinen Stift nicht.'],
+  ].map(([p, de, deNeg]) => ({ p, de, deNeg, verb: p.split(' ')[0], rest: p.split(' ').slice(1).join(' '), pos: `${gross(p)}.`, neg: `Don’t ${p}.` }));
+  // Aufforderungen mit be: [Satz, Deutsch, verneint?]
+  const IMPBE = [['Be quiet.', 'Sei leise.', 0], ['Be careful.', 'Sei vorsichtig.', 0], ['Don’t be late.', 'Komm nicht zu spät.', 1], ['Don’t be sad.', 'Sei nicht traurig.', 1]]
+    .map(([text, de, neg]) => ({ text, de, neg, rest: text.replace(/^(Don’t be|Be) /, '').replace('.', '') }));
+  const IMP_TIPP = 'Eine Aufforderung beginnt direkt mit dem <b>Verb</b>, ohne you: Open the window. Soll jemand etwas <b>nicht</b> tun, kommt <b>Don’t</b> davor: Don’t open the window.';
+  const DONT = ['Don’t', 'Don\'t', 'Do not'];
+  // A: verneinen (Don’t eintippen)
+  function impNeg() {
+    const s = pick(IMP);
+    return {
+      prompt: `Jetzt soll man es <b>nicht</b> tun. Was gehört an den Anfang?${en(s.pos)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: DONT, suffix: `${s.p}.`, label: 'ein Wort' }], answerText: 'Don’t (oder: Do not)',
+      hint: IMP_TIPP,
+      solution: `<span lang="en">${s.pos}</span> → <span lang="en"><b class="vb">Don’t</b> ${s.p}.</span> ${U.say(s.neg)}<br><b>Don’t</b> ist kurz für Do not. Danach steht das Verb klein und unverändert.<br><small>Auf Deutsch: ${s.deNeg}</small>`,
+      ex: { mode: 'neg', p: s.p, de: s.deNeg },
+    };
+  }
+  // B: richtigen verneinten Satz auswählen
+  function impNegWahl() {
+    const s = pick(IMP);
+    const ch = shuffle([s.neg, `Not ${s.p}.`, `Doesn’t ${s.p}.`]);
+    return {
+      prompt: `Wie sagst du auf Englisch: <b>${s.deNeg}</b>`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.neg),
+      hint: IMP_TIPP,
+      solution: `<span lang="en"><b class="vb">Don’t</b> ${s.p}.</span> ${U.say(s.neg)}<br>Bei Aufforderungen heißt es immer <b>Don’t</b>, egal zu wem man spricht.<br><small>Auf Deutsch: ${s.deNeg}</small>`,
+      ex: { mode: 'neg', p: s.p, de: s.deNeg },
+    };
+  }
+  // C: richtige Aufforderung auswählen (ohne you, ohne -s, ohne to)
+  function impWahl() {
+    const s = pick(IMP);
+    const ch = shuffle([s.pos, `${gross(mitS(s.verb))}${s.rest ? ' ' + s.rest : ''}.`, `To ${s.p}.`]);
+    return {
+      prompt: `Wie sagst du auf Englisch: <b>${s.de}</b>`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.pos),
+      hint: IMP_TIPP,
+      solution: `<span lang="en"><b class="vb">${gross(s.verb)}</b>${s.rest ? ' ' + s.rest : ''}.</span> ${U.say(s.pos)}<br>Die Aufforderung ist einfach das Verb in der Grundform: ohne you, ohne -s, ohne to.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: { mode: 'pos', p: s.p, de: s.de },
+    };
+  }
+  // D: das Verb eintippen
+  function impVerb() {
+    const s = pick(IMP.filter((x) => x.rest));
+    return {
+      prompt: `Wie heißt die Aufforderung? <b>${s.de}</b>`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: gross(s.verb), suffix: `${s.rest}.`, label: 'Verb' }],
+      hint: `Das gesuchte Verb heißt in der Grundform <b lang="en">${s.verb}</b>. Was musst du daran ändern?`,
+      solution: `<span lang="en"><b class="vb">${gross(s.verb)}</b> ${s.rest}.</span> ${U.say(s.pos)}<br>Nichts ändern: Die Aufforderung ist die Grundform. Nur der Satzanfang wird großgeschrieben.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: { mode: 'pos', p: s.p, de: s.de },
+    };
+  }
+  // E: verstehen: Was bedeutet die Aufforderung?
+  function impVerstehen() {
+    const s = pick(IMP), neg = Math.random() < 0.6, t = pick(IMP.filter((x) => x !== s));
+    const richtig = neg ? s.deNeg : s.de;
+    const ch = shuffle([richtig, neg ? s.de : s.deNeg, neg ? t.deNeg : t.de]);
+    return {
+      prompt: `Was bedeutet das? ${U.say(neg ? s.neg : s.pos)}${en(neg ? s.neg : s.pos)}`,
+      choices: ch, correct: ch.indexOf(richtig),
+      hint: 'Steht <b>Don’t</b> am Anfang? Dann soll man es <b>nicht</b> tun.',
+      solution: `<span lang="en"><b class="vb">${neg ? s.neg : s.pos}</b></span> ${U.say(neg ? s.neg : s.pos)}<br>= ${richtig}${neg ? '<br><b>Don’t</b> am Anfang heißt: Tu das nicht.' : ''}`,
+      ex: { mode: neg ? 'neg' : 'pos', p: s.p, de: richtig },
+    };
+  }
+  // F: Aufforderungen mit be
+  function impBe() {
+    const s = pick(IMPBE);
+    return {
+      prompt: `Was gehört in die Lücke? (${s.de})${en(s.neg ? `Don’t ___ ${s.rest}.` : `___ ${s.rest}.`)}`,
+      choices: s.neg ? ['be', 'are', 'is'] : ['Be', 'Are', 'Is'], correct: 0,
+      hint: 'Die Aufforderung ist immer die <b>Grundform</b> des Verbs. Die Grundform von am, is, are heißt <b>be</b>.',
+      solution: `<span lang="en">${s.text.replace(/\b(be|Be)\b/, '<b class="vb">$1</b>')}</span> ${U.say(s.text)}<br>Die Grundform von am, is, are ist <b>be</b>. Deshalb: Be quiet. Don’t be late.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: { mode: 'be', text: s.text, neg: s.neg, rest: s.rest, de: s.de },
+    };
+  }
+  const imperativ = () => U.wahl([[22, impNeg], [16, impNegWahl], [18, impWahl], [18, impVerb], [16, impVerstehen], [10, impBe]]);
+
+  // =====================================================
+  // can und must
+  // =====================================================
+  // [Subjekt, was, Deutsch, Pronomen für die Kurzantwort]
+  const CAN = [
+    ['I', 'swim', 'Ich kann schwimmen.', ''], ['You', 'sing well', 'Du kannst gut singen.', ''],
+    ['He', 'play the guitar', 'Er kann Gitarre spielen.', 'he'], ['She', 'ride a horse', 'Sie kann reiten.', 'she'],
+    ['We', 'speak English', 'Wir können Englisch sprechen.', ''], ['They', 'run fast', 'Sie können schnell rennen.', 'they'],
+    ['Tom', 'cook', 'Tom kann kochen.', 'he'], ['Lisa', 'ride a bike', 'Lisa kann Fahrrad fahren.', 'she'],
+    ['My dog', 'jump high', 'Mein Hund kann hoch springen.', 'it'], ['My sister', 'draw', 'Meine Schwester kann zeichnen.', 'she'],
+  ].map(([subj, vp, de, pr]) => ({ subj, vp, de, pr, wort: 'can', text: `${subj} can ${vp}.`, neg: `${subj} can’t ${vp}.`, frage: `Can ${subjKlein(subj)} ${vp}?` }));
+  const MUST = [
+    ['I', 'do my homework', 'Ich muss meine Hausaufgaben machen.'], ['You', 'be quiet', 'Du musst leise sein.'],
+    ['He', 'tidy his room', 'Er muss sein Zimmer aufräumen.'], ['She', 'go to bed', 'Sie muss ins Bett gehen.'],
+    ['We', 'wait here', 'Wir müssen hier warten.'], ['They', 'help their mum', 'Sie müssen ihrer Mama helfen.'],
+    ['Tom', 'feed the dog', 'Tom muss den Hund füttern.'],
+  ].map(([subj, vp, de]) => ({ subj, vp, de, wort: 'must', text: `${subj} must ${vp}.` }));
+  const MUSTNT = [
+    ['You', 'run in the classroom', 'Du darfst im Klassenzimmer nicht rennen.'], ['We', 'be late', 'Wir dürfen nicht zu spät kommen.'],
+    ['He', 'touch the dog', 'Er darf den Hund nicht anfassen.'], ['They', 'eat in the library', 'Sie dürfen in der Bücherei nicht essen.'],
+    ['You', 'talk in the test', 'Du darfst im Test nicht reden.'], ['I', 'forget my book', 'Ich darf mein Buch nicht vergessen.'],
+  ].map(([subj, vp, de]) => ({ subj, vp, de, wort: 'mustn’t', text: `${subj} mustn’t ${vp}.` }));
+  const CMM = [...CAN, ...MUST, ...MUSTNT];
+  const CAN_KA = CAN.filter((s) => s.pr);
+  const CAN_DE = { can: 'können', must: 'müssen', 'mustn’t': 'nicht dürfen' };
+  const cMark = (s) => `<span lang="en">${s.subj} <b class="vb">${s.wort}</b> ${s.vp}.</span>`;
+  const CAN_TIPP = '<b>can</b> (können) und <b>must</b> (müssen) sind bei allen Personen gleich: kein -s bei he, she, it. Dahinter steht das Verb in der <b>Grundform</b>, ohne to.';
+  const CEX = (s, mode, ja) => ({ mode, subj: s.subj, vp: s.vp, wort: s.wort, de: s.de, pr: s.pr || '', ja: !!ja });
+  const verbVon = (vp) => vp.split(' ')[0];
+  const mitS = (v) => (/(s|sh|ch|x|o)$/.test(v) ? v + 'es' : /[^aeiou]y$/.test(v) ? v.slice(0, -1) + 'ies' : v + 's');
+  // A: can / must ohne -s
+  function canForm() {
+    const s = pick([...CAN, ...MUST].filter((x) => !['I', 'You', 'We', 'They'].includes(x.subj)));
+    const ch = shuffle([s.wort, s.wort + 's', `${s.wort} to`]);
+    return {
+      prompt: `Was gehört in die Lücke? (${s.de})${en(`${s.subj} ___ ${s.vp}.`)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.wort),
+      hint: CAN_TIPP,
+      solution: `${cMark(s)} ${U.say(s.text)}<br><b>${s.wort}</b> bekommt nie ein -s, auch nicht bei he, she, it. Und es steht kein to dahinter.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: CEX(s, 'form'),
+    };
+  }
+  // B: das Verb dahinter in der Grundform
+  function canVerb() {
+    const s = pick([...CAN, ...MUST].filter((x) => !['I', 'You', 'We', 'They'].includes(x.subj) && verbVon(x.vp) !== 'be'));
+    const v = verbVon(s.vp), rest = s.vp.split(' ').slice(1).join(' ');
+    const ch = shuffle([v, mitS(v), `to ${v}`]);
+    return {
+      prompt: `Was gehört in die Lücke? (${s.de})${en(`${s.subj} ${s.wort} ___${rest ? ' ' + rest : ''}.`)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(v),
+      hint: CAN_TIPP,
+      solution: `<span lang="en">${s.subj} ${s.wort} <b class="vb">${v}</b>${rest ? ' ' + rest : ''}.</span> ${U.say(s.text)}<br>Hinter ${s.wort} steht das Verb in der <b>Grundform</b>: ohne -s und ohne to.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: CEX(s, 'verb'),
+    };
+  }
+  // C: can verneinen
+  function canNeg() {
+    const s = pick(CAN);
+    return {
+      prompt: `Verneine den Satz: Setze die <b>verneinte</b> Form von can ein.${en(s.text)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: ['can’t', 'can\'t', 'cannot'], prefix: s.subj, suffix: `${s.vp}.`, label: 'verneinte Form' }],
+      answerText: 'can’t (oder: cannot)',
+      hint: 'Aus can wird <b>can’t</b>. Ausgeschrieben heißt es <b>cannot</b>, in einem Wort.',
+      solution: `<span lang="en">${s.subj} <b class="vb">can’t</b> ${s.vp}.</span> ${U.say(s.neg)}<br><b>can’t</b> ist kurz für <b>cannot</b> (ein Wort). Das Verb dahinter bleibt unverändert.`,
+      ex: CEX(s, 'neg'),
+    };
+  }
+  // D: Frage mit can
+  function canFrage() {
+    const s = pick(CAN), tippen = Math.random() < 0.45;
+    const lo = `<span lang="en">${s.subj} <b>can</b> ${s.vp}.</span> → <span lang="en"><b class="vb">Can</b> ${subjKlein(s.subj)} ${s.vp}?</span> ${U.say(s.frage)}<br>Bei der Frage tauschen can und die Person die Plätze. Es braucht kein do oder does.`;
+    if (tippen) return {
+      prompt: `Mache aus dem Satz eine Frage und schreibe sie auf.${en(s.text)}`,
+      fields: [{ type: 'text', ci: true, answer: s.frage, label: 'Frage' }],
+      hint: 'Wie bei to be: Die ersten beiden Teile tauschen die Plätze. Erst <b>Can</b>, dann die Person.', solution: lo, ex: CEX(s, 'frage'),
+    };
+    const v = verbVon(s.vp), rest = s.vp.split(' ').slice(1).join(' ');
+    const ch = shuffle([s.frage, `Does ${subjKlein(s.subj)} can ${s.vp}?`, `Can ${subjKlein(s.subj)} ${mitS(v)}${rest ? ' ' + rest : ''}?`]);
+    return {
+      prompt: `Mache aus dem Satz eine Frage. Welche ist richtig?${en(s.text)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.frage),
+      hint: 'Wie bei to be: Die ersten beiden Teile tauschen die Plätze. Erst <b>Can</b>, dann die Person.', solution: lo, ex: CEX(s, 'frage'),
+    };
+  }
+  // E: Kurzantwort
+  function canAntwort() {
+    const s = pick(CAN_KA), ja = Math.random() < 0.5;
+    const richtig = ja ? `Yes, ${s.pr} can.` : `No, ${s.pr} can’t.`;
+    const falsch = ja ? [`Yes, ${s.pr} cans.`, `Yes, ${s.pr} ${s.pr === 'they' ? 'do' : 'does'}.`] : [`No, ${s.pr} not can.`, `No, ${s.pr} ${s.pr === 'they' ? 'don’t' : 'doesn’t'}.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Antworte kurz mit <b>${ja ? 'Ja' : 'Nein'}</b>.${en(s.frage)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: 'Die Kurzantwort nimmt das Wort <b>can</b> aus der Frage wieder auf: Yes, … can. / No, … can’t.',
+      solution: `<span lang="en">${s.frage}</span><br><span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>${s.subj.toLowerCase() !== s.pr ? `Für <b>${s.subj}</b> steht in der Antwort <b>${s.pr}</b>. ` : ''}In der Antwort steht wieder can, nicht do oder does.`,
+      ex: CEX(s, 'kurz', ja),
+    };
+  }
+  // F: can, must oder mustn’t? (nach der deutschen Bedeutung)
+  function canWelches() {
+    const s = pick(CMM);
+    return {
+      prompt: `Welches Wort passt? <b>${s.de}</b>${en(`${s.subj} ___ ${s.vp}.`)}`,
+      choices: ['can', 'must', 'mustn’t'], correct: ['can', 'must', 'mustn’t'].indexOf(s.wort),
+      hint: '<b>can</b> = können · <b>must</b> = müssen · <b>mustn’t</b> = nicht dürfen.',
+      solution: `${cMark(s)} ${U.say(s.text)}<br><b>${s.wort}</b> heißt <b>${CAN_DE[s.wort]}</b>.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: CEX(s, 'wort'),
+    };
+  }
+  // G: mustn’t heißt „nicht dürfen“ (nicht „nicht müssen“)
+  function canMustnt() {
+    const s = pick(MUSTNT);
+    const darf = s.de, muss = s.de.replace(/darfst/, 'musst').replace(/dürfen/, 'müssen').replace(/darf/, 'muss'), kann = s.de.replace(/darfst/, 'kannst').replace(/dürfen/, 'können').replace(/darf/, 'kann');
+    const ch = shuffle([darf, muss, kann]);
+    return {
+      prompt: `Was bedeutet das?${en(s.text)}`,
+      choices: ch, correct: ch.indexOf(darf),
+      hint: 'Vorsicht, <b>mustn’t</b> sieht aus wie „muss nicht“, bedeutet aber etwas Strengeres: ein Verbot.',
+      solution: `${cMark(s)} ${U.say(s.text)}<br>= ${darf}<br><b>mustn’t</b> ist ein <b>Verbot</b>: nicht dürfen. Es heißt nicht „nicht müssen“.`,
+      ex: CEX(s, 'wort'),
+    };
+  }
+  const canMust = () => U.wahl([[16, canForm], [16, canVerb], [14, canNeg], [14, canFrage], [10, canAntwort], [18, canWelches], [12, canMustnt]]);
+
+  Object.assign(D.daten, { IMP, IMPBE, CAN, MUST, MUSTNT, CMM, CAN_KA, CAN_DE });
+  const themenVorImp = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorImp(), {
+    'e5-imp': [...IMP.flatMap((s) => [s.pos, s.neg]), ...IMPBE.map((s) => s.text)],
+    'e5-can': [...CAN.flatMap((s) => [s.text, s.neg, s.frage]), ...MUST.map((s) => s.text), ...MUSTNT.map((s) => s.text),
+      ...['he', 'she', 'it', 'they'].flatMap((p) => [`Yes, ${p} can.`, `No, ${p} can’t.`])],
+  });
+  Object.assign(D.arten, {
+    'e5-imp': { impNeg, impNegWahl, impWahl, impVerb, impVerstehen, impBe },
+    'e5-can': { canForm, canVerb, canNeg, canFrage, canAntwort, canWelches, canMustnt },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -1176,6 +1407,8 @@
         { id: 'e5-this', title: 'this, that, these, those', icon: '👉', gen: dieseJene },
         { id: 'e5-poss', title: 'my, your, his, her …', icon: '🎁', gen: possessiv },
         { id: 'e5-gen', title: 'Wem gehört es? ’s und of', icon: '🏷️', gen: genitiv },
+        { id: 'e5-imp', title: 'Aufforderungen: Open … / Don’t …', icon: '📣', gen: imperativ },
+        { id: 'e5-can', title: 'can und must', icon: '💪', gen: canMust },
       ] },
     ],
   };

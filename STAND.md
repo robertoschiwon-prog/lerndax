@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v61`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v62`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -95,6 +95,14 @@ Weitere Dokumente:
   `e5-gen` „Wem gehört es? ’s und of“ (6 Aufgabenarten: mit ’s schreiben, Schreibweise wählen, ein Besitzer oder
   mehrere (girl’s / girls’), of bei Sachen). Jetzt 10 Themen und 432 Aufnahmen je Aussprache in 10 Paketen.
   Vom ersten Bereich fehlen noch: Aufforderungen (Imperativ) und can/must.
+- **EnDax v62 (13.11.2026): Themen 11 und 12, Bereich 1 „Erste Bausteine“ ist damit vollständig**, auf GitHub und live.
+  `e5-imp` „Aufforderungen: Open … / Don’t …“ (6 Aufgabenarten: Don’t einsetzen, richtige Form, Verb tippen, verstehen,
+  Be quiet / Don’t be late; Animation „you fällt weg, Don’t kommt davor“) und `e5-can` „can und must“ (7 Aufgabenarten:
+  kein -s, Grundform dahinter, can’t, Frage, Kurzantwort, can/must/mustn’t nach der Bedeutung, mustn’t = nicht dürfen;
+  Animation „drei Schilder“). Jetzt 12 Themen und 511 Aufnahmen je Aussprache in 12 Paketen.
+  Der Test `tests/endax.py` dauert mit 8 Runden jetzt gut 10 Minuten: mit 3 bis 4 Runden laufen lassen oder im Hintergrund.
+  Als Nächstes: Bereich 2 (present simple und progressive), dafür die neue Aufgabenform „Wörter in Reihenfolge bringen“
+  in `fach.js`. Vorher fragen, ob EnDax jetzt auf die Startseite soll (`faecher.js`: Status „fertig“).
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1124,3 +1132,7 @@ Infos zur ersten Arbeit:
 - **v61: EnDax, Themen 9 und 10** (13.11.2026): `e5-poss` und `e5-gen`. Nur `web/englisch/` und `sw.js` geändert.
   Geprüft: 11 000 erzeugte Aufgaben der beiden Themen ohne Fehler; `tests/endax.py` 8 Runden (10 Themen, 480 Antworten,
   160 Animationen, 78 Lautsprecher angetippt) ohne Fehler. Die neuen Aufnahmen hat noch niemand angehört.
+- **v62: EnDax, Themen 11 und 12** (13.11.2026): `e5-imp` und `e5-can`. Nur `web/englisch/` und `sw.js` geändert.
+  Geprüft: 19 500 erzeugte Aufgaben der beiden Themen ohne Fehler, Auswahl-Angebote durchgesehen; `tests/endax.py`
+  8 Runden (12 Themen, 576 Antworten, 192 Animationen, 95 Lautsprecher angetippt) ohne Fehler.
+  Die neuen Aufnahmen hat noch niemand angehört.

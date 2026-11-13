@@ -24,6 +24,10 @@ window.EnDaxIcons = (function () {
     'e5-poss': `<circle cx="7" cy="7" r="2.6"/><path d="M3 19v-4c0-2.4 1.8-4 4-4s4 1.6 4 4v4"/><rect x="14" y="12" width="7" height="7" rx="1.2" ${F}/><path d="M17.5 12v-2.2m0 0c-1.2-1.6-3-.2-1.6 1.2m1.6-1.2c1.2-1.6 3-.2 1.6 1.2"/>`,
     // ’s: ein Namensschild mit Apostroph
     'e5-gen': `<path d="M3 8.5h10.5l4.5 3.5-4.5 3.5H3z"/><circle cx="6.2" cy="12" r="1" ${F}/><path d="M20.5 5.5c0 1.6-.5 2.6-1.6 3.4" /><path d="M20.5 5.5h-.01"/>`,
+    // Aufforderung: eine Sprechblase mit Ausrufezeichen
+    'e5-imp': `<path d="M4 5h16v11H11l-4 3.5V16H4z"/><path d="M12 7.8v4.2"/><circle cx="12" cy="13.9" r=".9" ${F}/>`,
+    // can / must / mustn’t: Haken, Ausrufezeichen, Verbot
+    'e5-can': `<path d="M2.5 12.5l2.4 2.6 4-5.2"/><path d="M12 8v5"/><circle cx="12" cy="15.6" r=".9" ${F}/><circle cx="18.5" cy="12" r="3.4"/><path d="M16.2 14.4l4.6-4.8"/>`,
   };
   function svg(id) {
     const body = I[id];
