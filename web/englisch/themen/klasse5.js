@@ -960,6 +960,206 @@
   });
 
   // =====================================================
+  // my, your, his, her, its, our, their
+  // =====================================================
+  const POSS = { I: 'My', You: 'Your', He: 'His', She: 'Her', It: 'Its', We: 'Our', They: 'Their' };
+  const POSS_DE = { My: 'mein, meine', Your: 'dein, deine (auch: euer, eure)', His: 'sein, seine (von einem Jungen oder Mann)', Her: 'ihr, ihre (von einem Mädchen oder einer Frau)', Its: 'sein, ihr (von einem Tier oder einer Sache)', Our: 'unser, unsere', Their: 'ihr, ihre (von mehreren)' };
+  const ALLE_POSS = Object.values(POSS);
+  // [Besitzer, Pronomen dafür, have/has, was, das Ding, Rest des zweiten Satzes, Deutsch für den zweiten Satz]
+  const PO = [
+    ['I', 'I', 'have', 'a dog', 'dog', 'is black', 'Mein Hund ist schwarz.'],
+    ['I', 'I', 'have', 'a sister', 'sister', 'is ten', 'Meine Schwester ist zehn.'],
+    ['You', 'You', 'have', 'a nice bike', 'bike', 'is fast', 'Dein Fahrrad ist schnell.'],
+    ['You', 'You', 'have', 'a brother', 'brother', 'is funny', 'Dein Bruder ist lustig.'],
+    ['Tom', 'He', 'has', 'a cat', 'cat', 'is small', 'Seine Katze ist klein.'],
+    ['He', 'He', 'has', 'a new bag', 'bag', 'is blue', 'Seine Tasche ist blau.'],
+    ['My dad', 'He', 'has', 'a bike', 'bike', 'is very old', 'Sein Fahrrad ist sehr alt.'],
+    ['Lisa', 'She', 'has', 'a rabbit', 'rabbit', 'is white', 'Ihr Kaninchen ist weiß.'],
+    ['She', 'She', 'has', 'two brothers', 'brothers', 'are at school', 'Ihre Brüder sind in der Schule.'],
+    ['My sister', 'She', 'has', 'a friend', 'friend', 'is from London', 'Ihre Freundin ist aus London.'],
+    ['The dog', 'It', 'has', 'a ball', 'ball', 'is red', 'Sein Ball ist rot.'],
+    ['The cat', 'It', 'has', 'a new bed', 'bed', 'is soft', 'Ihr Bett ist weich.'],
+    ['The school', 'It', 'has', 'a garden', 'garden', 'is big', 'Ihr Garten ist groß.'],
+    ['We', 'We', 'have', 'a new teacher', 'teacher', 'is nice', 'Unser Lehrer ist nett.'],
+    ['We', 'We', 'have', 'a car', 'car', 'is old', 'Unser Auto ist alt.'],
+    ['Tom and Lisa', 'They', 'have', 'a house', 'house', 'is small', 'Ihr Haus ist klein.'],
+    ['They', 'They', 'have', 'three dogs', 'dogs', 'are in the garden', 'Ihre Hunde sind im Garten.'],
+    ['My parents', 'They', 'have', 'a shop', 'shop', 'is near the school', 'Ihr Laden ist in der Nähe der Schule.'],
+  ].map(([wer, pron, hv, was, ding, rest, de]) => ({ wer, pron, poss: POSS[pron], ding, rest, de,
+    satz1: `${wer} ${hv} got ${was}.`, satz2: `${POSS[pron]} ${ding} ${rest}.`, text: `${wer} ${hv} got ${was}. ${POSS[pron]} ${ding} ${rest}.` }));
+  const poWarum = (s) => `${s.wer === s.pron ? `Es gehört zu <b>${klein(s.pron)}</b>.` : `<b>${s.wer}</b>: Dafür kannst du <b>${klein(s.pron)}</b> sagen.`} Zu ${klein(s.pron)} gehört <b>${s.poss.toLowerCase()}</b>.`;
+  const poLoesung = (s) => `<span lang="en">${s.satz1} <b class="vb">${s.poss}</b> ${s.ding} ${s.rest}.</span> ${U.say(s.text)}<br>${poWarum(s)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const PO_TIPP = 'Frag: <b>Wem</b> gehört es? I → my · you → your · he → his · she → her · it → its · we → our · they → their. Es kommt auf den <b>Besitzer</b> an, nicht auf das Ding.';
+  const POEX = (s, mode) => ({ mode: mode || 'satz', wer: s.wer, pron: s.pron, poss: s.poss, ding: s.ding, rest: s.rest, satz1: s.satz1, de: s.de });
+  // A: auswählen
+  function poWahl() {
+    const s = pick(PO);
+    const ch = shuffle([s.poss, ...shuffle(ALLE_POSS.filter((x) => x !== s.poss)).slice(0, 3)]);
+    return { prompt: `Was gehört in die Lücke?${en(`${s.satz1} ___ ${s.ding} ${s.rest}.`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.poss), hint: PO_TIPP, solution: poLoesung(s), ex: POEX(s) };
+  }
+  // B: eintippen
+  function poTippen() {
+    const s = pick(PO);
+    return {
+      prompt: `Wem gehört es? Setze das passende Wort ein.${en(s.satz1)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.poss, suffix: `${s.ding} ${s.rest}.`, label: 'my, your, his, her, its, our oder their' }],
+      hint: PO_TIPP, solution: poLoesung(s), ex: POEX(s),
+    };
+  }
+  // C: die Paare (I – my, she – her …) in beide Richtungen
+  function poPaar() {
+    const pron = pick(Object.keys(POSS)), hin = Math.random() < 0.5;
+    const s = pick(PO.filter((x) => x.pron === pron));
+    if (hin) {
+      const ch = shuffle([POSS[pron], ...shuffle(ALLE_POSS.filter((x) => x !== POSS[pron])).slice(0, 3)]);
+      return { prompt: `Welches Wort gehört zu <b lang="en">${klein(pron)}</b>?`, choices: ch.map((c) => `<span lang="en">${c.toLowerCase()}</span>`), correct: ch.indexOf(POSS[pron]), hint: PO_TIPP, solution: `${klein(pron)} → <b class="vb" lang="en">${POSS[pron].toLowerCase()}</b> (${POSS_DE[POSS[pron]]})<br>Ein Beispiel: <span lang="en">${s.text}</span> ${U.say(s.text)}`, ex: POEX(s, 'paar') };
+    }
+    const ps = Object.keys(POSS), ch = shuffle([pron, ...shuffle(ps.filter((x) => x !== pron)).slice(0, 3)]);
+    return { prompt: `Zu welchem Wort gehört <b lang="en">${POSS[pron].toLowerCase()}</b>?`, choices: ch.map((c) => `<span lang="en">${klein(c)}</span>`), correct: ch.indexOf(pron), hint: PO_TIPP, solution: `<b class="vb" lang="en">${POSS[pron].toLowerCase()}</b> gehört zu ${klein(pron)} (${POSS_DE[POSS[pron]]})<br>Ein Beispiel: <span lang="en">${s.text}</span> ${U.say(s.text)}`, ex: POEX(s, 'paar') };
+  }
+  // D: his oder her? Es zählt der Besitzer, nicht das Ding (im Deutschen verwirrt „seine Schwester“ / „ihr Bruder“)
+  function poHisHer() {
+    const [wer, poss, ding, de] = pick([
+      ['Tom', 'His', 'sister', 'seine Schwester'], ['Tom', 'His', 'mum', 'seine Mama'], ['Ben', 'His', 'aunt', 'seine Tante'],
+      ['Lisa', 'Her', 'brother', 'ihr Bruder'], ['Lisa', 'Her', 'dad', 'ihr Papa'], ['Emma', 'Her', 'uncle', 'ihr Onkel'],
+    ]);
+    return {
+      prompt: `<b>his</b> oder <b>her</b>?${en(`This is ${wer}. And this is ___ ${ding}.`)}`,
+      choices: ['his', 'her'], correct: poss === 'His' ? 0 : 1,
+      hint: 'Schau auf den <b>Besitzer</b>: Ist es ein Junge oder Mann → his. Ein Mädchen oder eine Frau → her. Wer oder was dahinter steht, ist egal.',
+      solution: `<span lang="en">This is ${wer}. And this is <b class="vb">${poss.toLowerCase()}</b> ${ding}.</span> ${U.say(`This is ${wer}. And this is ${poss.toLowerCase()} ${ding}.`)}<br><b>${wer}</b> ist ${poss === 'His' ? 'ein Junge: <b>his</b>' : 'ein Mädchen: <b>her</b>'}. Dass ${ding} ${poss === 'His' ? 'weiblich' : 'männlich'} ist, spielt keine Rolle.<br><small>Auf Deutsch: ${de}</small>`,
+      ex: { mode: 'hisher', wer, poss, ding, de },
+    };
+  }
+  const HISHER = [['Tom', 'his', 'sister'], ['Tom', 'his', 'mum'], ['Ben', 'his', 'aunt'], ['Lisa', 'her', 'brother'], ['Lisa', 'her', 'dad'], ['Emma', 'her', 'uncle']].map(([w, p, d]) => `This is ${w}. And this is ${p} ${d}.`);
+  // E: its oder it’s?
+  function poIts() {
+    const mitBesitz = Math.random() < 0.5;
+    if (mitBesitz) {
+      const s = pick(PO.filter((x) => x.pron === 'It'));
+      return {
+        prompt: `<b>Its</b> oder <b>It’s</b>?${en(`${s.satz1} ___ ${s.ding} ${s.rest}.`)}`, choices: ['Its', 'It’s'], correct: 0,
+        hint: 'Mach die Probe: Kannst du <b>It is</b> einsetzen? Dann It’s (mit Apostroph). Wenn nicht, ist es <b>Its</b> und zeigt, wem etwas gehört.',
+        solution: `${poLoesung(s)}<br>Probe: „It is ${s.ding} …“ ergibt keinen Sinn. Also <b>Its</b> ohne Apostroph.`, ex: POEX(s, 'its'),
+      };
+    }
+    const b = pick(PRONS.filter((x) => x.subj === 'It'));
+    return {
+      prompt: `<b>Its</b> oder <b>It’s</b>?${en(`___ ${b.rest}.`)}`, choices: ['Its', 'It’s'], correct: 1,
+      hint: 'Mach die Probe: Kannst du <b>It is</b> einsetzen? Dann It’s (mit Apostroph). Wenn nicht, ist es <b>Its</b> und zeigt, wem etwas gehört.',
+      solution: `<span lang="en"><b class="vb">It’s</b> ${b.rest}.</span> ${U.say(kurzText(b))}<br>Probe: „It is ${b.rest}“ passt. <b>It’s</b> ist die Kurzform von It is.<br><small>Auf Deutsch: ${b.de}</small>`,
+      ex: { mode: 'itis', rest: b.rest, de: b.de },
+    };
+  }
+  const possessiv = () => U.wahl([[28, poWahl], [26, poTippen], [18, poPaar], [16, poHisHer], [12, poIts]]);
+
+  // =====================================================
+  // Wem gehört es? ’s und of
+  // =====================================================
+  // Personen und Tiere: [Besitzer, Ding, Deutsch]
+  const GP = [
+    ['Ben', 'bike', 'Bens Fahrrad'], ['Lisa', 'bag', 'Lisas Tasche'], ['Tom', 'dog', 'Toms Hund'], ['Mr Brown', 'garden', 'der Garten von Herrn Brown'],
+    ['my mum', 'car', 'das Auto meiner Mama'], ['my brother', 'room', 'das Zimmer meines Bruders'], ['my friend', 'house', 'das Haus meines Freundes'],
+    ['the teacher', 'desk', 'der Tisch des Lehrers'], ['the dog', 'ball', 'der Ball des Hundes'], ['the cat', 'bed', 'das Bett der Katze'],
+  ].map(([wer, ding, de]) => ({ wer, ding, de, text: `${wer}’s ${ding}` }));
+  // eins oder mehrere Besitzer: [Einzahl, Mehrzahl, Ding, deutsch eins, deutsch mehrere]
+  const GM = [
+    ['the girl', 'the girls', 'room', 'das Zimmer des Mädchens', 'das Zimmer der Mädchen'],
+    ['the boy', 'the boys', 'ball', 'der Ball des Jungen', 'der Ball der Jungen'],
+    ['my friend', 'my friends', 'house', 'das Haus meines Freundes', 'das Haus meiner Freunde'],
+    ['the teacher', 'the teachers', 'room', 'das Zimmer des Lehrers', 'das Zimmer der Lehrer'],
+    ['my sister', 'my sisters', 'cat', 'die Katze meiner Schwester', 'die Katze meiner Schwestern'],
+  ].map(([sg, pl, ding, de1, de2]) => ({ sg, pl, ding, de1, de2, eins: `${sg}’s ${ding}`, viele: `${pl}’ ${ding}` }));
+  // Sachen: [Teil, Sache, Deutsch]
+  const GO = [
+    ['the door', 'the house', 'die Tür des Hauses'], ['the name', 'the street', 'der Name der Straße'], ['the end', 'the film', 'das Ende des Films'],
+    ['the colour', 'the car', 'die Farbe des Autos'], ['the roof', 'the school', 'das Dach der Schule'], ['the first page', 'the book', 'die erste Seite des Buches'],
+  ].map(([teil, sache, de]) => ({ teil, sache, de, text: `${teil} of ${sache}` }));
+  const apo = (t) => [t, t.replace(/’/g, "'")];
+  const G_TIPP = 'Gehört etwas einer <b>Person</b> oder einem <b>Tier</b>, hängst du <b>’s</b> an den Besitzer: Ben’s bike. Im Englischen steht immer ein Apostroph (anders als im Deutschen: Bens Fahrrad).';
+  // A: mit ’s schreiben
+  function gTippen() {
+    const g = pick(GP);
+    return {
+      prompt: `Wem gehört es? Schreibe es mit <b>’s</b>.<br>Besitzer: <b lang="en">${g.wer}</b> · Ding: <b lang="en">${g.ding}</b>`,
+      fields: [{ type: 'text', ci: true, answer: apo(g.text), label: 'mit ’s' }], answerText: g.text,
+      hint: G_TIPP,
+      solution: `<span lang="en">${g.wer}<b class="vb">’s</b> ${g.ding}</span> ${U.say(g.text)}<br>Erst der Besitzer mit <b>’s</b>, dann das Ding. Ohne the davor und ohne of.<br><small>Auf Deutsch: ${g.de}</small>`,
+      ex: { mode: 's', wer: g.wer, ding: g.ding, de: g.de },
+    };
+  }
+  // B: richtige Schreibweise auswählen
+  function gWahl() {
+    const g = pick(GP);
+    const ch = shuffle([g.text, `${g.wer}s ${g.ding}`, `${g.wer} ${g.ding}’s`]);
+    return {
+      prompt: `Welche Schreibweise ist richtig? (${g.de})`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(g.text),
+      hint: G_TIPP,
+      solution: `<span lang="en">${g.wer}<b class="vb">’s</b> ${g.ding}</span> ${U.say(g.text)}<br>Der Apostroph und das s hängen am <b>Besitzer</b>. Im Englischen darf der Apostroph nicht fehlen.<br><small>Auf Deutsch: ${g.de}</small>`,
+      ex: { mode: 's', wer: g.wer, ding: g.ding, de: g.de },
+    };
+  }
+  // C: ein Besitzer oder mehrere? (’s oder s’)
+  function gWieViele() {
+    const g = pick(GM), viele = Math.random() < 0.5;
+    return {
+      prompt: `Wie viele Besitzer sind es?${en(viele ? g.viele : g.eins)}`,
+      choices: ['einer', 'mehrere'], correct: viele ? 1 : 0,
+      hint: 'Schau, wo der Apostroph steht. <b>Vor</b> dem s (girl’s): ein Besitzer. <b>Hinter</b> dem s (girls’): mehrere Besitzer.',
+      solution: `<span lang="en"><b class="vb">${viele ? g.viele : g.eins}</b></span> ${U.say(viele ? g.viele : g.eins)}<br>${viele ? `Das Wort heißt schon <b>${g.pl.split(' ').pop()}</b> (Mehrzahl mit s). Dann kommt nur noch der Apostroph dahinter.` : `<b>${g.sg.split(' ').pop()}</b> ist Einzahl. Dann kommt <b>’s</b> dazu.`} Beim Sprechen hört man den Unterschied nicht.<br><small>Auf Deutsch: ${viele ? g.de2 : g.de1}</small>`,
+      ex: { mode: 'viele', sg: g.sg, pl: g.pl, ding: g.ding, viele, de: viele ? g.de2 : g.de1 },
+    };
+  }
+  // D: den Apostroph richtig setzen
+  function gApostroph() {
+    const g = pick(GM), viele = Math.random() < 0.5, richtig = viele ? g.viele : g.eins;
+    const ch = shuffle([g.eins, g.viele, `${g.pl} ${g.ding}`]);
+    return {
+      prompt: `Wie schreibt man das auf Englisch?<br><b>${viele ? g.de2 : g.de1}</b>`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: 'Ein Besitzer: <b>’s</b> anhängen (girl’s). Mehrere Besitzer, deren Wort schon auf s endet: nur den Apostroph <b>hinter</b> das s (girls’).',
+      solution: `<span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>${viele ? `Mehrere: <b>${g.pl}</b> endet schon auf s, also nur noch der Apostroph dahinter.` : `Einer: <b>${g.sg}</b> + <b>’s</b>.`} Ohne Apostroph ist es immer falsch.`,
+      ex: { mode: 'viele', sg: g.sg, pl: g.pl, ding: g.ding, viele, de: viele ? g.de2 : g.de1 },
+    };
+  }
+  // E: bei Sachen nimmt man of
+  function gOfWahl() {
+    const o = pick(GO);
+    const ch = shuffle([o.sache, ...shuffle(GP).slice(0, 2).map((g) => g.wer)]);
+    return {
+      prompt: 'Bei Personen und Tieren nimmt man ’s. Bei welchem Besitzer nimmt man stattdessen <b>of</b>?',
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(o.sache),
+      hint: 'Was davon ist eine <b>Sache</b> und keine Person und kein Tier?',
+      solution: `<b lang="en">${o.sache}</b> ist eine Sache. Dann heißt es: <span lang="en">${o.teil} <b class="vb">of</b> ${o.sache}</span> ${U.say(o.text)}<br><small>Auf Deutsch: ${o.de}</small>`,
+      ex: { mode: 'of', teil: o.teil, sache: o.sache, de: o.de },
+    };
+  }
+  // F: mit of schreiben
+  function gOfTippen() {
+    const o = pick(GO);
+    return {
+      prompt: `Verbinde die beiden Teile mit <b>of</b> und schreibe alles auf.<br>Teil: <b lang="en">${o.teil}</b> · Sache: <b lang="en">${o.sache}</b>`,
+      fields: [{ type: 'text', ci: true, answer: o.text, label: 'mit of' }],
+      hint: 'Bei Sachen steht zuerst der Teil, dann das kleine Wort <b>of</b> (von), dann die Sache. Kein ’s.',
+      solution: `<span lang="en">${o.teil} <b class="vb">of</b> ${o.sache}</span> ${U.say(o.text)}<br><b>${o.sache}</b> ist eine Sache, deshalb <b>of</b> und kein ’s.<br><small>Auf Deutsch: ${o.de}</small>`,
+      ex: { mode: 'of', teil: o.teil, sache: o.sache, de: o.de },
+    };
+  }
+  const genitiv = () => U.wahl([[26, gTippen], [18, gWahl], [14, gWieViele], [16, gApostroph], [12, gOfWahl], [14, gOfTippen]]);
+
+  Object.assign(D.daten, { POSS, POSS_DE, PO, GP, GM, GO });
+  const themenVorPoss = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorPoss(), {
+    'e5-poss': [...PO.map((s) => s.text), ...HISHER],
+    'e5-gen': [...GP.map((g) => g.text), ...GM.flatMap((g) => [g.eins, g.viele]), ...GO.map((o) => o.text)],
+  });
+  Object.assign(D.arten, {
+    'e5-poss': { poWahl, poTippen, poPaar, poHisHer, poIts },
+    'e5-gen': { gTippen, gWahl, gWieViele, gApostroph, gOfWahl, gOfTippen },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -974,6 +1174,8 @@
         { id: 'e5-plural', title: 'Mehrzahl: one box, two boxes', icon: '📦', gen: mehrzahl },
         { id: 'e5-there', title: 'there is und there are', icon: '👀', gen: thereIs },
         { id: 'e5-this', title: 'this, that, these, those', icon: '👉', gen: dieseJene },
+        { id: 'e5-poss', title: 'my, your, his, her …', icon: '🎁', gen: possessiv },
+        { id: 'e5-gen', title: 'Wem gehört es? ’s und of', icon: '🏷️', gen: genitiv },
       ] },
     ],
   };

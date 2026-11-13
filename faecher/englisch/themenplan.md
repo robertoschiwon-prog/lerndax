@@ -30,8 +30,8 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 | 6 | Mehrzahl (Plural) (gebaut, v59) | Tippe die Mehrzahl: box → boxes, baby → babies, child → children · Welches Wort ist falsch geschrieben? |
 | 7 | there is / there are (gebaut, v60) | „___ two cats in the garden.“ · Bild-Aufgabe: Was liegt auf dem Tisch? |
 | 8 | this, that, these, those (gebaut, v60) | nah oder fern, eins oder mehrere: „___ books over there“ |
-| 9 | my, your, his, her … (Possessivbegleiter) | „Lisa has got a dog. ___ dog is black.“ · he → his, they → their · its oder it’s? |
-| 10 | Wem gehört es? ’s und of | „the bike of Ben“ → Ben’s bike · „the girls’ room“: ein Mädchen oder mehrere? |
+| 9 | my, your, his, her … (Possessivbegleiter) (gebaut, v61) | „Lisa has got a dog. ___ dog is black.“ · he → his, they → their · its oder it’s? |
+| 10 | Wem gehört es? ’s und of (gebaut, v61) | „the bike of Ben“ → Ben’s bike · „the girls’ room“: ein Mädchen oder mehrere? |
 | 11 | Aufforderungen (Imperativ) | „Open the window.“ verneinen → Don’t open the window. · Was passt im Klassenraum? |
 | 12 | can und must | „I ___ swim.“ (kann) · can’t oder mustn’t? · Frage bauen: „you / can / ride / a horse / ?“ |
 

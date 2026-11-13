@@ -9,7 +9,7 @@ Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. 
 | 1 Lehrplan auswerten | **erledigt (12.11.2026)**. Wichtig: Klasse 5 und 6 sind gemeinsam beschrieben, die Aufteilung macht das Schulbuch | `lehrplan/sachsen-gymnasium.md` |
 | 2 Schulbuch abgleichen | offen: Titel, Ausgabe, ISBN und Foto des Inhaltsverzeichnisses fehlen | `lehrplan/schulbuch-abgleich.md` (anlegen) |
 | 3 Themenplan | **Vorschlag liegt vor (12.11.2026)**, wartet auf Zustimmung; Entscheidungen stehen dort | `themenplan.md` |
-| 4 Themen bauen | **8 Themen gebaut** (to be v55; Pronomen und „to be verneinen und fragen“ v57; have got und a/an v58; Mehrzahl v59; there is/are und this/that v60), live; die übrigen offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
+| 4 Themen bauen | **10 Themen gebaut** (to be v55; Pronomen und „to be verneinen und fragen“ v57; have got und a/an v58; Mehrzahl v59; there is/are und this/that v60; my/your und ’s/of v61), live; die übrigen offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
 
 ## Was feststeht
 

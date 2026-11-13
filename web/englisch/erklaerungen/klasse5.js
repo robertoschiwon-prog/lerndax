@@ -815,4 +815,174 @@
       };
     },
   };
+
+  // =====================================================
+  // my, your, his, her …: zu jedem Pronomen gehört ein Wort
+  // =====================================================
+  //   ctx: { mode:'satz'|'paar'|'its', wer, pron, poss, ding, rest, satz1, de } | { mode:'hisher', wer, poss, ding, de } | { mode:'itis', rest, de }
+  const PKARTEN = ['I', 'You', 'He', 'She', 'It', 'We', 'They'];
+  EX['e5-poss'] = {
+    title: 'my, your, his, her …',
+    titleFor: (ctx) => (ctx && ctx.mode === 'itis' ? 'Its oder It’s?' : ctx && ctx.poss ? `Warum „${ctx.poss.toLowerCase()}“?` : 'my, your, his, her …'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, frei = [], Z1 = null, Z2 = null, karten = {};
+      const satzModus = mode === 'satz' || mode === 'paar' || mode === 'its';
+      if (satzModus) S0 = ctx.post ? ctx : U.pick(T.PO.filter((s) => s.pron === ctx.pron && (s.wer !== ctx.wer || s.ding !== ctx.ding)));
+      const neuFrei = () => { frei = ['He', 'She', 'They'].map((p) => U.pick(T.PO.filter((s) => s.pron === p && s.wer !== p))); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const KW = 44, KX = 8, KY = 108, KH = 90;
+      function kaertchen() {
+        karten = {};
+        PKARTEN.forEach((p, i) => {
+          const x = KX + i * (KW + 6);
+          const r = el('rect', { x, y: KY, width: KW, height: KH, rx: 9, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: x + KW / 2, y: KY + 24, 'text-anchor': 'middle', class: 'ex-s', text: p === 'I' ? 'I' : p.toLowerCase(), style: 'font-size:13px' }, api.svg);
+          el('path', { d: `M${x + KW / 2} ${KY + 32}v14m-4 -5l4 5l4 -5`, fill: 'none', stroke: '#8b8577', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, api.svg);
+          el('text', { x: x + KW / 2, y: KY + 72, 'text-anchor': 'middle', class: 'ex-b', text: T.POSS[p].toLowerCase(), style: `fill:${BLAU};font-size:${T.POSS[p].length > 4 ? 14 : 16}px` }, api.svg);
+          karten[p] = r;
+        });
+      }
+      const leuchte = (p) => PKARTEN.forEach((k) => karten[k].setAttribute('fill', k === p ? '#dfe9ff' : '#fff'));
+      const z1 = (teile) => { if (Z1) Z1.g.remove(); Z1 = zeile(api, teile, 36, 17); };
+      const z2 = (teile) => { if (Z2) Z2.g.remove(); Z2 = zeile(api, teile, 72, 19); };
+      const teile1 = (s, markiert) => { const rest = s.satz1.slice(s.wer.length + 1); return [{ t: s.wer, c: markiert ? ORANGE : '' }, { t: rest }]; };
+      async function zeige(s, pause) {
+        leuchte('');
+        z1(teile1(s, true)); z2([{ t: '___' }, { t: s.ding }, { t: s.rest + '.' }]);
+        api.say(s.wer === s.pron ? `Wem gehört es? <b>${s.wer}</b>.` : `Wem gehört es? <b>${s.wer}</b>. Dafür kannst du <b>${s.pron.toLowerCase()}</b> sagen.`);
+        await api.wait(pause);
+        leuchte(s.pron);
+        api.say(`Zu <b>${s.pron === 'I' ? 'I' : s.pron.toLowerCase()}</b> gehört <b>${s.poss.toLowerCase()}</b>.`);
+        await api.wait(pause);
+        z2([{ t: s.poss, c: BLAU }, { t: s.ding }, { t: s.rest + '.' }]);
+      }
+      return {
+        reset() {
+          api.clear(); Z1 = Z2 = null;
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : satzModus ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
+          kaertchen();
+          if (satzModus) { z1(teile1(S0, false)); z2([{ t: '___' }, { t: S0.ding }, { t: S0.rest + '.' }]); }
+          else if (mode === 'hisher') { z1([{ t: `This is ${ctx.wer}.` }]); z2([{ t: 'And this is' }, { t: '___' }, { t: ctx.ding + '.' }]); }
+          else if (mode === 'itis') z2([{ t: '___' }, { t: ctx.rest + '.' }]);
+          else z2([{ t: 'Wem gehört es?', c: BLAU }]);
+        },
+        async play() {
+          if (satzModus) {
+            const s = S0;
+            await zeige(s, 2600);
+            api.say(`Also: <b>${s.poss}</b> ${s.ding} ${s.rest}. ${U.say(`${s.satz1} ${s.poss} ${s.ding} ${s.rest}.`)}${mode === 'its' ? '<br><b>Its</b> ohne Apostroph zeigt, wem etwas gehört. It’s mit Apostroph heißt „It is“.' : ''}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (mode === 'hisher') {
+            const p = ctx.poss === 'His' ? 'He' : 'She';
+            z1([{ t: 'This is' }, { t: ctx.wer + '.', c: ORANGE }]);
+            api.say(`Schau auf den <b>Besitzer</b>: <b>${ctx.wer}</b> ist ${p === 'He' ? 'ein Junge' : 'ein Mädchen'}, also ${p.toLowerCase()}.`);
+            await api.wait(2800);
+            leuchte(p);
+            api.say(`Zu ${p.toLowerCase()} gehört <b>${ctx.poss.toLowerCase()}</b>. Wer danach kommt (${ctx.ding}), ist egal.`);
+            await api.wait(2800);
+            z2([{ t: 'And this is' }, { t: ctx.poss.toLowerCase(), c: BLAU }, { t: ctx.ding + '.' }]);
+            api.say(`This is ${ctx.wer}. And this is <b>${ctx.poss.toLowerCase()}</b> ${ctx.ding}. ${U.say(`This is ${ctx.wer}. And this is ${ctx.poss.toLowerCase()} ${ctx.ding}.`)}<br><small>${ctx.de}</small>`);
+            return;
+          }
+          if (mode === 'itis') {
+            api.say('Mach die Probe: Passt <b>It is</b> in die Lücke?');
+            await api.wait(2400);
+            z1([{ t: 'It is', c: ORANGE }, { t: ctx.rest + '.' }]);
+            api.say(`„It is ${ctx.rest}.“ Das passt. Dann ist es die Kurzform mit Apostroph.`);
+            await api.wait(2800);
+            z2([{ t: 'It’s', c: BLAU }, { t: ctx.rest + '.' }]);
+            api.say(`<b>It’s</b> ${ctx.rest}. It’s = It is. Das Wort <b>its</b> ohne Apostroph zeigt dagegen, wem etwas gehört. ${U.say(`It’s ${ctx.rest}.`)}<br><small>${ctx.de}</small>`);
+            return;
+          }
+          api.say('Zu jedem Pronomen gehört ein Wort, das sagt, <b>wem</b> etwas gehört.');
+          await api.wait(3000);
+          for (const s of frei) {
+            await zeige(s, 2000);
+            api.say(`<b>${s.poss}</b> ${s.ding} ${s.rest}. ${U.say(s.text)}<br><small>${s.de}</small>`);
+            await api.wait(2800);
+          }
+          leuchte('');
+          api.say('Merke: Es kommt auf den <b>Besitzer</b> an. Und das Wort bleibt immer gleich: my dog, my dogs, my sister.');
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // Wem gehört es? ’s und of
+  // =====================================================
+  //   ctx: { mode:'s', wer, ding, de } | { mode:'viele', sg, pl, ding, viele, de } | { mode:'of', teil, sache, de }
+  EX['e5-gen'] = {
+    title: 'Wem gehört es? ’s und of',
+    titleFor: (ctx) => (ctx && ctx.mode === 'of' ? 'Warum „of“?' : ctx && ctx.mode === 'viele' ? 'Apostroph: vor oder hinter dem s?' : ctx && ctx.mode === 's' ? 'So geht ’s' : 'Wem gehört es? ’s und of'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let C0 = null, frei = null, Z = [];
+      if (mode === 's') C0 = ctx.post ? ctx : U.pick(T.GP.filter((g) => g.wer !== ctx.wer));
+      if (mode === 'viele') C0 = ctx.post ? ctx : Object.assign({}, U.pick(T.GM.filter((g) => g.sg !== ctx.sg)), { viele: ctx.viele });
+      if (mode === 'of') C0 = ctx.post ? ctx : U.pick(T.GO.filter((o) => o.sache !== ctx.sache));
+      const neuFrei = () => { frei = { s: U.pick(T.GP), m: U.pick(T.GM), o: U.pick(T.GO) }; };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const weg = () => { Z.forEach((z) => z.remove()); Z = []; };
+      const zeig = (teile, y, fs) => { const t = tzeile(api, teile, y, fs || 28); Z.push(t); return t; };
+      async function mitS(g) {
+        weg();
+        zeig([[g.wer, ORANGE], ['   ·   ', '#8b8577'], [g.ding]], 70);
+        api.say(`Der Besitzer ist <b>${g.wer}</b>, eine Person oder ein Tier. Das Ding ist <b>${g.ding}</b>.`);
+        await api.wait(2800);
+        zeig([[g.wer], ['’s', BLAU], [' ' + g.ding]], 130);
+        return `An den Besitzer kommt <b>’s</b>, dann folgt das Ding: <b>${g.wer}’s ${g.ding}</b>. ${U.say(`${g.wer}’s ${g.ding}`)}<br><small>${g.de}</small>`;
+      }
+      async function einsOderViele(g, viele) {
+        weg();
+        const wort = (viele ? g.pl : g.sg);
+        zeig([[wort, ORANGE]], 60);
+        api.say(viele ? `<b>${g.pl}</b>: Das sind mehrere. Das Wort endet schon auf s.` : `<b>${g.sg}</b>: Das ist einer oder eine.`);
+        await api.wait(2800);
+        zeig(viele ? [[g.pl], ['’', BLAU], [' ' + g.ding]] : [[g.sg], ['’s', BLAU], [' ' + g.ding]], 110);
+        zeig([[viele ? 'Apostroph hinter dem s' : 'Apostroph vor dem s', '#8b8577']], 160, 15);
+        const text = viele ? `${g.pl}’ ${g.ding}` : `${g.sg}’s ${g.ding}`;
+        return viele
+          ? `Bei mehreren kommt nur der Apostroph <b>hinter</b> das s: <b>${text}</b>. ${U.say(text)}<br><small>${viele === true || viele ? (g.de2 || g.de) : ''}</small>`
+          : `Bei einem Besitzer kommt <b>’s</b> dazu: <b>${text}</b>. ${U.say(text)}<br><small>${g.de1 || g.de}</small>`;
+      }
+      async function mitOf(o) {
+        weg();
+        zeig([[o.teil], ['   ·   ', '#8b8577'], [o.sache, ORANGE]], 70, 24);
+        api.say(`<b>${o.sache}</b> ist eine <b>Sache</b>, keine Person und kein Tier.`);
+        await api.wait(2800);
+        zeig([[o.teil + ' '], ['of', BLAU], [' ' + o.sache]], 130, 24);
+        return `Bei Sachen verbindet <b>of</b> die beiden Teile: <b>${o.teil} of ${o.sache}</b>. ${U.say(`${o.teil} of ${o.sache}`)}<br><small>${o.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); Z = [];
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 's') zeig([[C0.wer], ['   ·   ', '#8b8577'], [C0.ding]], 70);
+          else if (mode === 'viele') zeig([[C0.viele ? C0.pl : C0.sg]], 60);
+          else if (mode === 'of') zeig([[C0.teil], ['   ·   ', '#8b8577'], [C0.sache]], 70, 24);
+          else zeig([['’s', BLAU], [' oder '], ['of', BLAU], ['?']], 100);
+        },
+        async play() {
+          if (mode === 's') { api.say(await mitS(C0)); return; }
+          if (mode === 'viele') { api.say(await einsOderViele(C0, C0.viele)); return; }
+          if (mode === 'of') { api.say(await mitOf(C0)); return; }
+          api.say('Wem gehört etwas? Im Englischen zeigt das ein <b>’s</b> am Besitzer. Der Apostroph gehört immer dazu.');
+          await api.wait(3200);
+          api.say(await mitS(frei.s)); await api.wait(3400);
+          api.say(await einsOderViele(frei.m, true)); await api.wait(3600);
+          api.say(await mitOf(frei.o)); await api.wait(3400);
+          weg();
+          zeig([['Person: ', '#8b8577'], ['’s', BLAU], ['  ·  Sache: ', '#8b8577'], ['of', BLAU]], 100, 22);
+          api.say('Merke: Personen und Tiere bekommen <b>’s</b> (Ben’s bike). Bei Sachen nimmt man <b>of</b> (the door of the house).');
+        },
+      };
+    },
+  };
 })();

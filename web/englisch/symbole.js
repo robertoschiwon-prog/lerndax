@@ -20,6 +20,10 @@ window.EnDaxIcons = (function () {
     'e5-there': `<rect x="2.5" y="6" width="8" height="12" rx="1.6"/><circle cx="6.5" cy="12" r="1.8" ${F}/><rect x="13.5" y="6" width="8" height="12" rx="1.6"/><circle cx="17.5" cy="9" r="1.4" ${F}/><circle cx="15.8" cy="14.5" r="1.4" ${F}/><circle cx="19.2" cy="14.5" r="1.4" ${F}/>`,
     // this / that: ein naher großer Punkt und ein ferner kleiner, mit Zeigepfeil
     'e5-this': `<circle cx="6" cy="16" r="3.2" ${F}/><circle cx="19" cy="6.5" r="1.8"/><path d="M9.5 13.5l6-4.6"/><path d="M12.6 8.4l3-.1-.6 3"/>`,
+    // my, your …: eine Figur und ein Geschenk, das ihr gehört
+    'e5-poss': `<circle cx="7" cy="7" r="2.6"/><path d="M3 19v-4c0-2.4 1.8-4 4-4s4 1.6 4 4v4"/><rect x="14" y="12" width="7" height="7" rx="1.2" ${F}/><path d="M17.5 12v-2.2m0 0c-1.2-1.6-3-.2-1.6 1.2m1.6-1.2c1.2-1.6 3-.2 1.6 1.2"/>`,
+    // ’s: ein Namensschild mit Apostroph
+    'e5-gen': `<path d="M3 8.5h10.5l4.5 3.5-4.5 3.5H3z"/><circle cx="6.2" cy="12" r="1" ${F}/><path d="M20.5 5.5c0 1.6-.5 2.6-1.6 3.4" /><path d="M20.5 5.5h-.01"/>`,
   };
   function svg(id) {
     const body = I[id];

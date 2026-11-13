@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v60`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v61`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -80,7 +80,7 @@ Weitere Dokumente:
   Die alten Ordner `audio/k5/` und `audio/k5-gb/` sind im Repository gelöscht. **Im OneDrive-Ordner liegen sie noch**
   (Löschen geht aus der Sitzung nicht): Der Auftraggeber kann beide Ordner löschen, sie werden nicht mehr gebraucht.
   Damit sind OneDrive und GitHub wieder gleich (bis auf diese beiden alten Ordner).
-  **Nicht auf einem iPhone geprüft**, nur im Test-Browser: Rückmeldung des Auftraggebers abwarten.
+  Zunächst nur im Test-Browser geprüft; **am 13.11.2026 hat der Auftraggeber bestätigt: Der Ton funktioniert am iPhone.**
   `e5-plural` „Mehrzahl: one box, two boxes“: 41 Wörter, 5 Aufgabenarten (Mehrzahl tippen und wählen, Einzahl, Regel
   erkennen, passendes Wort finden), Animation „auf das Wortende kommt es an“. Jetzt 292 Aufnahmen je Aussprache.
   Als Nächstes laut Themenplan: there is/are, this/that, my/your, ’s, Imperativ, can/must.
@@ -90,6 +90,11 @@ Weitere Dokumente:
   Jetzt 8 Themen und 383 Aufnahmen je Aussprache in 8 Paketen. Bewusst weggelassen: verneinte Mehrzahl und Fragen mit
   „any“ (There aren’t any …), das gehört zu some/any (Thema 22). Als Nächstes laut Themenplan: my/your/his/her,
   ’s und of, Imperativ, can/must.
+- **EnDax v61 (13.11.2026): Themen 9 und 10**, auf GitHub und live. `e5-poss` „my, your, his, her …“ (5 Aufgabenarten:
+  einsetzen, Paare I–my, his oder her nach dem Besitzer, Its oder It’s; Animation „sieben Kärtchen mit Pfeil“) und
+  `e5-gen` „Wem gehört es? ’s und of“ (6 Aufgabenarten: mit ’s schreiben, Schreibweise wählen, ein Besitzer oder
+  mehrere (girl’s / girls’), of bei Sachen). Jetzt 10 Themen und 432 Aufnahmen je Aussprache in 10 Paketen.
+  Vom ersten Bereich fehlen noch: Aufforderungen (Imperativ) und can/must.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1116,3 +1121,6 @@ Infos zur ersten Arbeit:
 - **v60: EnDax, Themen 7 und 8** (13.11.2026): `e5-there` und `e5-this`. Nur `web/englisch/` und `sw.js` geändert.
   Geprüft: 13 000 erzeugte Aufgaben der beiden Themen ohne Fehler; `tests/endax.py` 8 Runden (8 Themen, 384 Antworten,
   128 Animationen, 64 Lautsprecher angetippt) ohne Fehler. Die neuen Aufnahmen hat noch niemand angehört.
+- **v61: EnDax, Themen 9 und 10** (13.11.2026): `e5-poss` und `e5-gen`. Nur `web/englisch/` und `sw.js` geändert.
+  Geprüft: 11 000 erzeugte Aufgaben der beiden Themen ohne Fehler; `tests/endax.py` 8 Runden (10 Themen, 480 Antworten,
+  160 Animationen, 78 Lautsprecher angetippt) ohne Fehler. Die neuen Aufnahmen hat noch niemand angehört.
