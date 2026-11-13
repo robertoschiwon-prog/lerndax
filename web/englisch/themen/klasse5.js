@@ -2260,6 +2260,155 @@
   });
 
   // =====================================================
+  // Wo? in, on, under, next to, behind, in front of, between – mit Bild
+  // =====================================================
+  // Bild: Kiste und Tisch schräg von vorn, das Tier liegt je nach Wort vor oder hinter den Dingen.
+  const KISTE = (dx, offen) => {
+    const P = (pts) => pts.map(([x, y]) => `${x + dx},${y}`).join(' ');
+    const S = 'stroke="#7a5426" stroke-width="2" stroke-linejoin="round"';
+    const oben = offen
+      ? `<polygon points="${P([[140, 112], [220, 112], [244, 96], [164, 96]])}" fill="#5a3b18" ${S}/><polygon points="${P([[164, 96], [244, 96], [252, 80], [172, 80]])}" fill="#e8bd80" ${S}/><polygon points="${P([[140, 112], [164, 96], [146, 86], [122, 102]])}" fill="#e8bd80" ${S}/>`
+      : `<polygon points="${P([[140, 112], [220, 112], [244, 96], [164, 96]])}" fill="#e8bd80" ${S}/><line x1="${152 + dx}" y1="104" x2="${232 + dx}" y2="104" stroke="#b9884a" stroke-width="4"/>`;
+    const vorn = `<rect x="${140 + dx}" y="112" width="80" height="58" fill="#d8a464" ${S}/><polygon points="${P([[220, 112], [244, 96], [244, 154], [220, 170]])}" fill="#b9884a" ${S}/>${offen ? `<polygon points="${P([[140, 112], [220, 112], [226, 124], [134, 124]])}" fill="#e8bd80" ${S}/>` : ''}`;
+    return { oben, vorn };
+  };
+  const TISCH_HINTEN = '<rect x="268" y="92" width="7" height="66" fill="#8a5a2c"/><rect x="146" y="92" width="7" height="58" fill="#8a5a2c"/>';
+  const TISCH_VORN = '<polygon points="120,100 260,100 280,86 140,86" fill="#b67c40" stroke="#6e4520" stroke-width="2" stroke-linejoin="round"/><rect x="120" y="100" width="140" height="8" fill="#8a5a2c" stroke="#6e4520" stroke-width="2"/><rect x="124" y="108" width="8" height="62" fill="#8a5a2c"/><rect x="248" y="108" width="8" height="62" fill="#8a5a2c"/>';
+  const TIER = {
+    cat: { en: 'the cat', de: 'Die Katze', farbe: '#f08a2c', dunkel: '#c46a1a', ohren: 'M-17 -38 l1 -12 l8 7z M-6 -42 l6 -9 l3 10z' },
+    dog: { en: 'the dog', de: 'Der Hund', farbe: '#a8754a', dunkel: '#7a5230', ohren: 'M-19 -38 q-4 4 -2 14 q5 -2 7 -10z M2 -38 q4 4 2 14 q-5 -2 -7 -10z' },
+  };
+  const tierSvg = (t, x, y, sk, flip) => {
+    const a = TIER[t];
+    return `<g transform="translate(${x} ${y}) scale(${flip ? -sk : sk} ${sk})"><path d="M14 -4 q24 2 18 -24" stroke="${a.dunkel}" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="4" cy="-14" rx="15" ry="14" fill="${a.farbe}"/><path d="${a.ohren}" fill="${t === 'dog' ? a.dunkel : a.farbe}"/><circle cx="-8" cy="-32" r="11" fill="${a.farbe}"/><circle cx="-12" cy="-33" r="1.7" fill="#222"/><circle cx="-4" cy="-33" r="1.7" fill="#222"/><ellipse cx="-8" cy="-28" rx="2" ry="1.4" fill="#222"/><ellipse cx="-5" cy="-1" rx="5" ry="3" fill="${a.dunkel}"/></g>`;
+  };
+  // Szene: hinten (vor dem Tier gezeichnet), vorn (darüber), wo das Tier sitzt
+  const ORT_SZENE = {
+    'in|box': () => { const k = KISTE(0, true); return { hinten: k.oben, vorn: k.vorn, pos: [188, 107, 0.85] }; },
+    'on|box': () => { const k = KISTE(0); return { hinten: k.oben + k.vorn, vorn: '', pos: [192, 106, 0.85] }; },
+    'on|table': () => ({ hinten: TISCH_HINTEN + TISCH_VORN, vorn: '', pos: [200, 96, 0.85] }),
+    'under|table': () => ({ hinten: TISCH_HINTEN, vorn: TISCH_VORN, pos: [196, 166, 0.85] }),
+    'next to|box': () => { const k = KISTE(-30); return { hinten: k.oben + k.vorn, vorn: '', pos: [270, 170, 1] }; },
+    'next to|table': () => ({ hinten: TISCH_HINTEN + TISCH_VORN, vorn: '', pos: [312, 170, 0.95] }),
+    'behind|box': () => { const k = KISTE(0); return { hinten: '', vorn: k.oben + k.vorn, pos: [252, 140, 0.95, true] }; },
+    'in front of|box': () => { const k = KISTE(0); return { hinten: k.oben + k.vorn, vorn: '', pos: [182, 196, 1.05] }; },
+    'between|boxes': () => { const a = KISTE(-104), b = KISTE(78); return { hinten: a.oben + a.vorn + b.oben + b.vorn, vorn: '', pos: [178, 170, 1] }; },
+  };
+  const BODEN = '<polygon points="0,150 360,150 360,210 0,210" fill="#f4efe4"/><line x1="0" y1="150" x2="360" y2="150" stroke="#e2dacb" stroke-width="2"/>';
+  const ortBild = (o, tier) => {
+    const sz = ORT_SZENE[`${o.prep}|${o.ding}`](), [x, y, sk, flip] = sz.pos;
+    return `<svg viewBox="0 30 360 180" role="img" aria-label="Bild">${BODEN}${sz.hinten}${tierSvg(tier, x, y, sk, flip)}${sz.vorn}</svg>`;
+  };
+  // [Wort, Ding, englischer Ort, deutscher Ort]
+  const ORTE = [
+    ['in', 'box', 'the box', 'in der Kiste'], ['on', 'box', 'the box', 'auf der Kiste'], ['on', 'table', 'the table', 'auf dem Tisch'],
+    ['under', 'table', 'the table', 'unter dem Tisch'], ['next to', 'box', 'the box', 'neben der Kiste'], ['next to', 'table', 'the table', 'neben dem Tisch'],
+    ['behind', 'box', 'the box', 'hinter der Kiste'], ['in front of', 'box', 'the box', 'vor der Kiste'], ['between', 'boxes', 'the two boxes', 'zwischen den beiden Kisten'],
+  ].map(([prep, ding, wo, deWo]) => ({ prep, ding, wo, deWo }));
+  const PREPS = ['in', 'on', 'under', 'next to', 'behind', 'in front of', 'between'];
+  const PREP_DE = { in: 'in', on: 'auf', under: 'unter', 'next to': 'neben', behind: 'hinter', 'in front of': 'vor', between: 'zwischen' };
+  // Wörter, die bei einem Bild leicht auch passen könnten, kommen nicht als falsche Antwort vor
+  const ORT_NICHT = { behind: ['next to'], 'in front of': ['next to'], between: ['next to', 'in'], 'next to': ['behind', 'in front of'], in: ['between'], on: ['between'], under: ['between'] };
+  const ORT_SAETZE = Object.keys(TIER).flatMap((t) => ORTE.map((o) => ({ ...o, tier: t, text: `${gross(TIER[t].en)} is ${o.prep} ${o.wo}.`, de: `${TIER[t].de} ist ${o.deWo}.` })));
+  const ortErkl = { in: 'Das Tier ist <b>drin</b>.', on: 'Das Tier sitzt <b>oben drauf</b>.', under: 'Das Tier ist <b>darunter</b>.', 'next to': 'Das Tier sitzt <b>daneben</b>.', behind: 'Das Tier ist <b>dahinter</b>: Die Kiste verdeckt einen Teil.', 'in front of': 'Das Tier sitzt <b>davor</b>: Es verdeckt einen Teil der Kiste.', between: 'Das Tier sitzt <b>in der Mitte</b> zwischen zwei Dingen.' };
+  const ortLoesung = (o) => `<span lang="en">${gross(TIER[o.tier].en)} is <b class="vb">${o.prep}</b> ${o.wo}.</span> ${U.say(o.text)}<br>${ortErkl[o.prep]} <b>${o.prep}</b> heißt <b>${PREP_DE[o.prep]}</b>.<br><small>Auf Deutsch: ${o.de}</small>`;
+  const ORT_TIPP = 'in = in · on = auf · under = unter · next to = neben · behind = hinter · in front of = vor · between = zwischen';
+  const ORTEX = (o) => ({ mode: 'bild', prep: o.prep, ding: o.ding, tier: o.tier });
+  const ortAndere = (o, n) => shuffle(PREPS.filter((p) => p !== o.prep && !(ORT_NICHT[o.prep] || []).includes(p) && (o.ding === 'boxes' || p !== 'between'))).slice(0, n);
+  // A: Bild ansehen, Wort auswählen
+  function ortWahl() {
+    const o = pick(ORT_SAETZE), ch = shuffle([o.prep, ...ortAndere(o, 3)]);
+    return { prompt: `Wo ist ${o.tier === 'cat' ? 'die Katze' : 'der Hund'}? Was gehört in die Lücke?${en(`${gross(TIER[o.tier].en)} is ___ ${o.wo}.`)}`, figure: ortBild(o, o.tier), choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(o.prep), hint: ORT_TIPP, solution: ortLoesung(o), ex: ORTEX(o) };
+  }
+  // B: Bild ansehen, Wort eintippen
+  function ortTippen() {
+    const o = pick(ORT_SAETZE);
+    return {
+      prompt: 'Schau dir das Bild an. Welches Wort fehlt?', figure: ortBild(o, o.tier), layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: o.prep, prefix: `${gross(TIER[o.tier].en)} is`, suffix: `${o.wo}.`, label: 'Wo?' }],
+      hint: ORT_TIPP, solution: ortLoesung(o), ex: ORTEX(o),
+    };
+  }
+  // C: Welcher Satz passt zum Bild?
+  function ortSatz() {
+    const o = pick(ORT_SAETZE), andere = ortAndere(o, 6).filter((p) => o.ding !== 'table' || ['on', 'under', 'next to'].includes(p)).slice(0, 2);
+    const satz = (p) => `${gross(TIER[o.tier].en)} is ${p} ${o.wo}.`, ch = shuffle([o.prep, ...andere]);
+    return { prompt: 'Welcher Satz passt zum Bild?', figure: ortBild(o, o.tier), choices: ch.map((p) => `<span lang="en">${satz(p)}</span>`), correct: ch.indexOf(o.prep), hint: ORT_TIPP, solution: ortLoesung(o), ex: ORTEX(o) };
+  }
+  // D: Deutsch → Englisch
+  function ortDeutsch() {
+    const p = pick(PREPS.filter((x) => x !== 'in')), ch = shuffle([p, ...shuffle(PREPS.filter((x) => x !== p)).slice(0, 3)]);
+    const o = { ...pick(ORTE.filter((x) => x.prep === p)), tier: pick(['cat', 'dog']) };
+    o.text = `${gross(TIER[o.tier].en)} is ${o.prep} ${o.wo}.`; o.de = `${TIER[o.tier].de} ist ${o.deWo}.`;
+    return {
+      prompt: `Wo ist etwas? Wie heißt <b>„${PREP_DE[p]}“</b> auf Englisch?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(p),
+      hint: ORT_TIPP, solution: `${PREP_DE[p]} = <b class="vb" lang="en">${p}</b><br>Beispiel: ${ortLoesung(o).split('<br>')[0]}<br><small>${o.de}</small>`, ex: ORTEX(o),
+    };
+  }
+  const praepOrt = () => U.wahl([[30, ortWahl], [28, ortTippen], [24, ortSatz], [18, ortDeutsch]]);
+
+  // =====================================================
+  // Wann? at, on, in
+  // =====================================================
+  // [at/on/in, Ausdruck, Satz mit ___, Deutsch, Art]
+  const ZEIT = [
+    ['at', 'seven o’clock', 'I get up ___ seven o’clock.', 'Ich stehe um sieben Uhr auf.', 'uhr'],
+    ['at', 'half past four', 'The film starts ___ half past four.', 'Der Film beginnt um halb fünf.', 'uhr'],
+    ['at', 'eight o’clock', 'We have breakfast ___ eight o’clock.', 'Wir frühstücken um acht Uhr.', 'uhr'],
+    ['at', 'ten o’clock', 'The shop opens ___ ten o’clock.', 'Der Laden öffnet um zehn Uhr.', 'uhr'],
+    ['at', 'night', 'Owls fly ___ night.', 'Eulen fliegen nachts.', 'fest'],
+    ['at', 'midnight', 'The party ends ___ midnight.', 'Die Party endet um Mitternacht.', 'fest'],
+    ['on', 'Monday', 'We have English ___ Monday.', 'Wir haben am Montag Englisch.', 'tag'],
+    ['on', 'Friday', 'I play football ___ Friday.', 'Ich spiele am Freitag Fußball.', 'tag'],
+    ['on', 'Sunday', 'My grandma visits us ___ Sunday.', 'Meine Oma besucht uns am Sonntag.', 'tag'],
+    ['on', 'my birthday', 'I get presents ___ my birthday.', 'An meinem Geburtstag bekomme ich Geschenke.', 'tag'],
+    ['on', 'Saturday morning', 'We go shopping ___ Saturday morning.', 'Wir gehen am Samstagmorgen einkaufen.', 'tagzeit'],
+    ['on', 'Christmas Day', 'We sing songs ___ Christmas Day.', 'Am ersten Weihnachtstag singen wir Lieder.', 'tag'],
+    ['in', 'July', 'My birthday is ___ July.', 'Mein Geburtstag ist im Juli.', 'monat'],
+    ['in', 'December', 'It often snows ___ December.', 'Im Dezember schneit es oft.', 'monat'],
+    ['in', 'summer', 'We go swimming ___ summer.', 'Im Sommer gehen wir schwimmen.', 'jahr'],
+    ['in', 'winter', 'It is cold ___ winter.', 'Im Winter ist es kalt.', 'jahr'],
+    ['in', 'the morning', 'I go to school ___ the morning.', 'Ich gehe am Morgen zur Schule.', 'tageszeit'],
+    ['in', 'the afternoon', 'We play outside ___ the afternoon.', 'Am Nachmittag spielen wir draußen.', 'tageszeit'],
+    ['in', 'the evening', 'I read a book ___ the evening.', 'Am Abend lese ich ein Buch.', 'tageszeit'],
+  ].map(([prep, wann, satz, de, art]) => ({ prep, wann, satz, de, art, text: satz.replace('___', prep) }));
+  const ZEIT_ART = {
+    uhr: 'eine <b>Uhrzeit</b>', fest: 'ein fester Ausdruck (at night, at midnight)', tag: 'ein <b>Tag</b>',
+    tagzeit: 'ein <b>Tag</b> mit Tageszeit. Steht der Tag dabei, gewinnt on', monat: 'ein <b>Monat</b>', jahr: 'eine <b>Jahreszeit</b>', tageszeit: 'eine <b>Tageszeit</b>',
+  };
+  const zMark = (z) => `<span lang="en">${z.satz.replace('___', `<b class="vb">${z.prep}</b>`)}</span>`;
+  const zWarum = (z) => `<b>${z.wann}</b> ist ${ZEIT_ART[z.art]}: <b>${z.prep}</b>.`;
+  const zLoesung = (z) => `${zMark(z)} ${U.say(z.text)}<br>${zWarum(z)}<br><small>Auf Deutsch: ${z.de}</small>`;
+  const Z_TIPP = '<b>at</b> + Uhrzeit (at seven o’clock) · <b>on</b> + Tag (on Monday, on my birthday) · <b>in</b> + Monat, Jahreszeit, Tageszeit (in July, in summer, in the morning). Ausnahme: at night.';
+  const ZEX = (z, mode) => ({ mode: mode || 'satz', prep: z.prep, wann: z.wann, satz: z.satz, art: z.art, de: z.de });
+  const zCh = ['at', 'on', 'in'].map((c) => `<span lang="en">${c}</span>`);
+  function zWahl() { const z = pick(ZEIT); return { prompt: `Was gehört in die Lücke?${en(z.satz)}`, choices: zCh, correct: ['at', 'on', 'in'].indexOf(z.prep), hint: Z_TIPP, solution: zLoesung(z), ex: ZEX(z) }; }
+  function zTippen() {
+    const z = pick(ZEIT), [a, b] = z.satz.split('___');
+    return { prompt: '<b>at</b>, <b>on</b> oder <b>in</b>? Tippe das passende Wort ein.', layout: 'satz', fields: [{ type: 'text', ci: true, answer: z.prep, prefix: a.trim(), suffix: b.trim(), label: 'at, on oder in' }], hint: Z_TIPP, solution: zLoesung(z), ex: ZEX(z) };
+  }
+  function zKurz() {
+    const z = pick(ZEIT);
+    return { prompt: `Welches Wort gehört davor?${en(`___ ${z.wann}`)}`, choices: zCh, correct: ['at', 'on', 'in'].indexOf(z.prep), hint: Z_TIPP, solution: `<span lang="en"><b class="vb">${z.prep}</b> ${z.wann}</span><br>${zWarum(z)}<br>Im Satz: ${zMark(z)} ${U.say(z.text)}`, ex: ZEX(z, 'kurz') };
+  }
+  function zRichtig() {
+    const z = pick(ZEIT), ch = shuffle(['at', 'on', 'in']);
+    return { prompt: `Wie sagt man das auf Englisch? <b>${z.de}</b>`, choices: ch.map((p) => `<span lang="en">${z.satz.replace('___', p)}</span>`), correct: ch.indexOf(z.prep), hint: Z_TIPP, solution: zLoesung(z), ex: ZEX(z) };
+  }
+  const praepZeit = () => U.wahl([[28, zWahl], [26, zTippen], [24, zKurz], [22, zRichtig]]);
+
+  Object.assign(D.daten, { ORTE, PREPS, PREP_DE, ORT_SZENE, ORT_SAETZE, ortErkl, tierSvg, BODEN, TIER, ZEIT, ZEIT_ART });
+  const themenVorOrt = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorOrt(), {
+    'e5-ort': ORT_SAETZE.map((o) => o.text),
+    'e5-zeit': ZEIT.map((z) => z.text),
+  });
+  Object.assign(D.arten, {
+    'e5-ort': { ortWahl, ortTippen, ortSatz, ortDeutsch },
+    'e5-zeit': { zWahl, zTippen, zKurz, zRichtig },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -2293,6 +2442,8 @@
       { id: 'e5-mengen', nr: 3, title: 'Mengen, Ort und Zeit', topics: [
         { id: 'e5-some', title: 'some und any', icon: '🥛', gen: someAny },
         { id: 'e5-much', title: 'much, many, a lot of', icon: '🧮', gen: muchMany },
+        { id: 'e5-ort', title: 'Wo? in, on, under, next to …', icon: '🐈', gen: praepOrt },
+        { id: 'e5-zeit', title: 'Wann? at, on, in', icon: '🕖', gen: praepZeit },
       ] },
     ],
   };

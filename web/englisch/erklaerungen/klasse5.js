@@ -1874,4 +1874,125 @@
       };
     },
   };
+
+  // =====================================================
+  // Wo? Das Tier springt an seinen Platz
+  // =====================================================
+  //   ctx: { mode:'bild', prep, ding, tier }
+  EX['e5-ort'] = {
+    title: 'Wo? in, on, under, next to …',
+    titleFor: (ctx) => (ctx && ctx.post && ctx.prep ? `Warum „${ctx.prep}“?` : 'Wo? in, on, under, next to …'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!ctx.prep;
+      let S0 = null, tour = [], oben = null;
+      const voll = (o, tier) => Object.assign({}, o, { tier, text: `${tier === 'cat' ? 'The cat' : 'The dog'} is ${o.prep} ${o.wo}.`, de: `${T.TIER[tier].de} ist ${o.deWo}.` });
+      if (task) {
+        const passend = T.ORTE.filter((o) => o.prep === ctx.prep);
+        const o = ctx.post ? passend.find((x) => x.ding === ctx.ding) : (passend.find((x) => x.ding !== ctx.ding) || passend[0]);
+        S0 = voll(o, ctx.post ? ctx.tier : (passend.length > 1 ? ctx.tier : (ctx.tier === 'cat' ? 'dog' : 'cat')));
+      }
+      const neuTour = () => { const t = U.pick(['cat', 'dog']); tour = ['in|box', 'on|table', 'under|table', 'next to|box', 'behind|box', 'in front of|box', 'between|boxes'].map((k) => voll(T.ORTE.find((o) => `${o.prep}|${o.ding}` === k), t)); };
+      if (!task) { neuTour(); api.chips([{ label: 'Anderes Tier', onClick() { neuTour(); api.replay(); } }]); }
+      const zeig = (teile) => { if (oben) oben.remove(); oben = tzeile(api, teile, 30, 18); };
+      function szene(o, sichtbar) {
+        [...api.svg.querySelectorAll('.ortszene')].forEach((g) => g.remove());
+        const sz = T.ORT_SZENE[`${o.prep}|${o.ding}`](), [x, y, sk, flip] = sz.pos;
+        const g = el('g', { class: 'ortszene' }, api.svg);
+        if (oben) api.svg.appendChild(oben);
+        const lage = (html) => { const h = el('g', {}, g); h.innerHTML = html; return h; };
+        lage(T.BODEN + sz.hinten);
+        const tier = lage(T.tierSvg(o.tier, x, y, sk, flip));
+        lage(sz.vorn);
+        tier.setAttribute('opacity', sichtbar ? 1 : 0);
+        return tier;
+      }
+      async function zeige(o, pause) {
+        zeig([[`${o.tier === 'cat' ? 'The cat' : 'The dog'} is `], [o.prep, BLAU], [` ${o.wo}.`]]);
+        const tier = szene(o, false);
+        await api.tw(700, (t) => { tier.setAttribute('opacity', Math.min(1, t * 2)); tier.setAttribute('transform', `translate(0 ${-36 * (1 - t) * (1 - t)})`); });
+        api.say(`<b>${o.prep}</b> = ${T.PREP_DE[o.prep]}. ${T.ortErkl[o.prep]}<br>${o.text} ${U.say(o.text)}<br><small>${o.de}</small>`);
+        await api.wait(pause);
+      }
+      return {
+        reset() {
+          api.clear(); oben = null;
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          const o = task ? S0 : tour[0];
+          zeig([['Wo ist das Tier?', BLAU]]);
+          szene(o, false);
+        },
+        async play() {
+          if (task) {
+            api.say('Schau genau hin: Wo sitzt das Tier?');
+            await api.wait(1800);
+            await zeige(S0, 0);
+            return;
+          }
+          api.say('Diese kleinen Wörter sagen, <b>wo</b> etwas ist. Das Tier springt von Platz zu Platz.');
+          await api.wait(2600);
+          for (const o of tour) await zeige(o, 3200);
+          api.say('in · on · under · next to · behind · in front of · between');
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // Wann? at, on, in – ein Trichter von groß nach klein
+  // =====================================================
+  //   ctx: { mode:'satz'|'kurz', prep, wann, satz, art, de }
+  EX['e5-zeit'] = {
+    title: 'Wann? at, on, in',
+    titleFor: (ctx) => (ctx && ctx.post && ctx.prep ? `Warum „${ctx.prep}“?` : 'Wann? at, on, in'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!ctx.prep;
+      let S0 = null, frei = [], oben = null, reihen = {};
+      if (task) S0 = ctx.post ? T.ZEIT.find((z) => z.wann === ctx.wann) : U.pick(T.ZEIT.filter((z) => z.prep === ctx.prep && z.wann !== ctx.wann));
+      const neuFrei = () => { frei = ['in', 'on', 'at'].map((p) => U.pick(T.ZEIT.filter((z) => z.prep === p && z.art !== 'fest' && z.art !== 'tagzeit'))); };
+      if (!task) { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const zeig = (teile) => { if (oben) oben.remove(); oben = tzeile(api, teile, 32, 18); };
+      function trichter() {
+        reihen = {};
+        [['in', 'lange Zeit: Monat, Jahreszeit, Tageszeit', 'July · summer · the morning', 10, 340],
+          ['on', 'ein Tag', 'Monday · my birthday', 32, 318],
+          ['at', 'ein Zeitpunkt: die Uhrzeit', 'seven o’clock · night', 54, 296]].forEach(([p, was, bsp, x0, x1], k) => {
+          const y = 54 + k * 51;
+          const r = el('polygon', { points: `${x0},${y} ${x1 + 10},${y} ${x1 - 12},${y + 46} ${x0 + 22},${y + 46}`, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' }, api.svg);
+          el('text', { x: x0 + 34, y: y + 30, class: 'ex-b', text: p, style: `font-size:24px;fill:${BLAU}` }, api.svg);
+          el('text', { x: x0 + 72, y: y + 20, class: 'ex-s', text: was, style: 'font-size:11.5px' }, api.svg);
+          el('text', { x: x0 + 72, y: y + 36, class: 'ex-s', text: bsp, style: `font-size:11.5px;fill:${GRAU}` }, api.svg);
+          reihen[p] = r;
+        });
+      }
+      const leuchte = (p) => Object.entries(reihen).forEach(([k, r]) => r.setAttribute('fill', k === p ? '#dfe9ff' : '#fff'));
+      async function loese(z, pause, kurz) {
+        leuchte('');
+        if (kurz) zeig([['___ '], [z.wann, ORANGE]]); else { const [a, b] = z.satz.split('___'); zeig([[a], ['___', GRAU], [b.replace(z.wann, '')], [z.wann, ORANGE], [b.slice(b.indexOf(z.wann) + z.wann.length)]]); }
+        api.say(`Was für eine Zeitangabe ist <b>${z.wann}</b>?`);
+        await api.wait(pause);
+        leuchte(z.prep);
+        if (kurz) zeig([[z.prep, BLAU], [` ${z.wann}`]]); else { const [a, b] = z.satz.split('___'); zeig([[a], [z.prep, BLAU], [b]]); }
+        return `<b>${z.wann}</b> ist ${T.ZEIT_ART[z.art]}: <b>${z.prep}</b>.<br>${z.text} ${U.say(z.text)}<br><small>${z.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; trichter();
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (task) zeig(ctx.mode === 'kurz' ? [['___ '], [S0.wann, ORANGE]] : [[S0.satz]]); else zeig([['Wann?', BLAU]]);
+        },
+        async play() {
+          if (task) { api.say(await loese(S0, 2600, ctx.mode === 'kurz')); return; }
+          api.say('Von groß nach klein: <b>in</b> für lange Zeiten, <b>on</b> für einen Tag, <b>at</b> für einen Zeitpunkt.');
+          await api.wait(3600);
+          for (const z of frei) { api.say(await loese(z, 2000)); await api.wait(3800); }
+          leuchte('');
+          api.say('Ausnahmen merken: <b>at night</b>. Und steht ein Tag dabei, gewinnt <b>on</b>: on Saturday morning.');
+        },
+      };
+    },
+  };
 })();

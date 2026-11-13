@@ -45,6 +45,8 @@ window.EnDaxIcons = (function () {
     'e5-obj': `<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" ${F}/>`,
     'e5-some': `<path d="M4 12h16a8 8 0 0 1-16 0z"/><circle cx="9" cy="7.5" r="1.4" ${F}/><circle cx="13" cy="5.5" r="1.4" ${F}/><circle cx="16" cy="8" r="1.4" ${F}/>`,
     'e5-much': `<path d="M7 4h10l-1.5 16h-7z"/><path d="M7.7 11h8.6"/><path d="M10 15h4"/>`,
+    'e5-ort': `<path d="M3 20h18"/><rect x="5" y="11" width="9" height="9" rx="1"/><circle cx="18" cy="16.5" r="3" ${F}/>`,
+    'e5-zeit': `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>`,
   };
   function svg(id) {
     const body = I[id];

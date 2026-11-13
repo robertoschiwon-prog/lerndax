@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v66`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v67`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -133,6 +133,12 @@ Weitere Dokumente:
   `e5-much` „much, many, a lot of“ (How much/How many, tippen, zählbar oder nicht, verneinte Sätze, a lot of; Erklärung mit zwei Kästen
   zählbar/nicht zählbar). 23 Themen, 756 Aufnahmen je Aussprache in 23 Paketen. Bewusst weggelassen: some in Angeboten und Bitten
   („Would you like some …?“). Als Nächstes: Thema 24 (Präpositionen des Ortes, mit Bild).
+- **EnDax v67 (13.11.2026): Themen 24 und 25**, auf GitHub und live. `e5-ort` „Wo? in, on, under, next to …“: erstes EnDax-Thema
+  **mit Bild** (Feld `figure` der Aufgabe; Katze oder Hund bei Kiste, Tisch oder zwei Kisten, 9 Szenen in `ORT_SZENE`, gezeichnet als SVG
+  im Code). Aufgaben: Bild ansehen und Wort wählen oder tippen, passenden Satz wählen, Deutsch → Englisch. Erklärung: Das Tier springt
+  von Platz zu Platz. Wörter, die bei einem Bild auch passen könnten, kommen nicht als falsche Antwort vor (`ORT_NICHT`).
+  `e5-zeit` „Wann? at, on, in“ (Lücke wählen und tippen, „___ Monday“, Satz auf Englisch wählen; Erklärung als Trichter
+  in – on – at). 25 Themen, 792 Aufnahmen je Aussprache. Als Nächstes: Thema 26 (Zahlen, Ordnungszahlen, Datum, Uhrzeit).
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1170,6 +1176,8 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v67: EnDax, Themen 24 und 25** (13.11.2026): `e5-ort` (mit Bildern), `e5-zeit`. Geändert: `web/englisch/` (Themen, Erklärungen,
+  Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (25 Themen), `web/sw.js`. Test `tests/endax.py 3` ohne Meldung.
 - **v66: EnDax, Themen 22 und 23** (13.11.2026): `e5-some`, `e5-much`, neuer Bereich `e5-mengen`. Geändert: `web/englisch/` (Themen,
   Erklärungen, Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (23 Themen), `web/sw.js`. Test `tests/endax.py 3` ohne Meldung.
 - **v65: EnDax, Themen 19 bis 21** (13.11.2026): `e5-pp`, `e5-sp`, `e5-obj`. Geändert: `web/englisch/` (Themen, Erklärungen, Symbole,
