@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v84`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v85`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -238,6 +238,10 @@ Weitere Dokumente:
   twenty/twenty-five past und to; Uhr-Bild, digital, Hören). (3) Entdeckung `en-greenwich` (Nullmeridian, Zeitzonen, Aussprache).
   Der Mehrzahl-Genitiv (girls’) war schon da (`gWieViele`, `gApostroph`). **Offen und nur mit Buchseiten zu klären:** Benutzt
   Green Line „have got“ oder „have“? Vokabeln je Unit (eigene Listen treffen sie nur ungefähr).
+- **v85 (13.11.2026): „have got“ geklärt** (Fotos S. 42–46): Green Line 1 lehrt **have got** in Unit 2, Station 2 („The verb have
+  got“, G8: I’ve got two brothers. / I haven’t got …). `e5-have` steht deshalb jetzt in Unit 2 (nach Familie), nicht mehr in Extra.
+  Die Sätze mit have got bleiben. Familie + „only child“. Bestätigt durch S. 46: Uhrzeit mit Minuten (twenty past eight),
+  Häufigkeitswörter (always, usually, often, never), Gefühle. „at weekends“ bleibt weggelassen (amerikanisch „on weekends“ wäre auch richtig).
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1275,6 +1279,7 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v85: `e5-have` nach Unit 2 verschoben, „only child“** (13.11.2026): `web/englisch/themen/klasse5.js`, Aufnahmen, `sw.js`. Test `endax.py 1`.
 - **v84: EnDax Kurzantworten mit I/we/you, Uhrzeit mit Minuten, Entdeckung Greenwich** (13.11.2026): `web/englisch/themen/klasse5.js`,
   `erklaerungen/klasse5.js`, `erklaerungen/entdecken.js`, `index.html`, Aufnahmen, `sw.js`.
 - **v83: EnDax Unit 1 Station 2 ergänzt** (13.11.2026): `web/englisch/themen/klasse5.js` (TH, Schule, Medien), Aufnahmen, `sw.js`.

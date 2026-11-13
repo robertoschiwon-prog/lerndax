@@ -22,7 +22,7 @@ Seit v77 sind die EnDax-Bereiche genau diese Units. Die Themen-IDs sind gleich g
 | Station 3 | 25 | can/can’t, Imperativ, Personalpronomen, Possessivbegleiter | `e5-can`, `e5-imp`, `e5-pron`, `e5-poss`, dazu `e5-a-klasse` |
 | Media smart | 34 | Medien | `e5-w-medien` (**neu v81**) |
 | **Unit 2 It’s fun at home**, Station 1 | 38 | Dinge im Haus, Zahlen 11–100, Besitzangaben mit ’s und s’ | `e5-w-haus`, `e5-zahl`, `e5-gen` |
-| Station 2 | 42 | Familie; simple present: Aussagesätze | `e5-w-familie`, `e5-ps` |
+| Station 2 | 42 | Familie; **have got** (S. 43, G8, per Foto bestätigt v85); simple present: Aussagesätze | `e5-w-familie`, `e5-have`, `e5-ps` |
 | Station 3 | 46 | Uhrzeit, Wochentage; simple present: Bildung, Satzstellung; Objektformen der Personalpronomen; wann und wie oft | `e5-w-tag`, `e5-w-zeit`, `e5-zeit`, `e5-satzbau`, `e5-oft`, `e5-obj` |
 | Across cultures 1 | 58 | Sehenswürdigkeiten in Greenwich, Großbritannien und das Meer | (Entdecken: `en-britam`, `en-pfund`, `en-schule`) |
 | **Unit 3 Our Greenwich**, Check-in | 60 | Adjektive zur Beschreibung, Freizeitaktivitäten | `e5-w-adj` (**neu v77**), `e5-w-freizeit` |
@@ -38,12 +38,11 @@ Seit v77 sind die EnDax-Bereiche genau diese Units. Die Themen-IDs sind gleich g
 
 ## In EnDax, aber nicht im Inhaltsverzeichnis von Green Line 1
 
-Im Bereich **„Extra: nicht in Green Line 1“** gesammelt: `e5-have` (have got), `e5-this` (this, that, these, those),
+Im Bereich **„Extra: nicht in Green Line 1“** gesammelt: `e5-this` (this, that, these, those),
 `e5-w-tiere`, `e5-w-koerper`, `e5-a-lesen`, und die Vergangenheit `e5-was`, `e5-ed`, `e5-irr` (kommt erst in Klasse 6).
 Der Lehrplan Sachsen beschreibt Klasse 5 und 6 gemeinsam; diese Themen sind also nicht falsch, nur früher als im Buch.
 
-Auffällig: **have got** steht nicht im Inhaltsverzeichnis. Viele EnDax-Sätze benutzen „have got“ (britisch, richtig).
-Ob das Buch stattdessen „have“ benutzt, zeigt erst ein Blick in die Seiten; bei Bedarf Sätze umstellen.
+**have got** steht nicht im Inhaltsverzeichnis, wird aber in Unit 2, Station 2 gelehrt (S. 43). Seit v85 steht `e5-have` in Unit 2.
 
 ## Stand im Unterricht
 - 13.11.2026: **Unit 1, Station 2** (S. 22–23). Dazu passen `e5-there`, `e5-ort`, `e5-w-schule` (in v83 mit Wörtern und Sätzen aus
