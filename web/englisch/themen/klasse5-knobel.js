@@ -469,6 +469,17 @@
       ['I think cats are better than dogs.', 'I don’t agree. I think dogs are better.', ['Yes, I agree. Cats are better.', 'I think so too.'], 'Mit <b>I don’t agree</b> sagst du freundlich, dass du es anders siehst.'],
       ['Maths is the best subject.', 'I don’t think so. I like art more.', ['That’s right, maths is the best.', 'I agree with you.'], '<b>I don’t think so</b> = Das finde ich nicht.']], 'agree = zustimmen, I don’t agree / I don’t think so = anderer Meinung sein.'));
 
+  K('e5-laut',
+    wahlK('Gleiche Buchstaben, verschiedene Laute! Welche Lautschrift passt?', [
+      ['ship', 'ʃɪp', ['ʃiːp', 'sɪp'], 'Kurzes i: <b>ɪ</b>. Langes i (sheep) wäre <b>iː</b>.'],
+      ['three', 'θriː', ['triː', 'friː'], 'th am Anfang von three: <b>θ</b> (Zunge zwischen den Zähnen).'],
+      ['this', 'ðɪs', ['θɪs', 'dɪs'], 'th in this ist summend: <b>ð</b>.'],
+      ['book', 'bʊk', ['buːk', 'bʌk'], 'oo in book ist kurz: <b>ʊ</b>. In school ist es lang: uː.']], 'Achte auf ː (lang) und auf θ/ð.'),
+    wahlK('Welches Wort reimt sich? Vergleiche die Lautschrift, nicht die Schreibung!', [
+      ['/ʃuː/ (shoe)', 'zoo /zuː/', ['go /ɡəʊ/', 'now /naʊ/'], 'shoe und zoo enden beide auf <b>uː</b>, obwohl man sie ganz anders schreibt.'],
+      ['/fəʊn/ (phone)', 'own /əʊn/', ['town /taʊn/', 'one /wʌn/'], 'phone und own enden beide auf <b>əʊn</b>. one klingt ganz anders: wʌn.'],
+      ['/bɜːd/ (bird)', 'word /wɜːd/', ['card /kɑːd/', 'board /bɔːd/'], 'bird und word: beide <b>ɜːd</b>.']], 'Die Lautschrift zeigt, wie ein Wort klingt. Gleiche Endung in der Lautschrift = Reim.'));
+
   K('e5-a-abc',
     wahlK('Geheimsprache in Nachrichten! Was bedeutet das?', [
       ['C U', 'See you.', ['Can you?', 'Call you.'], 'C klingt wie <b>see</b>, U wie <b>you</b>.'],

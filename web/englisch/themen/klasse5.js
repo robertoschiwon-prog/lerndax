@@ -3379,6 +3379,79 @@
   D.arten['e5-a-abc'] = { abcHoeren, abcWort, abcKlang, abcFolge };
 
   // =====================================================
+  // Lautschrift lesen (wie im Vocabulary von Green Line: britisches Englisch, Schreibweise wie im Wörterbuch)
+  // Ohne einzelne Laute als Ton: Die Stimme spricht nur ganze Wörter (in der Lösung).
+  // =====================================================
+  // [Wort, Lautschrift, Deutsch]
+  const LS = [['cat', 'kæt', 'Katze'], ['dog', 'dɒɡ', 'Hund'], ['bus', 'bʌs', 'Bus'], ['sheep', 'ʃiːp', 'Schaf'], ['ship', 'ʃɪp', 'Schiff'], ['three', 'θriː', 'drei'],
+    ['this', 'ðɪs', 'dies'], ['house', 'haʊs', 'Haus'], ['boy', 'bɔɪ', 'Junge'], ['car', 'kɑː', 'Auto'], ['bird', 'bɜːd', 'Vogel'], ['book', 'bʊk', 'Buch'],
+    ['school', 'skuːl', 'Schule'], ['thank', 'θæŋk', 'danken'], ['sing', 'sɪŋ', 'singen'], ['yes', 'jes', 'ja'], ['zoo', 'zuː', 'Zoo'], ['jump', 'dʒʌmp', 'springen'],
+    ['chair', 'tʃeə', 'Stuhl'], ['water', 'ˈwɔːtə', 'Wasser'], ['girl', 'ɡɜːl', 'Mädchen'], ['phone', 'fəʊn', 'Telefon'], ['my', 'maɪ', 'mein'], ['say', 'seɪ', 'sagen'],
+    ['now', 'naʊ', 'jetzt'], ['go', 'ɡəʊ', 'gehen'], ['fish', 'fɪʃ', 'Fisch'], ['red', 'red', 'rot'], ['cup', 'kʌp', 'Tasse'], ['hot', 'hɒt', 'heiß'], ['ball', 'bɔːl', 'Ball'],
+    ['shoe', 'ʃuː', 'Schuh'], ['nine', 'naɪn', 'neun'], ['four', 'fɔː', 'vier'], ['green', 'ɡriːn', 'grün'], ['black', 'blæk', 'schwarz'], ['white', 'waɪt', 'weiß'],
+    ['juice', 'dʒuːs', 'Saft'], ['cheese', 'tʃiːz', 'Käse'], ['mother', 'ˈmʌðə', 'Mutter'], ['teacher', 'ˈtiːtʃə', 'Lehrer'], ['sister', 'ˈsɪstə', 'Schwester'],
+    ['apple', 'ˈæpl', 'Apfel'], ['banana', 'bəˈnɑːnə', 'Banane'], ['orange', 'ˈɒrɪndʒ', 'Orange'], ['brother', 'ˈbrʌðə', 'Bruder'], ['father', 'ˈfɑːðə', 'Vater'],
+    ['birthday', 'ˈbɜːθdeɪ', 'Geburtstag'], ['music', 'ˈmjuːzɪk', 'Musik'], ['yellow', 'ˈjeləʊ', 'gelb'], ['hello', 'həˈləʊ', 'hallo'], ['sugar', 'ˈʃʊɡə', 'Zucker'],
+    ['computer', 'kəmˈpjuːtə', 'Computer'], ['potato', 'pəˈteɪtəʊ', 'Kartoffel'], ['tomato', 'təˈmɑːtəʊ', 'Tomate'], ['guitar', 'ɡɪˈtɑː', 'Gitarre'], ['hotel', 'həʊˈtel', 'Hotel']]
+    .map(([w, ipa, de]) => ({ w, ipa, de }));
+  // Silben der geschriebenen Wörter für die Betonung (Index der betonten Silbe)
+  const LS_SILB = { mother: [['moth', 'er'], 0], water: [['wa', 'ter'], 0], teacher: [['tea', 'cher'], 0], sister: [['sis', 'ter'], 0], apple: [['ap', 'ple'], 0],
+    banana: [['ba', 'na', 'na'], 1], orange: [['or', 'ange'], 0], brother: [['broth', 'er'], 0], father: [['fa', 'ther'], 0], birthday: [['birth', 'day'], 0],
+    music: [['mu', 'sic'], 0], yellow: [['yel', 'low'], 0], hello: [['hel', 'lo'], 1], sugar: [['su', 'gar'], 0], computer: [['com', 'pu', 'ter'], 1],
+    potato: [['po', 'ta', 'to'], 1], tomato: [['to', 'ma', 'to'], 1], guitar: [['gui', 'tar'], 1], hotel: [['ho', 'tel'], 1] };
+  // Zeichen: [Zeichen, Beispiel, so klingt es]
+  const LZ = [['θ', 'three, thank', 'Zungenspitze zwischen die Zähne, ohne Stimme (wie ein gelispeltes s)'], ['ð', 'this, mother', 'wie θ, aber mit Stimme (gesummt)'],
+    ['ʃ', 'ship, fish', 'wie deutsches sch'], ['tʃ', 'chair, cheese', 'wie tsch in Matsch'], ['dʒ', 'jump, juice', 'wie dsch in Dschungel'], ['ŋ', 'sing', 'wie ng in singen'],
+    ['æ', 'cat, black', 'ein offenes ä, Mund weit auf'], ['ʌ', 'cup, bus', 'ein kurzes, dunkles a'], ['ə', 'teacher, banana', 'ein schwaches, kurzes e (wie in bitte)'],
+    ['w', 'water, white', 'Lippen rund wie bei u, dann öffnen'], ['z', 'zoo, cheese', 'ein summendes s wie in Sonne'], ['j', 'yes, yellow', 'wie deutsches j in ja'],
+    ['ɜː', 'bird, girl', 'ein langes ö'], ['ɒ', 'dog, hot', 'ein kurzes o']];
+  // verwechselbare Zeichen für falsche Angebote
+  const LS_TAUSCH = [['æ', 'e'], ['e', 'æ'], ['ʌ', 'æ'], ['iː', 'ɪ'], ['ɪ', 'iː'], ['uː', 'ʊ'], ['ʊ', 'uː'], ['ɔː', 'ɒ'], ['ɒ', 'ɔː'], ['ɑː', 'ʌ'], ['ɜː', 'eə'], ['eə', 'ɜː'],
+    ['aɪ', 'eɪ'], ['eɪ', 'aɪ'], ['əʊ', 'aʊ'], ['aʊ', 'əʊ'], ['θ', 's'], ['ð', 'd'], ['ʃ', 's'], ['tʃ', 'ʃ'], ['dʒ', 'ʒ'], ['ŋ', 'n'], ['w', 'v'], ['z', 's'], ['j', 'dʒ']];
+  const LS_IPA = new Set(LS.map((x) => x.ipa));
+  // Lautschrift in Laute zerlegen (Doppelzeichen zuerst), dann einen ganzen Laut tauschen
+  const LS_LAUTE = ['tʃ', 'dʒ', 'iː', 'uː', 'ɔː', 'ɑː', 'ɜː', 'eə', 'ɪə', 'aɪ', 'eɪ', 'ɔɪ', 'əʊ', 'aʊ'];
+  const lsZerlege = (ipa) => { const t = []; for (let i = 0; i < ipa.length;) { const d = LS_LAUTE.find((x) => ipa.startsWith(x, i)); t.push(d || ipa[i]); i += d ? d.length : 1; } return t; };
+  const lsFalsch = (x) => {
+    const t = lsZerlege(x.ipa), out = [];
+    for (const [a, b] of shuffle(LS_TAUSCH)) {
+      const i = t.indexOf(a);
+      if (i >= 0) { const f = t.map((y, k) => (k === i ? b : y)).join(''); if (!LS_IPA.has(f) && !out.includes(f)) out.push(f); }
+      if (out.length === 2) break;
+    }
+    return out;
+  };
+  const LS_TIPP = 'In der Lautschrift steht jedes Zeichen für einen Laut. <b>ː</b> heißt: lang sprechen. <b>ˈ</b> steht vor der Silbe, die betont wird.';
+  const lsLoesung = (x) => `<b>/${x.ipa}/</b> = <b class="vb" lang="en">${x.w}</b> ${U.say(x.w)} (${x.de})`;
+  const LSEX = (x, art) => ({ mode: 'wort', art, w: x.w, ipa: x.ipa, de: x.de });
+  function lsWort() {
+    const x = pick(LS), ch = shuffle([x, ...shuffle(LS.filter((y) => y !== x)).slice(0, 2)]);
+    return { prompt: `Welches Wort steht hier in Lautschrift?<div class="bsp gross" lang="en">/${x.ipa}/</div>`, choices: ch.map((y) => `<span lang="en">${y.w}</span>`), correct: ch.indexOf(x), hint: LS_TIPP, solution: lsLoesung(x), ex: LSEX(x, 'lsWort') };
+  }
+  function lsWelche() {
+    const x = pick(LS.filter((y) => lsFalsch(y).length === 2)), f = lsFalsch(x), ch = shuffle([x.ipa, ...f]);
+    return { prompt: `Welche Lautschrift passt zu <b lang="en">${x.w}</b>? ${U.say(x.w)}`, choices: ch.map((c) => `/${c}/`), correct: ch.indexOf(x.ipa), hint: `${LS_TIPP} Hör dir das Wort an und achte auf jeden Laut.`, solution: lsLoesung(x), ex: LSEX(x, 'lsWelche') };
+  }
+  function lsTippen() {
+    const x = pick(LS.filter((y) => y.w.length <= 6));
+    return { prompt: `Schreibe das Wort: <span class="bsp gross" lang="en">/${x.ipa}/</span>`, fields: [{ type: 'text', ci: true, answer: x.w, label: 'Wort' }], hint: `${LS_TIPP} Tipp: Es heißt auf Deutsch „${x.de}“.`, solution: lsLoesung(x), ex: LSEX(x, 'lsTippen') };
+  }
+  function lsZeichen() {
+    const z = pick(LZ), andere = shuffle(LZ.filter((y) => y !== z)).slice(0, 2), ch = shuffle([z, ...andere]);
+    return { prompt: `Welches Zeichen steht für den Laut in <b lang="en">${z[1]}</b>? <small>(${z[2]})</small>`, choices: ch.map((y) => `/${y[0]}/`), correct: ch.indexOf(z), hint: 'Sprich die Beispielwörter und hör auf den gemeinsamen Laut.', solution: `<b>/${z[0]}/</b> wie in <span lang="en">${z[1]}</span>: ${z[2]}.`, ex: { mode: 'zeichen', art: 'lsZeichen', z: z[0] } };
+  }
+  function lsBetonung() {
+    const x = pick(LS.filter((y) => LS_SILB[y.w])), [silben, b] = LS_SILB[x.w];
+    return { prompt: `Welche Silbe wird betont? Schau auf das Zeichen <b>ˈ</b>.<div class="bsp gross" lang="en">/${x.ipa}/</div>`, choices: silben.map((sb, i) => `<span lang="en">${silben.map((t, k) => (k === i ? t.toUpperCase() : t)).join('-')}</span>`), correct: b,
+      hint: 'Das Zeichen <b>ˈ</b> steht immer <b>vor</b> der betonten Silbe.', solution: `<b>/${x.ipa}/</b>: Das ˈ steht vor der ${b + 1}. Silbe. Also: <b lang="en">${silben.map((t, k) => (k === b ? t.toUpperCase() : t)).join('-')}</b> ${U.say(x.w)}`, ex: LSEX(x, 'lsBetonung') };
+  }
+  const lautschrift = () => U.wahl([[28, lsWort], [24, lsWelche], [16, lsTippen], [16, lsZeichen], [16, lsBetonung]]);
+  Object.assign(D.daten, { LS, LZ, LS_SILB, lsZerlege });
+  const themenVorLaut = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorLaut(), { 'e5-laut': LS.map((x) => x.w) });
+  D.arten['e5-laut'] = { lsWort, lsWelche, lsTippen, lsZeichen, lsBetonung };
+
+  // =====================================================
   // Daten für „Entdecken“ (Animationen in erklaerungen/entdecken.js)
   // =====================================================
   const ENT = {
@@ -3414,6 +3487,7 @@
         { id: 'e5-w-farben', title: 'Farben: red, blue …', icon: '🎨', gen: wfGen('e5-w-farben') },
         { id: 'e5-w-schule', title: 'Schule: pen, ruler …', icon: '🏫', gen: wfGen('e5-w-schule') },
         { id: 'e5-a-abc', title: 'Alphabet und Buchstabieren', icon: '🔤', gen: alphabet },
+        { id: 'e5-laut', title: 'Lautschrift lesen: /kæt/ = cat', icon: '🗣️', gen: lautschrift },
       ] },
       { id: 'e5-u1', nr: 2, title: 'Unit 1: A new school', topics: [
         { id: 'e5-w-gefuehle', title: 'Gefühle: happy, sad, tired …', icon: '😊', gen: wfGen('e5-w-gefuehle') },

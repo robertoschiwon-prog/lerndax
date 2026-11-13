@@ -2714,6 +2714,64 @@
     },
   };
 
+  // =====================================================
+  // Lautschrift: Zeichen für Zeichen zum Wort
+  // =====================================================
+  //   ctx: { mode:'wort', art, w, ipa, de } | { mode:'zeichen', z }
+  EX['e5-laut'] = {
+    title: 'Lautschrift lesen',
+    titleFor: (ctx) => (ctx && ctx.post && ctx.w ? `/${ctx.ipa}/ = ${ctx.w}` : 'Lautschrift lesen'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      const wortNeu = () => U.pick(T.LS.filter((x) => x.w !== ctx.w));
+      let S0 = mode === 'wort' ? (ctx.post ? ctx : wortNeu()) : mode === 'zeichen' ? (ctx.post ? T.LZ.find((z) => z[0] === ctx.z) : U.pick(T.LZ.filter((z) => z[0] !== ctx.z))) : wortNeu();
+      if (mode === 'frei') api.chips([{ label: 'Anderes Wort', onClick() { S0 = wortNeu(); api.replay(); } }]);
+      let oben = null, unten = null, kaesten = [];
+      const LZ_BY = Object.fromEntries(T.LZ.map((z) => [z[0], z]));
+      function laute(x) {
+        kaesten.forEach((k) => k.remove()); kaesten = [];
+        const t = T.lsZerlege(x.ipa), w = 36, n = t.length, x0 = 180 - (n * w + (n - 1) * 4) / 2;
+        t.forEach((l, i) => {
+          const g = el('g', {}, api.svg);
+          el('rect', { x: x0 + i * (w + 4), y: 80, width: w, height: 40, rx: 8, fill: LZ_BY[l] ? '#dfe9ff' : '#fff', stroke: LZ_BY[l] ? BLAU : '#cfc8ba', 'stroke-width': 2 }, g);
+          el('text', { x: x0 + i * (w + 4) + w / 2, y: 107, 'text-anchor': 'middle', class: 'ex-b', text: l, style: `font-size:${l.length > 1 ? 17 : 21}px` }, g);
+          kaesten.push(g);
+        });
+        return t;
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; unten = null; kaesten = [];
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'zeichen') oben = tzeile(api, [[`/${S0[0]}/`, BLAU]], 60, 44);
+          else oben = tzeile(api, [[`/${S0.ipa}/`, BLAU]], 50, 30);
+        },
+        async play() {
+          if (mode === 'zeichen') {
+            api.say(`Das Zeichen <b>/${S0[0]}/</b>: ${S0[2]}.`);
+            await api.wait(2600);
+            unten = tzeile(api, [['wie in  '], [S0[1], ORANGE]], 140, 22);
+            api.say(`<b>/${S0[0]}</b>/ wie in <b lang="en">${S0[1]}</b>: ${S0[2]}.`);
+            return;
+          }
+          const x = S0;
+          api.say('Jedes Zeichen steht für einen Laut. Lies sie der Reihe nach.');
+          await api.wait(1800);
+          const t = laute(x), bes = t.filter((l) => LZ_BY[l]);
+          await api.wait(1200);
+          const tipps = [...new Set(bes)].slice(0, 2).map((l) => `<b>${l}</b>: ${LZ_BY[l][2]}`);
+          if (x.ipa.includes('ː')) tipps.push('<b>ː</b>: lang sprechen');
+          if (x.ipa.includes('ˈ')) tipps.push('<b>ˈ</b>: die nächste Silbe betonen');
+          if (tipps.length) { api.say(tipps.join('<br>')); await api.wait(3200); }
+          unten = tzeile(api, [[x.w, ORANGE]], 172, 30);
+          api.say(`<b>/${x.ipa}/</b> = <b lang="en">${x.w}</b> ${U.say(x.w)} (${x.de})`);
+        },
+      };
+    },
+  };
+
   EX['e5-a-lesen'] = {
     title: 'Lesen: kurze Texte',
     titleFor: () => 'Lesen: Wo steht die Antwort?',

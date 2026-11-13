@@ -15,7 +15,7 @@ Seit v77 sind die EnDax-Bereiche genau diese Units. Die Themen-IDs sind gleich g
 
 | Buch | Seite | Sprachmittel laut Inhaltsverzeichnis | EnDax-Thema |
 |---|---|---|---|
-| **Hello!** | 6 | Zahlen 0–12, Farben, Hobbys, Alphabet, Schulsachen, to be: Langformen | `e5-be`, `e5-a-hallo`, `e5-w-farben`, `e5-w-schule`, `e5-a-abc` (Zahlen in `e5-zahl`, Hobbys in `e5-w-freizeit`) |
+| **Hello!** | 6 | Zahlen 0–12, Farben, Hobbys, Alphabet, Schulsachen, to be: Langformen | `e5-be`, `e5-a-hallo`, `e5-w-farben`, `e5-w-schule`, `e5-a-abc`, dazu `e5-laut` Lautschrift (v82, für das Vocabulary) (Zahlen in `e5-zahl`, Hobbys in `e5-w-freizeit`) |
 | **Unit 1 A new school**, Check-in | 15 | Schule, Gefühle; Schuluniformen | `e5-w-gefuehle` (**neu v77**), `e5-w-kleidung` |
 | Station 1 | 18 | Nomen und Artikel; to be: Kurzformen, Verneinung, Fragen und Kurzantworten | `e5-a-an`, `e5-plural`, `e5-be-neg` |
 | Station 2 | 22 | Präpositionen; there is/there are: Aussagesätze, Fragen | `e5-there`, `e5-ort` |
