@@ -23,6 +23,10 @@ window.DeDaxIcons = (function () {
     'd5-adverbial': `<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z" ${F}/>`,
     // Satzreihe: zwei gleich große Kästen, verbunden
     'd5-satzreihe': `<rect x="2" y="7" width="8.5" height="9" rx="1.5"/><rect x="13.5" y="7" width="8.5" height="9" rx="1.5" ${F}/><path d="M10.5 11.5h3"/>`,
+    // Theater: Vorhang
+    'd5-theater': `<path d="M3 4h18v16"/><path d="M3 4v16"/><path d="M3 4c2 5 4 8 7 9M21 4c-2 5-4 8-7 9" ${F}/>`,
+    // Film: Kamera
+    'd5-kamera': `<rect x="2.5" y="8" width="13" height="10" rx="2"/><path d="M15.5 11l6-3v10l-6-3z" ${F}/><circle cx="6" cy="5" r="2.2"/><circle cx="12" cy="5" r="2.2"/>`,
     'd5-wortarten': `<circle cx="7" cy="7.5" r="4"/><rect x="13.5" y="3.5" width="7.5" height="7.5" rx="1.2" ${F}/><path d="M12 13.5l5.5 8h-11z"/>`,
     // Satzglieder: drei Wagen hintereinander
     'd5-satzglieder': `<rect x="1.5" y="8" width="6" height="7" rx="1.2"/><rect x="9" y="8" width="6" height="7" rx="1.2" ${F}/><rect x="16.5" y="8" width="6" height="7" rx="1.2"/><path d="M3 18.5h18"/>`,

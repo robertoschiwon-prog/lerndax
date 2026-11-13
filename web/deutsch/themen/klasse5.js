@@ -2050,7 +2050,30 @@
     const g = pick(GED);
     return { prompt: `Wie viele <b>Verse</b> hat diese Strophe?${vers(g)}`, choices: ['1', '2', '4', '8'], correct: 2, hint: 'Ein Vers ist eine Zeile im Gedicht.', solution: 'Die Strophe hat <b>4</b> Verse. Jede Zeile ist ein Vers, alle vier zusammen bilden eine Strophe.', ex: exReim('gedZaehlen', g) };
   }
-  const gedicht = () => U.wahl([[42, gedSchema], [33, gedReimwort], [17, gedFest], [8, gedZaehlen]]);
+  // Versmaß (Deutschbuch Kap. 5, S. 118): Silben mit Leerzeichen, betonte Silben mit * markiert
+  const METRUM = [
+    ['Der *Ha-se *hop-pelt *ü-bers *Feld', 'J'], ['Ein *Vo-gel *singt im *Ap-fel-*baum', 'J'], ['Am *Him-mel *zieht ein *Flug-zeug *hin', 'J'], ['Die *Kat-ze *schläft auf *mei-nem *Bett', 'J'],
+    ['Der *I-gel *ra-schelt *durch das *Laub', 'J'], ['Im *Win-ter *fällt der *ers-te *Schnee', 'J'],
+    ['*Son-ne, *Mond und *Ster-ne *leuch-ten', 'T'], ['*Wind und *Wel-len *spie-len *heu-te', 'T'], ['*Kat-zen *schlei-chen *durch die *Gas-sen', 'T'],
+    ['*Kin-der *la-chen, *Hun-de *bel-len', 'T'], ['*Bun-te *Dra-chen *flie-gen *hoch', 'T'], ['*Mor-gens *kräht der *Hahn im *Hof', 'T'],
+  ].map(([roh, typ]) => {
+    const silben = roh.split(' ').flatMap((w) => w.split('-'));
+    const tokens = silben.map((x) => x.replace('*', '')), betont = silben.map((x, i) => (x[0] === '*' ? i : -1)).filter((i) => i >= 0);
+    return { satz: roh.replace(/[*-]/g, ''), tokens, betont, typ, muster: tokens.map((_, i) => (betont.includes(i) ? 'X' : 'x')).join(' ') };
+  });
+  const MNAME = { J: 'Jambus (unbetont – betont: x X)', T: 'Trochäus (betont – unbetont: X x)' };
+  function gedMetrum() {
+    const m = pick(METRUM), ch = ['J', 'T'];
+    const silbig = m.tokens.map((t, i) => (m.betont.includes(i) ? `<b>${t.toUpperCase()}</b>` : t)).join(' · ');
+    return {
+      prompt: `Welches <b>Versmaß</b> hat der Vers? Sprich ihn laut und klopfe mit.<br><span class="bsp">${m.satz}</span>`,
+      choices: ch.map((x) => MNAME[x]), correct: ch.indexOf(m.typ),
+      hint: 'Sprich den Vers langsam und klopfe bei jeder betonten Silbe auf den Tisch. Beginnt er mit einer <b>unbetonten</b> Silbe (der, ein, am)? Dann Jambus. Beginnt er <b>betont</b>? Dann Trochäus.',
+      solution: `${silbig}<br>Muster: <b>${m.muster}</b> → <b>${m.typ === 'J' ? 'Jambus' : 'Trochäus'}</b>. ${m.typ === 'J' ? 'Unbetont und betont wechseln sich ab, der Vers beginnt unbetont.' : 'Betont und unbetont wechseln sich ab, der Vers beginnt betont.'}`,
+      ex: { mode: 'marken', art: 'gedMetrum', tokens: m.tokens, correct: m.betont, was: 'Betonte Silben', s1: 'Sprich den Vers langsam. Welche Silben sind betont?', merk: `Muster <b>${m.muster}</b>: ${m.typ === 'J' ? 'Jambus' : 'Trochäus'}.` },
+    };
+  }
+  const gedicht = () => U.wahl([[36, gedSchema], [28, gedReimwort], [14, gedFest], [6, gedZaehlen], [16, gedMetrum]]);
 
   // ---------- Thema: Sprachliche Bilder ----------
   // [Satz (Bildwort mit *), Bedeutung, zwei falsche Deutungen, Art: P Personifikation, V Vergleich, B anderes Bild]
@@ -2061,22 +2084,147 @@
     ['Er schläft *wie ein Murmeltier.', 'Er schläft tief und lange.', ['Er schläft in einer Höhle.', 'Er ist ein Tier.'], 'V'], ['Die Blätter *tanzen im Wind.', 'Die Blätter bewegen sich im Wind hin und her.', ['Die Blätter hören Musik.', 'Kinder tanzen im Laub.'], 'P'],
     ['Der Bach *murmelt.', 'Der Bach plätschert leise.', ['Der Bach spricht undeutlich.', 'Jemand murmelt am Bach.'], 'P'], ['Sie ist flink *wie ein Wiesel.', 'Sie ist sehr schnell.', ['Sie ist ein kleines Tier.', 'Sie wohnt im Wald.'], 'V'],
     ['Der Nebel *verschluckt das Dorf.', 'Im Nebel sieht man das Dorf nicht mehr.', ['Der Nebel hat einen Mund.', 'Das Dorf ist zerstört.'], 'P'], ['Seine Augen leuchten *wie Sterne.', 'Seine Augen strahlen vor Freude.', ['Seine Augen sind Lampen.', 'Es ist gerade Nacht.'], 'V'],
+    ['Mein Bruder ist ein *Faultier.', 'Mein Bruder ist sehr faul.', ['Mein Bruder ist ein Tier.', 'Mein Bruder hängt gern in Bäumen.'], 'B'],
+    ['Lina ist eine *Leseratte.', 'Lina liest sehr gern.', ['Lina ist eine Ratte.', 'Lina hat Angst vor Ratten.'], 'B'],
+    ['Die Klasse ist heute ein *Bienenstock.', 'In der Klasse ist es laut und unruhig.', ['In der Klasse wohnen Bienen.', 'Die Klasse sammelt Honig.'], 'B'],
   ].map(([roh, sinn, falsch, typ]) => { const w = roh.split(' '); return { tokens: w.map((x) => x.replace('*', '')), mark: w.findIndex((x) => x[0] === '*'), text: roh.replace('*', ''), sinn, falsch, typ }; });
-  const BWARUM = { P: 'Das ist eine <b>Personifikation</b>: Etwas, das kein Mensch ist (Wind, Sonne, Bach), handelt wie ein Mensch.', V: 'Das ist ein <b>Vergleich</b>: Mit „wie“ wird etwas mit etwas anderem verglichen.', B: 'Das ist ein <b>sprachliches Bild</b>: Die Wörter sind nicht wörtlich gemeint, sie malen ein Bild im Kopf.' };
+  const BWARUM = { P: 'Das ist eine <b>Personifikation</b>: Etwas, das kein Mensch ist (Wind, Sonne, Bach), handelt wie ein Mensch.', V: 'Das ist ein <b>Vergleich</b>: Mit „wie“ wird etwas mit etwas anderem verglichen.', B: 'Das ist eine <b>Metapher</b>: ein Vergleich ohne „wie“. Die Wörter sind nicht wörtlich gemeint, sie malen ein Bild im Kopf (stark wie ein Bär → Er ist ein Bär).' };
   const exBild = (art, b) => ({ mode: 'marken', art, tokens: b.tokens, correct: [b.mark], was: 'Bildwort', s1: BWARUM[b.typ], merk: `„${b.text}“ bedeutet: <b>${b.sinn}</b>` });
   function bildSinn() {
     const b = pick(BILDER), w = shuffle([b.sinn, ...b.falsch]);
     return { prompt: `Was ist gemeint?<br><span class="bsp">${b.text}</span>`, choices: w, correct: w.indexOf(b.sinn), hint: 'Ein sprachliches Bild ist <b>nicht wörtlich</b> gemeint. Stell dir das Bild vor: Was will es zeigen?', solution: `<b>${b.sinn}</b><br>${BWARUM[b.typ]}`, ex: exBild('bildSinn', b) };
   }
   function bildArt() {
-    const b = pick(BILDER.filter((x) => x.typ !== 'B'));
-    return { prompt: `Welches sprachliche Bild ist das?<br><span class="bsp">${b.text}</span>`, choices: ['Vergleich (mit „wie“)', 'Personifikation'], correct: b.typ === 'V' ? 0 : 1, hint: 'Steht ein „wie“ im Satz? Oder tut ein Ding oder die Natur etwas, das sonst nur Menschen tun?', solution: `${BWARUM[b.typ]}<br>Gemeint ist: ${b.sinn}`, ex: exBild('bildArt', b) };
+    const b = pick(BILDER);
+    return { prompt: `Welches sprachliche Bild ist das?<br><span class="bsp">${b.text}</span>`, choices: ['Vergleich (mit „wie“)', 'Personifikation', 'Metapher (Vergleich ohne „wie“)'], correct: { V: 0, P: 1, B: 2 }[b.typ], hint: 'Steht ein „wie“ im Satz? Dann Vergleich. Tut ein Ding oder die Natur etwas Menschliches? Dann Personifikation. Wird etwas einfach „gleichgesetzt“ (Er ist ein Bär)? Dann Metapher.', solution: `${BWARUM[b.typ]}<br>Gemeint ist: ${b.sinn}`, ex: exBild('bildArt', b) };
   }
   function bildWort() {
     const b = pick(BILDER.filter((x) => x.typ === 'P'));
     return { prompt: 'Tippe das Wort an, das etwas <b>Menschliches</b> ausdrückt.', tap: { tokens: b.tokens, correct: [b.mark], one: true }, answerText: b.tokens[b.mark].replace('.', ''), hint: 'Welches Wort beschreibt etwas, das eigentlich nur Menschen tun?', solution: `<b>${b.tokens[b.mark].replace('.', '')}</b>: Das können eigentlich nur Menschen.<br>${BWARUM.P} Gemeint ist: ${b.sinn}`, ex: Object.assign(exBild('bildWort', b), { merk: `<b>${b.tokens[b.mark].replace('.', '')}</b>: Das können eigentlich nur Menschen. Gemeint ist: ${b.sinn}` }) };
   }
   const bilder = () => U.wahl([[50, bildSinn], [28, bildArt], [22, bildWort]]);
+
+  // ---------- Thema: Theaterszenen (Deutschbuch Kap. 6) ----------
+  // Szenen: Teile; Regieanweisungen stehen in Klammern
+  const SZENEN = [
+    ['LINA:', '(flüstert)', 'Hörst du das?', 'BEN:', 'Nein.', '(Er schaut sich um.)', 'Was denn?'],
+    ['MIA:', '(stampft mit dem Fuß auf)', 'Das ist mein Ball!', 'PAUL:', '(lacht)', 'Dann hol ihn dir doch!'],
+    ['OMA:', 'Wer hat den Kuchen gegessen?', 'EMIL:', '(wischt sich schnell den Mund ab)', 'Ich nicht!'],
+    ['NORA:', '(öffnet langsam die Tür)', 'Hallo? Ist da jemand?', 'OPA:', '(lacht)', 'Nur ich und der Hund!'],
+    ['LEHRERIN:', 'Wo sind deine Hausaufgaben?', 'BEN:', '(kratzt sich am Kopf)', 'Die hat mein Hund gefressen.'],
+  ];
+  const MONO = [['EMIL', '(allein in seinem Zimmer)', 'Morgen ist der große Test. Ich habe noch gar nichts gelernt. Was mache ich nur? Ich fange gleich an, ganz bestimmt!'],
+    ['LINA', '(steht allein am Fenster)', 'Wo bleibt sie nur? Sie wollte doch um drei Uhr kommen. Hoffentlich ist nichts passiert.']];
+  const THFEST = [
+    ['Wie nennt man ein <b>Gespräch zwischen zwei oder mehr Figuren</b>?', ['Dialog', 'Monolog', 'Regieanweisung'], 'Sprechen mehrere Figuren miteinander, ist es ein Dialog.'],
+    ['Wie nennt man es, wenn <b>eine Figur allein</b> spricht?', ['Monolog', 'Dialog', 'Szene'], 'Spricht eine Figur allein (oft über ihre Gedanken), ist es ein Monolog.'],
+    ['Was ist eine <b>Regieanweisung</b>?', ['ein Hinweis, wie gespielt wird; er wird nicht gesprochen', 'ein Satz, den eine Figur laut sagt', 'der Name des Theaterstücks'], 'Regieanweisungen stehen meist in Klammern und schräg gedruckt. Sie sagen, was die Figur tut oder wie sie spricht.'],
+    ['Wie nennt man einen <b>Gegenstand</b>, den man auf der Bühne braucht (z. B. einen Ball)?', ['Requisite', 'Kulisse', 'Regieanweisung'], 'Gegenstände, mit denen gespielt wird, heißen Requisiten. Die Kulisse ist der Hintergrund.'],
+    ['Wie nennt man einen <b>kurzen Abschnitt</b> eines Theaterstücks?', ['Szene', 'Strophe', 'Kapitel'], 'Ein Theaterstück besteht aus Szenen. Eine Strophe gehört zum Gedicht.'],
+  ];
+  // Mimik (Gesicht), Gestik (Hände, Arme, Körper), Stimme
+  const MGS = [['runzelt die Stirn', 'Mimik'], ['lächelt', 'Mimik'], ['reißt die Augen weit auf', 'Mimik'], ['zeigt mit dem Finger auf Ben', 'Gestik'], ['verschränkt die Arme', 'Gestik'],
+    ['winkt mit beiden Händen', 'Gestik'], ['flüstert', 'Stimme'], ['ruft laut', 'Stimme'], ['spricht mit zitternder Stimme', 'Stimme']];
+  const MGS_WARUM = { Mimik: '<b>Mimik</b> ist alles, was das Gesicht zeigt.', Gestik: '<b>Gestik</b> sind Bewegungen mit Händen, Armen und Körper.', Stimme: 'Mit der <b>Stimme</b> zeigt man, wie etwas gesagt wird: laut, leise, zitternd …' };
+  function thRegie() {
+    const z = pick(SZENEN), correct = z.map((t, i) => (t[0] === '(' ? i : -1)).filter((i) => i >= 0);
+    return {
+      prompt: 'Tippe <b>alle Regieanweisungen</b> an.', tap: { tokens: z, correct }, answerText: correct.map((i) => z[i]).join(', '),
+      hint: 'Regieanweisungen werden nicht gesprochen. Sie stehen in Klammern und sagen, was eine Figur tut oder wie sie spricht.',
+      solution: `${z.map((t, i) => (correct.includes(i) ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Die Teile in Klammern sind Regieanweisungen: Sie werden gespielt, nicht gesprochen.`,
+      ex: { mode: 'marken', art: 'thRegie', tokens: z, correct, klein: true, was: 'Regieanweisungen', s1: 'Was wird gesprochen, was wird gespielt?' },
+    };
+  }
+  function thMonoDia() {
+    const mono = Math.random() < 0.4;
+    const text = mono ? (() => { const [w, r, t] = pick(MONO); return `${w}: ${r} ${t}`; })() : pick(SZENEN).join(' ');
+    return {
+      prompt: `Monolog oder Dialog?<br><span class="bsp">${text}</span>`, choices: ['Monolog', 'Dialog'], correct: mono ? 0 : 1,
+      hint: 'Zähle, wie viele Figuren sprechen. Ihre Namen stehen in Großbuchstaben vor dem Text.',
+      solution: mono ? 'Nur eine Figur spricht, allein mit ihren Gedanken: ein <b>Monolog</b>.' : 'Mehrere Figuren sprechen miteinander: ein <b>Dialog</b>.',
+      ex: { mode: 'marken', art: 'thMonoDia', tokens: text.split(' '), correct: text.split(' ').map((t, i) => (/^[A-ZÄÖÜ]{2,}:$/.test(t) ? i : -1)).filter((i) => i >= 0), klein: true, was: 'Sprecher', s1: 'Wer spricht? Die Namen stehen in Großbuchstaben.', merk: mono ? '<b>Monolog</b>: eine Figur spricht.' : '<b>Dialog</b>: mehrere Figuren sprechen.' },
+    };
+  }
+  function thFest() {
+    const [frage, w, warum] = pick(THFEST), ch = shuffle(w);
+    return { prompt: frage, choices: ch, correct: ch.indexOf(w[0]), hint: 'Dialog: mehrere sprechen. Monolog: einer spricht allein. Regieanweisung: wie gespielt wird.', solution: `<b>${w[0]}</b><br>${warum}`,
+      ex: { mode: 'marken', art: 'thFest', tokens: [w[0]], correct: [0], was: 'Fachwort', s1: frage.replace(/<\/?b>/g, ''), merk: `<b>${w[0]}</b>: ${warum}` } };
+  }
+  function thMgs() {
+    const [was, art] = pick(MGS), ch = ['Mimik', 'Gestik', 'Stimme'], fig = pick(['Lina', 'Emil', 'Mia', 'Paul']);
+    return {
+      prompt: `In der Regieanweisung steht: <i>(${fig} ${was})</i><br>Womit spielt ${fig} das?`, choices: ch, correct: ch.indexOf(art),
+      hint: 'Mimik: Gesicht. Gestik: Hände, Arme, Körper. Stimme: wie etwas gesagt wird.',
+      solution: `<b>${art}</b>: ${MGS_WARUM[art]}`, ex: { mode: 'marken', art: 'thMgs', tokens: `(${fig} ${was})`.split(' '), correct: was.split(' ').map((_, k) => k + 1), klein: true, was: art, s1: 'Gesicht, Hände oder Stimme?', merk: `<b>${art}</b>: ${MGS_WARUM[art]}` },
+    };
+  }
+  const theater = () => U.wahl([[30, thRegie], [24, thMonoDia], [22, thFest], [24, thMgs]]);
+
+  // ---------- Thema: Kamera – Einstellungsgrößen und Perspektiven (Deutschbuch Kap. 7) ----------
+  // Ein Bild (Haus, Baum, Kind) und verschiedene Ausschnitte daraus
+  const KSZENE = '<rect x="0" y="0" width="320" height="180" fill="#cfe6ff"/><circle cx="280" cy="30" r="14" fill="#ffd34d"/><rect x="0" y="140" width="320" height="40" fill="#8fce79"/>'
+    + '<rect x="18" y="80" width="70" height="60" fill="#f2c79a" stroke="#6b4a2b" stroke-width="2"/><path d="M12 82 L53 48 L94 82z" fill="#c4553b" stroke="#6b4a2b" stroke-width="2"/><rect x="45" y="108" width="16" height="32" fill="#7a4b2a"/><rect x="26" y="92" width="14" height="12" fill="#bfe3ff" stroke="#6b4a2b"/>'
+    + '<rect x="252" y="92" width="10" height="48" fill="#7a4b2a"/><circle cx="257" cy="80" r="26" fill="#3f9b45"/>'
+    + '<path d="M152 140 L156 116 M168 140 L164 116" stroke="#2b3a67" stroke-width="5" stroke-linecap="round"/><rect x="148" y="92" width="24" height="27" rx="5" fill="#e4572e"/>'
+    + '<path d="M150 98 L139 114 M170 98 L181 112" stroke="#f1c27d" stroke-width="4.5" stroke-linecap="round"/><circle cx="160" cy="80" r="10.5" fill="#f1c27d"/><path d="M149.5 78 Q150 67 160 67 Q170 67 170.5 78 Q165 72 160 73 Q154 72 149.5 78z" fill="#5a3a1a"/>'
+    + '<circle cx="156.3" cy="80" r="1.4" fill="#222"/><circle cx="163.7" cy="80" r="1.4" fill="#222"/><circle cx="156.8" cy="79.5" r="0.45" fill="#fff"/><path d="M156 84.5 Q160 87.5 164 84.5" stroke="#9b3b2b" stroke-width="1" fill="none" stroke-linecap="round"/>';
+  const KGR = [
+    ['Totale', '0 0 320 180', 'Man sieht den ganzen Ort: Haus, Baum und das Kind ganz klein.', 'zeigt, wo die Szene spielt (Überblick)'],
+    ['Halbtotale', '88 62 144 81', 'Man sieht das Kind von Kopf bis Fuß und ein Stück der Umgebung.', 'zeigt eine Person ganz, mit ihrer Bewegung'],
+    ['Nahaufnahme', '131 66 58 32.6', 'Man sieht Kopf und Oberkörper.', 'zeigt eine Person beim Sprechen'],
+    ['Großaufnahme', '143 67 34 19.125', 'Man sieht nur das Gesicht.', 'zeigt Gefühle im Gesicht'],
+    ['Detailaufnahme', '153.5 77.5 6 3.4', 'Man sieht nur einen kleinen Teil: hier ein Auge.', 'lenkt den Blick auf eine Kleinigkeit'],
+  ];
+  const kBild = (vb) => `<svg viewBox="${vb}" width="320" height="180" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Bildausschnitt" style="max-width:100%;height:auto;border:3px solid #2b2440;border-radius:8px">${KSZENE}</svg>`;
+  // Perspektive: Seitenansicht mit Kind und Kamera
+  const KAM = (x, y, rot) => `<g transform="translate(${x},${y}) rotate(${rot})"><rect x="-16" y="-10" width="26" height="20" rx="3" fill="#2b2440"/><path d="M10 -6 L22 -12 L22 12 L10 6z" fill="#2b2440"/><circle cx="-6" cy="-14" r="5" fill="#2b2440"/><circle cx="6" cy="-14" r="5" fill="#2b2440"/></g>`;
+  const KP = [
+    ['Vogelperspektive', 'von oben', [60, 30, 38], 'Die Figur wirkt <b>klein</b> und schwach, man hat einen guten Überblick.'],
+    ['Froschperspektive', 'von unten', [62, 146, -38], 'Die Figur wirkt <b>groß</b>, stark oder sogar bedrohlich.'],
+    ['Normalsicht', 'auf Augenhöhe', [50, 82, 0], 'Wir sehen die Figur wie im Alltag, auf gleicher Höhe.'],
+  ];
+  const kpBild = (p) => `<svg viewBox="0 0 320 180" role="img" aria-label="Kamera und Kind" style="max-width:100%;height:auto"><rect x="0" y="0" width="320" height="180" fill="#eef5ff"/><rect x="0" y="160" width="320" height="20" fill="#8fce79"/>`
+    + `<path d="M${p[2][0] + 22 * Math.cos(p[2][2] * Math.PI / 180)} ${p[2][1] + 22 * Math.sin(p[2][2] * Math.PI / 180)} L200 84" stroke="#e4572e" stroke-width="2.5" stroke-dasharray="6 5"/>`
+    + `<path d="M193 160 L197 125 M207 160 L203 125" stroke="#2b3a67" stroke-width="6" stroke-linecap="round"/><rect x="188" y="98" width="24" height="30" rx="5" fill="#e4572e"/><circle cx="200" cy="84" r="12" fill="#f1c27d"/>`
+    + `${KAM(...p[2])}</svg>`;
+  function kamGroesse() {
+    const i = R(0, KGR.length - 1), andere = shuffle(KGR.map((_, k) => k).filter((k) => Math.abs(k - i) >= 2)).slice(0, 2), ch = shuffle([i, ...andere]);
+    return {
+      prompt: 'Welche <b>Einstellungsgröße</b> zeigt das Bild?', figure: kBild(KGR[i][1]), choices: ch.map((k) => KGR[k][0]), correct: ch.indexOf(i),
+      hint: 'Wie viel sieht man? Den ganzen Ort (Totale), die ganze Person (Halbtotale), Kopf und Oberkörper (Nah), nur das Gesicht (Groß) oder nur ein kleines Stück (Detail)?',
+      solution: `<b>${KGR[i][0]}</b>: ${KGR[i][2]} Sie ${KGR[i][3]}.`,
+      ex: { mode: 'bild', art: 'kamGroesse', svg: kBild(KGR[i][1]), s1: 'Wie viel ist im Bild zu sehen?', merk: `<b>${KGR[i][0]}</b>: ${KGR[i][2]}` },
+    };
+  }
+  function kamWozu() {
+    const i = R(0, KGR.length - 1), andere = shuffle(KGR.map((_, k) => k).filter((k) => Math.abs(k - i) >= 2)).slice(0, 2), ch = shuffle([i, ...andere]);
+    return {
+      prompt: `Welche Einstellungsgröße passt? Sie soll <b>${KGR[i][3].replace(/^zeigt/, 'zeigen').replace(/^lenkt/, 'lenken')}</b>.`, choices: ch.map((k) => KGR[k][0]), correct: ch.indexOf(i),
+      hint: 'Je näher die Kamera ist, desto weniger Umgebung und desto mehr Gefühl sieht man.',
+      solution: `<b>${KGR[i][0]}</b>: ${KGR[i][2]} Sie ${KGR[i][3]}.`,
+      ex: { mode: 'bild', art: 'kamWozu', svg: kBild(KGR[i][1]), s1: `Gesucht: ${KGR[i][3]}.`, merk: `<b>${KGR[i][0]}</b>: ${KGR[i][2]}` },
+    };
+  }
+  function kamPersp() {
+    const p = pick(KP), ch = KP.map((x) => x[0]);
+    return {
+      prompt: 'Aus welcher <b>Perspektive</b> filmt die Kamera das Kind?', figure: kpBild(p), choices: ch, correct: ch.indexOf(p[0]),
+      hint: 'Schau, wo die Kamera steht: oben (wie ein Vogel), unten (wie ein Frosch) oder auf Augenhöhe?',
+      solution: `<b>${p[0]}</b>: Die Kamera filmt ${p[1]}. ${p[3]}`,
+      ex: { mode: 'bild', art: 'kamPersp', svg: kpBild(p), s1: 'Wo steht die Kamera?', merk: `<b>${p[0]}</b> (${p[1]}): ${p[3]}` },
+    };
+  }
+  function kamWirkung() {
+    const p = pick(KP.slice(0, 2)), ch = shuffle([KP[0][3], KP[1][3]].map((t) => t.replace(/<\/?b>/g, '')));
+    const ok = p[3].replace(/<\/?b>/g, '');
+    return {
+      prompt: `Ein Film zeigt eine Figur in der <b>${p[0]}</b> (${p[1]}). Wie wirkt die Figur?`, choices: ch, correct: ch.indexOf(ok),
+      hint: 'Stell dir vor, du schaust von oben auf jemanden herab oder du stehst unten und schaust zu jemandem hoch.',
+      solution: `<b>${p[0]}</b>: ${p[3]}`,
+      ex: { mode: 'bild', art: 'kamWirkung', svg: kpBild(p), s1: `Die Kamera filmt ${p[1]}.`, merk: `<b>${p[0]}</b>: ${p[3]}` },
+    };
+  }
+  const kamera = () => U.wahl([[32, kamGroesse], [20, kamWozu], [28, kamPersp], [20, kamWirkung]]);
 
   // ---------- Thema: Erzählen, Beschreiben, Berichten ----------
   const TS = [
@@ -2204,7 +2352,7 @@
     'd5-wortfamilie': { famNicht, famDazu, famStamm },
     'd5-wortfeld': { feldTreffend, feldNicht, feldWelches, feldStark },
     'd5-maerchen': { msErkennen, msMerkmal, msFest },
-    'd5-gedicht': { gedSchema, gedReimwort, gedFest, gedZaehlen },
+    'd5-gedicht': { gedSchema, gedReimwort, gedFest, gedZaehlen, gedMetrum },
     'd5-bilder': { bildSinn, bildArt, bildWort },
     'd5-textsorten': { tsErkennen, tsMerkmal, tsReihe, tsWFrage },
     'd5-sachtext': { sachFrage, sachTitel, sachTabelle, sachBild },
@@ -2213,6 +2361,8 @@
     'd5-adverb': { advAntippen, advFrage, advLuecke, advOderAdj },
     'd5-adverbial': { abBestimmen, abAntippen, abFrage },
     'd5-satzreihe': { begSatz, begWort, reiheKomma, reiheOderGefuege },
+    'd5-theater': { thRegie, thMonoDia, thFest, thMgs },
+    'd5-kamera': { kamGroesse, kamWozu, kamPersp, kamWirkung },
   };
 
   // =====================================================
@@ -2258,12 +2408,14 @@
         { id: 'd5-wortfamilie', title: 'Wortfamilien', icon: '🌳', gen: wortfamilie },
         { id: 'd5-wortfeld', title: 'Wortfelder', icon: '☁', gen: wortfeld },
       ] },
-      { id: 'd5-text', nr: 5, title: 'Texte verstehen', topics: [
+      { id: 'd5-text', nr: 5, title: 'Texte und Medien verstehen', topics: [
         { id: 'd5-maerchen', title: 'Märchen und Sage', icon: '👑', gen: maerchen },
-        { id: 'd5-gedicht', title: 'Gedichte: Vers, Strophe, Reim', icon: '🎵', gen: gedicht },
+        { id: 'd5-gedicht', title: 'Gedichte: Vers, Strophe, Reim, Versmaß', icon: '🎵', gen: gedicht },
         { id: 'd5-bilder', title: 'Sprachliche Bilder', icon: '🖼', gen: bilder },
         { id: 'd5-textsorten', title: 'Erzählen, Beschreiben, Berichten', icon: '📝', gen: textsorten },
         { id: 'd5-sachtext', title: 'Sachtexte, Tabellen, Schaubilder', icon: '📊', gen: sachtext },
+        { id: 'd5-theater', title: 'Theaterszenen: Dialog, Monolog, Regieanweisung', icon: '🎭', gen: theater },
+        { id: 'd5-kamera', title: 'Film: Einstellungsgrößen und Perspektiven', icon: '🎥', gen: kamera },
       ] },
     ],
   };

@@ -77,6 +77,7 @@ async def main():
                 await pg.click('[data-go="home"]')
         # freie Erklärung
         for t in ids:
+            await pg.evaluate("() => document.querySelectorAll('[data-lbopen]').forEach(b => b.click())")   # fertige Bereiche sind eingeklappt
             eb = await pg.query_selector(f'[data-explain="{t}"]')
             if not eb: meld.append(f'{t}: kein Erklär-Knopf'); continue
             await eb.click()

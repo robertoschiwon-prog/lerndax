@@ -325,6 +325,15 @@
       api.say(x.s2); await api.wait(2600);
       api.say(x.merk);
     },
+    // ein Bild (SVG-Text aus der Aufgabe) in die Mitte, dann die Erklärung
+    async bild(api, x) {
+      const g = el('g', { opacity: 0 }, api.svg);
+      g.innerHTML = x.svg.replace(/^<svg([^>]*)>/, (m, a) => `<svg${a.replace(/ (width|height|style|preserveAspectRatio)="[^"]*"/g, '')} x="76" y="4" width="208" height="117" preserveAspectRatio="xMidYMid slice">`);
+      el('rect', { x: 76, y: 4, width: 208, height: 117, rx: 6, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2.5 }, api.svg);
+      await api.tw(500, (t) => g.setAttribute('opacity', t));
+      api.say(x.s1); await api.wait(2400);
+      api.say(x.merk);
+    },
     // Wörter im Satz nacheinander markieren
     async marken(api, x) {
       const a = x.klein ? absatz(api, x.tokens) : zeile(api, x.tokens, 66, !x.dicht, true);
@@ -537,5 +546,7 @@
   thema('d5-gedicht', 'Vers, Strophe, Reim', '0 0 360 140');
   thema('d5-bilder', 'Sprachliche Bilder', '0 0 360 120');
   thema('d5-textsorten', 'Erzählen, Beschreiben, Berichten', '0 0 360 150');
+  thema('d5-theater', 'Theaterszenen', '0 0 360 150');
+  thema('d5-kamera', 'Film: Einstellungsgrößen und Perspektiven', '0 0 360 125');
   thema('d5-sachtext', 'Sachtexte und Schaubilder lesen', '0 0 360 150');
 })();

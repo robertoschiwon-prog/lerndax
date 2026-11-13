@@ -48,9 +48,9 @@ Bildungssprache) · 8 Sachtexte, Schaubilder, Tabellen · **9 Wortarten und Satz
 - ~~Komma bei Appositionen~~ in `d5-komma` (v79).
 - ~~weil, da, denn~~ in `d5-satzreihe` (v79).
 - ~~Anredepronomen im Brief~~ in `d5-gross` (v79).
-- Gedichte: **Metrum** und **Metapher** (Kap. 5); `d5-gedicht` und `d5-bilder` prüfen.
-- Theaterszene: Monolog, Dialog, Regieanweisung (Kap. 6) – neues Thema möglich.
-- Einstellungsgrößen und Kameraperspektiven (Kap. 7) – am Bildschirm gut zeigbar.
+- ~~Gedichte: Metrum und Metapher~~ v80: Versmaß (Jambus, Trochäus) in `d5-gedicht`, Metapher in `d5-bilder`.
+- ~~Theaterszene~~ v80: neues Thema `d5-theater` (Dialog, Monolog, Regieanweisung, Mimik/Gestik/Stimme).
+- ~~Einstellungsgrößen und Kameraperspektiven~~ v80: neues Thema `d5-kamera` mit Bildern.
 
 ## Entschieden
 **„Nomen“** wie im Buch (Roberto, 13.11.2026). Umgestellt in v78.
