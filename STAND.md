@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v65`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v66`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -128,6 +128,11 @@ Weitere Dokumente:
   Erklärung mit zwei Kästen „immer wieder“ und „gerade jetzt“), `e5-obj` „me, him, her, us, them“ (ersetzen per Auswahl und Tippen, Paare,
   vorn oder hinten, Deutsch → Englisch; Erklärung mit Tafel „vorn/hinten“). 21 Themen, 699 Aufnahmen je Aussprache in 21 Paketen.
   Als Nächstes: Bereich 3 ab Thema 22 (some/any).
+- **EnDax v66 (13.11.2026): Themen 22 und 23, Bereich 3 „Mengen, Ort und Zeit“ begonnen**, auf GitHub und live. `e5-some` „some und any“
+  (Auswahl, tippen, richtiger Satz, Aussage umbauen in Verneinung oder Frage, Bedeutung; Erklärung mit drei Fächern Aussage/Verneinung/Frage),
+  `e5-much` „much, many, a lot of“ (How much/How many, tippen, zählbar oder nicht, verneinte Sätze, a lot of; Erklärung mit zwei Kästen
+  zählbar/nicht zählbar). 23 Themen, 756 Aufnahmen je Aussprache in 23 Paketen. Bewusst weggelassen: some in Angeboten und Bitten
+  („Would you like some …?“). Als Nächstes: Thema 24 (Präpositionen des Ortes, mit Bild).
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1165,6 +1170,8 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v66: EnDax, Themen 22 und 23** (13.11.2026): `e5-some`, `e5-much`, neuer Bereich `e5-mengen`. Geändert: `web/englisch/` (Themen,
+  Erklärungen, Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (23 Themen), `web/sw.js`. Test `tests/endax.py 3` ohne Meldung.
 - **v65: EnDax, Themen 19 bis 21** (13.11.2026): `e5-pp`, `e5-sp`, `e5-obj`. Geändert: `web/englisch/` (Themen, Erklärungen, Symbole,
   Aufnahmen-Pakete `pp`, `sp`, `obj` in `audio/us` und `audio/gb`), `web/plattform/faecher.js` (21 Themen), `web/sw.js`. Test `tests/endax.py 3` ohne Meldung.
 - **v64: EnDax, Themen 16 bis 18** (13.11.2026): `e5-fragewort`, `e5-satzbau`, `e5-oft`. Geändert: `web/englisch/`,

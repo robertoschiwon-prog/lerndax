@@ -2123,6 +2123,143 @@
   });
 
   // =====================================================
+  // some und any
+  // =====================================================
+  // [Aussage, Verneinung, Frage, Deutsch dreimal]
+  const SA = [
+    ['There is ___ milk in the fridge.', 'There isn’t ___ milk in the fridge.', 'Is there ___ milk in the fridge?', 'Im Kühlschrank ist etwas Milch.', 'Im Kühlschrank ist keine Milch.', 'Ist Milch im Kühlschrank?'],
+    ['I have got ___ apples.', 'I haven’t got ___ apples.', 'Have you got ___ apples?', 'Ich habe ein paar Äpfel.', 'Ich habe keine Äpfel.', 'Hast du Äpfel?'],
+    ['We need ___ eggs.', 'We don’t need ___ eggs.', 'Do we need ___ eggs?', 'Wir brauchen ein paar Eier.', 'Wir brauchen keine Eier.', 'Brauchen wir Eier?'],
+    ['There are ___ books on the table.', 'There aren’t ___ books on the table.', 'Are there ___ books on the table?', 'Auf dem Tisch liegen ein paar Bücher.', 'Auf dem Tisch liegen keine Bücher.', 'Liegen Bücher auf dem Tisch?'],
+    ['She has got ___ money.', 'She hasn’t got ___ money.', 'Has she got ___ money?', 'Sie hat etwas Geld.', 'Sie hat kein Geld.', 'Hat sie Geld?'],
+    ['Tom wants ___ water.', 'Tom doesn’t want ___ water.', 'Does Tom want ___ water?', 'Tom möchte etwas Wasser.', 'Tom möchte kein Wasser.', 'Möchte Tom Wasser?'],
+    ['They have got ___ friends in London.', 'They haven’t got ___ friends in London.', 'Have they got ___ friends in London?', 'Sie haben ein paar Freunde in London.', 'Sie haben keine Freunde in London.', 'Haben sie Freunde in London?'],
+    ['There is ___ juice in the bottle.', 'There isn’t ___ juice in the bottle.', 'Is there ___ juice in the bottle?', 'In der Flasche ist etwas Saft.', 'In der Flasche ist kein Saft.', 'Ist Saft in der Flasche?'],
+    ['I can see ___ birds in the garden.', 'I can’t see ___ birds in the garden.', 'Can you see ___ birds in the garden?', 'Ich sehe ein paar Vögel im Garten.', 'Ich sehe keine Vögel im Garten.', 'Siehst du Vögel im Garten?'],
+  ].map((z, t) => ['+', '-', '?'].map((art, k) => ({ t, art, satz: z[k], form: k ? 'any' : 'some', de: z[k + 3], text: z[k].replace('___', k ? 'any' : 'some') })));
+  const SAS = SA.flat();
+  const SA_ART = { '+': 'Das ist eine <b>Aussage</b>: Etwas ist da.', '-': 'Der Satz ist <b>verneint</b> (not oder n’t).', '?': 'Das ist eine <b>Frage</b>.' };
+  const saMark = (x) => `<span lang="en">${x.satz.replace('___', `<b class="vb">${x.form}</b>`)}</span>`;
+  const saLoesung = (x) => `${saMark(x)} ${U.say(x.text)}<br>${SA_ART[x.art]} Dann steht <b>${x.form}</b>.<br><small>Auf Deutsch: ${x.de}</small>`;
+  const SA_TIPP = '<b>some</b> steht in Aussagen: Es ist etwas da. <b>any</b> steht in Verneinungen (not, n’t) und in Fragen.';
+  const SAEX = (x) => ({ satz: x.satz, art: x.art, form: x.form, de: x.de });
+  // A: some oder any (Auswahl)
+  function saWahl() {
+    const x = pick(SAS);
+    return { prompt: `Was gehört in die Lücke?${en(x.satz)}`, choices: ['some', 'any'].map((c) => `<span lang="en">${c}</span>`), correct: x.form === 'some' ? 0 : 1, hint: SA_TIPP, solution: saLoesung(x), ex: SAEX(x) };
+  }
+  // B: eintippen
+  function saTippen() {
+    const x = pick(SAS), [a, b] = x.satz.split('___');
+    return { prompt: '<b>some</b> oder <b>any</b>? Tippe das passende Wort ein.', layout: 'satz', fields: [{ type: 'text', ci: true, answer: x.form, prefix: a.trim(), suffix: b.trim(), label: 'some oder any' }], hint: SA_TIPP, solution: saLoesung(x), ex: SAEX(x) };
+  }
+  // C: Welcher Satz ist richtig?
+  function saRichtig() {
+    const x = pick(SAS), falsch = x.satz.replace('___', x.form === 'some' ? 'any' : 'some'), ch = shuffle([x.text, falsch]);
+    return { prompt: 'Welcher Satz ist richtig?', choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(x.text), hint: SA_TIPP, solution: saLoesung(x), ex: SAEX(x) };
+  }
+  // D: umbauen – aus der Aussage wird eine Verneinung oder Frage
+  function saUmbau() {
+    const z = pick(SA), x = z[pick([1, 2])], [a, b] = x.satz.split('___');
+    return {
+      prompt: `Mach aus dem Satz eine <b>${x.art === '-' ? 'Verneinung' : 'Frage'}</b>. Welches Wort fehlt?${en(z[0].text)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: 'any', prefix: a.trim(), suffix: b.trim(), label: 'some oder any' }],
+      hint: 'In der Aussage steht some. Was wird daraus, wenn der Satz verneint ist oder eine Frage wird?',
+      solution: `<span lang="en">${z[0].text}</span> → ${saMark(x)} ${U.say(x.text)}<br>Aus <b>some</b> wird <b>any</b>: ${SA_ART[x.art]}<br><small>Auf Deutsch: ${x.de}</small>`, ex: SAEX(x),
+    };
+  }
+  // E: Was bedeutet der Satz?
+  function saBedeutung() {
+    const z = pick(SA), x = z[pick([0, 1])], ch = shuffle([z[0].de, z[1].de]);
+    return {
+      prompt: `Was bedeutet der Satz?${en(x.text)}`, choices: ch, correct: ch.indexOf(x.de),
+      hint: '<b>some</b> heißt „etwas“ oder „ein paar“. <b>not … any</b> heißt „kein, keine“.',
+      solution: `${saMark(x)} ${U.say(x.text)}<br>${x.art === '+' ? '<b>some</b> heißt „etwas“ oder „ein paar“.' : '<b>not … any</b> heißt „kein“ oder „keine“.'}<br><small>Auf Deutsch: ${x.de}</small>`, ex: SAEX(x),
+    };
+  }
+  const someAny = () => U.wahl([[26, saWahl], [24, saTippen], [16, saRichtig], [20, saUmbau], [14, saBedeutung]]);
+
+  // =====================================================
+  // much, many, a lot of
+  // =====================================================
+  // z: zählbar (true) oder nicht (false)
+  const MQ = [
+    ['apples', true, 'How ___ apples have you got?', 'Wie viele Äpfel hast du?'], ['books', true, 'How ___ books are on the table?', 'Wie viele Bücher liegen auf dem Tisch?'],
+    ['friends', true, 'How ___ friends has Tom got?', 'Wie viele Freunde hat Tom?'], ['eggs', true, 'How ___ eggs do we need?', 'Wie viele Eier brauchen wir?'],
+    ['pets', true, 'How ___ pets have you got?', 'Wie viele Haustiere hast du?'], ['pencils', true, 'How ___ pencils are in your bag?', 'Wie viele Bleistifte sind in deiner Tasche?'],
+    ['children', true, 'How ___ children are in your class?', 'Wie viele Kinder sind in deiner Klasse?'], ['bananas', true, 'How ___ bananas do you want?', 'Wie viele Bananen möchtest du?'],
+    ['water', false, 'How ___ water do you drink?', 'Wie viel Wasser trinkst du?'], ['milk', false, 'How ___ milk is in the fridge?', 'Wie viel Milch ist im Kühlschrank?'],
+    ['money', false, 'How ___ money have you got?', 'Wie viel Geld hast du?'], ['time', false, 'How ___ time have we got?', 'Wie viel Zeit haben wir?'],
+    ['homework', false, 'How ___ homework have you got?', 'Wie viele Hausaufgaben hast du?'], ['juice', false, 'How ___ juice do you want?', 'Wie viel Saft möchtest du?'],
+    ['bread', false, 'How ___ bread do we need?', 'Wie viel Brot brauchen wir?'], ['cheese', false, 'How ___ cheese is on the pizza?', 'Wie viel Käse ist auf der Pizza?'],
+  ];
+  const MN = [
+    ['eggs', true, 'There aren’t ___ eggs in the fridge.', 'Im Kühlschrank sind nicht viele Eier.'], ['friends', true, 'I haven’t got ___ friends in London.', 'Ich habe nicht viele Freunde in London.'],
+    ['books', true, 'We haven’t got ___ books.', 'Wir haben nicht viele Bücher.'], ['children', true, 'There aren’t ___ children in the park.', 'Im Park sind nicht viele Kinder.'],
+    ['milk', false, 'There isn’t ___ milk in the fridge.', 'Im Kühlschrank ist nicht viel Milch.'], ['time', false, 'I haven’t got ___ time.', 'Ich habe nicht viel Zeit.'],
+    ['money', false, 'We haven’t got ___ money.', 'Wir haben nicht viel Geld.'], ['water', false, 'There isn’t ___ water in the bottle.', 'In der Flasche ist nicht viel Wasser.'],
+  ];
+  const ML = [
+    ['friends', true, 'She has got ___ friends.', 'Sie hat viele Freunde.'], ['books', true, 'There are ___ books in my room.', 'In meinem Zimmer sind viele Bücher.'],
+    ['bananas', true, 'Tom eats ___ bananas.', 'Tom isst viele Bananen.'], ['homework', false, 'We have got ___ homework.', 'Wir haben viele Hausaufgaben.'],
+    ['water', false, 'There is ___ water in the lake.', 'Im See ist viel Wasser.'], ['tea', false, 'My dad drinks ___ tea.', 'Mein Papa trinkt viel Tee.'],
+  ];
+  const mm = (liste, lot) => liste.map(([wort, z, satz, de]) => { const form = lot ? 'a lot of' : z ? 'many' : 'much'; return { wort, z, satz, de, form, lot: !!lot, text: satz.replace('___', form) }; });
+  const MMQ = mm(MQ), MMN = mm(MN), MML = mm(ML, true), MMS = [...MMQ, ...MMN];
+  const MM_Z = [...new Map([...MQ, ...MN, ...ML, ['chairs', true], ['sandwiches', true], ['sugar', false], ['rice', false], ['butter', false]].map((x) => [x[0], x[1]])).entries()];
+  const mmWarum = (x) => (x.z ? `<b>${x.wort}</b> kann man <b>zählen</b> (one, two, three …).` : `<b>${x.wort}</b> kann man <b>nicht zählen</b>. Es hat keine Mehrzahl.`);
+  const mmMark = (x) => `<span lang="en">${x.satz.replace('___', `<b class="vb">${x.form}</b>`)}</span>`;
+  const mmLoesung = (x) => `${mmMark(x)} ${U.say(x.text)}<br>${mmWarum(x)} ${x.lot ? '<b>a lot of</b> passt zu beidem.' : `Dann heißt es <b>${x.form}</b>.`}<br><small>Auf Deutsch: ${x.de}</small>`;
+  const MM_TIPP = 'Kann man es <b>zählen</b> (one apple, two apples)? Dann <b>many</b>. Kann man es <b>nicht zählen</b> (water, money, time)? Dann <b>much</b>.';
+  const MMEX = (x) => ({ mode: 'satz', satz: x.satz, wort: x.wort, z: x.z, form: x.form, de: x.de, art: x.lot ? 'l' : x.satz.startsWith('How') ? 'q' : 'n' });
+  const mmCh = ['much', 'many'].map((c) => `<span lang="en">${c}</span>`);
+  // A: How much oder How many
+  function mmHow() {
+    const x = pick(MMQ);
+    return { prompt: `Was gehört in die Lücke?${en(x.satz)}`, choices: mmCh, correct: x.z ? 1 : 0, hint: MM_TIPP, solution: mmLoesung(x), ex: MMEX(x) };
+  }
+  // B: eintippen
+  function mmTippen() {
+    const x = pick(MMS), [a, b] = x.satz.split('___');
+    return { prompt: '<b>much</b> oder <b>many</b>? Tippe das passende Wort ein.', layout: 'satz', fields: [{ type: 'text', ci: true, answer: x.form, prefix: a.trim(), suffix: b.trim(), label: 'much oder many' }], hint: MM_TIPP, solution: mmLoesung(x), ex: MMEX(x) };
+  }
+  // C: zählbar oder nicht?
+  function mmZaehlbar() {
+    const [wort, z] = pick(MM_Z);
+    return {
+      prompt: `Kann man das zählen? <b lang="en">${wort}</b>`, choices: ['zählbar: Dazu passt many.', 'nicht zählbar: Dazu passt much.'], correct: z ? 0 : 1,
+      hint: 'Probiere es mit Zahlen: Kannst du „two …“ davor sagen? Dann ist es zählbar.',
+      solution: `${mmWarum({ wort, z })}<br>Deshalb: <b class="vb" lang="en">${z ? 'many' : 'much'} ${wort}</b>.`, ex: { mode: 'wort', wort, z },
+    };
+  }
+  // D: verneinte Sätze
+  function mmNeg() {
+    const x = pick(MMN);
+    return { prompt: `Was gehört in die Lücke?${en(x.satz)}`, choices: mmCh, correct: x.z ? 1 : 0, hint: MM_TIPP, solution: mmLoesung(x), ex: MMEX(x) };
+  }
+  // E: a lot of passt zu beidem
+  function mmLot() {
+    const x = pick(MML), falsch = x.z ? 'much' : 'many', ch = shuffle(['a lot of', falsch]);
+    return {
+      prompt: `Was gehört in die Lücke?${en(x.satz)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf('a lot of'),
+      hint: '<b>a lot of</b> heißt „viel, viele“ und passt immer. much passt nur zu Dingen, die man nicht zählt, many nur zu Dingen, die man zählt.',
+      solution: `${mmMark(x)} ${U.say(x.text)}<br>${mmWarum(x)} Deshalb passt <b>${falsch}</b> hier nicht. <b>a lot of</b> passt zu beidem.<br><small>Auf Deutsch: ${x.de}</small>`, ex: MMEX(x),
+    };
+  }
+  const muchMany = () => U.wahl([[24, mmHow], [24, mmTippen], [20, mmZaehlbar], [18, mmNeg], [14, mmLot]]);
+
+  Object.assign(D.daten, { SA, SAS, SA_ART, MMQ, MMN, MML, MMS, MM_Z });
+  const themenVorSome = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorSome(), {
+    'e5-some': SAS.map((x) => x.text),
+    'e5-much': [...MMQ, ...MMN, ...MML].map((x) => x.text),
+  });
+  Object.assign(D.arten, {
+    'e5-some': { saWahl, saTippen, saRichtig, saUmbau, saBedeutung },
+    'e5-much': { mmHow, mmTippen, mmZaehlbar, mmNeg, mmLot },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -2152,6 +2289,10 @@
         { id: 'e5-pp', title: 'present progressive: is playing', icon: '⏱️', gen: progressive },
         { id: 'e5-sp', title: 'simple oder progressive?', icon: '⚖️', gen: simpleProg },
         { id: 'e5-obj', title: 'me, him, her, us, them', icon: '🎯', gen: objektPron },
+      ] },
+      { id: 'e5-mengen', nr: 3, title: 'Mengen, Ort und Zeit', topics: [
+        { id: 'e5-some', title: 'some und any', icon: '🥛', gen: someAny },
+        { id: 'e5-much', title: 'much, many, a lot of', icon: '🧮', gen: muchMany },
       ] },
     ],
   };

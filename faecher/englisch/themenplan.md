@@ -53,8 +53,8 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 
 | Nr. | Thema | Beispiel-Aufgaben |
 |---|---|---|
-| 22 | some und any | „There isn’t ___ milk.“ · „Have you got ___ pets?“ |
-| 23 | much, many, a lot of | zählbar oder nicht: „How ___ apples?“ / „How ___ water?“ |
+| 22 | some und any (gebaut, v66) | „There isn’t ___ milk.“ · „Have you got ___ pets?“ |
+| 23 | much, many, a lot of (gebaut, v66) | zählbar oder nicht: „How ___ apples?“ / „How ___ water?“ |
 | 24 | Wo? in, on, under, next to, behind, in front of, between | Bild: Wo ist die Katze? |
 | 25 | Wann? at, on, in | „___ Monday“, „___ seven o’clock“, „___ July“ |
 | 26 | Zahlen, Ordnungszahlen, Datum, Uhrzeit | 12 → twelve · 3rd → third · „half past four“ → Uhr mit Zeigern |

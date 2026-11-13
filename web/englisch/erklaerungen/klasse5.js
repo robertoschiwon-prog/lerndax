@@ -1738,4 +1738,140 @@
       };
     },
   };
+
+  // =====================================================
+  // some und any: drei Fächer – Aussage, Verneinung, Frage
+  // =====================================================
+  //   ctx: { satz (mit ___), art:'+'|'-'|'?', form, de }
+  EX['e5-some'] = {
+    title: 'some und any',
+    titleFor: (ctx) => (ctx && ctx.post && ctx.form ? `Warum „${ctx.form}“?` : 'some und any'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!ctx.satz;
+      let S0 = null, frei = null, oben = null, kaesten = [];
+      const ARTEN = ['+', '-', '?'];
+      if (task) S0 = ctx.post ? ctx : U.pick(T.SAS.filter((x) => x.art === ctx.art && x.satz !== ctx.satz));
+      const neuFrei = () => { frei = U.pick(T.SA); };
+      if (!task) { neuFrei(); api.chips([{ label: 'Anderes Beispiel', onClick() { neuFrei(); api.replay(); } }]); }
+      const zeig = (teile) => { if (oben) oben.remove(); oben = tzeile(api, teile, 44, 18); };
+      const luecke = (x) => zeig([[x.satz]]);
+      const voll = (x) => { const [a, b] = x.satz.split('___'); zeig([[a], [x.form, BLAU], [b]]); };
+      function faecher() {
+        kaesten = [['+', 'Aussage', 'some'], ['– not', 'Verneinung', 'any'], ['?', 'Frage', 'any']].map(([z, name, form], i) => {
+          const x = 14 + i * 112;
+          const r = el('rect', { x, y: 78, width: 108, height: 122, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: x + 54, y: 110, 'text-anchor': 'middle', class: 'ex-b', text: z, style: `font-size:24px;fill:${ORANGE}` }, api.svg);
+          el('text', { x: x + 54, y: 134, 'text-anchor': 'middle', class: 'ex-s', text: name, style: 'font-size:13px' }, api.svg);
+          el('line', { x1: x + 14, y1: 146, x2: x + 94, y2: 146, stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+          el('text', { x: x + 54, y: 180, 'text-anchor': 'middle', class: 'ex-b', text: form, style: `font-size:24px;fill:${BLAU}` }, api.svg);
+          return r;
+        });
+      }
+      const leuchte = (i) => kaesten.forEach((r, k) => r.setAttribute('fill', k === i ? '#dfe9ff' : '#fff'));
+      async function loese(x, pause) {
+        leuchte(-1); luecke(x);
+        api.say('Schau zuerst: Was für ein Satz ist das?');
+        await api.wait(pause);
+        leuchte(ARTEN.indexOf(x.art));
+        api.say(`${T.SA_ART[x.art]} Dazu gehört <b>${x.form}</b>.`);
+        await api.wait(pause);
+        voll(x);
+        return `${x.satz.replace('___', `<b>${x.form}</b>`)} ${U.say(x.satz.replace('___', x.form))}<br><small>${x.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; faecher();
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          luecke(task ? S0 : frei[0]);
+        },
+        async play() {
+          if (task) { api.say(await loese(S0, 2600)); return; }
+          api.say('<b>some</b> und <b>any</b> heißen beide „etwas“ oder „ein paar“. Welches passt, hängt vom Satz ab.');
+          await api.wait(3200);
+          for (const x of frei) { api.say(await loese(x, 2000)); await api.wait(3400); }
+          leuchte(-1);
+          api.say('Merke: <b>some</b> in Aussagen, <b>any</b> in Verneinungen und Fragen.');
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // much, many, a lot of: zählbar oder nicht
+  // =====================================================
+  //   ctx: { mode:'satz', satz, wort, z, form, de, art:'q'|'n'|'l' } | { mode:'wort', wort, z }
+  EX['e5-much'] = {
+    title: 'much, many, a lot of',
+    titleFor: (ctx) => (ctx && ctx.post && ctx.form ? `Warum „${ctx.form}“?` : 'much, many, a lot of'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, frei = [], oben = null, kaesten = [], band = null;
+      const liste = (art) => (art === 'q' ? T.MMQ : art === 'n' ? T.MMN : T.MML);
+      if (mode === 'satz') S0 = ctx.post ? ctx : Object.assign({ art: ctx.art }, U.pick(liste(ctx.art).filter((x) => x.z === ctx.z && x.satz !== ctx.satz)));
+      if (mode === 'wort') S0 = ctx.post ? ctx : (() => { const [wort, z] = U.pick(T.MM_Z.filter((x) => x[1] === ctx.z && x[0] !== ctx.wort)); return { wort, z }; })();
+      const neuFrei = () => { frei = [U.pick(T.MMQ.filter((x) => x.z)), U.pick(T.MMQ.filter((x) => !x.z))]; };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const zeig = (teile) => { if (oben) oben.remove(); oben = tzeile(api, teile, 40, 18); };
+      function bild() {
+        kaesten = [
+          { x: 14, titel: 'zählbar', unter: 'one, two, three …', form: 'many', bsp: 'apples · books · friends' },
+          { x: 186, titel: 'nicht zählbar', unter: 'keine Mehrzahl', form: 'much', bsp: 'water · money · time' },
+        ].map((k) => {
+          const r = el('rect', { x: k.x, y: 62, width: 160, height: 104, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: k.x + 80, y: 83, 'text-anchor': 'middle', class: 'ex-b', text: k.titel, style: 'font-size:15px' }, api.svg);
+          el('text', { x: k.x + 80, y: 100, 'text-anchor': 'middle', class: 'ex-s', text: k.unter, style: `font-size:11.5px;fill:${GRAU}` }, api.svg);
+          el('text', { x: k.x + 80, y: 130, 'text-anchor': 'middle', class: 'ex-b', text: k.form, style: `font-size:24px;fill:${BLAU}` }, api.svg);
+          el('text', { x: k.x + 80, y: 154, 'text-anchor': 'middle', class: 'ex-s', text: k.bsp, style: 'font-size:11.5px' }, api.svg);
+          return r;
+        });
+        band = el('rect', { x: 14, y: 174, width: 332, height: 28, rx: 10, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+        const t = el('text', { x: 180, y: 193, 'text-anchor': 'middle', class: 'ex-s', style: 'font-size:12px' }, api.svg);
+        el('tspan', { text: 'a lot of', style: `fill:${BLAU}` }, t); el('tspan', { text: ' passt zu beidem (in Aussagen)' }, t);
+      }
+      const leuchte = (i, lot) => { kaesten.forEach((r, k) => r.setAttribute('fill', k === i ? '#dfe9ff' : '#fff')); band.setAttribute('fill', lot ? '#dfe9ff' : '#fff'); };
+      const warum = (x) => (x.z ? `<b>${x.wort}</b> kann man <b>zählen</b>: one, two, three …` : `<b>${x.wort}</b> kann man <b>nicht zählen</b>.`);
+      async function loese(x, pause) {
+        const [a, b] = x.satz.split('___');
+        leuchte(-1, false);
+        zeig([[x.satz]]);
+        api.say(`Schau auf das Wort hinter der Lücke: <b>${x.wort}</b>. Kann man das zählen?`);
+        await api.wait(pause);
+        leuchte(x.z ? 0 : 1, false);
+        api.say(`${warum(x)} ${x.z ? 'Linker Kasten: many.' : 'Rechter Kasten: much.'}`);
+        await api.wait(pause);
+        if (x.form === 'a lot of') leuchte(x.z ? 0 : 1, true);
+        zeig([[a], [x.form, BLAU], [b]]);
+        return `${a}<b>${x.form}</b>${b} ${U.say(x.satz.replace('___', x.form))}<br>${x.form === 'a lot of' ? `<b>a lot of</b> passt zu beidem. ${x.z ? 'much' : 'many'} wäre hier falsch.` : x.z ? 'Zählbar: <b>many</b>.' : 'Nicht zählbar: <b>much</b>.'}<br><small>${x.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; bild();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'wort') zeig([[S0.wort, ORANGE]]);
+          else if (mode === 'satz') zeig([[S0.satz]]);
+          else zeig([['much oder many?', BLAU]]);
+        },
+        async play() {
+          if (mode === 'wort') {
+            api.say(`Kann man <b>${S0.wort}</b> zählen? Probiere es mit „two ${S0.wort}“.`);
+            await api.wait(2800);
+            leuchte(S0.z ? 0 : 1, false);
+            zeig([[S0.z ? 'many ' : 'much ', BLAU], [S0.wort, ORANGE]]);
+            api.say(`${warum(S0)}<br>Deshalb: <b>${S0.z ? 'many' : 'much'} ${S0.wort}</b>.`);
+            return;
+          }
+          if (mode === 'satz') { api.say(await loese(S0, 2700)); return; }
+          api.say('<b>much</b> und <b>many</b> heißen beide „viel“. Welches passt, hängt vom Wort dahinter ab.');
+          await api.wait(3200);
+          for (const x of frei) { api.say(await loese(x, 2200)); await api.wait(3800); }
+          leuchte(-1, true);
+          api.say('Und <b>a lot of</b> passt zu beidem: a lot of apples, a lot of water.');
+        },
+      };
+    },
+  };
 })();
