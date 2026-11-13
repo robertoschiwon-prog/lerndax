@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 12.11.2026, Version `lerndax-v54`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v56`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -33,6 +33,36 @@ Weitere Dokumente:
 - Wartet auf den Auftraggeber: ISBN und Foto des Inhaltsverzeichnisses vom **Deutschbuch** (Schulbuch-Abgleich DeDax),
   Rückmeldungen aus dem Test mit dem Kind (MaDax am 13.11.2026 geplant; DeDax hat außer „Zeitformen“ noch niemand
   durchgespielt, die Knobel-Aufgaben und ihre Texte hat noch kein Mensch gegengelesen).
+- **EnDax, Stand 12.11.2026 spät:** Lehrplan Englisch Klassenstufen 5/6 am Originaltext ausgewertet
+  (`faecher/englisch/lehrplan/sachsen-gymnasium.md`). Wichtig: Klasse 5 und 6 sind dort **gemeinsam** beschrieben, die
+  Aufteilung auf Klasse 5 macht das Schulbuch. Als Nächstes: offene Fragen einzeln klären (zuerst das Schulbuch), dann Themenplan.
+  **Entscheidungen des Auftraggebers:** Schulbuch noch unbekannt (wird nachgereicht); Start mit **Grammatik vom
+  Schuljahresanfang**; App-Sprache **Deutsch**; Vorlesen **erst ausprobieren** (Probeseite als Claude-Artifact
+  „EnDax – Probe: Vorlesen“, wartet auf Anhören am iPhone). **Themenplan als Vorschlag:** `faecher/englisch/themenplan.md`
+  (29 Grammatik-Themen in 4 Bereichen, dazu Wörter, Alltag/Lesen), wartet auf Zustimmung. Danach: Apostroph in `fach.js`,
+  dann Thema 1 „to be: am, is, are“ ganz fertig bauen. Hochgeladen am 13.11.2026.
+  **Vorlesen:** Die Stimme des Geräts (Sprachausgabe des Browsers) hat der Auftraggeber **abgelehnt**. Jetzt wird geprüft,
+  ob fertige Aufnahmen taugen: Kokoro (freie Sprachausgabe, Apache-2.0, läuft ohne Konto), britische Stimmen, rund 6–18 KB
+  je Wort oder Satz als MP3. Hörprobe mit vier Stimmen als Claude-Artifact „EnDax – Hörprobe: aufgenommene Stimmen“,
+  wartet auf sein Urteil. Aufnahmen gehen nur für **feste** Wörter und Sätze, nicht für zufällig zusammengesetzte.
+  Am Code wurde nichts geändert (Version bleibt `lerndax-v54`).
+- **EnDax v55 (12.11.2026 nachts): erstes Thema „to be: am, is, are“ gebaut** (`web/englisch/`, erreichbar unter `…/lerndax/englisch/`,
+  steht noch **nicht** auf der Startseite: `faecher.js` bleibt „geplant“). 8 Aufgabenarten, 34 feste Sätze, Animation
+  „drei Fächer: am, is, are“ (frei, ähnliches Beispiel, Lösung zur Aufgabe), Symbol, Test `tests/endax.py`.
+  **Ton entschieden:** Stimme **„Frau B“** = Kokoro `af_bella` (amerikanisch; die britischen Stimmen gefielen nicht).
+  Aufnahmen als MP3 in `web/englisch/audio/k5/` (56 Dateien, 496 KB), erzeugt mit `tests/endax_audio.py`.
+  Neu in der gemeinsamen App (`fach.js`, `fach.css`): Lautsprecher-Knopf (`data-say`, Einstellung `audio` im Fach) und
+  Apostroph „’“ = „'“ beim Prüfen. Geschrieben wird britisch, gesprochen amerikanisch (dem Auftraggeber gesagt).
+  Aufnahmen stehen **nicht** in der Offline-Liste von `sw.js`; sie werden beim ersten Anhören gespeichert.
+  (Am 12.11. noch nicht auf GitHub, hochgeladen am 13.11. zusammen mit v56.)
+  Zum Ausprobieren gibt es eine Vorschau als Claude-Artifact „EnDax – Vorschau: to be“ (ohne Konto und Synchronisation).
+  Wartet auf: Urteil des Auftraggebers zum Thema und zum Themenplan, Englischbuch, Hochladen auf GitHub.
+- **EnDax v56 (13.11.2026 früh): Umschalter „Aussprache“ amerikanisch / britisch** (Wunsch des Auftraggebers).
+  Auf der Startseite von EnDax, gilt je Gerät (`localStorage`, Schlüssel `lerndax.englisch.akzent`), Voreinstellung amerikanisch.
+  Amerikanisch = `af_bella` („Frau B“), britisch = `bm_fable` („Mann 2“, vom Auftraggeber so gewählt, er fand ihn „einigermaßen“).
+  Britische Aufnahmen in `web/englisch/audio/k5-gb/` (56 Dateien, 725 KB). `F.audio` kann jetzt eine Liste sein.
+  **Seit 13.11.2026 auf GitHub und live (v55 und v56 zusammen hochgeladen)**, mit ausdrücklichem Ja des Auftraggebers.
+  Das Vorschau-Artifact „EnDax – Vorschau: to be“ wird damit nicht mehr gebraucht.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1031,3 +1061,15 @@ Infos zur ersten Arbeit:
 - **Übergabe für EnDax vorbereitet** (12.11.2026, keine Änderung an der App, Version bleibt `lerndax-v54`): neuer
   Startpunkt `faecher/englisch/README.md`; Abschnitt 0 beginnt jetzt mit der Kurzfassung für den neuen Chat;
   `faecher/README.md` und `faecher/deutsch/README.md` auf den heutigen Stand gebracht.
+- **EnDax begonnen** (12.11.2026 spät, keine Änderung an der App, Version bleibt `lerndax-v54`): Lehrplan Englisch
+  Klassenstufen 5/6 am Originaltext ausgewertet (`faecher/englisch/lehrplan/sachsen-gymnasium.md`). Noch **nicht auf GitHub**
+  (in dieser Sitzung kein Schreibzugriff auf das Repository), liegt nur im OneDrive-Ordner.
+- **v55: EnDax, erstes Thema „to be: am, is, are“** (12.11.2026 nachts). Neu: `web/englisch/` (Themen, Erklärung, Symbol,
+  56 Aufnahmen), `tests/endax.py`, `tests/endax_audio.py`. Gemeinsame App: Anhören-Knopf und Apostroph-Regel.
+  Geprüft: 4800 erzeugte Aufgaben ohne Fehler; `tests/endax.py` (12 Runden: richtige Antwort angenommen, falsche führt zur
+  Lösung, Animation nennt die Antwort, nichts ragt aus dem Bild, jede Aufnahme vorhanden). Tests für Mathe und Deutsch nach der Änderung an `fach.js` ohne Fehler: `ui2` (576 Aufgaben), `loesung` (108 Animationen), `knobel`, `dedax` (2 Runden, 360 Antworten, 120 Animationen), `dedax_knobel` (430), `eltern`, `training`, `hub`. Nicht gelaufen: `sync_test`, `design_audit`, `bild_audit`.
+  Die Aufnahmen hat nur der Auftraggeber in der Hörprobe gehört (9 Beispielsätze), die 56 Dateien selbst noch niemand.
+- **v56: Umschalter „Aussprache“ in EnDax** (13.11.2026). `fach.js`/`fach.css`: `F.audio` als Liste `[{ id, name, pfad }]`,
+  Umschalter auf der Startseite des Fachs. Britische Aufnahmen (`bm_fable`) in `audio/k5-gb/`. `tests/endax_audio.py` erzeugt
+  beide Sätze, `tests/endax.py` prüft beide Ordner und den Umschalter. Tests: endax (8 Runden) ohne Fehler; Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden, 360 Antworten), `eltern`.
+  Die britischen Aufnahmen hat noch niemand angehört.

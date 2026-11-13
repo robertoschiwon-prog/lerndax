@@ -1,15 +1,15 @@
 # EnDax (Englisch) – Startpunkt
 
-Stand 12.11.2026: **noch nichts gebaut.** Diese Datei sagt, was feststeht, was zu klären ist und wie man anfängt.
+Stand 12.11.2026 (nachts): Lehrplan ausgewertet, Themenplan als Vorschlag, **Thema 1 gebaut**, Ton entschieden. Diese Datei sagt, was feststeht, was zu klären ist und wie man anfängt.
 Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. Vorbild für alles: DeDax
 (`faecher/deutsch/README.md`, `web/deutsch/`).
 
 | Schritt | Stand | Datei |
 |---|---|---|
-| 1 Lehrplan auswerten | offen | `lehrplan/sachsen-gymnasium.md` (anlegen) |
+| 1 Lehrplan auswerten | **erledigt (12.11.2026)**. Wichtig: Klasse 5 und 6 sind gemeinsam beschrieben, die Aufteilung macht das Schulbuch | `lehrplan/sachsen-gymnasium.md` |
 | 2 Schulbuch abgleichen | offen: Titel, Ausgabe, ISBN und Foto des Inhaltsverzeichnisses fehlen | `lehrplan/schulbuch-abgleich.md` (anlegen) |
-| 3 Themenplan | offen | `themenplan.md` (anlegen) |
-| 4 Themen bauen | offen | `web/englisch/` (anlegen), Test nach Vorbild `tests/dedax.py` |
+| 3 Themenplan | **Vorschlag liegt vor (12.11.2026)**, wartet auf Zustimmung; Entscheidungen stehen dort | `themenplan.md` |
+| 4 Themen bauen | **Thema 1 „to be: am, is, are“ gebaut (v55, 12.11.2026)**, wartet auf Rückmeldung; die übrigen offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
 
 ## Was feststeht
 
@@ -105,3 +105,22 @@ Deutsch laufen lassen, weil es die gemeinsame App betrifft):
    `undefined`, doppelte Auswahl, leere Antworten prüfen) **und** in der App durchspielen (`tests/dedax.py` als Vorbild).
 5. Bildschirmfotos ansehen, nicht nur Tests lesen: lange Wörter und Sätze laufen auf dem Handy (390 px) schnell über den Rand.
 6. In SVG-Animationen: Elemente mit den Klassen `ex-b`/`ex-s` bekommen ihre Farbe über `style.fill`, nicht über das Attribut.
+
+## Ton: so ist es entschieden und gebaut (12.11.2026)
+
+- Die Sprachausgabe des Geräts (Browser) hat der Auftraggeber **abgelehnt**. Nicht wieder vorschlagen.
+- Stattdessen **fertige Aufnahmen**: Kokoro v1.0 (frei, Apache-2.0), Stimme **`af_bella`** („Frau B“ der Hörprobe), Tempo 0.9.
+  Die britischen Stimmen gefielen nicht (bei den Männern ein Nachklang nach „She“). Deshalb: **gesprochen amerikanisch,
+  geschrieben britisch**.
+- Jeder englische Satz, der vorgelesen werden soll, muss in einer **festen Liste** stehen und in `EnDax.audioTexte()`
+  auftauchen. `python3 tests/endax_audio.py <Modell-Ordner>` erzeugt fehlende Dateien `web/englisch/audio/k5/<slug>.mp3`.
+  Der Test `tests/endax.py` meldet fehlende Aufnahmen.
+- In Aufgaben: `U.say(text)` liefert den Lautsprecher-Knopf. **Nicht** in die Aufgabenstellung setzen, wenn das Anhören
+  die Lösung verrät (Lücken). Im Lösungsweg und in der Animation immer.
+- **Seit v56 zwei Aussprachen zur Wahl** (Wunsch des Auftraggebers, 13.11.2026): Umschalter auf der Startseite von EnDax.
+  Amerikanisch `af_bella` in `audio/k5/` (Voreinstellung), britisch **`bm_fable`** („Mann 2“) in `audio/k5-gb/`.
+  Jede neue Aufnahme muss es in beiden Ordnern geben (macht `endax_audio.py` von selbst, der Test prüft es).
+- Offen: Aufnahmen in die Offline-Liste von `sw.js`? Bisher werden sie erst beim ersten Anhören gespeichert.
+- Hinweis: Beim Zurückschreiben aus einer Claude-Sitzung bekommt jede MP3 automatisch einen eingebetteten Herkunftsvermerk
+  (C2PA „Content Credentials“, rund 6 KB im ID3-Teil). Der Ton selbst bleibt gleich. Die Dateien im Ordner sind deshalb
+  etwas größer als frisch erzeugte; das ist kein Fehler.

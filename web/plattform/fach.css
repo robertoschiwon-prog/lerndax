@@ -592,3 +592,14 @@ body.noscroll{overflow:hidden}
 .tbl th,.tbl td{border:2px solid #cfc8ba;padding:5px 6px;text-align:center}
 .tbl th{text-align:left;background:#e9e3d6}
 .bsp svg{display:block;margin-top:6px}
+
+/* Anhören: Lautsprecher-Knopf an englischen Sätzen (fach.js, data-say) */
+.say{display:inline-grid;place-items:center;width:38px;height:38px;vertical-align:middle;margin:0 2px;padding:0;border:2px solid var(--ink);border-radius:50%;background:var(--card);box-shadow:2px 2px 0 var(--ink);font-size:17px;line-height:1}
+.say:active{transform:translate(2px,2px);box-shadow:none}
+.say.on{background:#d9f3e8}
+.say.err{opacity:.45}
+/* Umschalter „Aussprache“ auf der Startseite eines Fachs (fach.js, F.audio als Liste) */
+.akzent{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:22px 0 4px;font-size:14px;font-weight:700}
+.akzent span{margin-right:2px}
+.akzent button{font:inherit;padding:7px 14px;border:2px solid var(--ink);border-radius:999px;background:var(--card);color:var(--ink)}
+.akzent button.on{background:var(--ink);color:#fff}

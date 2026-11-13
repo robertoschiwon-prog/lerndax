@@ -1,0 +1,97 @@
+# EnDax Klasse 5 – Themenplan (Vorschlag)
+
+Stand 12.11.2026. Grundlage: `lehrplan/sachsen-gymnasium.md`. **Das Schulbuch ist noch nicht bekannt**; der Lehrplan
+beschreibt Klasse 5 und 6 gemeinsam. Die Auswahl für Klasse 5 ist deshalb eine begründete Annahme (das, was in den
+üblichen Büchern in Klasse 5 steht) und wird mit dem Buch abgeglichen, sobald Titel und Inhaltsverzeichnis da sind.
+
+## Entscheidungen des Auftraggebers (12.11.2026)
+
+| Frage | Entscheidung |
+|---|---|
+| Schulbuch | noch unbekannt, wird nachgereicht (Titel, ISBN, Foto Inhaltsverzeichnis) |
+| Womit anfangen | **Grammatik vom Schuljahresanfang** |
+| Sprache der App | **Deutsch** (Aufgabenstellung, Tipp, Lösungsweg); nur die Übungssätze sind englisch |
+| Vorlesen | **Ja, mit fertigen Aufnahmen**, Stimme des Geräts abgelehnt. **Zwei Aussprachen zur Wahl** (Umschalter auf der Startseite): amerikanisch „Frau B“ (Kokoro `af_bella`, Voreinstellung), britisch „Mann 2“ (`bm_fable`). Einzelheiten in `README.md`, Abschnitt „Ton“. |
+| Vokabeln (eigene Listen oder selbst eintragen) | noch offen, wird vor Bereich 3 gefragt |
+
+Festgelegt ohne Rückfrage (kann geändert werden): britische **Schreibweise** als Standard (gesprochen wird amerikanisch oder britisch, siehe Vorlesen); amerikanische Schreibweisen
+(color, favorite) werden beim Eintippen als richtig angenommen. Kurz- und Langform (isn’t / is not) gelten beide,
+wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ und „'“ zählen gleich.
+
+## Bereich 1: Erste Bausteine (12 Themen) – damit fängt EnDax an
+
+| Nr. | Thema | Beispiel-Aufgaben |
+|---|---|---|
+| 1 | **to be: am, is, are** (gebaut, v55) | Lücke: „She ___ my sister.“ (am / is / are) · Kurzform eintippen: „I am“ → I’m · Welcher Satz stimmt? „We is friends.“ / „We are friends.“ |
+| 2 | Personalpronomen (I, you, he, she, it, we, they) | Ersetze: „**Tom and I** are late.“ → We · „**The dog** is brown.“ → It · Wer ist gemeint? „they“ → mehrere |
+| 3 | to be: verneinen und fragen | Verneine: „He is ten.“ → He isn’t ten. · Bau die Frage: „you / are / ready / ?“ · Kurzantwort: „Is she at home?“ – „Yes, she ___.“ |
+| 4 | have got / has got | Lücke: „My brother ___ got a bike.“ · Verneine: „I have got a pet.“ · Frage: „___ you got a pen?“ |
+| 5 | a oder an | „___ apple“, „___ book“, „___ hour“ (es zählt der Laut, nicht der Buchstabe) |
+| 6 | Mehrzahl (Plural) | Tippe die Mehrzahl: box → boxes, baby → babies, child → children · Welches Wort ist falsch geschrieben? |
+| 7 | there is / there are | „___ two cats in the garden.“ · Bild-Aufgabe: Was liegt auf dem Tisch? |
+| 8 | this, that, these, those | nah oder fern, eins oder mehrere: „___ books over there“ |
+| 9 | my, your, his, her … (Possessivbegleiter) | „Lisa has got a dog. ___ dog is black.“ · he → his, they → their · its oder it’s? |
+| 10 | Wem gehört es? ’s und of | „the bike of Ben“ → Ben’s bike · „the girls’ room“: ein Mädchen oder mehrere? |
+| 11 | Aufforderungen (Imperativ) | „Open the window.“ verneinen → Don’t open the window. · Was passt im Klassenraum? |
+| 12 | can und must | „I ___ swim.“ (kann) · can’t oder mustn’t? · Frage bauen: „you / can / ride / a horse / ?“ |
+
+## Bereich 2: Sätze im present simple und present progressive (9 Themen)
+
+| Nr. | Thema | Beispiel-Aufgaben |
+|---|---|---|
+| 13 | present simple: Aussagen (he, she, it – das s muss mit) | „Tom ___ (play) football.“ · go → goes, watch → watches, carry → carries |
+| 14 | present simple: verneinen (don’t / doesn’t) | „She likes tea.“ → She doesn’t like tea. · don’t oder doesn’t? |
+| 15 | present simple: Fragen mit do / does, Kurzantworten | „___ your sister play tennis?“ – „No, she ___.“ |
+| 16 | Fragewörter (who, what, where, when, why, how) | Welches Fragewort passt zur Antwort „At eight o’clock.“? |
+| 17 | Satzbau: wer – tut – was – wo – wann | Wörter in die richtige Reihenfolge bringen *(neue Aufgabenform)* |
+| 18 | Wie oft? always, often, sometimes, never | An welche Stelle gehört „often“? (Stelle antippen) |
+| 19 | present progressive (am/is/are + -ing) | „Look! The dog ___ (run).“ · -ing-Form: make → making, sit → sitting |
+| 20 | simple oder progressive? | Signalwörter: every day, now, at the moment, on Mondays |
+| 21 | me, him, her, us, them (Objektpronomen) | „I like Ben.“ → I like him. · he oder him? |
+
+## Bereich 3: Mengen, Ort und Zeit (5 Themen)
+
+| Nr. | Thema | Beispiel-Aufgaben |
+|---|---|---|
+| 22 | some und any | „There isn’t ___ milk.“ · „Have you got ___ pets?“ |
+| 23 | much, many, a lot of | zählbar oder nicht: „How ___ apples?“ / „How ___ water?“ |
+| 24 | Wo? in, on, under, next to, behind, in front of, between | Bild: Wo ist die Katze? |
+| 25 | Wann? at, on, in | „___ Monday“, „___ seven o’clock“, „___ July“ |
+| 26 | Zahlen, Ordnungszahlen, Datum, Uhrzeit | 12 → twelve · 3rd → third · „half past four“ → Uhr mit Zeigern |
+
+## Bereich 4: Vergangenheit, erster Einstieg (3 Themen) – nur wenn das Buch es in Klasse 5 hat
+
+| Nr. | Thema | Beispiel-Aufgaben |
+|---|---|---|
+| 27 | was und were | „Yesterday we ___ at the zoo.“ |
+| 28 | past simple: regelmäßige Verben (-ed) | play → played, stop → stopped, carry → carried |
+| 29 | past simple: wichtige unregelmäßige Verben | go → went, see → saw, have → had |
+
+## Bereich 5: Wörter (Wortfelder, im Lehrplan „bevorzugt Klasse 5“)
+
+Family · house and home · school and classroom · daily routine · clothes · free time and hobbies · pets and animals ·
+parts of the body · food and drink · colours · days, months, seasons.
+Je Wortfeld: Bedeutung wählen, Wort eintippen, Wort im Satz, was passt nicht dazu.
+Eigene Wortlisten nach Themen, nichts aus dem Schulbuch übernommen. **Vorher klären:** Vokabeln selbst eintragen können?
+
+## Bereich 6: Sprechen im Alltag und Lesen
+
+Sich vorstellen, begrüßen, danken, im Klassenraum, einkaufen, nach dem Weg fragen, telefonieren (passende Antwort
+wählen, Dialog ordnen) · kurze selbst geschriebene Texte mit Fragen · Alphabet und Buchstabieren · Lautschrift lesen.
+
+## „Entdecken“ (Ideen)
+
+Warum heißt es „an hour“? · Englische Wörter im Deutschen · Falsche Freunde (become, gift, chef) · Warum schreibt man
+„knight“ mit k? · British und American English · Pfund und Pence · Schule in Großbritannien · Feiertage.
+
+## Nicht in Klasse 5 geplant (laut Annahme Klasse 6)
+
+Steigerung, will/going to, should/could/would/may, Bedingungssätze, present perfect, past progressive,
+Adverbien der Art und Weise, mine/yours.
+
+## Reihenfolge beim Bauen
+
+1. Hörprobe mit aufgenommenen Stimmen (Entscheidung: Ton ja/nein, welche Stimme).
+2. Kleine Erweiterung der gemeinsamen App: Apostroph „’“ = „'“ (danach alle Tests für Mathe und Deutsch).
+3. **Thema 1 „to be: am, is, are“ ganz fertig** (Aufgaben, Tipp, Lösungsweg, Animation, Symbol, Test), zeigen.
+4. Danach Bereich 1 der Reihe nach, dann Bereich 2 (dafür neue Aufgabenform „Wörter in Reihenfolge bringen“).

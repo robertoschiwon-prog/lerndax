@@ -9,6 +9,8 @@
  *   dachs, dachsKlein, dachsStaunt: Bilder des Fach-Dachses
  *   entdecken:     Reihenfolge der Entdeckungen; entdeckenText, entdeckenKurz: Texte dazu
  *   andereKlassen: { 6: ['Lernbereich …'] } für „Klasse 6 kommt bald“
+ *   audio:         Ordner mit Aufnahmen (optional, z. B. 'audio/k5/'); Knöpfe mit data-say="name" spielen <audio>name.mp3.
+ *                  Oder eine Liste zur Auswahl [{ id, name, pfad }]: dann zeigt die Startseite des Fachs einen Umschalter „Aussprache“.
  * Das Aussehen steht in fach.css.
  */
 (function () {
@@ -105,7 +107,8 @@
   // Wörter als Antwort (type:'text'): f.answer ist ein Wort oder eine Liste erlaubter Schreibweisen.
   // Groß- und Kleinschreibung zählt (außer f.ci), Leerzeichen am Rand und doppelte Leerzeichen nicht.
   const textAnswers = (f) => [].concat(f.answer).map(String);
-  const normText = (s, f) => { s = String(s).trim().replace(/\s+/g, ' ').replace(/[.!?]+$/, ''); return f.ci ? s.toLocaleLowerCase('de') : s; };
+  // Apostrophe gelten alle gleich: Das Handy tippt „’“ statt „'“ (don’t).
+  const normText = (s, f) => { s = String(s).trim().replace(/[’‘`´]/g, "'").replace(/\s+/g, ' ').replace(/[.!?]+$/, ''); return f.ci ? s.toLocaleLowerCase('de') : s; };
   const textOk = (v, f) => textAnswers(f).some((a) => normText(a, f) === normText(v, f));
   const cleanTok = (s) => String(s).replace(/[.,!?:;„“"]+/g, '');
 
@@ -234,6 +237,7 @@
   }
 
   function home() {
+    sayStop();
     if (TR) return trainingHome();
     VIEW = 'home'; $app.dataset.view = VIEW;
     const weak = weakTopics();
@@ -259,6 +263,7 @@
           ${zu ? `<button class="btn lbzu" data-lbopen="${lb.id}">Geschafft! Themen anzeigen ↓</button>` : `<div class="topics">${lb.topics.map((t) => topicTile(t, lb.nr)).join('')}</div>`}
         </section>`; }).join('')}
       ${discoverHtml()}
+      ${akzentWahl()}
       <div class="foot"><button class="btn ghost" data-go="parents">Für Eltern: Fortschritt ansehen</button></div>`;
     bindName();
   }
@@ -327,6 +332,7 @@
   }
 
   function nextTask() {
+    sayStop();
     if (R.idx >= R.seq.length) return result();
     const topic = R.seq[R.idx];
     let task;
@@ -860,11 +866,47 @@
     renderSyncCard();
   });
 
+  // ---------- Anhören ----------
+  // Ein Knopf mit data-say="<name>" spielt die Aufnahme <Ordner><name>.mp3 (fertige Dateien des Fachs, keine Gerätestimme).
+  // F.audio ist ein Ordner oder eine Liste zur Auswahl: [{ id:'us', name:'amerikanisch', pfad:'audio/k5/' }, …].
+  // Die Wahl gilt für dieses Gerät (localStorage), der erste Eintrag ist die Voreinstellung.
+  const AKZENT_KEY = 'lerndax.' + F.id + '.akzent';
+  const AKZENTE = Array.isArray(F.audio) ? F.audio : null;
+  function akzent() {
+    if (!AKZENTE) return null;
+    let id = null; try { id = localStorage.getItem(AKZENT_KEY); } catch (e) {}
+    return AKZENTE.find((a) => a.id === id) || AKZENTE[0];
+  }
+  const audioPfad = () => (AKZENTE ? akzent().pfad : F.audio);
+  function akzentWahl() {
+    if (!AKZENTE || AKZENTE.length < 2) return '';
+    const jetzt = akzent().id;
+    return `<div class="akzent" role="group" aria-label="Aussprache"><span>🔊 Aussprache</span>${AKZENTE.map((a) =>
+      `<button type="button" class="${a.id === jetzt ? 'on' : ''}" data-akzent="${a.id}" aria-pressed="${a.id === jetzt}">${a.name}</button>`).join('')}</div>`;
+  }
+  let SAYER = null, SAYBTN = null;
+  function sayStop() { if (SAYER) { try { SAYER.pause(); } catch (e) {} } if (SAYBTN) SAYBTN.classList.remove('on'); SAYBTN = null; }
+  function say(name, btn) {
+    if (!F.audio || !/^[a-z0-9-]+$/.test(name)) return;
+    const war = SAYBTN === btn;
+    sayStop();
+    if (war) return; // zweites Tippen hält an
+    try {
+      if (!SAYER) { SAYER = new Audio(); SAYER.addEventListener('ended', sayStop); SAYER.addEventListener('error', () => { if (SAYBTN) SAYBTN.classList.add('err'); sayStop(); }); }
+      SAYER.src = audioPfad() + name + '.mp3';
+      SAYBTN = btn; btn.classList.remove('err'); btn.classList.add('on');
+      const p = SAYER.play();
+      if (p && p.catch) p.catch(() => { btn.classList.add('err'); sayStop(); });
+    } catch (e) { sayStop(); }
+  }
+
   // ---------- Ereignisse ----------
   document.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
     const d = b.dataset;
+    if (d.say) { say(d.say, b); return; }
+    if (d.akzent) { try { localStorage.setItem(AKZENT_KEY, d.akzent); } catch (e) {} sayStop(); home(); return; }
     if (d.go === 'home' && b.classList.contains('x') && VIEW === 'task' && R && (R.results.length || (R.cur && (R.cur.done || R.cur.attempt > 1)))) quitAsk();
     else if (d.go === 'home') { R = null; home(); window.scrollTo(0, 0); }
     else if (d.go === 'parents') { PTAB = 'fort'; parents(false); window.scrollTo(0, 0); }
