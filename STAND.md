@@ -23,6 +23,12 @@ Weitere Dokumente:
 
 ## 0. Übergabe vom 13.11.2026 abends: GeDax gebaut (`lerndax-v87`)
 
+- **BioDax begonnen (13.11. nachts, nur Doku, App unverändert v87):** Lehrplan Biologie Klasse 5 am Originaltext ausgewertet
+  (`faecher/bio/lehrplan/sachsen-gymnasium.md`, Startpunkt `faecher/bio/README.md`). Wichtig: Es gilt die **Fassung 2025**
+  (Klasse 5–10 seit 1.8.2025), das Buch LINDER 5 ist von 2020. Sieben Lernbereiche: Merkmale des Lebens, Fische, Lurche,
+  Kriechtiere, Vögel, Säugetiere (mit Fortpflanzung des Menschen), Systematisierung; drei Wahlbereiche.
+  **Wartet auf Roberto:** Fotos Inhaltsverzeichnis LINDER 5, aktuelles Kapitel. Danach Themenplan, dann bauen.
+
 - **GeDax (Geschichte) Klasse 5 ist gebaut und live** (Auftrag Roberto: „Baue alles, frage wenig nach. Wir schauen später drüber.“).
   31 Themen in 5 Bereichen = Kapitel von ANNO 1 (Begegnungen mit Geschichte, Frühgeschichte, Ägypten, Griechische Polis,
   Längsschnitt Mensch und Natur), Entdecken (5: Erdgeschichte als ein Tag, Steinzeit-Brunnen/Jahresringe, C-14-Uhr, wandernder
