@@ -773,6 +773,13 @@
     [1, 'five apples', 'in my bag', 'In meiner Tasche sind fünf Äpfel.', 5],
     [1, 'twenty desks', 'in our classroom', 'In unserem Klassenzimmer stehen zwanzig Tische.', 0],
     [1, 'some pens', 'in the box', 'In der Kiste sind ein paar Stifte.', 0],
+    // Klassenzimmer und Bücherei (Green Line 1, Unit 1, Station 2)
+    [0, 'a clock', 'on the wall', 'An der Wand hängt eine Uhr.', 1],
+    [0, 'a map', 'next to the door', 'Neben der Tür hängt eine Landkarte.', 1],
+    [0, 'a noticeboard', 'behind the desk', 'Hinter dem Pult ist eine Pinnwand.', 1],
+    [1, 'computers', 'in the library', 'In der Bücherei gibt es Computer.', 0],
+    [1, 'two laptops', 'on the desk', 'Auf dem Pult liegen zwei Laptops.', 2],
+    [1, 'magazines', 'in the reading corner', 'In der Leseecke gibt es Zeitschriften.', 0],
   ].map(([g, was, wo, de, n]) => ({ g, form: TFORM[g], was, wo, de, n, text: `There ${TFORM[g]} ${was} ${wo}.` }));
   const TH1 = TH.filter((s) => s.g === 0);
   const TQ = TH.filter((s) => !s.was.startsWith('some'));   // Fragen: ohne „some“ (in Fragen stünde „any“)
@@ -2864,7 +2871,12 @@
     ['pen', 'Kuli oder Füller'], ['pencil', 'Bleistift', { bild: '✏️' }], ['rubber', 'Radiergummi', { alt: ['eraser'] }], ['ruler', 'Lineal', { bild: '📏' }],
     ['pencil case', 'Federmappe'], ['schoolbag', 'Schultasche', { alt: ['school bag', 'backpack', 'rucksack'], bild: '🎒' }], ['exercise book', 'Heft'], ['book', 'Buch', { bild: '📕' }],
     ['board', 'Tafel'], ['homework', 'Hausaufgaben'], ['lesson', 'Unterrichtsstunde'], ['break', 'Pause'], ['subject', 'Schulfach'], ['timetable', 'Stundenplan'], ['scissors', 'Schere', { bild: '✂️' }], ['glue', 'Kleber'],
+    ['desk', 'Pult, Schreibtisch'], ['clock', 'Uhr (an der Wand)', { bild: '🕰️' }], ['noticeboard', 'Pinnwand, Schwarzes Brett', { alt: ['notice board'] }], ['map', 'Landkarte', { bild: '🗺️' }],
+    ['library', 'Bücherei, Bibliothek'], ['magazine', 'Zeitschrift'], ['newspaper', 'Zeitung', { bild: '📰' }],
   ], [
+    ['The ___ on the wall says it’s ten o’clock.', 'clock', ['map', 'desk', 'glue'], 'Die Uhr an der Wand zeigt zehn Uhr.'],
+    ['There are lots of books in the ___.', 'library', ['clock', 'glue', 'ruler'], 'In der Bücherei gibt es viele Bücher.'],
+    ['Look at the ___ next to the door. There is information on it.', 'noticeboard', ['ruler', 'glue', 'clock'], 'Schau auf die Pinnwand neben der Tür. Darauf stehen Infos.'],
     ['I write with a ___.', 'pen', ['ruler', 'rubber', 'schoolbag'], 'Ich schreibe mit einem Kuli.'],
     ['I draw lines with a ___.', 'ruler', ['rubber', 'glue', 'pencil case'], 'Ich ziehe Linien mit einem Lineal.'],
     ['Oh no, a mistake! Can I have your ___, please?', 'rubber', ['ruler', 'scissors', 'glue'], 'Oh nein, ein Fehler! Kann ich bitte deinen Radiergummi haben?'],
@@ -3037,7 +3049,7 @@
     ['keyboard', 'Tastatur', { bild: '⌨️' }], ['mouse', 'Maus (am Computer)', { bild: '🖱️', kein: true }], ['screen', 'Bildschirm'], ['printer', 'Drucker', { bild: '🖨️' }],
     ['internet', 'Internet'], ['website', 'Webseite', { alt: ['web page', 'webpage'] }], ['app', 'App'], ['email', 'E-Mail', { alt: ['e-mail', 'mail'] }], ['password', 'Passwort'],
     ['message', 'Nachricht', { alt: ['text', 'text message'] }], ['photo', 'Foto', { alt: ['picture'] }], ['video', 'Video'],
-    ['click', 'klicken'], ['type', 'tippen (auf der Tastatur)'], ['print', 'drucken'], ['send', 'schicken, senden'], ['save', 'speichern'],
+    ['headphones', 'Kopfhörer', { bild: '🎧' }], ['click', 'klicken'], ['type', 'tippen (auf der Tastatur)'], ['print', 'drucken'], ['send', 'schicken, senden'], ['save', 'speichern'],
   ], [
     ['I type on the ___.', 'keyboard', ['printer', 'password', 'email'], 'Ich tippe auf der Tastatur.'],
     ['Never tell anyone your ___.', 'password', ['keyboard', 'printer', 'screen'], 'Verrate niemandem dein Passwort.'],
@@ -3051,7 +3063,7 @@
   // Tagesablauf nur mit Tieren und Farben mischen: die Ausdrücke passen sonst halb zu Haus, Schule, Essen, Kleidung, Körper …
   const WF_NAH = new Set(['e5-w-haus|e5-w-schule', 'e5-w-freizeit|e5-w-schule', 'e5-w-essen|e5-w-haus',
     ...['e5-w-familie', 'e5-w-haus', 'e5-w-schule', 'e5-w-kleidung', 'e5-w-freizeit', 'e5-w-koerper', 'e5-w-essen', 'e5-w-zeit', 'e5-w-gefuehle', 'e5-w-party', 'e5-w-adj', 'e5-w-medien'].map((x) => [x, 'e5-w-tag'].sort().join('|')),
-    'e5-w-medien|e5-w-tiere', 'e5-w-freizeit|e5-w-medien', 'e5-w-medien|e5-w-schule', 'e5-w-haus|e5-w-medien',
+    'e5-w-schule|e5-w-zeit', 'e5-w-medien|e5-w-tiere', 'e5-w-freizeit|e5-w-medien', 'e5-w-medien|e5-w-schule', 'e5-w-haus|e5-w-medien',
     // Gefühle und Beschreiben sind beide Adjektive (bored – boring); die Party hat Essen, Musik, Tanzen und Monate
     'e5-w-adj|e5-w-gefuehle', 'e5-w-essen|e5-w-party', 'e5-w-freizeit|e5-w-party', 'e5-w-party|e5-w-zeit', 'e5-w-adj|e5-w-farben', 'e5-w-adj|e5-w-tiere', 'e5-w-adj|e5-w-koerper', 'e5-w-gefuehle|e5-w-koerper']);
   const wfAndere = (F, w, n, nur) => shuffle(F.W.filter((x) => x !== w && (!w.g || x.g !== w.g) && x.de !== w.de && (!nur || nur(x)))).slice(0, n);

@@ -45,6 +45,10 @@ Der Lehrplan Sachsen beschreibt Klasse 5 und 6 gemeinsam; diese Themen sind also
 Auffällig: **have got** steht nicht im Inhaltsverzeichnis. Viele EnDax-Sätze benutzen „have got“ (britisch, richtig).
 Ob das Buch stattdessen „have“ benutzt, zeigt erst ein Blick in die Seiten; bei Bedarf Sätze umstellen.
 
+## Stand im Unterricht
+- 13.11.2026: **Unit 1, Station 2** (S. 22–23). Dazu passen `e5-there`, `e5-ort`, `e5-w-schule` (in v83 mit Wörtern und Sätzen aus
+  Bücherei und Klassenzimmer ergänzt).
+
 ## Noch offen
 
 - Den Auftraggeber fragen, welche Unit gerade dran ist (dann kann der Bereich oben stehen oder markiert werden).

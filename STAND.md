@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v82`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v83`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -228,6 +228,11 @@ Weitere Dokumente:
   (wie im Vocabulary von Green Line). Aufgaben: Wort zur Lautschrift, Lautschrift zum Wort (falsche Angebote tauschen genau einen
   Laut, z. B. ɪ/iː, θ/s), Wort eintippen, Zeichen zum Laut (θ, ð, ʃ, æ, ʌ, ə …), Betonung (ˈ). Ohne einzelne Laute als Ton;
   in der Lösung wird das ganze Wort gesprochen. Damit ist die Liste aus dem Themenplan vollständig.
+- **v83 (13.11.2026): Englisch im Unterricht gerade dran: Green Line 1, Unit 1, Station 2** (S. 22–23, „There are TTS tablets for
+  you here“: there is/there are mit Fragen und Kurzantworten, Präpositionen on/in/next to/behind/in front of/under, Wörter aus
+  Bücherei und Klassenzimmer). Foto von Roberto, 13.11. Passende EnDax-Themen: `e5-there`, `e5-ort`, `e5-w-schule`. Ergänzt:
+  6 Sätze zu Klassenzimmer und Bücherei in `e5-there`; Wortfeld Schule + desk, clock, noticeboard, map, library, magazine,
+  newspaper; Medien + headphones.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1265,6 +1270,7 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v83: EnDax Unit 1 Station 2 ergänzt** (13.11.2026): `web/englisch/themen/klasse5.js` (TH, Schule, Medien), Aufnahmen, `sw.js`.
 - **v82: EnDax Lautschrift** (13.11.2026). Geändert: `web/englisch/themen/klasse5.js` (LS, LZ, LS_SILB, `lautschrift`),
   `klasse5-knobel.js`, `erklaerungen/klasse5.js` (`EX['e5-laut']`), `symbole.js`, Aufnahmen (e5-laut), `faecher.js` (53), `sw.js`.
 - **v81: EnDax Medien und Meinung, DeDax Konjunktionen** (13.11.2026). Geändert: `web/englisch/themen/klasse5.js`, `klasse5-knobel.js`,
