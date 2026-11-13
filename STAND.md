@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v69`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v70`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -152,6 +152,14 @@ Weitere Dokumente:
   went, saw, had“ (22 unregelmäßige Verben: Form tippen, wählen, rückwärts, im Satz, didn’t + Grundform). Für „read – read“ gibt es keine
   Aufnahme, weil beide Formen gleich geschrieben, aber verschieden gesprochen werden. 29 Themen, 1144 Aufnahmen je Aussprache.
   Als Nächstes: Bereich 5 Wörter (Wortfelder mit festen Listen).
+- **EnDax v70 (13.11.2026): Bereich 5 „Wörter“ mit 11 Wortfeldern (Themen 30 bis 40)**, auf GitHub und live. Feste Listen
+  (Roberto 13.11.): Familie, Haus und Wohnung, Schule, Tagesablauf, Kleidung, Freizeit, Tiere, Körper, Essen und Trinken, Farben,
+  Tage und Jahreszeiten – zusammen gut 200 Wörter und 77 Sätze, alle in `wfFeld(...)` in `themen/klasse5.js`. Ein gemeinsamer
+  Aufgaben-Baukasten `WFT` für alle Felder: Deutsch → Englisch wählen, Englisch → Deutsch, eintippen (mit erlaubten Schreibweisen
+  `alt`, z. B. grey/gray, trainers/sneakers), Hören, **Bild** (Emoji; bei Farben ein Farbfleck), Wort im Satz (je Satz drei feste
+  falsche Wörter, die sicher nicht passen), „Was passt nicht dazu?“ (ohne zu nahe Themenpaare, `WF_NAH`; Wörter mit `kein` wie
+  fish, chicken, cook nie als Außenseiter). Eine gemeinsame Erklärung für alle Felder: Wortkarten drehen sich von Deutsch auf Englisch.
+  40 Themen, 1425 Aufnahmen je Aussprache. Als Nächstes: Bereich 6 Alltag und Lesen, dann „Entdecken“ für Englisch.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1189,6 +1197,8 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v70: EnDax, Themen 30 bis 40 (Wortfelder)** (13.11.2026): neuer Bereich `e5-woerter`. Geändert: `web/englisch/` (Themen, Erklärungen,
+  Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (40 Themen), `web/sw.js`. Test `tests/endax.py 3` ohne Meldung.
 - **v69: EnDax, Themen 27 bis 29** (13.11.2026): `e5-was`, `e5-ed`, `e5-irr`, neuer Bereich `e5-vergangen`. Geändert: `web/englisch/`
   (Themen, Erklärungen, Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (29 Themen), `web/sw.js`. Test `tests/endax.py 3` ohne Meldung.
 - **v68: EnDax, Thema 26** (13.11.2026): `e5-zahl`. Geändert: `web/englisch/` (Themen, Erklärungen, Symbole, Aufnahmen-Pakete),

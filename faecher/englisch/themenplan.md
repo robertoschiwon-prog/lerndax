@@ -67,7 +67,7 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 | 28 | past simple: regelmäßige Verben (-ed) (gebaut, v69) | play → played, stop → stopped, carry → carried |
 | 29 | past simple: wichtige unregelmäßige Verben (gebaut, v69) | go → went, see → saw, have → had |
 
-## Bereich 5: Wörter (Wortfelder, im Lehrplan „bevorzugt Klasse 5“)
+## Bereich 5: Wörter (Wortfelder, im Lehrplan „bevorzugt Klasse 5“) – gebaut in v70 (11 Themen `e5-w-…`)
 
 Family · house and home · school and classroom · daily routine · clothes · free time and hobbies · pets and animals ·
 parts of the body · food and drink · colours · days, months, seasons.

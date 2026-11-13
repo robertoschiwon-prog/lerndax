@@ -2736,6 +2736,217 @@
   });
 
   // =====================================================
+  // Wörter: Wortfelder mit festen Listen (Roberto 13.11.: erst feste Listen)
+  // =====================================================
+  // Wort: [englisch, deutsch, { alt: weitere richtige Schreibweisen, g: Gruppe (nie zusammen als Auswahl),
+  //        bild: Emoji für die Bild-Aufgabe, farbe: Farbfleck, kein: nie als „passt nicht dazu“ in einem anderen Feld }]
+  // Satz: [Satz mit ___, richtig, [drei Wörter, die sicher nicht passen], Deutsch]
+  const WF = {};
+  const wfFeld = (id, kurz, woerter, saetze, tipp) => {
+    WF[id] = { id, kurz, tipp, W: woerter.map(([en, de, x]) => Object.assign({ en, de }, x || {})), S: saetze.map(([satz, richtig, falsch, de]) => ({ satz, richtig, falsch, de, text: satz.replace('___', richtig) })) };
+  };
+  wfFeld('e5-w-familie', 'Familie', [
+    ['mother', 'Mutter', { alt: ['mum', 'mom'], g: 'm' }], ['father', 'Vater', { alt: ['dad'], g: 'v' }], ['mum', 'Mama', { alt: ['mom', 'mummy', 'mother'], g: 'm' }], ['dad', 'Papa', { alt: ['daddy', 'father'], g: 'v' }],
+    ['parents', 'Eltern'], ['sister', 'Schwester'], ['brother', 'Bruder'], ['grandma', 'Oma', { alt: ['granny', 'grandmother'] }], ['grandpa', 'Opa', { alt: ['grandad', 'granddad', 'grandfather'] }],
+    ['grandparents', 'Großeltern'], ['aunt', 'Tante'], ['uncle', 'Onkel'], ['cousin', 'Cousin oder Cousine'], ['son', 'Sohn'], ['daughter', 'Tochter'], ['baby', 'Baby', { bild: '👶' }], ['family', 'Familie'], ['twins', 'Zwillinge'],
+  ], [
+    ['My mother’s sister is my ___.', 'aunt', ['uncle', 'cousin', 'grandpa'], 'Die Schwester meiner Mutter ist meine Tante.'],
+    ['My father’s brother is my ___.', 'uncle', ['aunt', 'sister', 'grandma'], 'Der Bruder meines Vaters ist mein Onkel.'],
+    ['My mum’s mother is my ___.', 'grandma', ['aunt', 'sister', 'daughter'], 'Die Mutter meiner Mama ist meine Oma.'],
+    ['My aunt’s son is my ___.', 'cousin', ['uncle', 'grandpa', 'father'], 'Der Sohn meiner Tante ist mein Cousin.'],
+    ['Ben and I have the same parents. Ben is my ___.', 'brother', ['uncle', 'aunt', 'grandma'], 'Ben und ich haben dieselben Eltern. Ben ist mein Bruder.'],
+    ['My grandma and my grandpa are my ___.', 'grandparents', ['parents', 'children', 'cousins'], 'Meine Oma und mein Opa sind meine Großeltern.'],
+    ['Lisa and Anna were born on the same day. They are ___.', 'twins', ['parents', 'grandparents', 'uncles'], 'Lisa und Anna sind am selben Tag geboren. Sie sind Zwillinge.'],
+  ], 'Familienwörter: mother, father, sister, brother, grandma, grandpa, aunt, uncle, cousin.');
+  wfFeld('e5-w-haus', 'Haus und Wohnung', [
+    ['house', 'Haus', { bild: '🏠' }], ['flat', 'Wohnung', { alt: ['apartment'] }], ['room', 'Zimmer'], ['kitchen', 'Küche'], ['bathroom', 'Badezimmer'], ['bedroom', 'Schlafzimmer'],
+    ['living room', 'Wohnzimmer', { alt: ['sitting room', 'lounge'] }], ['garden', 'Garten', { alt: ['yard'] }], ['stairs', 'Treppe'], ['door', 'Tür', { bild: '🚪' }], ['window', 'Fenster'],
+    ['bed', 'Bett', { bild: '🛏️' }], ['sofa', 'Sofa', { alt: ['couch'], bild: '🛋️' }], ['chair', 'Stuhl', { bild: '🪑' }], ['lamp', 'Lampe'], ['shelf', 'Regal'], ['fridge', 'Kühlschrank'],
+    ['cupboard', 'Schrank', { alt: ['wardrobe'] }], ['toilet', 'Toilette', { bild: '🚽' }],
+  ], [
+    ['We cook in the ___.', 'kitchen', ['bedroom', 'bathroom', 'garden'], 'Wir kochen in der Küche.'],
+    ['I sleep in my ___.', 'bed', ['fridge', 'stairs', 'shelf'], 'Ich schlafe in meinem Bett.'],
+    ['The milk is in the ___.', 'fridge', ['sofa', 'bed', 'lamp'], 'Die Milch ist im Kühlschrank.'],
+    ['I have a shower in the ___.', 'bathroom', ['kitchen', 'living room', 'garden'], 'Ich dusche im Badezimmer.'],
+    ['We watch TV in the ___.', 'living room', ['bathroom', 'fridge', 'stairs'], 'Wir sehen im Wohnzimmer fern.'],
+    ['Close the ___, please. It’s cold.', 'window', ['sofa', 'lamp', 'bed'], 'Mach bitte das Fenster zu. Es ist kalt.'],
+    ['We play football in the ___.', 'garden', ['fridge', 'bathroom', 'shelf'], 'Wir spielen im Garten Fußball.'],
+  ], 'Zimmer: kitchen, bathroom, bedroom, living room. Möbel: bed, sofa, chair, shelf, cupboard.');
+  wfFeld('e5-w-schule', 'Schule', [
+    ['school', 'Schule', { bild: '🏫' }], ['classroom', 'Klassenzimmer'], ['teacher', 'Lehrer oder Lehrerin'], ['pupil', 'Schüler oder Schülerin', { alt: ['student'] }],
+    ['pen', 'Kuli oder Füller'], ['pencil', 'Bleistift', { bild: '✏️' }], ['rubber', 'Radiergummi', { alt: ['eraser'] }], ['ruler', 'Lineal', { bild: '📏' }],
+    ['pencil case', 'Federmappe'], ['schoolbag', 'Schultasche', { alt: ['school bag', 'backpack', 'rucksack'], bild: '🎒' }], ['exercise book', 'Heft'], ['book', 'Buch', { bild: '📕' }],
+    ['board', 'Tafel'], ['homework', 'Hausaufgaben'], ['lesson', 'Unterrichtsstunde'], ['break', 'Pause'], ['subject', 'Schulfach'], ['timetable', 'Stundenplan'], ['scissors', 'Schere', { bild: '✂️' }], ['glue', 'Kleber'],
+  ], [
+    ['I write with a ___.', 'pen', ['ruler', 'rubber', 'schoolbag'], 'Ich schreibe mit einem Kuli.'],
+    ['I draw lines with a ___.', 'ruler', ['rubber', 'glue', 'pencil case'], 'Ich ziehe Linien mit einem Lineal.'],
+    ['Oh no, a mistake! Can I have your ___, please?', 'rubber', ['ruler', 'scissors', 'glue'], 'Oh nein, ein Fehler! Kann ich bitte deinen Radiergummi haben?'],
+    ['The teacher writes on the ___.', 'board', ['rubber', 'ruler', 'homework'], 'Die Lehrerin schreibt an die Tafel.'],
+    ['My pens and pencils are in my ___.', 'pencil case', ['board', 'timetable', 'lesson'], 'Meine Stifte sind in meiner Federmappe.'],
+    ['I cut paper with ___.', 'scissors', ['glue', 'a rubber', 'a ruler'], 'Ich schneide Papier mit einer Schere.'],
+    ['Look at the ___. What lesson is next?', 'timetable', ['rubber', 'scissors', 'glue'], 'Schau auf den Stundenplan. Welche Stunde kommt als Nächstes?'],
+  ], 'In der Federmappe: pen, pencil, rubber, ruler. Im Klassenzimmer: board, teacher, timetable.');
+  wfFeld('e5-w-tag', 'Tagesablauf', [
+    ['wake up', 'aufwachen'], ['get up', 'aufstehen'], ['have a shower', 'duschen', { alt: ['take a shower', 'shower'] }], ['have a bath', 'baden', { alt: ['take a bath'] }],
+    ['brush my teeth', 'mir die Zähne putzen', { alt: ['brush your teeth', 'brush teeth', 'clean my teeth'] }], ['get dressed', 'mich anziehen'], ['have breakfast', 'frühstücken'],
+    ['go to school', 'zur Schule gehen'], ['have lunch', 'zu Mittag essen'], ['come home', 'nach Hause kommen'], ['do my homework', 'meine Hausaufgaben machen', { alt: ['do your homework', 'do homework'] }],
+    ['tidy my room', 'mein Zimmer aufräumen', { alt: ['tidy your room', 'tidy up my room'] }], ['have dinner', 'zu Abend essen'], ['go to bed', 'ins Bett gehen'],
+  ], [
+    ['After dinner I ___. Good night!', 'go to bed', ['get up', 'have breakfast', 'go to school'], 'Nach dem Abendessen gehe ich ins Bett. Gute Nacht!'],
+    ['I take my toothbrush and ___.', 'brush my teeth', ['get dressed', 'have lunch', 'go to school'], 'Ich nehme meine Zahnbürste und putze mir die Zähne.'],
+    ['In the morning I eat toast and drink milk. I ___.', 'have breakfast', ['have dinner', 'go to bed', 'have a shower'], 'Am Morgen esse ich Toast und trinke Milch. Ich frühstücke.'],
+    ['School ends at one o’clock. Then I ___.', 'come home', ['get up', 'have breakfast', 'go to bed'], 'Die Schule endet um eins. Dann komme ich nach Hause.'],
+    ['My alarm clock rings. I ___.', 'wake up', ['go to bed', 'have dinner', 'do my homework'], 'Mein Wecker klingelt. Ich wache auf.'],
+    ['I put on my T-shirt and my jeans. I ___.', 'get dressed', ['have a shower', 'go to bed', 'brush my teeth'], 'Ich ziehe mein T-Shirt und meine Jeans an. Ich ziehe mich an.'],
+    ['My room is a mess. I must ___.', 'tidy my room', ['have lunch', 'wake up', 'come home'], 'Mein Zimmer ist unordentlich. Ich muss mein Zimmer aufräumen.'],
+  ], 'Viele Ausdrücke beginnen mit have: have breakfast, have lunch, have dinner, have a shower. Zu „mir“ und „mein“ gehört my: brush my teeth.');
+  wfFeld('e5-w-kleidung', 'Kleidung', [
+    ['T-shirt', 'T-Shirt', { alt: ['tshirt', 't shirt', 'tee shirt', 'tee-shirt'], bild: '👕' }], ['shirt', 'Hemd'], ['trousers', 'Hose', { alt: ['pants'] }], ['jeans', 'Jeans', { bild: '👖' }],
+    ['skirt', 'Rock'], ['dress', 'Kleid', { bild: '👗' }], ['jumper', 'Pullover', { alt: ['sweater', 'pullover'] }], ['jacket', 'Jacke'], ['coat', 'Mantel', { bild: '🧥' }],
+    ['shoes', 'Schuhe'], ['trainers', 'Turnschuhe', { alt: ['sneakers'], bild: '👟' }], ['boots', 'Stiefel', { bild: '👢' }], ['socks', 'Socken', { bild: '🧦' }], ['hat', 'Mütze oder Hut'],
+    ['cap', 'Basecap', { alt: ['baseball cap'], bild: '🧢' }], ['scarf', 'Schal', { bild: '🧣' }], ['gloves', 'Handschuhe', { bild: '🧤' }], ['shorts', 'kurze Hose', { bild: '🩳' }], ['pyjamas', 'Schlafanzug', { alt: ['pajamas'] }],
+  ], [
+    ['I wear ___ on my hands.', 'gloves', ['socks', 'a scarf', 'a skirt'], 'An den Händen trage ich Handschuhe.'],
+    ['I wear ___ on my feet.', 'shoes', ['gloves', 'a hat', 'a skirt'], 'An den Füßen trage ich Schuhe.'],
+    ['I wear a ___ on my head.', 'hat', ['skirt', 'dress', 'glove'], 'Auf dem Kopf trage ich eine Mütze.'],
+    ['At night I wear my ___.', 'pyjamas', ['trainers', 'scarf', 'coat'], 'Nachts trage ich meinen Schlafanzug.'],
+    ['For sport I wear my ___.', 'trainers', ['pyjamas', 'dress', 'coat'], 'Beim Sport trage ich meine Turnschuhe.'],
+    ['It’s hot. I wear ___ and a T-shirt.', 'shorts', ['gloves', 'boots', 'coats'], 'Es ist heiß. Ich trage eine kurze Hose und ein T-Shirt.'],
+  ], 'Achtung: trousers, jeans, shorts und pyjamas sind im Englischen immer Mehrzahl. Pullover heißt jumper.');
+  wfFeld('e5-w-freizeit', 'Freizeit', [
+    ['play football', 'Fußball spielen', { bild: '⚽' }], ['play tennis', 'Tennis spielen', { bild: '🎾' }], ['play the piano', 'Klavier spielen', { bild: '🎹' }], ['play the guitar', 'Gitarre spielen', { bild: '🎸' }],
+    ['play computer games', 'Computerspiele spielen', { alt: ['play video games'], bild: '🎮' }], ['ride a bike', 'Fahrrad fahren', { alt: ['ride my bike', 'cycle'], bild: '🚲' }],
+    ['swim', 'schwimmen', { bild: '🏊' }], ['dance', 'tanzen', { bild: '💃' }], ['sing', 'singen', { bild: '🎤' }], ['draw', 'zeichnen'], ['paint', 'malen', { bild: '🎨' }],
+    ['read books', 'Bücher lesen', { bild: '📚' }], ['listen to music', 'Musik hören', { bild: '🎧' }], ['watch films', 'Filme schauen', { alt: ['watch movies'] }],
+    ['go shopping', 'einkaufen gehen', { bild: '🛍️' }], ['meet friends', 'Freunde treffen', { alt: ['meet my friends'] }], ['take photos', 'Fotos machen', { alt: ['take pictures'], bild: '📷' }], ['cook', 'kochen', { bild: '🍳', kein: true }],
+  ], [
+    ['I ___ in the pool.', 'swim', ['ride a bike', 'play the piano', 'read books'], 'Ich schwimme im Schwimmbecken.'],
+    ['I put on my headphones and ___.', 'listen to music', ['ride a bike', 'swim', 'play football'], 'Ich setze meine Kopfhörer auf und höre Musik.'],
+    ['Let’s go to the park and ___ with a ball.', 'play football', ['play the piano', 'read books', 'swim'], 'Lass uns in den Park gehen und mit einem Ball Fußball spielen.'],
+    ['I ___ in the library.', 'read books', ['swim', 'ride a bike', 'play football'], 'Ich lese Bücher in der Bücherei.'],
+    ['I need my camera to ___.', 'take photos', ['swim', 'sing', 'cook'], 'Ich brauche meine Kamera, um Fotos zu machen.'],
+    ['I put on my helmet and ___.', 'ride a bike', ['read books', 'sing', 'play the piano'], 'Ich setze meinen Helm auf und fahre Fahrrad.'],
+    ['I need a pencil and paper to ___.', 'draw', ['swim', 'dance', 'sing'], 'Ich brauche einen Bleistift und Papier, um zu zeichnen.'],
+  ], 'Sport ohne the: play football, play tennis. Instrumente mit the: play the piano, play the guitar.');
+  wfFeld('e5-w-tiere', 'Tiere', [
+    ['dog', 'Hund', { bild: '🐶' }], ['cat', 'Katze', { bild: '🐱' }], ['rabbit', 'Kaninchen', { alt: ['bunny'], bild: '🐰' }], ['hamster', 'Hamster', { bild: '🐹' }], ['guinea pig', 'Meerschweinchen'],
+    ['bird', 'Vogel', { bild: '🐦' }], ['fish', 'Fisch', { bild: '🐟', kein: true }], ['horse', 'Pferd', { bild: '🐴' }], ['mouse', 'Maus', { bild: '🐭' }], ['cow', 'Kuh', { bild: '🐮' }],
+    ['pig', 'Schwein', { bild: '🐷' }], ['sheep', 'Schaf', { bild: '🐑' }], ['duck', 'Ente', { bild: '🦆', kein: true }], ['chicken', 'Huhn', { alt: ['hen'], bild: '🐔', kein: true }],
+    ['tortoise', 'Schildkröte', { alt: ['turtle'], bild: '🐢' }], ['snake', 'Schlange', { bild: '🐍' }], ['frog', 'Frosch', { bild: '🐸' }], ['elephant', 'Elefant', { bild: '🐘' }], ['lion', 'Löwe', { bild: '🦁' }], ['monkey', 'Affe', { bild: '🐵' }],
+  ], [
+    ['A ___ says ‘Woof!’', 'dog', ['cat', 'cow', 'duck'], 'Ein Hund macht „Wuff!“'],
+    ['A ___ says ‘Moo!’', 'cow', ['dog', 'sheep', 'frog'], 'Eine Kuh macht „Muh!“'],
+    ['A ___ can swim, but it can’t walk.', 'fish', ['horse', 'dog', 'cat'], 'Ein Fisch kann schwimmen, aber nicht laufen.'],
+    ['The ___ is very big and grey. It has a long nose.', 'elephant', ['mouse', 'frog', 'rabbit'], 'Der Elefant ist sehr groß und grau. Er hat eine lange Nase.'],
+    ['A ___ is very small and likes cheese.', 'mouse', ['horse', 'elephant', 'cow'], 'Eine Maus ist sehr klein und mag Käse.'],
+    ['You can ride a ___.', 'horse', ['frog', 'fish', 'snake'], 'Man kann auf einem Pferd reiten.'],
+    ['A ___ is green and can jump.', 'frog', ['pig', 'cow', 'elephant'], 'Ein Frosch ist grün und kann springen.'],
+  ], 'Haustiere (pets): dog, cat, rabbit, hamster, guinea pig. Auf dem Bauernhof: cow, pig, sheep, horse, chicken.');
+  wfFeld('e5-w-koerper', 'Körper', [
+    ['head', 'Kopf'], ['hair', 'Haare'], ['face', 'Gesicht'], ['eye', 'Auge', { bild: '👁️' }], ['ear', 'Ohr', { bild: '👂' }], ['nose', 'Nase', { bild: '👃' }], ['mouth', 'Mund', { bild: '👄' }],
+    ['tooth', 'Zahn', { bild: '🦷' }], ['teeth', 'Zähne'], ['neck', 'Hals'], ['arm', 'Arm', { bild: '💪' }], ['hand', 'Hand', { bild: '✋' }], ['finger', 'Finger'], ['leg', 'Bein', { bild: '🦵' }],
+    ['knee', 'Knie'], ['foot', 'Fuß', { bild: '🦶' }], ['feet', 'Füße'], ['back', 'Rücken'], ['tummy', 'Bauch', { alt: ['stomach', 'belly'] }], ['toe', 'Zeh'],
+  ], [
+    ['I see with my ___.', 'eyes', ['ears', 'feet', 'hands'], 'Ich sehe mit meinen Augen.'],
+    ['I hear with my ___.', 'ears', ['eyes', 'knees', 'teeth'], 'Ich höre mit meinen Ohren.'],
+    ['I eat with my ___.', 'mouth', ['nose', 'ear', 'knee'], 'Ich esse mit meinem Mund.'],
+    ['I smell with my ___.', 'nose', ['ear', 'hand', 'foot'], 'Ich rieche mit meiner Nase.'],
+    ['I brush my ___ every morning.', 'teeth', ['knees', 'feet', 'shoulders'], 'Ich putze jeden Morgen meine Zähne.'],
+    ['I write with my ___.', 'hand', ['foot', 'nose', 'ear'], 'Ich schreibe mit meiner Hand.'],
+    ['I have ten ___ on my hands.', 'fingers', ['toes', 'eyes', 'ears'], 'An meinen Händen habe ich zehn Finger.'],
+  ], 'Achtung Mehrzahl: one tooth – two teeth, one foot – two feet. Haare heißt hair (ohne s).');
+  wfFeld('e5-w-essen', 'Essen und Trinken', [
+    ['bread', 'Brot', { bild: '🍞' }], ['butter', 'Butter', { bild: '🧈' }], ['cheese', 'Käse', { bild: '🧀' }], ['egg', 'Ei', { bild: '🥚' }], ['apple', 'Apfel', { bild: '🍎' }],
+    ['banana', 'Banane', { bild: '🍌' }], ['pear', 'Birne', { bild: '🍐' }], ['strawberry', 'Erdbeere', { bild: '🍓' }], ['carrot', 'Karotte', { bild: '🥕' }], ['potato', 'Kartoffel', { bild: '🥔' }],
+    ['tomato', 'Tomate', { bild: '🍅' }], ['rice', 'Reis', { bild: '🍚' }], ['pasta', 'Nudeln', { alt: ['noodles'], bild: '🍝' }], ['pizza', 'Pizza', { bild: '🍕' }], ['cake', 'Kuchen', { bild: '🍰' }],
+    ['biscuit', 'Keks', { alt: ['cookie'], bild: '🍪' }], ['chocolate', 'Schokolade', { bild: '🍫' }], ['ice cream', 'Eis', { alt: ['ice-cream'], bild: '🍦' }], ['milk', 'Milch', { bild: '🥛' }],
+    ['water', 'Wasser'], ['juice', 'Saft'], ['tea', 'Tee', { bild: '🍵' }], ['sandwich', 'Sandwich', { bild: '🥪' }], ['soup', 'Suppe'],
+  ], [
+    ['I drink ___ with my breakfast.', 'milk', ['cheese', 'bread', 'pasta'], 'Zum Frühstück trinke ich Milch.'],
+    ['I need ___ for my sandwich.', 'bread', ['water', 'ice cream', 'tea'], 'Für mein Sandwich brauche ich Brot.'],
+    ['Rabbits love ___.', 'carrots', ['sausages', 'chocolate', 'tea'], 'Kaninchen lieben Karotten.'],
+    ['On my birthday I have a big ___ with candles.', 'cake', ['egg', 'soup', 'potato'], 'An meinem Geburtstag habe ich einen großen Kuchen mit Kerzen.'],
+    ['It’s hot. Let’s have some ___!', 'ice cream', ['soup', 'bread', 'potatoes'], 'Es ist heiß. Lass uns ein Eis essen!'],
+    ['Chickens lay ___.', 'eggs', ['apples', 'bread', 'cheese'], 'Hühner legen Eier.'],
+    ['I’m thirsty. Can I have some ___, please?', 'water', ['bread', 'cheese', 'rice'], 'Ich habe Durst. Kann ich bitte etwas Wasser haben?'],
+  ], 'Obst (fruit): apple, banana, pear, strawberry. Gemüse (vegetables): carrot, potato, tomato. Getränke: milk, water, juice, tea.');
+  wfFeld('e5-w-farben', 'Farben', [
+    ['red', 'rot', { farbe: '#e53935' }], ['blue', 'blau', { farbe: '#1e5bd8' }], ['green', 'grün', { farbe: '#2e9d4a' }], ['yellow', 'gelb', { farbe: '#f7d02c' }], ['orange', 'orange', { farbe: '#f28c28' }],
+    ['black', 'schwarz', { farbe: '#1a1a1a' }], ['white', 'weiß', { farbe: '#ffffff' }], ['brown', 'braun', { farbe: '#8b5a2b' }], ['grey', 'grau', { alt: ['gray'], farbe: '#9e9e9e' }],
+    ['pink', 'rosa', { farbe: '#f48fb1' }], ['purple', 'lila', { farbe: '#8e44ad' }], ['colour', 'Farbe', { alt: ['color'] }],
+  ], [
+    ['The sky is ___.', 'blue', ['green', 'pink', 'orange'], 'Der Himmel ist blau.'],
+    ['Grass is ___.', 'green', ['blue', 'pink', 'purple'], 'Gras ist grün.'],
+    ['Snow is ___.', 'white', ['black', 'red', 'green'], 'Schnee ist weiß.'],
+    ['Bananas are ___.', 'yellow', ['blue', 'purple', 'pink'], 'Bananen sind gelb.'],
+    ['Black and white make ___.', 'grey', ['green', 'yellow', 'pink'], 'Schwarz und Weiß ergibt Grau.'],
+    ['Red and yellow make ___.', 'orange', ['green', 'purple', 'grey'], 'Rot und Gelb ergibt Orange.'],
+    ['Blue and yellow make ___.', 'green', ['orange', 'pink', 'brown'], 'Blau und Gelb ergibt Grün.'],
+    ['Red and white make ___.', 'pink', ['green', 'blue', 'black'], 'Rot und Weiß ergibt Rosa.'],
+  ], 'Achtung: rosa heißt pink, lila heißt purple. Grau schreibt man britisch grey, amerikanisch gray.');
+  wfFeld('e5-w-zeit', 'Tage und Jahreszeiten', [
+    ['Monday', 'Montag'], ['Tuesday', 'Dienstag'], ['Wednesday', 'Mittwoch'], ['Thursday', 'Donnerstag'], ['Friday', 'Freitag'], ['Saturday', 'Samstag'], ['Sunday', 'Sonntag'],
+    ['spring', 'Frühling'], ['summer', 'Sommer'], ['autumn', 'Herbst', { alt: ['fall'] }], ['winter', 'Winter'], ['today', 'heute'], ['tomorrow', 'morgen (der nächste Tag)'], ['yesterday', 'gestern'],
+    ['day', 'Tag'], ['week', 'Woche'], ['weekend', 'Wochenende'], ['month', 'Monat'], ['year', 'Jahr'],
+  ], [
+    ['The day after Monday is ___.', 'Tuesday', ['Thursday', 'Sunday', 'Friday'], 'Der Tag nach Montag ist Dienstag.'],
+    ['The day before Friday is ___.', 'Thursday', ['Tuesday', 'Saturday', 'Monday'], 'Der Tag vor Freitag ist Donnerstag.'],
+    ['Saturday and Sunday are the ___.', 'weekend', ['week', 'month', 'year'], 'Samstag und Sonntag sind das Wochenende.'],
+    ['In ___ it is hot and we go swimming.', 'summer', ['winter', 'autumn', 'spring'], 'Im Sommer ist es heiß, und wir gehen schwimmen.'],
+    ['In ___ it is cold and it snows.', 'winter', ['summer', 'spring', 'autumn'], 'Im Winter ist es kalt, und es schneit.'],
+    ['A week has seven ___.', 'days', ['months', 'years', 'weekends'], 'Eine Woche hat sieben Tage.'],
+    ['A year has twelve ___.', 'months', ['days', 'weeks', 'weekends'], 'Ein Jahr hat zwölf Monate.'],
+    ['Yesterday was Monday, so today is ___.', 'Tuesday', ['Sunday', 'Wednesday', 'Monday'], 'Gestern war Montag, also ist heute Dienstag.'],
+  ], 'Wochentage schreibt man im Englischen immer groß: Monday, Tuesday … Achtung: Wednesday spricht man „Wens-day“.');
+  // Paare, die sich beim „passt nicht dazu“ zu nah sind
+  // Tagesablauf nur mit Tieren und Farben mischen: die Ausdrücke passen sonst halb zu Haus, Schule, Essen, Kleidung, Körper …
+  const WF_NAH = new Set(['e5-w-haus|e5-w-schule', 'e5-w-freizeit|e5-w-schule', 'e5-w-essen|e5-w-haus',
+    ...['e5-w-familie', 'e5-w-haus', 'e5-w-schule', 'e5-w-kleidung', 'e5-w-freizeit', 'e5-w-koerper', 'e5-w-essen', 'e5-w-zeit'].map((x) => [x, 'e5-w-tag'].sort().join('|'))]);
+  const wfAndere = (F, w, n, nur) => shuffle(F.W.filter((x) => x !== w && (!w.g || x.g !== w.g) && x.de !== w.de && (!nur || nur(x)))).slice(0, n);
+  const wfBild = (w) => (w.bild
+    ? `<svg viewBox="0 0 360 130" role="img" aria-label="Bild"><text x="180" y="104" text-anchor="middle" style="font-size:92px">${w.bild}</text></svg>`
+    : `<svg viewBox="0 0 360 130" role="img" aria-label="Farbe"><path d="M180 14c30 0 40 18 62 20s30 30 18 52-38 34-80 32-72-6-80-34 12-30 22-46 28-24 58-24z" fill="${w.farbe}" stroke="#2b2440" stroke-width="3"/></svg>`);
+  const wfLoesung = (F, w) => {
+    const s = F.S.find((x) => x.richtig === w.en);
+    return `<b class="vb" lang="en">${w.en}</b> ${U.say(w.en)} = <b>${w.de}</b>${w.alt ? `<br><small>Auch richtig: <span lang="en">${w.alt.join(', ')}</span></small>` : ''}${s ? `<br>Im Satz: <span lang="en">${s.text}</span> ${U.say(s.text)}<br><small>${s.de}</small>` : ''}`;
+  };
+  const WFT = {
+    wDeEn(F) { const w = pick(F.W), ch = shuffle([w, ...wfAndere(F, w, 3)]); return { prompt: `Wie heißt <b>${w.de}</b> auf Englisch?`, choices: ch.map((x) => `<span lang="en">${x.en}</span>`), correct: ch.indexOf(w), hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
+    wEnDe(F) { const w = pick(F.W), ch = shuffle([w, ...wfAndere(F, w, 3)]); return { prompt: `Was heißt das auf Deutsch?${en(w.en)}`, choices: ch.map((x) => x.de), correct: ch.indexOf(w), hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
+    wTippen(F) { const w = pick(F.W); return { prompt: `Wie heißt <b>${w.de}</b> auf Englisch? Tippe es ein.`, fields: [{ type: 'text', ci: true, answer: [w.en, ...(w.alt || [])], label: 'auf Englisch' }], hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
+    wHoeren(F) { const w = pick(F.W), ch = shuffle([w, ...wfAndere(F, w, 3)]); return { prompt: `Hör genau hin: Was bedeutet das? ${U.say(w.en)}`, choices: ch.map((x) => x.de), correct: ch.indexOf(w), hint: 'Tippe auf den Lautsprecher und hör dir das Wort an. Du kannst es so oft hören, wie du willst.', solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
+    wBild(F) {
+      const hat = (x) => x.bild || x.farbe, w = pick(F.W.filter(hat)), ch = shuffle([w, ...wfAndere(F, w, 3, hat)]);
+      return { prompt: w.farbe ? 'Welche Farbe ist das?' : 'Was ist das? Wähle das englische Wort.', figure: wfBild(w), choices: ch.map((x) => `<span lang="en">${x.en}</span>`), correct: ch.indexOf(w), hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } };
+    },
+    wSatz(F) {
+      const s = pick(F.S), ch = shuffle([s.richtig, ...s.falsch]);
+      return { prompt: `Welches Wort passt in die Lücke?${en(s.satz)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.richtig), hint: F.tipp, solution: `<span lang="en">${s.satz.replace('___', `<b class="vb">${s.richtig}</b>`)}</span> ${U.say(s.text)}<br><small>Auf Deutsch: ${s.de}</small>`, ex: { mode: 'satz', i: F.S.indexOf(s) } };
+    },
+    wRaus(F) {
+      const B = pick(Object.values(WF).filter((G) => G !== F && !WF_NAH.has([F.id, G.id].sort().join('|'))));
+      const drei = [];
+      for (const w of shuffle(F.W)) if (drei.length < 3 && !drei.some((x) => x.g && x.g === w.g)) drei.push(w);
+      const r = pick(B.W.filter((x) => !x.kein)), ch = shuffle([...drei, r]);
+      return {
+        prompt: 'Welches Wort passt nicht zu den anderen?', choices: ch.map((x) => `<span lang="en">${x.en}</span>`), correct: ch.indexOf(r),
+        hint: 'Übersetze jedes Wort im Kopf. Drei gehören zum selben Thema.',
+        solution: `<b class="vb" lang="en">${r.en}</b> (${r.de}) gehört zum Thema <b>${B.kurz}</b>.<br>Die anderen gehören zum Thema <b>${F.kurz}</b>: ${drei.map((x) => `<span lang="en">${x.en}</span> (${x.de})`).join(', ')}.`,
+        ex: { mode: 'raus', en: ch.map((x) => x.en), raus: r.en, rausFeld: B.id },
+      };
+    },
+  };
+  const wfMitBild = (F) => F.W.filter((x) => x.bild || x.farbe).length >= 4;
+  const wfGen = (id) => () => {
+    const F = WF[id];
+    return U.wahl([[15, () => WFT.wDeEn(F)], [12, () => WFT.wEnDe(F)], [20, () => WFT.wTippen(F)], [12, () => WFT.wHoeren(F)], ...(wfMitBild(F) ? [[15, () => WFT.wBild(F)]] : []), [16, () => WFT.wSatz(F)], [10, () => WFT.wRaus(F)]]);
+  };
+  Object.assign(D.daten, { WF, WF_NAH });
+  const themenVorWort = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorWort(), Object.fromEntries(Object.values(WF).map((F) => [F.id, [...F.W.map((w) => w.en), ...F.S.map((x) => x.text)]])));
+  for (const id of Object.keys(WF)) D.arten[id] = Object.fromEntries(Object.keys(WFT).filter((k) => k !== 'wBild' || wfMitBild(WF[id])).map((k) => [k, () => WFT[k](WF[id])]));
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -2777,6 +2988,19 @@
         { id: 'e5-was', title: 'was und were', icon: '⏪', gen: wasWere },
         { id: 'e5-ed', title: 'past simple: played, danced, stopped', icon: '📆', gen: pastEd },
         { id: 'e5-irr', title: 'past simple: went, saw, had', icon: '🌀', gen: pastIrr },
+      ] },
+      { id: 'e5-woerter', nr: 5, title: 'Wörter', topics: [
+        { id: 'e5-w-familie', title: 'Familie: mother, father …', icon: '👪', gen: wfGen('e5-w-familie') },
+        { id: 'e5-w-haus', title: 'Haus: kitchen, bedroom …', icon: '🏠', gen: wfGen('e5-w-haus') },
+        { id: 'e5-w-schule', title: 'Schule: pen, ruler …', icon: '🏫', gen: wfGen('e5-w-schule') },
+        { id: 'e5-w-tag', title: 'Mein Tag: get up, go to bed …', icon: '⏰', gen: wfGen('e5-w-tag') },
+        { id: 'e5-w-kleidung', title: 'Kleidung: T-shirt, jeans …', icon: '👕', gen: wfGen('e5-w-kleidung') },
+        { id: 'e5-w-freizeit', title: 'Freizeit: swim, dance …', icon: '⚽', gen: wfGen('e5-w-freizeit') },
+        { id: 'e5-w-tiere', title: 'Tiere: dog, cat …', icon: '🐶', gen: wfGen('e5-w-tiere') },
+        { id: 'e5-w-koerper', title: 'Körper: head, hand …', icon: '✋', gen: wfGen('e5-w-koerper') },
+        { id: 'e5-w-essen', title: 'Essen und Trinken: bread, milk …', icon: '🍎', gen: wfGen('e5-w-essen') },
+        { id: 'e5-w-farben', title: 'Farben: red, blue …', icon: '🎨', gen: wfGen('e5-w-farben') },
+        { id: 'e5-w-zeit', title: 'Tage und Jahreszeiten: Monday, summer …', icon: '🗓️', gen: wfGen('e5-w-zeit') },
       ] },
     ],
   };

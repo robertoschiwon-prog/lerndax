@@ -2306,4 +2306,121 @@
       };
     },
   };
+
+  // =====================================================
+  // Wörter: Wortkarten drehen sich um (Deutsch → Englisch)
+  // =====================================================
+  //   ctx: { mode:'wort', en } | { mode:'satz', i } | { mode:'raus', en:[4 Wörter], raus, rausFeld }
+  const WF_TITEL = [
+    ['e5-w-familie', 'Familie: mother, father …'],
+    ['e5-w-haus', 'Haus: kitchen, bedroom …'],
+    ['e5-w-schule', 'Schule: pen, ruler …'],
+    ['e5-w-tag', 'Mein Tag: get up, go to bed …'],
+    ['e5-w-kleidung', 'Kleidung: T-shirt, jeans …'],
+    ['e5-w-freizeit', 'Freizeit: swim, dance …'],
+    ['e5-w-tiere', 'Tiere: dog, cat …'],
+    ['e5-w-koerper', 'Körper: head, hand …'],
+    ['e5-w-essen', 'Essen und Trinken: bread, milk …'],
+    ['e5-w-farben', 'Farben: red, blue …'],
+    ['e5-w-zeit', 'Tage und Jahreszeiten: Monday, summer …'],
+  ];
+  const passe = (t, maxW) => { try { let fs = parseFloat(t.style.fontSize) || 16; while (fs > 9 && t.getComputedTextLength() > maxW) { fs -= 1; t.style.fontSize = fs + 'px'; } } catch (e) {} };
+  function wfKarte(api, x, y, w, h, wort, offen) {
+    const g = el('g', {}, api.svg);
+    const r = el('rect', { x, y, width: w, height: h, rx: 10, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, g);
+    const bild = wort.bild || wort.farbe;
+    if (wort.bild) el('text', { x: x + w / 2, y: y + h * 0.42, 'text-anchor': 'middle', text: wort.bild, style: `font-size:${Math.round(h * 0.3)}px` }, g);
+    else if (wort.farbe) el('circle', { cx: x + w / 2, cy: y + h * 0.28, r: h * 0.15, fill: wort.farbe, stroke: 'var(--ink)', 'stroke-width': 1.5 }, g);
+    const enT = el('text', { x: x + w / 2, y: y + h * (bild ? 0.68 : 0.46), 'text-anchor': 'middle', class: 'ex-b', text: '', style: `font-size:${Math.min(22, Math.round(h * 0.2))}px;fill:${BLAU}` }, g);
+    const deT = el('text', { x: x + w / 2, y: y + h * (bild ? 0.88 : 0.76), 'text-anchor': 'middle', class: 'ex-s', text: wort.de || '', style: `font-size:${Math.min(15, Math.round(h * 0.15))}px;fill:${GRAU}` }, g);
+    passe(deT, w - 12);
+    try { // passt das Deutsche auch klein nicht, kommt es auf zwei Zeilen
+      if (deT.getComputedTextLength() > w - 12 && (wort.de || '').includes(' ')) {
+        const t = wort.de.split(' '), m = Math.ceil(t.length / 2), y0 = parseFloat(deT.getAttribute('y')), fs = Math.min(13, Math.round(h * 0.14));
+        deT.textContent = ''; deT.style.fontSize = `${fs}px`;
+        [t.slice(0, m).join(' '), t.slice(m).join(' ')].forEach((z, i) => el('tspan', { x: x + w / 2, y: y0 - fs * 0.45 + i * fs * 1.05, text: z }, deT));
+        passe(deT, w - 12);
+      }
+    } catch (e) {}
+    const k = { g, r, zeig() { enT.textContent = wort.en; enT.style.fontSize = `${Math.min(22, Math.round(h * 0.2))}px`; passe(enT, w - 12); } };
+    if (offen) k.zeig();
+    return k;
+  }
+  const wfErkl = (id, titel) => ({
+    title: titel,
+    titleFor: (ctx) => (ctx && ctx.mode === 'raus' ? 'Was passt nicht dazu?' : ctx && ctx.post && ctx.en && ctx.mode === 'wort' ? `„${ctx.en}“` : titel),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const F = T.WF[id], mode = ctx.mode || 'frei';
+      const finde = (en) => { for (const G of Object.values(T.WF)) { const w = G.W.find((x) => x.en === en); if (w) return w; } return { en, de: '' }; };
+      let S0 = null, frei = [], oben = null;
+      if (mode === 'wort') {
+        const w = F.W.find((x) => x.en === ctx.en), mitBild = !!(w.bild || w.farbe);
+        S0 = ctx.post ? w : U.pick(F.W.filter((x) => x !== w && !!(x.bild || x.farbe) === mitBild));
+      }
+      if (mode === 'satz') S0 = ctx.post ? F.S[ctx.i] : U.pick(F.S.filter((x, i) => i !== ctx.i));
+      if (mode === 'raus') {
+        if (ctx.post) S0 = { woerter: ctx.en.map(finde), raus: ctx.raus, B: T.WF[ctx.rausFeld] };
+        else {
+          const B = U.pick(Object.values(T.WF).filter((G) => G !== F && !T.WF_NAH.has([id, G.id].sort().join('|'))));
+          const drei = U.shuffle(F.W.filter((x) => !x.g)).slice(0, 3), r = U.pick(B.W.filter((x) => !x.kein));
+          S0 = { woerter: U.shuffle([...drei, r]), raus: r.en, B };
+        }
+      }
+      const neuFrei = () => { frei = U.shuffle(F.W).slice(0, 6); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Wörter', onClick() { neuFrei(); api.replay(); } }]); }
+      const zeig = (teile, y, fs) => { if (oben) oben.remove(); oben = tzeile(api, teile, y || 30, fs || 18); };
+      let karten = [];
+      return {
+        reset() {
+          api.clear(); oben = null; karten = [];
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'frei') { zeig([[F.kurz, BLAU]], 26, 17); karten = frei.map((w, k) => wfKarte(api, 14 + (k % 3) * 114, 40 + Math.floor(k / 3) * 86, 104, 80, w)); }
+          if (mode === 'wort') { zeig([['Wie heißt das auf Englisch?', BLAU]], 28, 16); karten = [wfKarte(api, 80, 44, 200, 118, S0)]; }
+          if (mode === 'satz') { zeig([[S0.satz]], 48, 18); karten = [wfKarte(api, 110, 78, 140, 90, finde(S0.richtig))]; }
+          if (mode === 'raus') { zeig([['Was passt nicht dazu?', BLAU]], 30, 17); karten = S0.woerter.map((w, k) => wfKarte(api, 14 + k * 86, 52, 80, 92, w, true)); karten.forEach((k, i) => { k.de = S0.woerter[i]; }); }
+        },
+        async play() {
+          if (mode === 'frei') {
+            api.say(`Sechs Wörter zum Thema <b>${F.kurz}</b>. Erst steht das deutsche Wort da, dann dreht sich die Karte um.`);
+            await api.wait(2600);
+            for (const k of karten) { k.zeig(); k.r.setAttribute('fill', '#dfe9ff'); await api.wait(700); }
+            api.say(frei.map((w) => `<b>${w.en}</b> ${U.say(w.en)} = ${w.de}`).join('<br>'));
+            return;
+          }
+          if (mode === 'wort') {
+            const w = S0, s = F.S.find((x) => x.richtig === w.en);
+            api.say(`Gesucht ist das englische Wort für <b>${w.de}</b>.`);
+            await api.wait(2000);
+            karten[0].zeig(); karten[0].r.setAttribute('fill', '#dfe9ff');
+            if (s) zeig([[s.text]], 192, 15); else zeig([[w.en, BLAU], [' = '], [w.de]], 192, 16);
+            api.say(`<b>${w.en}</b> ${U.say(w.en)} = ${w.de}${w.alt ? `<br><small>Auch richtig: ${w.alt.join(', ')}</small>` : ''}${s ? `<br>${s.text} ${U.say(s.text)}<br><small>${s.de}</small>` : `<br><small>${F.tipp}</small>`}`);
+            return;
+          }
+          if (mode === 'satz') {
+            const s = S0;
+            api.say('Lies den Satz genau. Welches Wort ergibt einen Sinn?');
+            await api.wait(2200);
+            karten[0].zeig(); karten[0].r.setAttribute('fill', '#dfe9ff');
+            await api.wait(1000);
+            const [a, b] = s.satz.split('___');
+            zeig([[a], [s.richtig, BLAU], [b]], 48, 18);
+            api.say(`${a}<b>${s.richtig}</b>${b} ${U.say(s.text)}<br><small>${s.de}</small>`);
+            return;
+          }
+          const S = S0, ri = S.woerter.findIndex((w) => w.en === S.raus), r = S.woerter[ri];
+          api.say('Übersetze jedes Wort. Drei gehören zum selben Thema.');
+          await api.wait(2400);
+          karten.forEach((k, i) => { if (i !== ri) k.r.setAttribute('fill', '#dfe9ff'); });
+          await api.wait(900);
+          karten[ri].r.setAttribute('fill', '#fde2d0'); karten[ri].r.setAttribute('stroke', ORANGE);
+          await api.tw(600, (t) => karten[ri].g.setAttribute('transform', `translate(0 ${18 * t})`));
+          zeig([[F.kurz, BLAU], ['  ·  '], [`${r.en}: ${S.B.kurz}`, ORANGE]], 196, 15);
+          api.say(`<b>${r.en}</b> (${r.de}) gehört zum Thema <b>${S.B.kurz}</b>.<br>Die anderen gehören zum Thema <b>${F.kurz}</b>: ${S.woerter.filter((w, i) => i !== ri).map((w) => `${w.en} (${w.de})`).join(', ')}.`);
+        },
+      };
+    },
+  });
+  for (const [id, titel] of WF_TITEL) EX[id] = wfErkl(id, titel);
 })();

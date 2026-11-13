@@ -51,6 +51,17 @@ window.EnDaxIcons = (function () {
     'e5-was': `<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/>`,
     'e5-ed': `<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M8 14l2.5 2.5L16 13"/>`,
     'e5-irr': `<path d="M4 17c3-9 13-9 16 0"/><path d="M17 14l3 3 3-3" transform="translate(-3 0)"/><circle cx="6" cy="8" r="2" ${F}/>`,
+    'e5-w-familie': `<circle cx="8" cy="7" r="3"/><circle cx="16" cy="7" r="3"/><path d="M3 20c0-4 2-7 5-7s5 3 5 7M11 20c0-4 2-7 5-7s5 3 5 7"/>`,
+    'e5-w-haus': `<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><rect x="10" y="14" width="4" height="6" ${F}/>`,
+    'e5-w-schule': `<path d="M4 19V6a2 2 0 0 1 2-2h12v15H6a2 2 0 0 0-2 2"/><path d="M8 8h6"/>`,
+    'e5-w-tag': `<circle cx="12" cy="13" r="7"/><path d="M12 10v3l2 2M5 4l3 2M19 4l-3 2"/>`,
+    'e5-w-kleidung': `<path d="M8 3l4 3 4-3 5 4-3 3-2-1v12H8V9l-2 1-3-3z"/>`,
+    'e5-w-freizeit': `<circle cx="12" cy="12" r="9"/><path d="M12 7l4 3-1.5 5h-5L8 10z" ${F}/>`,
+    'e5-w-tiere': `<circle cx="6" cy="9" r="2"/><circle cx="10" cy="5" r="2"/><circle cx="14" cy="5" r="2"/><circle cx="18" cy="9" r="2"/><path d="M8 17c0-3 2-5 4-5s4 2 4 5-2 3-4 3-4 0-4-3z" ${F}/>`,
+    'e5-w-koerper': `<circle cx="12" cy="5" r="2.5"/><path d="M12 8v7M6 11h12M12 15l-4 6M12 15l4 6"/>`,
+    'e5-w-essen': `<path d="M12 7c-4-3-8 0-8 5 0 5 4 9 8 9s8-4 8-9c0-5-4-8-8-5z"/><path d="M12 7c0-2 1-4 3-4"/>`,
+    'e5-w-farben': `<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-2 0-3 4 0 5-2a9 9 0 0 0-7-11z"/><circle cx="8" cy="10" r="1.5" ${F}/><circle cx="12" cy="7" r="1.5" ${F}/><circle cx="16" cy="10" r="1.5" ${F}/>`,
+    'e5-w-zeit': `<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><rect x="7" y="13" width="3" height="3" ${F}/>`,
   };
   function svg(id) {
     const body = I[id];
