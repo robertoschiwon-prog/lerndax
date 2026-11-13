@@ -1,17 +1,17 @@
 # DeDax (Deutsch) – Startpunkt
 
 Stand 12.11.2026 (`lerndax-v54`): **Klasse 5 ist gebaut** (30 Themen in 5 Bereichen, „Entdecken“, Knobel-Aufgaben) und steht
-auf der Startseite. Abgleich mit dem Deutschbuch: `lehrplan/schulbuch-abgleich.md` (13.11.2026). Offen: Lücken schließen, „Nomen oder Substantiv“, Test mit dem Kind.
+auf der Startseite. Abgleich mit dem Deutschbuch: `lehrplan/schulbuch-abgleich.md` (13.11.2026). Offen: Lücken schließen, Test mit dem Kind. **Seit v78 heißt es „Nomen“** (wie im Buch).
 Die Abschnitte unten ab „Vorgehen“ beschreiben den Weg dorthin und sind als Vorbild für das nächste Fach stehen geblieben.
 
 | Schritt | Stand | Datei |
 |---|---|---|
 | 1 Lehrplan auswerten | ✅ 12.11.2026 | `lehrplan/sachsen-gymnasium.md` |
-| 2 Schulbuch abgleichen | **abgeglichen (13.11.2026)**: Lücken und die Frage „Nomen oder Substantiv“ stehen in der Datei | `lehrplan/schulbuch-abgleich.md` |
+| 2 Schulbuch abgleichen | **abgeglichen (13.11.2026)**: Lücken stehen in der Datei; „Nomen“ entschieden (v78) | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | Vorschlag (5 Bereiche, 31 Themen), noch nicht entschieden | `themenplan.md` |
 | 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. **Bereich Satzbau und Satzzeichen fertig (8 Themen).** **Alle fünf Bereiche sind gebaut (30 Themen).** **„Entdecken“ hat sechs Entdeckungen.** Knobel-Aufgaben zu allen Themen. Offen: Schulbuch-Abgleich | `web/deutsch/`, Test `tests/dedax.py` |
 
-**Entschieden am 12.11.2026:** Start mit dem Bereich **Wortarten**. Es heißt **„Substantiv“** (nicht „Nomen“). Die gemeinsamen Teile wurden **sofort** aus der
+**Entschieden am 12.11.2026:** Start mit dem Bereich **Wortarten**. Es hieß zuerst „Substantiv“; **seit 13.11.2026 (v78) „Nomen“** wie im Deutschbuch. Die gemeinsamen Teile wurden **sofort** aus der
 Mathe-Seite herausgezogen (`web/plattform/fach.js` und `fach.css`); beide Fächer nutzen sie.
 DeDax ist unter `…/lerndax/deutsch/` erreichbar und steht seit v48 als große Kachel auf der Startseite.
 Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`.
@@ -45,7 +45,7 @@ Lehrkraft oder Kind im öffentlichen Code; Aufgaben aus dem Schulbuch werden nic
 ## Was vor dem Bauen zu klären ist
 
 **Mit dem Auftraggeber**
-- ~~Welches Deutschbuch genau~~ ISBN 978-3-06-061189-8, Inhaltsverzeichnis ausgewertet (13.11.2026). Offen: „Nomen“ oder „Substantiv“?
+- ~~Welches Deutschbuch genau~~ ISBN 978-3-06-061189-8, Inhaltsverzeichnis ausgewertet (13.11.2026). Entschieden: „Nomen“ (v78).
 - Womit anfangen: Was ist gerade im Unterricht dran, steht eine Klassenarbeit an, was fällt dem Kind schwer?
 - Soll es wie bei Mathe eine Trainingsseite für eine bestimmte Arbeit geben?
 

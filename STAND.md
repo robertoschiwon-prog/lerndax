@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v77`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v78`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -207,6 +207,9 @@ Weitere Dokumente:
   **Deutschbuch** ebenfalls fotografiert: Abgleich in `faecher/deutsch/lehrplan/schulbuch-abgleich.md` (Lücken: Präpositionen,
   Adverbien, adverbiale Bestimmungen, Satzreihe, silbentrennendes h, Apposition …). **Offene Frage an Roberto: „Nomen“ (wie
   im Buch) oder „Substantiv“ (bisher in DeDax)?** Außerdem: britische Stimme als Voreinstellung, weil das Buch britisch ist?
+- **v78 (13.11.2026): Roberto hat entschieden: „Nomen, britisch“.** DeDax sagt jetzt überall **„Nomen“** wie das Deutschbuch
+  (vorher „Substantiv“; die Themen-ID `d5-substantive` bleibt). EnDax spricht als **Voreinstellung britisch** (wer schon
+  amerikanisch gewählt hat, behält es). Als Nächstes: die DeDax-Lücken aus `faecher/deutsch/lehrplan/schulbuch-abgleich.md` bauen.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -259,7 +262,7 @@ für ein zweites Fach wiederverwendet werden, statt sie zu kopieren.
 - **Erstes Thema gebaut: „Zeitformen“** (`web/deutsch/`), mit Aufgaben, Tipp, Lösungsweg, Symbol und der Animation
   „Zeitformen am Zeitstrahl“ (frei, ähnliches Beispiel, Lösung zur Aufgabe). Erreichbar unter `…/lerndax/deutsch/`.
   Auf der Startseite steht DeDax weiter unter „Kommt bald“ (`faecher.js` unverändert), bis mehr Themen da sind.
-- **Entschieden: „Substantiv“** (nicht „Nomen“), so sagt es auch der Lehrplan. Gilt für alle Texte in DeDax.
+- ~~Entschieden: „Substantiv“~~ **Seit v78 (13.11.2026) „Nomen“**, wie im Deutschbuch (Entscheidung des Auftraggebers).
 - **Gebaut (v46): „Substantive: Geschlecht und Mehrzahl“ und „Die vier Fälle“**, je mit Aufgaben, Tipp, Lösungsweg,
   Symbol und Animation. Wortliste: 60 Substantive mit Artikel, Genitiv und Mehrzahl in `web/deutsch/themen/klasse5.js`.
 - **Gebaut (v47): Bereich Wortarten ist vollständig** (7 Themen): dazu kamen „Pronomen“, „Adjektive steigern“,
@@ -1244,6 +1247,10 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v78: „Nomen“ statt „Substantiv“ in DeDax, britische Stimme als Voreinstellung in EnDax** (13.11.2026). Geändert:
+  `web/deutsch/themen/klasse5.js`, `klasse5-knobel.js`, `erklaerungen/klasse5.js`, `symbole.js` (109 Stellen), `web/englisch/index.html`
+  (gb zuerst), `tests/endax.py` (prüft die Voreinstellung; klappt vor den freien Erklärungen fertige Bereiche auf), `web/sw.js`.
+  Tests: `dedax.py 2` (30 Themen, 360 Antworten, 120 Animationen), `dedax_knobel.py` (430 Aufgaben), `endax.py 1` ohne Meldung.
 - **v77: EnDax nach Green Line 1 geordnet, 4 neue Themen** (13.11.2026). Geändert: `web/englisch/themen/klasse5.js`
   (Bereiche = Units, Wortfelder Gefühle, Party, Beschreiben, Monate, Thema `e5-wenig`, Kurzantworten `ppKurzantwort`),
   `klasse5-knobel.js`, `erklaerungen/klasse5.js` (`EX['e5-wenig']`), `symbole.js`, Aufnahmen-Pakete, `web/plattform/faecher.js`

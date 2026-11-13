@@ -5,7 +5,7 @@ https://www.schulportal.sachsen.de/lplandb/lehrplan/file/135/f3QLnBqlLcQXq3XngWT
 Ausgewertet am Originaltext (zwei unabhängige Abrufe: Schulportal Sachsen und Archivkopie, gleiches Ergebnis).
 Wiedergabe in eigenen Worten, Fachbegriffe wie im Lehrplan.
 
-**Wichtig für DeDax:** Der Lehrplan sagt „Substantiv“ (nicht „Nomen“). Das Schulbuch kann „Nomen“ sagen; siehe
+**Wichtig für DeDax:** Der Lehrplan sagt „Substantiv“, das Deutschbuch „Nomen“; DeDax sagt seit v78 „Nomen“. Das Schulbuch kann „Nomen“ sagen; siehe
 `schulbuch-abgleich.md`. Vor dem Bauen klären, welches Wort im Unterricht benutzt wird.
 
 ## Lernbereiche und Zeitrichtwerte

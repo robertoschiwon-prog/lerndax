@@ -50,4 +50,4 @@ Ob das Buch stattdessen „have“ benutzt, zeigt erst ein Blick in die Seiten; 
 - Meinungsäußerung (Unit 3, Station 3): I think …, I like … because …
 - Wortfeld Medien (Media smart)
 - Den Auftraggeber fragen, welche Unit gerade dran ist (dann kann der Bereich oben stehen oder markiert werden).
-- Britische oder amerikanische Stimme als Voreinstellung (das Buch ist britisch; Voreinstellung ist bisher amerikanisch).
+- ~~Britische oder amerikanische Stimme~~ Seit v78 britisch als Voreinstellung (Roberto, 13.11.2026).

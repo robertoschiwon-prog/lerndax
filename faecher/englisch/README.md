@@ -118,7 +118,7 @@ Deutsch laufen lassen, weil es die gemeinsame App betrifft):
 - In Aufgaben: `U.say(text)` liefert den Lautsprecher-Knopf. **Nicht** in die Aufgabenstellung setzen, wenn das Anhören
   die Lösung verrät (Lücken). Im Lösungsweg und in der Animation immer.
 - **Seit v56 zwei Aussprachen zur Wahl** (Wunsch des Auftraggebers, 13.11.2026): Umschalter auf der Startseite von EnDax.
-  Amerikanisch `af_bella` in `audio/k5/` (Voreinstellung), britisch **`bm_fable`** („Mann 2“) in `audio/k5-gb/`.
+  Amerikanisch `af_bella` in `audio/us/`, britisch **`bm_fable`** („Mann 2“) in `audio/gb/`. **Seit v78 ist britisch die Voreinstellung** (Roberto 13.11.: das Schulbuch ist britisch).
   Jede neue Aufnahme muss es in beiden Ordnern geben (macht `endax_audio.py` von selbst, der Test prüft es).
 - Offen: Aufnahmen in die Offline-Liste von `sw.js`? Bisher werden sie erst beim ersten Anhören gespeichert.
 - Hinweis: Beim Zurückschreiben aus einer Claude-Sitzung bekommt jede MP3 automatisch einen eingebetteten Herkunftsvermerk

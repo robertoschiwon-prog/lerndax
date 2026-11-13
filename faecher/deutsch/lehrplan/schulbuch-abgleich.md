@@ -21,7 +21,7 @@ Bildungssprache) · 8 Sachtexte, Schaubilder, Tabellen · **9 Wortarten und Satz
 
 | Buch | Seite | DeDax |
 |---|---|---|
-| Nomen an ihren Begleitern erkennen; Genus und Numerus | 198, 200 | `d5-substantive` ✓ (DeDax sagt „Substantiv“, das Buch „**Nomen**“) |
+| Nomen an ihren Begleitern erkennen; Genus und Numerus | 198, 200 | `d5-substantive` ✓ (seit v78 auch in DeDax „Nomen“) |
 | Nomen in vier Fällen (Kasus) | 201 | `d5-faelle` ✓ |
 | Adjektive: beschreiben und vergleichen | 202 | `d5-adjektive` ✓ |
 | Personalpronomen, Possessivpronomen | 204, 205 | `d5-pronomen` ✓ |
@@ -52,6 +52,5 @@ Bildungssprache) · 8 Sachtexte, Schaubilder, Tabellen · **9 Wortarten und Satz
 - Theaterszene: Monolog, Dialog, Regieanweisung (Kap. 6) – neues Thema möglich.
 - Einstellungsgrößen und Kameraperspektiven (Kap. 7) – am Bildschirm gut zeigbar.
 
-## Entscheidung offen
-**„Nomen“ oder „Substantiv“?** Das Buch sagt durchgehend Nomen (Nomenprobe, Nomen an ihren Begleitern erkennen).
-DeDax sagt auf Wunsch des Auftraggebers „Substantiv“. Gefragt am 13.11.2026.
+## Entschieden
+**„Nomen“** wie im Buch (Roberto, 13.11.2026). Umgestellt in v78.

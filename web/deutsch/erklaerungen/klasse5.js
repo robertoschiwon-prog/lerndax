@@ -131,13 +131,13 @@
   };
 
   // =====================================================
-  // Substantive: Geschlecht und Mehrzahl
+  // Nomen: Geschlecht und Mehrzahl
   // =====================================================
-  //   ctx: { mode:'genus'|'plural', art, sg, pl } oder { mode:'satz', tokens, correct } (Substantive im Satz finden), dazu pre/post
+  //   ctx: { mode:'genus'|'plural', art, sg, pl } oder { mode:'satz', tokens, correct } (Nomen im Satz finden), dazu pre/post
   const GFARBE = { der: '#1f55d6', die: '#c62f4b', das: '#0a7d57' };
   const ORANGE = '#c2410c';
   EX['d5-substantive'] = {
-    title: 'Substantive: Geschlecht und Mehrzahl',
+    title: 'Nomen: Geschlecht und Mehrzahl',
     viewBox: '0 0 360 190',
     create(api, ctx) {
       ctx = ctx || {};
@@ -156,17 +156,17 @@
           api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
         },
         async play() {
-          if (SZ) { // Substantive im Satz finden: jedes groß geschriebene Wort prüfen
+          if (SZ) { // Nomen im Satz finden: jedes groß geschriebene Wort prüfen
             const tx = el('text', { x: 180, y: 60, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
             const ts = SZ.tokens.map((w, i) => el('tspan', { text: (i ? ' ' : '') + w }, tx));
             try { for (let fs = 18; fs >= 10 && tx.getBBox().width > 340; fs--) tx.setAttribute('style', `font-size:${fs}px`); } catch (e) {}
             const probe = el('text', { x: 180, y: 120, 'text-anchor': 'middle', class: 'ex-s', text: '', style: 'font-size:15px' }, api.svg);
-            api.say('Substantive schreibt man <b>groß</b>. Probe: Passt ein Artikel (der, die, das) davor?');
+            api.say('Nomen schreibt man <b>groß</b>. Probe: Passt ein Artikel (der, die, das) davor?');
             await api.wait(2200);
             const liste = SZ.correct.map((i) => SZ.tokens[i].replace('.', ''));
             if (!SZ.correct.includes(0)) {
               ts[0].setAttribute('fill', '#6b6680'); probe.textContent = `„${SZ.tokens[0]}“: nur groß wegen des Satzanfangs`;
-              api.say(`Vorsicht: <b>${SZ.tokens[0]}</b> ist kein Substantiv. Es ist nur groß, weil der Satz damit anfängt.`);
+              api.say(`Vorsicht: <b>${SZ.tokens[0]}</b> ist kein Nomen. Es ist nur groß, weil der Satz damit anfängt.`);
               await api.wait(2600);
             }
             for (const i of SZ.correct) {
@@ -175,7 +175,7 @@
               await api.wait(1300);
             }
             probe.textContent = '';
-            api.say(`Substantive: <b>${liste.join(', ')}</b>. Vor jedes passt ein Artikel.`);
+            api.say(`Nomen: <b>${liste.join(', ')}</b>. Vor jedes passt ein Artikel.`);
             return;
           }
           // links: Einzahl
@@ -183,7 +183,7 @@
           const sg = el('text', { x: 92, y: 84, 'text-anchor': 'middle', class: 'ex-b', opacity: 0 }, api.svg);
           el('tspan', { text: n.art, fill: GFARBE[n.art] }, sg); el('tspan', { text: ' ' + n.sg }, sg);
           zeig(k1); await zeig(sg);
-          api.say(`<b>${n.art} ${n.sg}</b>: Jedes Substantiv hat ein Geschlecht (Genus). Der Artikel zeigt es.`);
+          api.say(`<b>${n.art} ${n.sg}</b>: Jedes Nomen hat ein Geschlecht (Genus). Der Artikel zeigt es.`);
           await api.wait(2200);
           const g = el('text', { x: 92, y: 108, 'text-anchor': 'middle', class: 'ex-s', text: T.GENUS[n.art], style: `font-size:12px;fill:${GFARBE[n.art]}`, opacity: 0 }, api.svg);
           await zeig(g);
@@ -267,7 +267,7 @@
             api.say(`Frage: <b>${S.frage}</b> → <b>${S.form}</b>. Das ist der <b>${T.FNAME[S.fall]}</b>. In der Tabelle siehst du, wie der Artikel sich in den vier Fällen ändert.`);
             return;
           }
-          api.say('Ein Substantiv kann in vier Fällen stehen. Jeden Fall findest du mit einer <b>Frage</b>.');
+          api.say('Ein Nomen kann in vier Fällen stehen. Jeden Fall findest du mit einer <b>Frage</b>.');
           await api.wait(2200);
           for (let k = 0; k < 4; k++) {
             await zeige(k, frei.i[k], frei.q[k], frei.teile[frei.i[k]]);

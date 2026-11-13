@@ -4,7 +4,7 @@ window.DeDaxIcons = (function () {
   const W = 'currentColor';
   const F = `fill="${W}" stroke="none"`;
   const I = {
-    // Substantive: Anhänger-Schild (ein Name für ein Ding)
+    // Nomen: Anhänger-Schild (ein Name für ein Ding)
     'd5-substantive': `<path d="M3 5h8.5L21 14.5 14.5 21 3 12.5z"/><circle cx="7.6" cy="9.4" r="1.6" ${F}/>`,
     // Die vier Fälle: vier Felder, eines ist gefüllt
     'd5-faelle': `<rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" ${F}/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/>`,
@@ -22,7 +22,7 @@ window.DeDaxIcons = (function () {
     'd5-subjekt': `<circle cx="7" cy="6.5" r="3" ${F}/><path d="M2.5 20c0-4 2-6.5 4.5-6.5s4.5 2.5 4.5 6.5"/><path d="M14 12h7"/><path d="M18 8.8 21.2 12 18 15.2"/>`,
     // Objekte: Geschenk (jemandem etwas geben)
     'd5-objekte': `<rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M3 10h18V7H3z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3.5-5-3.5-4.5-1s3 1 4.5 1c1.5 0 4-1 4.5-1s-3-2.5-4.5 1"/>`,
-    // Attribute: Substantiv mit Schmuck-Stern davor
+    // Attribute: Nomen mit Schmuck-Stern davor
     'd5-attribute': `<path d="M6.5 4l1.300 2.900 3.2.3-2.400 2.100.7 3.100-2.8-1.7-2.8 1.7.7-3.100L2 7.2l3.2-.3z" ${F}/><rect x="11" y="13" width="10.5" height="7" rx="1.5"/>`,
     // Hauptsatz und Nebensatz: großer und kleiner Kasten mit Komma dazwischen
     'd5-nebensatz': `<rect x="2" y="6" width="10" height="9" rx="1.5"/><rect x="16" y="8.5" width="6" height="6.5" rx="1.5" ${F}/><path d="M14 14.5c.300 1.5-.300 2.8-1.2 3.8"/>`,

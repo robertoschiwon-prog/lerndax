@@ -56,9 +56,12 @@ async def main():
         await pg.add_init_script(FAST.join(['(', ')()']))
         await pg.goto(URL); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')")
         await pg.fill('#nameI', 'Max'); await pg.click('#nameF button')
-        # Umschalter „Aussprache“: britisch wählen, danach müssen die Aufnahmen aus k5-gb kommen
+        # Umschalter „Aussprache“: Voreinstellung ist britisch; einmal amerikanisch und zurück, danach kommen alle Aufnahmen aus gb
         mp3 = []; pg.on('request', lambda r: mp3.append(r.url) if '/audio/' in r.url else None)
-        await pg.wait_for_selector('.akzent'); await pg.click('[data-akzent="gb"]')
+        await pg.wait_for_selector('.akzent')
+        vorein = await pg.evaluate("() => document.querySelector('.akzent button.on').dataset.akzent")
+        print('Voreinstellung:', vorein, '(soll gb sein)')
+        await pg.click('[data-akzent="us"]'); await pg.click('[data-akzent="gb"]')
         gewaehlt = await pg.evaluate("() => [localStorage.getItem('lerndax.englisch.akzent'), document.querySelector('.akzent button.on').dataset.akzent]")
         print('Aussprache gewählt:', gewaehlt)
         await pg.screenshot(path=str(SHOTS / 'endax-start.png'))
@@ -105,8 +108,9 @@ async def main():
                         if await pg.query_selector('.say.err'): meld.append(f'{t}: Aufnahme ließ sich nicht abspielen')
                     await pg.click('#nextB')
                 await pg.click('[data-go="home"]')
-        # freie Erklärung
+        # freie Erklärung (fertige Lernbereiche sind eingeklappt: erst aufklappen)
         for t in ids:
+            await pg.evaluate("() => document.querySelectorAll('[data-lbopen]').forEach(b => b.click())")
             eb = await pg.query_selector(f'[data-explain="{t}"]')
             if not eb: meld.append(f'{t}: kein Erklär-Knopf'); continue
             await eb.click()

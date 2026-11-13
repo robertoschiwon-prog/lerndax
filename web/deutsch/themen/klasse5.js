@@ -235,7 +235,7 @@
 
 
   // =====================================================
-  // Substantive (für Geschlecht, Mehrzahl, die vier Fälle)
+  // Nomen (für Geschlecht, Mehrzahl, die vier Fälle)
   // =====================================================
   // [Artikel, Einzahl, Genitiv (nur der/das; „(e)“ = mit und ohne e richtig), Mehrzahl, Art: P Person, T Tier, sonst Ding]
   const N = [
@@ -281,14 +281,14 @@
     if (!b.umlaut && !b.endung) return 'Das Wort bleibt gleich. Nur der Artikel zeigt die Mehrzahl.';
     return [b.umlaut ? `Umlaut: <b>${b.umlaut}</b>` : '', b.endung ? `Endung <b>${b.endung}</b>` : ''].filter(Boolean).join(', ') + '.';
   }
-  // Wortgruppe „Artikel + Substantiv“ im Fall f (0 Nominativ … 3 Akkusativ); gibt alle richtigen Schreibweisen zurück
+  // Wortgruppe „Artikel + Nomen“ im Fall f (0 Nominativ … 3 Akkusativ); gibt alle richtigen Schreibweisen zurück
   function gruppe(n, f, plural) {
     if (plural) { const w = f === 2 && !/[ns]$/.test(n.pl) ? n.pl + 'n' : n.pl; return [`${ARTIKEL.pl[f]} ${w}`]; }
     const a = ARTIKEL[n.art][f];
     return f === 1 ? n.gen.map((g) => `${a} ${g}`) : [`${a} ${n.sg}`];
   }
 
-  // ---------- Thema: Substantive – Geschlecht und Mehrzahl ----------
+  // ---------- Thema: Nomen – Geschlecht und Mehrzahl ----------
   const EXN = (n, mode) => ({ mode, art: n.art, sg: n.sg, pl: n.pl });
   function artikelWahl() {
     const n = pick(N);
@@ -296,7 +296,7 @@
       prompt: `Welcher Artikel gehört zu <b>${n.sg}</b>?`,
       choices: ['der', 'die', 'das'], correct: ['der', 'die', 'das'].indexOf(n.art),
       hint: 'Sprich das Wort mit allen drei Artikeln. Was klingt richtig? Ein paar Endungen helfen: <b>-ung, -heit, -keit, -in</b> → die, <b>-chen</b> → das.',
-      solution: `<b>${n.art} ${n.sg}</b>: Das Substantiv ist ${GENUS[n.art]}. Das Geschlecht (Genus) lernt man am besten gleich mit dem Wort.`,
+      solution: `<b>${n.art} ${n.sg}</b>: Das Nomen ist ${GENUS[n.art]}. Das Geschlecht (Genus) lernt man am besten gleich mit dem Wort.`,
       ex: EXN(n, 'genus'),
     };
   }
@@ -335,7 +335,7 @@
       ex: EXN(n, 'plural'),
     };
   }
-  // Sätze zum Antippen: Substantive sind mit * markiert
+  // Sätze zum Antippen: Nomen sind mit * markiert
   const SATZ_SUBST = [
     'Heute sucht der *Lehrer den *Schlüssel im *Garten.', 'Morgens fährt der *Zug über die *Brücke.', 'Leise schleicht die *Katze durch das *Zimmer.',
     'Abends liest die *Schwester ein dickes *Buch.', 'Schnell rollt der *Ball über die *Straße.', 'Dort hängt ein altes *Bild an der *Wand.',
@@ -351,17 +351,17 @@
     const { tokens, correct } = substSatz();
     const liste = correct.map((i) => tokens[i].replace('.', ''));
     return {
-      prompt: 'Tippe <b>alle Substantive</b> an.',
+      prompt: 'Tippe <b>alle Nomen</b> an.',
       tap: { tokens, correct }, answerText: liste.join(', '),
-      hint: 'Substantive schreibt man <b>groß</b>, und man kann einen Artikel davorsetzen (der, die, das). Vorsicht: Das erste Wort im Satz ist immer groß.',
-      solution: `Substantive: <b>${liste.join(', ')}</b>.${correct[0] === 0 ? '' : ` „${tokens[0]}“ ist nur groß, weil es am Satzanfang steht.`} Probe: Vor ein Substantiv passt ein Artikel.`,
+      hint: 'Nomen schreibt man <b>groß</b>, und man kann einen Artikel davorsetzen (der, die, das). Vorsicht: Das erste Wort im Satz ist immer groß.',
+      solution: `Nomen: <b>${liste.join(', ')}</b>.${correct[0] === 0 ? '' : ` „${tokens[0]}“ ist nur groß, weil es am Satzanfang steht.`} Probe: Vor ein Nomen passt ein Artikel.`,
       ex: { mode: 'satz', tokens, correct },
     };
   }
   const substantive = () => U.wahl([[28, artikelWahl], [34, mehrzahl], [16, einzahl], [10, einOderMehr], [12, substAntippen]]);
 
   // ---------- Thema: Die vier Fälle ----------
-  // Satzmuster je Fall: vor = Text vor der Wortgruppe, nach = Text danach, q = Frage, typ = für welche Substantive (P, T, D)
+  // Satzmuster je Fall: vor = Text vor der Wortgruppe, nach = Text danach, q = Frage, typ = für welche Nomen (P, T, D)
   const MUSTER = {
     nominativ: [
       { vor: 'Dort', verb: ['ist', 'sind'], nach: '', q: (pl) => `Wer oder was ${pl ? 'sind' : 'ist'} dort?`, typ: 'PTD', nachVerb: true },
@@ -436,7 +436,7 @@
       prompt: `Setze <b>${s.grund}</b> in den richtigen Fall.`, layout: 'satz',
       fields: [{ type: 'text', answer: s.formen, prefix: vor, suffix: (nach ? nach : '') + '.', label: 'Wortgruppe im richtigen Fall' }],
       hint: `Frage nach der Lücke: „${s.frage}“ Die Frage verrät den Fall. Dann ändert sich der Artikel, manchmal auch das Wortende.`,
-      solution: `${fallLoesung(s)}${s.fall === 'genitiv' && !s.plural && s.n.art !== 'die' ? '<br>Im Genitiv bekommen männliche und sächliche Substantive ein <b>-s</b> oder <b>-es</b>.' : ''}${s.fall === 'dativ' && s.plural && s.formen[0].split(' ')[1] !== s.n.pl ? '<br>Im Dativ der Mehrzahl kommt ein <b>-n</b> ans Wort.' : ''}`,
+      solution: `${fallLoesung(s)}${s.fall === 'genitiv' && !s.plural && s.n.art !== 'die' ? '<br>Im Genitiv bekommen männliche und sächliche Nomen ein <b>-s</b> oder <b>-es</b>.' : ''}${s.fall === 'dativ' && s.plural && s.formen[0].split(' ')[1] !== s.n.pl ? '<br>Im Dativ der Mehrzahl kommt ein <b>-n</b> ans Wort.' : ''}`,
       ex: EXF(s),
     };
   }
@@ -477,12 +477,12 @@
   const mitLeer = (teile) => teile.map((t, i) => (i ? ' ' : '') + t).concat('.');
   function pronEx(art, r) {
     return zz(art, mitLeer(r.s.teile), r.s.idx, mitLeer(r.neuT), r.s.idx,
-      `Für welches Substantiv soll das Pronomen stehen? <b>${r.s.teile[r.s.idx]}</b>: ${r.s.plural ? 'Mehrzahl' : GENUS[r.s.n.art]}, ${FNAME[r.s.fall]}.`,
+      `Für welches Nomen soll das Pronomen stehen? <b>${r.s.teile[r.s.idx]}</b>: ${r.s.plural ? 'Mehrzahl' : GENUS[r.s.n.art]}, ${FNAME[r.s.fall]}.`,
       `Das Pronomen muss in Geschlecht, Zahl und Fall passen: <b>${r.p}</b>.`,
       `<b>${r.s.teile[r.s.idx]}</b> → <b>${r.p}</b><br>${r.neuT.join(' ')}.`);
   }
   const pronLoesung = (r) => `${fallText(r.s, (t) => `<u>${t}</u>`)}<br>→ ${r.neuT.map((t, i) => (i === r.s.idx ? `<b class="vb">${t}</b>` : t)).join(' ')}.<br>„${r.s.teile[r.s.idx]}“: ${r.s.plural ? 'Mehrzahl' : GENUS[r.s.n.art]}, ${FNAME[r.s.fall]} (${r.s.frage}) → <b>${r.p}</b>.`;
-  const TIPP_PRON = 'Ein Personalpronomen steht <b>für</b> ein Substantiv. Es richtet sich nach dem Geschlecht (der → er, die → sie, das → es), nach der Zahl und nach dem Fall (Wem? → ihm, ihr, ihnen · Wen? → ihn, sie, es).';
+  const TIPP_PRON = 'Ein Personalpronomen steht <b>für</b> ein Nomen. Es richtet sich nach dem Geschlecht (der → er, die → sie, das → es), nach der Zahl und nach dem Fall (Wem? → ihm, ihr, ihnen · Wen? → ihn, sie, es).';
   function pronWahl() {
     const r = pronSatz();
     return {
@@ -527,9 +527,9 @@
     return {
       prompt: `Wofür steht das markierte Pronomen?<br><span class="bsp">${s1} <u>${ziel[3]}</u> ${rest}.</span>`,
       choices: wahl, correct: dinge.indexOf(ziel),
-      hint: 'Das Pronomen hat dasselbe Geschlecht wie sein Substantiv: <b>er</b> → der, <b>sie</b> → die, <b>es</b> → das.',
+      hint: 'Das Pronomen hat dasselbe Geschlecht wie sein Nomen: <b>er</b> → der, <b>sie</b> → die, <b>es</b> → das.',
       solution: `<b>${ziel[3]}</b> steht für „<b>${ziel[0]} ${ziel[1]}</b>“, denn ${ziel[3].toLowerCase()} passt nur zu „${ziel[0]}“.<br>${ziel[0] === 'der' ? 'Der' : ziel[0] === 'die' ? 'Die' : 'Das'} ${ziel[1]} ${rest}.`,
-      ex: zz('pronBezug', [`${ziel[3]} ${rest}.`], 0, [gross(ziel[0]) + ' ' + ziel[1], ` ${rest}.`], 0, `<b>${ziel[3]}</b>: Welches Substantiv hat dieses Geschlecht?`, `${ziel[3].toLowerCase()} → <b>${ziel[0]}</b>: Das passt nur zu „${ziel[0]} ${ziel[1]}“.`, `<b>${ziel[3]}</b> steht für „<b>${ziel[0]} ${ziel[1]}</b>“.`),
+      ex: zz('pronBezug', [`${ziel[3]} ${rest}.`], 0, [gross(ziel[0]) + ' ' + ziel[1], ` ${rest}.`], 0, `<b>${ziel[3]}</b>: Welches Nomen hat dieses Geschlecht?`, `${ziel[3].toLowerCase()} → <b>${ziel[0]}</b>: Das passt nur zu „${ziel[0]} ${ziel[1]}“.`, `<b>${ziel[3]}</b> steht für „<b>${ziel[0]} ${ziel[1]}</b>“.`),
     };
   }
   // Sätze zum Antippen: Pronomen sind mit * markiert
@@ -717,15 +717,15 @@
   const verbformen = () => U.wahl([[26, persForm], [14, persWahl], [22, partizip], [22, imperativ], [16, formArt]]);
 
   // ---------- Thema: Wortarten erkennen ----------
-  // Jedes Wort trägt seine Wortart: N Substantiv, V Verb, A Adjektiv, D Artikel, P Pronomen, x andere (kommt später)
-  const WA = { N: 'Substantiv', V: 'Verb', A: 'Adjektiv', D: 'Artikel', P: 'Pronomen' };
-  const WAPL = { N: 'Substantive', V: 'Verben', A: 'Adjektive', D: 'Artikel', P: 'Pronomen' };
+  // Jedes Wort trägt seine Wortart: N Nomen, V Verb, A Adjektiv, D Artikel, P Pronomen, x andere (kommt später)
+  const WA = { N: 'Nomen', V: 'Verb', A: 'Adjektiv', D: 'Artikel', P: 'Pronomen' };
+  const WAPL = { N: 'Nomen', V: 'Verben', A: 'Adjektive', D: 'Artikel', P: 'Pronomen' };
   const WAPROBE = {
-    N: 'Substantive schreibt man groß, und ein Artikel passt davor.',
+    N: 'Nomen schreibt man groß, und ein Artikel passt davor.',
     V: 'Verben sagen, was jemand tut oder was geschieht. Sie ändern sich mit der Person (ich …, du …).',
     A: 'Adjektive sagen, wie etwas ist. Man kann sie steigern (klein, kleiner, am kleinsten).',
-    D: 'Artikel begleiten ein Substantiv: der, die, das, ein, eine (auch dem, den, des, einen …).',
-    P: 'Pronomen stehen für ein Substantiv (ich, er, uns …) oder zeigen, wem etwas gehört (mein, unser …).',
+    D: 'Artikel begleiten ein Nomen: der, die, das, ein, eine (auch dem, den, des, einen …).',
+    P: 'Pronomen stehen für ein Nomen (ich, er, uns …) oder zeigen, wem etwas gehört (mein, unser …).',
   };
   const SATZ_WA = [
     'Der|D kleine|A Hund|N schläft|V im|x Garten|N', 'Wir|P suchen|V den|D roten|A Ball|N', 'Die|D alte|A Lampe|N steht|V auf|x dem|D Tisch|N',
@@ -742,7 +742,7 @@
     return {
       prompt: `Welche Wortart hat das markierte Wort?<br><span class="bsp">${z.w.map((w, k) => (k === i ? `<u>${w}</u>` : w)).join(' ')}.</span>`,
       choices: arten.map((a) => WA[a]), correct: arten.indexOf(z.tag[i]),
-      hint: 'Mach die Proben: Passt ein Artikel davor (Substantiv)? Ändert es sich mit der Person (Verb)? Kann man es steigern (Adjektiv)? Begleitet es ein Substantiv (Artikel)? Steht es für ein Substantiv (Pronomen)?',
+      hint: 'Mach die Proben: Passt ein Artikel davor (Nomen)? Ändert es sich mit der Person (Verb)? Kann man es steigern (Adjektiv)? Begleitet es ein Nomen (Artikel)? Steht es für ein Nomen (Pronomen)?',
       solution: `<b>${z.w[i]}</b> ist ein <b>${WA[z.tag[i]]}</b>. ${WAPROBE[z.tag[i]]}`,
       ex: { mode: 'wa', art: 'waBestimmen', w: z.w, tag: z.tag, ziel: z.tag[i], idx: [i] },
     };
@@ -904,7 +904,7 @@
     'Lina trägt einen *schweren Koffer.', 'Emil findet einen *glänzenden Stein.', 'Die *müde Lehrerin trinkt einen *heißen Tee.', 'Im Garten blühen *bunte Blumen.',
     'Der *alte Baum verliert seine *gelben Blätter.', 'Mia füttert das *hungrige Pferd.', 'Das *spielende Mädchen wirft den *kleinen Ball.', 'Der Zug fährt über die *lange Brücke.',
   ];
-  const TIPP_ATTR = 'Ein Attribut beschreibt ein Substantiv genauer und steht direkt davor. <b>Weglassprobe:</b> Lässt du es weg, bleibt der Satz trotzdem richtig.';
+  const TIPP_ATTR = 'Ein Attribut beschreibt ein Nomen genauer und steht direkt davor. <b>Weglassprobe:</b> Lässt du es weg, bleibt der Satz trotzdem richtig.';
   function attrAntippen() {
     const { tokens, correct } = markSatz(SATZ_ATTR);
     const liste = correct.map((i) => tokens[i]);
@@ -913,7 +913,7 @@
       prompt: 'Tippe <b>alle Attribute</b> an.', tap: { tokens, correct }, answerText: liste.join(', '),
       hint: TIPP_ATTR,
       solution: `Attribute: <b>${liste.join(', ')}</b>.<br>Weglassprobe: „${ohne}“ Der Satz stimmt immer noch.`,
-      ex: { mode: 'marken', art: 'attrAntippen', tokens, correct, was: 'Attribute', s1: 'Ein Attribut steht vor einem Substantiv und beschreibt es genauer. Ohne Attribut bleibt der Satz richtig.' },
+      ex: { mode: 'marken', art: 'attrAntippen', tokens, correct, was: 'Attribute', s1: 'Ein Attribut steht vor einem Nomen und beschreibt es genauer. Ohne Attribut bleibt der Satz richtig.' },
     };
   }
   function attrWeglassen() {
@@ -938,11 +938,11 @@
     const { tokens, correct } = m, a = pick(correct);
     const subst = tokens.map((w, i) => i).filter((i) => (i > 0 && /^[A-ZÄÖÜ]/.test(tokens[i])) || (i === 0 && EIGEN.includes(tokens[0])));
     return {
-      prompt: `Welches Substantiv beschreibt das markierte Attribut genauer?<br><span class="bsp">${tokens.map((w, i) => (i === a ? `<u>${w}</u>` : w)).join(' ')}</span>`,
+      prompt: `Welches Nomen beschreibt das markierte Attribut genauer?<br><span class="bsp">${tokens.map((w, i) => (i === a ? `<u>${w}</u>` : w)).join(' ')}</span>`,
       choices: subst.map((i) => cleanW(tokens[i])), correct: subst.indexOf(a + 1),
-      hint: 'Ein Attribut steht direkt <b>vor</b> seinem Substantiv. Frage: „Was für ein …?“',
+      hint: 'Ein Attribut steht direkt <b>vor</b> seinem Nomen. Frage: „Was für ein …?“',
       solution: `<b>${tokens[a]} ${cleanW(tokens[a + 1])}</b>: Das Attribut „${tokens[a]}“ steht direkt vor „${cleanW(tokens[a + 1])}“ und beschreibt es genauer.`,
-      ex: { mode: 'marken', art: 'attrBezug', tokens, correct: [a, a + 1], was: 'Attribut und Substantiv', s1: 'Ein Attribut steht direkt vor seinem Substantiv. Frage: Was für ein …?' },
+      ex: { mode: 'marken', art: 'attrBezug', tokens, correct: [a, a + 1], was: 'Attribut und Nomen', s1: 'Ein Attribut steht direkt vor seinem Nomen. Frage: Was für ein …?' },
     };
   }
   const attribute = () => U.wahl([[40, attrAntippen], [32, attrWeglassen], [28, attrBezug]]);
@@ -1297,7 +1297,7 @@
     return {
       prompt: 'Verlängere das Wort.', layout: 'satz',
       fields: [{ type: 'text', answer: w.mehr[0], prefix: w.adj ? `${w.wort} → die` : `ein ${w.wort}, viele`, suffix: w.adj ? 'Maus' : '', label: 'verlängertes Wort' }],
-      hint: w.adj ? 'Setze das Adjektiv vor ein Substantiv: „die … Maus“. Dann bekommt es eine Endung.' : 'Bilde die Mehrzahl: „ein …, viele …“.',
+      hint: w.adj ? 'Setze das Adjektiv vor ein Nomen: „die … Maus“. Dann bekommt es eine Endung.' : 'Bilde die Mehrzahl: „ein …, viele …“.',
       solution: `<b>${w.wort}</b> → <b class="vb">${w.mehr[0]}</b><br>Beim Verlängern hörst du das <b>${w.ein}</b> deutlich. Deshalb schreibt man auch „${w.wort}“ mit ${w.ein}.`,
       ex: zz('verlaengern', [w.vor, w.ein], 1, [w.adj ? 'die ' : 'viele ', w.mehr[0]], 1, 'Am Wortende hört man b, d, g nicht genau. Verlängere das Wort!', `Jetzt steht der Buchstabe nicht mehr am Ende, und du hörst das <b>${w.ein}</b>.`, `${w.wort} → <b>${w.mehr[0]}</b>`),
     };
@@ -1344,7 +1344,7 @@
   const sLaute = () => U.wahl([[48, slLuecke], [22, slRegel], [30, slTippen]]);
 
   // ---------- Thema: Groß- und Kleinschreibung ----------
-  const REGEL_GROSS = 'Groß schreibt man den <b>Satzanfang</b> und alle <b>Substantive</b>. Probe: Vor ein Substantiv passt ein Artikel (der, die, das), auch mit Adjektiv dazwischen (der kleine Hund).';
+  const REGEL_GROSS = 'Groß schreibt man den <b>Satzanfang</b> und alle <b>Nomen</b>. Probe: Vor ein Nomen passt ein Artikel (der, die, das), auch mit Adjektiv dazwischen (der kleine Hund).';
   function grossAntippen() {
     const z = pick(SATZ_WA);
     const correct = z.tag.map((t, k) => (k === 0 || t === 'N' ? k : -1)).filter((k) => k >= 0);
@@ -1353,7 +1353,7 @@
       prompt: 'Hier ist alles kleingeschrieben. Tippe alle Wörter an, die man <b>groß</b> schreiben muss.',
       tap: { tokens, correct }, answerText: correct.map((k) => z.w[k]).join(', '),
       hint: REGEL_GROSS,
-      solution: `<b>${z.w.join(' ')}.</b><br>${z.w[0]}: Satzanfang. ${correct.slice(1).map((k) => z.w[k]).join(', ')}: Substantiv${correct.length > 2 ? 'e' : ''}.`,
+      solution: `<b>${z.w.join(' ')}.</b><br>${z.w[0]}: Satzanfang. ${correct.slice(1).map((k) => z.w[k]).join(', ')}: Nomen.`,
       ex: { mode: 'marken', art: 'grossAntippen', tokens, correct, was: 'Groß', s1: REGEL_GROSS, merk: `<b>${z.w.join(' ')}.</b><br>Groß: ${correct.map((k) => z.w[k]).join(', ')}` },
     };
   }
@@ -1369,7 +1369,7 @@
       ex: zz('grossWort', [z.w[i].toUpperCase()], 0, [vor + ' ', z.w[i], (nach ? ' ' + nach : '') + '.'], 1, `Welche Wortart ist das? ${ist ? 'Passt ein Artikel davor?' : 'Passt ein Artikel davor? Hier nicht.'}`, `„${z.w[i]}“ ist ein ${WA[z.tag[i]]}: ${ist ? 'groß' : 'klein'}.`, `${vor} <b>${z.w[i]}</b>${nach ? ' ' + nach : ''}.`),
     };
   }
-  // Aus Verben werden Substantive: das Laufen, beim Spielen
+  // Aus Verben werden Nomen: das Laufen, beim Spielen
   const NOMV = ['laufen', 'schwimmen', 'lesen', 'singen', 'malen', 'spielen', 'tanzen', 'lachen', 'schreiben', 'rechnen'];
   const NOMS = [['Das', 'macht mir Spaß', 'das'], ['Beim', 'vergesse ich die Zeit', 'beim (= bei dem)'], ['Zum', 'brauche ich Ruhe', 'zum (= zu dem)']];
   const NOMK = [['Wir', 'jeden Tag'], ['Die Kinder', 'gern'], ['Heute wollen wir', '']];
@@ -1380,9 +1380,9 @@
     return {
       prompt: `Welche Schreibweise ist richtig?<br><span class="bsp">${vor} ___ ${nach}${nach ? '' : ''}.</span>`.replace(' .', '.'),
       choices: wahl, correct: wahl.indexOf(subst ? gr : v),
-      hint: 'Auch ein Verb kann zum Substantiv werden. Das erkennst du am <b>Artikel</b> davor: das, beim (= bei dem), zum (= zu dem). Dann schreibt man es groß.',
-      solution: `${vor} <b class="vb">${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.<br>${subst ? `Vor dem Wort steht „${wort}“. Das Verb ist hier ein Substantiv, also <b>groß</b>.` : 'Hier sagt das Wort, was jemand tut. Es ist ein Verb, also <b>klein</b>.'}`,
-      ex: zz('grossVerb', [vor + ' ', '___', nach ? ' ' + nach + '.' : '.'], 1, [vor + ' ', subst ? gr : v, nach ? ' ' + nach + '.' : '.'], 1, 'Steht ein Artikel davor (das, beim, zum)?', subst ? `„${wort}“ macht das Verb zum Substantiv: groß.` : 'Kein Artikel davor: Es bleibt ein Verb, also klein.', `${vor} <b>${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.`),
+      hint: 'Auch ein Verb kann zum Nomen werden. Das erkennst du am <b>Artikel</b> davor: das, beim (= bei dem), zum (= zu dem). Dann schreibt man es groß.',
+      solution: `${vor} <b class="vb">${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.<br>${subst ? `Vor dem Wort steht „${wort}“. Das Verb ist hier ein Nomen, also <b>groß</b>.` : 'Hier sagt das Wort, was jemand tut. Es ist ein Verb, also <b>klein</b>.'}`,
+      ex: zz('grossVerb', [vor + ' ', '___', nach ? ' ' + nach + '.' : '.'], 1, [vor + ' ', subst ? gr : v, nach ? ' ' + nach + '.' : '.'], 1, 'Steht ein Artikel davor (das, beim, zum)?', subst ? `„${wort}“ macht das Verb zum Nomen: groß.` : 'Kein Artikel davor: Es bleibt ein Verb, also klein.', `${vor} <b>${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.`),
     };
   }
   function grossWelches() {
@@ -1393,8 +1393,8 @@
       prompt: 'Welches Wort muss man <b>groß</b> schreiben?',
       choices: w, correct: w.indexOf(n.toLowerCase()),
       hint: 'Mach die Artikelprobe: Vor welches Wort passt „der“, „die“ oder „das“?',
-      solution: `<b>${n}</b> ist ein Substantiv: ${N.find((x) => x.sg === n).art} ${n}. Die anderen Wörter sind Verb, Adjektiv und Pronomen. Die schreibt man klein.`,
-      ex: zz('grossWelches', [n.toLowerCase()], 0, [N.find((x) => x.sg === n).art + ' ', n], 1, 'Artikelprobe: Vor welches Wort passt der, die oder das?', 'Passt ein Artikel davor, ist es ein Substantiv: groß.', `<b>${n}</b>`),
+      solution: `<b>${n}</b> ist ein Nomen: ${N.find((x) => x.sg === n).art} ${n}. Die anderen Wörter sind Verb, Adjektiv und Pronomen. Die schreibt man klein.`,
+      ex: zz('grossWelches', [n.toLowerCase()], 0, [N.find((x) => x.sg === n).art + ' ', n], 1, 'Artikelprobe: Vor welches Wort passt der, die oder das?', 'Passt ein Artikel davor, ist es ein Nomen: groß.', `<b>${n}</b>`),
     };
   }
   const grossKlein = () => U.wahl([[34, grossAntippen], [26, grossWort], [24, grossVerb], [16, grossWelches]]);
@@ -1524,7 +1524,7 @@
     ['essen', 'bar', 'essbar', 'A', ['lich', 'sam'], 0], ['lesen', 'bar', 'lesbar', 'A', ['ig', 'sam'], 0], ['hören', 'bar', 'hörbar', 'A', ['lich', 'sam'], 0], ['trinken', 'bar', 'trinkbar', 'A', ['ig', 'sam'], 0],
     ['sparen', 'sam', 'sparsam', 'A', ['ig', 'lich'], 0], ['Fehler', 'los', 'fehlerlos', 'A', ['ig', 'bar'], 1],
   ].map(([basis, nach, wort, wa, falsch, reg]) => ({ basis, nach, wort, wa, falsch, reg: !!reg }));
-  const NREGEL = { N: 'Die Nachsilben <b>-ung, -heit, -keit, -nis, -schaft</b> machen ein <b>Substantiv</b>. Das schreibt man groß.', A: 'Die Nachsilben <b>-ig, -lich, -isch, -bar, -sam, -los</b> machen ein <b>Adjektiv</b>. Das schreibt man klein.' };
+  const NREGEL = { N: 'Die Nachsilben <b>-ung, -heit, -keit, -nis, -schaft</b> machen ein <b>Nomen</b>. Das schreibt man groß.', A: 'Die Nachsilben <b>-ig, -lich, -isch, -bar, -sam, -los</b> machen ein <b>Adjektiv</b>. Das schreibt man klein.' };
   function vorsilbe() {
     const v = pick(VORS), wahl = shuffle([v.ok, ...v.falsch]);
     return {
@@ -1540,7 +1540,7 @@
     const n = pick(NACHS);
     return {
       prompt: `Welche Wortart ist das neue Wort?<br><span class="bsp">${n.basis} + -${n.nach} = ${n.wort}</span>`,
-      choices: ['Substantiv', 'Adjektiv', 'Verb'], correct: n.wa === 'N' ? 0 : 1,
+      choices: ['Nomen', 'Adjektiv', 'Verb'], correct: n.wa === 'N' ? 0 : 1,
       hint: 'Schau auf die Nachsilbe und auf den Anfangsbuchstaben: groß oder klein?',
       solution: `<b>${n.wort}</b> ist ein ${WA[n.wa]}.<br>${NREGEL[n.wa]}`, ex: exNach('nachWortart', n),
     };
@@ -1934,7 +1934,7 @@
   D.grades[5] = {
     lbs: [
       { id: 'd5-wortarten', nr: 1, title: 'Wortarten', topics: [
-        { id: 'd5-substantive', title: 'Substantive: Geschlecht und Mehrzahl', icon: '🏷', gen: substantive },
+        { id: 'd5-substantive', title: 'Nomen: Geschlecht und Mehrzahl', icon: '🏷', gen: substantive },
         { id: 'd5-faelle', title: 'Die vier Fälle', icon: '❓', gen: faelle },
         { id: 'd5-pronomen', title: 'Pronomen', icon: '👉', gen: pronomen },
         { id: 'd5-adjektive', title: 'Adjektive steigern', icon: '📶', gen: adjektive },
