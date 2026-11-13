@@ -774,11 +774,137 @@
   const wortarten = () => U.wahl([[40, waBestimmen], [36, waAntippen], [24, waWort]]);
 
 
+  // ---------- Thema: Präpositionen (Deutschbuch Kap. 9, S. 206; Sprachtraining Kap. 1) ----------
+  // Sätze: Präpositionen mit * markiert (keine verschmolzenen Formen wie im, zum)
+  const PRS = ['Die Katze schläft *unter dem Tisch', 'Lina wartet *vor der Tür', 'Das Bild hängt *über dem Sofa', 'Wir gehen *durch den Park',
+    'Emil spielt *mit seinem Hund', 'Das Geschenk ist *für meine Oma', '*Nach der Schule gehen wir *in den Garten', 'Der Ball rollt *hinter das Auto',
+    'Mia sitzt *zwischen ihren Freunden', '*Seit dem Sommer hat Ben einen Hund', 'Die Schuhe stehen *neben dem Bett', 'Wir laufen *um den See',
+    'Paul kommt *ohne seine Jacke', '*Bei Regen bleiben wir *in der Hütte', 'Das Heft liegt *auf dem Tisch', 'Nora fährt *mit dem Rad *zu ihrer Oma'];
+  const prSatz = () => { const w = pick(PRS).split(' '); const correct = w.map((x, i) => (x[0] === '*' ? i : -1)).filter((i) => i >= 0); const tokens = w.map((x, i) => x.replace('*', '') + (i === w.length - 1 ? '.' : '')); return { tokens, correct, woerter: correct.map((i) => tokens[i].replace('.', '')) }; };
+  const PR_TIPP = 'Präpositionen sind kleine Wörter wie <b>auf, unter, mit, für, durch, nach</b>. Sie stehen vor einem Nomen (oder Pronomen) und zeigen, wie Dinge zueinander stehen: wo, wohin, wann, womit.';
+  // [Präposition, Fall, Beispiel]
+  const PRFALL = [['mit', 'D', 'mit dem Bus'], ['nach', 'D', 'nach der Schule'], ['bei', 'D', 'bei meiner Oma'], ['seit', 'D', 'seit dem Sommer'], ['von', 'D', 'von meinem Freund'],
+    ['zu', 'D', 'zu meiner Freundin'], ['aus', 'D', 'aus dem Haus'], ['für', 'A', 'für meinen Bruder'], ['durch', 'A', 'durch den Wald'], ['ohne', 'A', 'ohne den Schirm'],
+    ['gegen', 'A', 'gegen die Wand'], ['um', 'A', 'um den Tisch']];
+  const PRFNAME = { D: 'Dativ (Wem?)', A: 'Akkusativ (Wen oder was?)' };
+  // Wechselpräpositionen: [Satz mit ___, richtig, falsch, wo/wohin]
+  const PRW = [['Das Buch liegt auf ___ Tisch.', 'dem', 'den', 'wo'], ['Ich lege das Buch auf ___ Tisch.', 'den', 'dem', 'wohin'],
+    ['Die Vase steht auf ___ Fensterbank.', 'der', 'die', 'wo'], ['Mama stellt die Vase auf ___ Fensterbank.', 'die', 'der', 'wohin'],
+    ['Der Hund sitzt neben ___ Sofa.', 'dem', 'das', 'wo'], ['Der Hund setzt sich neben ___ Sofa.', 'das', 'dem', 'wohin'],
+    ['Das Bild hängt an ___ Wand.', 'der', 'die', 'wo'], ['Mia hängt das Bild an ___ Wand.', 'die', 'der', 'wohin'],
+    ['Die Schuhe stehen unter ___ Bett.', 'dem', 'das', 'wo'], ['Ben stellt die Schuhe unter ___ Bett.', 'das', 'dem', 'wohin'],
+    ['Die Katze liegt vor ___ Ofen.', 'dem', 'den', 'wo'], ['Die Katze legt sich vor ___ Ofen.', 'den', 'dem', 'wohin']];
+  // passende Präposition: [Satz mit ___, richtig, [falsch], Hinweis]
+  const PRORT = [['Der Ball liegt ___ dem Schrank.', 'hinter', ['auf', 'neben'], 'Man sieht ihn nicht, der Schrank verdeckt ihn.'],
+    ['Die Lampe hängt ___ dem Tisch.', 'über', ['unter', 'neben'], 'Sie ist oben, der Tisch ist unten.'],
+    ['Der Hund schläft ___ dem Tisch.', 'unter', ['auf', 'über'], 'Der Tisch ist sein Dach.'],
+    ['Mia sitzt ___ Lina und Ben.', 'zwischen', ['über', 'unter'], 'Lina sitzt links von ihr, Ben rechts.'],
+    ['Wir gehen ___ den Wald.', 'durch', ['unter', 'über'], 'Wir kommen auf der anderen Seite wieder heraus.'],
+    ['Ich trinke den Tee ___ Zucker.', 'ohne', ['für', 'durch'], 'Ich mag ihn nicht süß.'],
+    ['Das Geschenk ist ___ dich.', 'für', ['mit', 'ohne'], 'Du bekommst es.'],
+    ['Wir fahren ___ dem Zug nach Berlin.', 'mit', ['ohne', 'gegen'], 'Der Zug bringt uns hin.']];
+  function prAntippen() {
+    const x = prSatz();
+    return {
+      prompt: `Tippe ${x.correct.length > 1 ? '<b>alle Präpositionen</b>' : 'die <b>Präposition</b>'} an.`,
+      tap: { tokens: x.tokens, correct: x.correct }, answerText: x.woerter.join(', '),
+      hint: PR_TIPP,
+      solution: `${x.tokens.map((t, k) => (x.correct.includes(k) ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Präposition${x.correct.length > 1 ? 'en' : ''}: <b>${x.woerter.join(', ')}</b>. Sie ${x.correct.length > 1 ? 'stehen' : 'steht'} vor einem Nomen und ${x.correct.length > 1 ? 'zeigen' : 'zeigt'}, wie die Dinge zueinander stehen.`,
+      ex: { mode: 'marken', art: 'prAntippen', tokens: x.tokens, correct: x.correct, was: 'Präpositionen', s1: 'Präpositionen stehen vor einem Nomen: <b>unter</b> dem Tisch, <b>mit</b> dem Bus.' },
+    };
+  }
+  function prFall() {
+    const [w, f, bsp] = pick(PRFALL), ch = ['D', 'A'];
+    const t = bsp.split(' ');
+    return {
+      prompt: `Welchen Fall verlangt die Präposition <b>${w}</b>?<br><span class="bsp">${w} ___ ${t.slice(2).join(' ')}</span>`,
+      choices: ch.map((x) => PRFNAME[x]), correct: ch.indexOf(f),
+      hint: 'Merke: <b>mit, nach, bei, seit, von, zu, aus</b> → Dativ. <b>für, durch, gegen, ohne, um</b> → Akkusativ.',
+      solution: `<b>${bsp}</b>: Nach „${w}“ steht der <b>${f === 'D' ? 'Dativ' : 'Akkusativ'}</b>.<br>Merke: mit, nach, bei, seit, von, zu, aus → Dativ. für, durch, gegen, ohne, um → Akkusativ.`,
+      ex: { mode: 'marken', art: 'prFall', tokens: t, correct: [0, 1], was: `${w} + ${f === 'D' ? 'Dativ' : 'Akkusativ'}`, s1: `Nach „${w}“ steht immer derselbe Fall.`, merk: `<b>${bsp}</b>: ${w} + <b>${f === 'D' ? 'Dativ' : 'Akkusativ'}</b>.` },
+    };
+  }
+  function prWechsel() {
+    const [satz, ok, falsch, frage] = pick(PRW), ch = shuffle([ok, falsch]);
+    const voll = satz.replace('___', ok);
+    return {
+      prompt: `Welcher Artikel passt?<br><span class="bsp">${satz}</span>`,
+      choices: ch, correct: ch.indexOf(ok),
+      hint: 'Frage: <b>Wo</b> ist etwas? Dann Dativ (dem, der). <b>Wohin</b> kommt etwas? Dann Akkusativ (den, die, das).',
+      solution: `<b>${voll}</b><br>Frage: <b>${frage === 'wo' ? 'Wo' : 'Wohin'}?</b> ${frage === 'wo' ? 'Es bleibt an seinem Platz: Dativ.' : 'Es kommt an einen neuen Platz: Akkusativ.'}`,
+      ex: zz('prWechsel', [satz], 0, [voll], 0, `Frage: <b>Wo</b> oder <b>Wohin</b>?`, frage === 'wo' ? '<b>Wo?</b> Es bleibt, wo es ist: Dativ.' : '<b>Wohin?</b> Es kommt an einen neuen Platz: Akkusativ.', `<b>${voll}</b>`),
+    };
+  }
+  function prPasst() {
+    const [satz, ok, falsch, hinweis] = pick(PRORT), ch = shuffle([ok, ...falsch]);
+    const voll = satz.replace('___', ok);
+    return {
+      prompt: `Welche Präposition passt? <i>${hinweis}</i><br><span class="bsp">${satz}</span>`,
+      choices: ch, correct: ch.indexOf(ok),
+      hint: 'Stell dir das Bild vor: Wo genau ist das Ding? Oben, unten, dahinter, dazwischen?',
+      solution: `<b>${voll}</b><br>${hinweis} Deshalb: <b>${ok}</b>.`,
+      ex: { mode: 'marken', art: 'prPasst', tokens: voll.split(' '), correct: [voll.split(' ').indexOf(ok)], was: 'Präposition', s1: hinweis, merk: `<b>${voll}</b>` },
+    };
+  }
+  const praepositionen = () => U.wahl([[30, prAntippen], [22, prFall], [26, prWechsel], [22, prPasst]]);
+
+  // ---------- Thema: Adverbien (Deutschbuch Kap. 9, S. 207) ----------
+  const ADVF = { wann: 'Wann?', wo: 'Wo?', wie: 'Wie?', warum: 'Warum?' };
+  const ADVW = { wann: ['heute', 'morgen', 'gestern', 'bald', 'jetzt', 'oft', 'abends'], wo: ['hier', 'dort', 'draußen', 'drinnen', 'oben', 'unten'], wie: ['gern', 'allein', 'zusammen'], warum: ['deshalb', 'darum'] };
+  // [Satz mit *Adverb, Frage]
+  const ADVS = [['Wir spielen *heute Fußball', 'wann'], ['Das Fahrrad steht *draußen', 'wo'], ['Lina liest *gern Comics', 'wie'], ['Es regnet. *Deshalb bleiben wir zu Hause', 'warum'],
+    ['*Morgen fahren wir ans Meer', 'wann'], ['Mein Zimmer ist *oben', 'wo'], ['Ben kommt *bald nach Hause', 'wann'], ['Wir machen die Hausaufgaben *zusammen', 'wie'],
+    ['Ich war *gestern im Kino', 'wann'], ['Mia wartet *dort auf den Bus', 'wo'], ['Paul war krank. *Darum fehlte er', 'warum'], ['Opa trinkt *abends Tee', 'wann'],
+    ['Emil geht *allein zur Schule', 'wie'], ['Wir essen *drinnen', 'wo']];
+  const advSatz = () => { const [roh, f] = pick(ADVS); const w = roh.split(' '); const i = w.findIndex((x) => x[0] === '*'); const tokens = w.map((x, k) => x.replace('*', '') + (k === w.length - 1 ? '.' : '')); return { tokens, i, wort: tokens[i].replace('.', ''), f }; };
+  const ADV_TIPP = 'Adverbien sagen genauer, <b>wann</b> (heute, bald), <b>wo</b> (draußen, oben), <b>wie</b> (gern, allein) oder <b>warum</b> (deshalb) etwas geschieht. Sie bekommen nie eine Endung.';
+  const ADJ_VGL = ['schnell', 'groß', 'rot', 'müde', 'laut', 'schön', 'klein', 'alt'];
+  function advAntippen() {
+    const x = advSatz();
+    return {
+      prompt: 'Tippe das <b>Adverb</b> an.', tap: { tokens: x.tokens, correct: [x.i], one: true }, answerText: x.wort,
+      hint: ADV_TIPP,
+      solution: `${x.tokens.map((t, k) => (k === x.i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br><b>${x.wort}</b> ist ein Adverb. Es antwortet auf die Frage <b>${ADVF[x.f]}</b>`,
+      ex: { mode: 'marken', art: 'advAntippen', tokens: x.tokens, correct: [x.i], was: 'Adverb', s1: `Frage: Wann? Wo? Wie? Warum?`, merk: `Adverb: <b>${x.wort}</b>. Frage: ${ADVF[x.f]}` },
+    };
+  }
+  function advFrage() {
+    const x = advSatz(), arten = Object.keys(ADVF);
+    return {
+      prompt: `Auf welche Frage antwortet das Adverb <b>${x.wort}</b>?<br><span class="bsp">${x.tokens.join(' ')}</span>`,
+      choices: arten.map((a) => ADVF[a]), correct: arten.indexOf(x.f), hint: ADV_TIPP,
+      solution: `${x.tokens.map((t, k) => (k === x.i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br><b>${x.wort}</b> antwortet auf <b>${ADVF[x.f]}</b>`,
+      ex: { mode: 'marken', art: 'advFrage', tokens: x.tokens, correct: [x.i], was: 'Adverb', s1: 'Frage: Wann? Wo? Wie? Warum?', merk: `<b>${x.wort}</b>: ${ADVF[x.f]}` },
+    };
+  }
+  function advLuecke() {
+    const x = advSatz(), andere = Object.keys(ADVW).filter((f) => f !== x.f), falsch = shuffle(andere).slice(0, 2).map((f) => pick(ADVW[f]));
+    const ch = shuffle([x.wort.toLowerCase(), ...falsch]);
+    const luecke = x.tokens.map((t, k) => (k === x.i ? '___' + (t.endsWith('.') ? '.' : '') : t)).join(' ');
+    const passt = (w) => (x.i === 0 || /\.$/.test(x.tokens[x.i - 1]) ? w.charAt(0).toUpperCase() + w.slice(1) : w);
+    return {
+      prompt: `Welches Adverb passt? Frage: <b>${ADVF[x.f]}</b><br><span class="bsp">${luecke}</span>`,
+      choices: ch.map(passt), correct: ch.indexOf(x.wort.toLowerCase()), hint: ADV_TIPP,
+      solution: `${x.tokens.map((t, k) => (k === x.i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Gefragt ist <b>${ADVF[x.f]}</b> → <b>${x.wort}</b>.`,
+      ex: { mode: 'marken', art: 'advLuecke', tokens: x.tokens, correct: [x.i], was: 'Adverb', s1: `Gesucht: ein Adverb für die Frage <b>${ADVF[x.f]}</b>`, merk: `${ADVF[x.f]} → <b>${x.wort}</b>` },
+    };
+  }
+  function advOderAdj() {
+    const adv = Math.random() < 0.5, w = adv ? pick(Object.values(ADVW).flat()) : pick(ADJ_VGL);
+    return {
+      prompt: `Adverb oder Adjektiv?<br><span class="bsp">${w}</span>`, choices: ['Adverb', 'Adjektiv'], correct: adv ? 0 : 1,
+      hint: 'Probe: Kann das Wort mit einer Endung vor einem Nomen stehen (der <b>schnelle</b> Hund) und kann man es steigern (schneller)? Dann ist es ein Adjektiv. Ein Adverb bleibt immer gleich.',
+      solution: adv ? `<b>${w}</b> ist ein <b>Adverb</b>: Es bekommt nie eine Endung und lässt sich nicht steigern. Mit Endung vor einem Nomen geht es nicht.` : `<b>${w}</b> ist ein <b>Adjektiv</b>: der ${w}e Hund, ${w}er. Adjektive kann man vor ein Nomen stellen und steigern.`,
+      ex: { mode: 'marken', art: 'advOderAdj', tokens: adv ? [w] : ['der', w + 'e', 'Hund'], correct: adv ? [0] : [1], was: adv ? 'Adverb' : 'Adjektiv', s1: 'Probe: Passt das Wort mit Endung vor ein Nomen?', merk: adv ? `<b>${w}</b>: Adverb, ohne Endung.` : `<b>der ${w}e Hund</b>: Adjektiv.` },
+    };
+  }
+  const adverbien = () => U.wahl([[32, advAntippen], [24, advFrage], [24, advLuecke], [20, advOderAdj]]);
+
   // =====================================================
   // Bereich 2: Satzbau und Satzzeichen
   // =====================================================
   // Sätze, in Satzglieder geteilt. Rolle: S Subjekt, P Prädikat, D Dativobjekt, A Akkusativobjekt, x weiteres Satzglied
-  const ROLLE = { S: 'Subjekt', P: 'Prädikat', D: 'Dativobjekt', A: 'Akkusativobjekt', x: 'weiteres Satzglied' };
+  const ROLLE = { S: 'Subjekt', P: 'Prädikat', D: 'Dativobjekt', A: 'Akkusativobjekt', x: 'weiteres Satzglied', t: 'Zeit', l: 'Ort', m: 'Art und Weise', k: 'Grund' };
   const RFRAGE = { S: 'Wer oder was?', P: 'Was tut jemand? Was geschieht?', D: 'Wem?', A: 'Wen oder was?' };
   const SG = [
     'Der Lehrer|S zeigt|P den Kindern|D das Bild|A', 'Am Abend|x liest|P die Schwester|S ein Buch|A', 'Emil|S schenkt|P seiner Freundin|D eine Blume|A',
@@ -1114,7 +1240,120 @@
       solution: `<b>${x.mitKomma.join(' ')}</b><br>${REGEL_GEF}`, ex: exKomma('kommaGef', x.w, [x.komma], REGEL_GEF),
     };
   }
-  const komma = () => U.wahl([[34, kommaAufz], [22, kommaWahl], [44, kommaGef]]);
+  // Apposition (Beisatz): Kommas mit (,) markiert (Deutschbuch Kap. 4, S. 112)
+  const APPO = ['Herr Meier(,) unser Nachbar(,) hat einen großen Hund.', 'Lina(,) meine beste Freundin(,) wohnt in Dresden.', 'Bello(,) der Hund von Ben(,) bellt jeden Morgen.',
+    'Frau Klein(,) unsere Lehrerin(,) liest uns eine Geschichte vor.', 'Dresden(,) die Hauptstadt von Sachsen(,) liegt an der Elbe.', 'Wir besuchen Oma Inge(,) die Mutter meines Vaters.',
+    'Emil(,) mein kleiner Bruder(,) spielt gern Fußball.', 'Der Elbradweg(,) ein langer Radweg(,) führt an der Elbe entlang.'];
+  const REGEL_APPO = 'Eine <b>Apposition</b> (Beisatz) steht hinter einem Nomen und erklärt es genauer: „Lina, <b>meine beste Freundin</b>, …“. Sie wird mit <b>Kommas</b> abgetrennt, vorn und hinten. Am Satzende ersetzt der Punkt das zweite Komma.';
+  function kommaAppo() {
+    const roh = pick(APPO).split(' '), w = roh.map((x) => x.replace('(,)', '').replace(/\.$/, '')), ks = roh.map((x, i) => (x.includes('(,)') ? i : -1)).filter((i) => i >= 0);
+    const voll = w.map((x, i) => x + (ks.includes(i) ? ',' : '')).join(' ') + '.';
+    return {
+      prompt: 'Setze die fehlenden <b>Kommas</b>: Tippe die Stellen an.',
+      tap: { tokens: w.map((t, i) => (i === w.length - 1 ? t + '.' : t)), correct: ks, gaps: true }, answerText: voll,
+      hint: 'Steckt im Satz ein Einschub, der ein Nomen genauer erklärt (meine Freundin, unser Nachbar)? Den trennt man mit Kommas ab.',
+      solution: `<b>${voll}</b><br>${REGEL_APPO}`, ex: exKomma('kommaAppo', w, ks, REGEL_APPO),
+    };
+  }
+  const komma = () => U.wahl([[28, kommaAufz], [18, kommaWahl], [34, kommaGef], [20, kommaAppo]]);
+
+  // ---------- Thema: Adverbiale Bestimmungen (Deutschbuch Kap. 9, S. 228) ----------
+  // Rollen: t Zeit (Wann?), l Ort (Wo? Wohin?), m Art und Weise (Wie?), k Grund (Warum?)
+  const ABF = { t: 'Wann?', l: 'Wo? Wohin?', m: 'Wie?', k: 'Warum?' };
+  const ABN = { t: 'adverbiale Bestimmung der Zeit', l: 'adverbiale Bestimmung des Ortes', m: 'adverbiale Bestimmung der Art und Weise', k: 'adverbiale Bestimmung des Grundes' };
+  const AB = [
+    'Am Morgen|t fährt|P Lina|S zur Schule|l', 'Wegen des Regens|k bleiben|P wir|S zu Hause|l', 'Der Hund|S schläft|P im Körbchen|l',
+    'Emil|S rennt|P schnell|m nach Hause|l', 'Nach dem Essen|t spielen|P die Kinder|S im Garten|l', 'Aus Angst|k bellt|P der Hund|S laut|m',
+    'Morgen|t schreiben|P wir|S einen Test|A', 'Mia|S singt|P fröhlich|m ein Lied|A', 'Im Sommer|t baden|P wir|S im See|l',
+    'Wegen der Hitze|k trinkt|P Ben|S viel Wasser|A', 'Oma|S strickt|P am Abend|t einen Schal|A', 'Vor Freude|k hüpft|P Nora|S durch das Zimmer|l',
+    'Heute|t gehen|P wir|S ins Kino|l', 'Leise|m öffnet|P Mia|S die Tür|A', 'Wegen der Kälte|k trägt|P Paul|S eine Mütze|A', 'Im Winter|t schneit|P es|S oft|t',
+  ].map((z) => { const t = z.split(/\|(\w) ?/).filter((x) => x !== ''); const g = [], r = []; for (let i = 0; i < t.length; i += 2) { g.push(t[i]); r.push(t[i + 1]); } return { g, r }; })
+    .filter((z) => z.r.filter((r) => r === 't').length < 2);
+  const AB_TIPP = 'Adverbiale Bestimmungen sind Satzglieder, die genauer sagen, <b>wann</b> (Zeit), <b>wo/wohin</b> (Ort), <b>wie</b> (Art und Weise) oder <b>warum</b> (Grund) etwas geschieht.';
+  const abZiel = () => { const z = pick(AB), idx = z.r.map((r, i) => (ABF[r] ? i : -1)).filter((i) => i >= 0), i = pick(idx); return { z, i, r: z.r[i] }; };
+  function abBestimmen() {
+    const { z, i, r } = abZiel(), arten = Object.keys(ABF);
+    return {
+      prompt: `Welche adverbiale Bestimmung ist markiert?<br><span class="bsp">${sgText(z, (t) => `<u>${t}</u>`, i)}</span>`,
+      choices: arten.map((a) => `${ROLLE[a]} (${ABF[a]})`), correct: arten.indexOf(r), hint: AB_TIPP,
+      solution: `${sgText(z, (t) => `<b class="vb">${t}</b>`, i)}<br>${ABF[r]} → <b>${z.g[i]}</b>: ${ABN[r]}.`,
+      ex: exGl('abBestimmen', z, [i], `Frage: <b>${ABF[r]}</b>`, `${ABF[r]} → <b>${z.g[i]}</b>: ${ABN[r]}.`),
+    };
+  }
+  function abAntippen() {
+    const { z, i, r } = abZiel();
+    return {
+      prompt: `Tippe die <b>${ABN[r]}</b> an.`, tap: { tokens: glTokens(z), correct: [i], one: true }, answerText: z.g[i],
+      hint: `Frage: <b>${ABF[r]}</b>`,
+      solution: `${sgText(z, (t) => `<b class="vb">${t}</b>`, i)}<br>${ABF[r]} → <b>${z.g[i]}</b>.`,
+      ex: exGl('abAntippen', z, [i], `Frage: <b>${ABF[r]}</b>`, `${ABF[r]} → <b>${z.g[i]}</b>: ${ABN[r]}.`),
+    };
+  }
+  function abFrage() {
+    const { z, i, r } = abZiel(), arten = Object.keys(ABF);
+    return {
+      prompt: `Mit welcher Frage findest du das markierte Satzglied?<br><span class="bsp">${sgText(z, (t) => `<u>${t}</u>`, i)}</span>`,
+      choices: arten.map((a) => ABF[a]), correct: arten.indexOf(r), hint: AB_TIPP,
+      solution: `${sgText(z, (t) => `<b class="vb">${t}</b>`, i)}<br><b>${ABF[r]}</b> → ${z.g[i]}. Das ist die ${ABN[r]}.`,
+      ex: exGl('abFrage', z, [i], `Frage: <b>${ABF[r]}</b>`, `${ABF[r]} → <b>${z.g[i]}</b>: ${ABN[r]}.`),
+    };
+  }
+  const adverbiale = () => U.wahl([[36, abBestimmen], [36, abAntippen], [28, abFrage]]);
+
+  // ---------- Thema: Satzreihe; weil, da, denn (Deutschbuch Kap. 9, S. 231; Kap. 2, S. 49) ----------
+  // Begründungen: [Hauptsatz, Subjekt, Rest, Verb]
+  const BEG = [['Ich bleibe zu Hause', 'ich', 'krank', 'bin'], ['Wir gehen nicht raus', 'es', 'stark', 'regnet'], ['Lina freut sich', 'sie', 'morgen Geburtstag', 'hat'],
+    ['Emil ist müde', 'er', 'lange gelesen', 'hat'], ['Der Hund bellt', 'er', 'Hunger', 'hat'], ['Wir ziehen Jacken an', 'es', 'kalt', 'ist'],
+    ['Paul lacht', 'der Film', 'lustig', 'ist'], ['Nora übt jeden Tag', 'sie', 'bald ein Konzert', 'hat']];
+  const vEnde = (b) => `${b[1]} ${b[2]} ${b[3]}`, vZwei = (b) => `${b[1]} ${b[3]} ${b[2]}`;
+  const BEG_REGEL = 'Nach <b>weil</b> und <b>da</b> beginnt ein Nebensatz: Das Verb steht am <b>Ende</b>. Nach <b>denn</b> kommt ein Hauptsatz: Das Verb steht an <b>2. Stelle</b>.';
+  function begSatz() {
+    const b = pick(BEG), k = pick(['weil', 'da', 'denn']), ende = k !== 'denn';
+    const ok = `${b[0]}, ${k} ${ende ? vEnde(b) : vZwei(b)}.`, falsch = `${b[0]}, ${k} ${ende ? vZwei(b) : vEnde(b)}.`;
+    const ch = shuffle([ok, falsch]), w = ok.replace('.', '').split(' '), vi = w.lastIndexOf(b[3]);
+    return {
+      prompt: `Welcher Satz ist richtig gebaut? Achte auf <b>${k}</b>.`, choices: ch, correct: ch.indexOf(ok), hint: BEG_REGEL,
+      solution: `<b>${ok}</b><br>${ende ? `Nach „${k}“ steht das Verb „${b[3]}“ am Ende.` : `Nach „denn“ steht das Verb „${b[3]}“ an 2. Stelle, wie in einem Hauptsatz.`}`,
+      ex: { mode: 'marken', art: 'begSatz', tokens: ok.split(' '), correct: [w.indexOf(k), vi], was: `${k} und das Verb`, s1: BEG_REGEL, merk: `<b>${ok}</b>` },
+    };
+  }
+  function begWort() {
+    const b = pick(BEG), ende = Math.random() < 0.5, k = ende ? pick(['weil', 'da']) : 'denn', ch = shuffle([ende ? k : pick(['weil', 'da']), 'denn']);
+    const rest = ende ? vEnde(b) : vZwei(b), ok = `${b[0]}, ${k} ${rest}.`;
+    return {
+      prompt: `Welches Wort passt?<br><span class="bsp">${b[0]}, ___ ${rest}.</span>`, choices: ch, correct: ch.indexOf(k), hint: BEG_REGEL,
+      solution: `<b>${ok}</b><br>${ende ? `Das Verb „${b[3]}“ steht am Ende. Dazu passt „${k}“.` : `Das Verb „${b[3]}“ steht an 2. Stelle. Dazu passt nur „denn“.`}`,
+      ex: { mode: 'marken', art: 'begWort', tokens: ok.split(' '), correct: [ok.split(' ').indexOf(k), ok.replace('.', '').split(' ').lastIndexOf(b[3])], was: `${k} und das Verb`, s1: 'Schau zuerst, wo das Verb steht: am Ende oder an 2. Stelle?', merk: `<b>${ok}</b>` },
+    };
+  }
+  // Satzreihen: [Hauptsatz 1, Verbindungswort, Hauptsatz 2]
+  const REIHE = [['Lina mag Katzen', 'aber', 'ihr Bruder mag Hunde'], ['Wir wollten grillen', 'aber', 'es hat geregnet'], ['Emil geht früh ins Bett', 'denn', 'er ist müde'],
+    ['Mia trägt eine Mütze', 'denn', 'es ist kalt'], ['Ben übt Gitarre', 'doch', 'die Nachbarn finden es zu laut'], ['Der Bus kam spät', 'aber', 'wir haben den Film nicht verpasst'],
+    ['Paul hat Hunger', 'denn', 'er hat nicht gefrühstückt'], ['Nora wollte schwimmen', 'doch', 'das Wasser war zu kalt']];
+  const REIHE_REGEL = 'In einer <b>Satzreihe</b> stehen zwei Hauptsätze nebeneinander. Vor <b>aber, denn, doch</b> steht immer ein Komma. (Vor „und“ und „oder“ darf man es weglassen.)';
+  function reiheKomma() {
+    const [a, k, b] = pick(REIHE), w = [...a.split(' '), k, ...b.split(' ')], komma = a.split(' ').length - 1;
+    const voll = w.map((x, i) => x + (i === komma ? ',' : '')).join(' ') + '.';
+    return {
+      prompt: 'Setze das fehlende <b>Komma</b>: Tippe die Stelle an.',
+      tap: { tokens: w.map((t, i) => (i === w.length - 1 ? t + '.' : t)), correct: [komma], gaps: true, one: true }, answerText: voll,
+      hint: 'Wo endet der erste Satz? Vor dem Verbindungswort (aber, denn, doch) steht ein Komma.',
+      solution: `<b>${voll}</b><br>${REIHE_REGEL}`, ex: exKomma('reiheKomma', w, [komma], REIHE_REGEL),
+    };
+  }
+  function reiheOderGefuege() {
+    const reihe = Math.random() < 0.5;
+    let t, toks, mark;
+    if (reihe) { const [a, k, b] = pick(REIHE); t = `${a}, ${k} ${b}.`; toks = t.split(' '); mark = [toks.indexOf(k)]; }
+    else { const x = gefuege(false); t = x.mitKomma.join(' '); toks = x.mitKomma; mark = [x.nsVerb]; }
+    return {
+      prompt: `Satzreihe oder Satzgefüge?<br><span class="bsp">${t}</span>`, choices: ['Satzreihe (Hauptsatz + Hauptsatz)', 'Satzgefüge (Hauptsatz + Nebensatz)'], correct: reihe ? 0 : 1,
+      hint: 'Schau auf das Verb im zweiten Teil: An 2. Stelle? Dann ist es ein Hauptsatz (Satzreihe). Ganz am Ende? Dann ist es ein Nebensatz (Satzgefüge).',
+      solution: reihe ? `<b>Satzreihe</b>: Beide Teile sind Hauptsätze. Das Verb steht jeweils an 2. Stelle.` : `<b>Satzgefüge</b>: Der zweite Teil ist ein Nebensatz. Sein Verb steht am Ende.`,
+      ex: { mode: 'marken', art: 'reiheOderGefuege', tokens: toks, correct: mark, was: reihe ? 'Satzreihe' : 'Satzgefüge', s1: 'Wo steht das Verb im zweiten Teil?', merk: reihe ? '<b>Satzreihe</b>: Hauptsatz + Hauptsatz.' : '<b>Satzgefüge</b>: Hauptsatz + Nebensatz, das Verb steht am Ende.' },
+    };
+  }
+  const satzreihe = () => U.wahl([[30, begSatz], [24, begWort], [24, reiheKomma], [22, reiheOderGefuege]]);
 
   // ---------- Thema: Wörtliche Rede ----------
   // [Wer, Verb des Sagens, was gesagt wird, Schlusszeichen]
@@ -1397,7 +1636,27 @@
       ex: zz('grossWelches', [n.toLowerCase()], 0, [N.find((x) => x.sg === n).art + ' ', n], 1, 'Artikelprobe: Vor welches Wort passt der, die oder das?', 'Passt ein Artikel davor, ist es ein Nomen: groß.', `<b>${n}</b>`),
     };
   }
-  const grossKlein = () => U.wahl([[34, grossAntippen], [26, grossWort], [24, grossVerb], [16, grossWelches]]);
+  // Anredewörter im Brief (Deutschbuch Kap. 1, S. 28): Sie, Ihnen, Ihr immer groß; du, dich, dein darf man groß oder klein schreiben
+  const ANREDE = [['Liebe Frau Klein, vielen Dank für ___ Hilfe.', 'Ihre', 'ihre'], ['Lieber Herr Meier, ich wünsche ___ schöne Ferien.', 'Ihnen', 'ihnen'],
+    ['Sehr geehrte Frau Lang, haben ___ meinen Brief bekommen?', 'Sie', 'sie'], ['Liebe Frau Klein, ich freue mich auf ___ Besuch.', 'Ihren', 'ihren'],
+    ['Lieber Herr Schulz, darf ich ___ etwas fragen?', 'Sie', 'sie'], ['Liebe Frau Klein, ich danke ___ für das Buch.', 'Ihnen', 'ihnen']];
+  const REGEL_ANREDE = 'Im Brief an Erwachsene, die man siezt, schreibt man <b>Sie, Ihnen, Ihr</b> immer <b>groß</b>. Die Anrede an Freunde (du, dich, dein, euch) darf man im Brief groß oder klein schreiben.';
+  function grossAnrede() {
+    if (Math.random() < 0.2) {
+      const [satz, w] = pick([['Liebe Oma, ich danke ___ für das Geschenk.', 'dir'], ['Lieber Ben, wie geht es ___?', 'dir'], ['Liebe Lina, ich habe ___ ein Foto geschickt.', 'dir']]);
+      const ch = ['nur klein: ' + w, 'nur groß: ' + gross(w), 'beides ist richtig'];
+      return { prompt: `Wie schreibt man die Anrede im Brief an eine vertraute Person?<br><span class="bsp">${satz}</span>`, choices: ch, correct: 2, hint: REGEL_ANREDE,
+        solution: `<b>Beides ist richtig</b>: ${satz.replace('___', w)} oder ${satz.replace('___', gross(w))}<br>${REGEL_ANREDE}`,
+        ex: zz('grossAnrede', [satz], 0, [satz.replace('___', `${w} / ${gross(w)}`)], 0, 'Der Brief geht an jemanden, den du duzt.', 'du, dir, dein: groß oder klein, beides ist richtig.', `<b>${w}</b> oder <b>${gross(w)}</b>`) };
+    }
+    const [satz, ok, falsch] = pick(ANREDE), ch = shuffle([ok, falsch]), voll = satz.replace('___', ok);
+    return {
+      prompt: `Du schreibst einen Brief an eine Person, die du <b>siezt</b>. Welches Wort passt?<br><span class="bsp">${satz}</span>`, choices: ch, correct: ch.indexOf(ok), hint: REGEL_ANREDE,
+      solution: `<b>${voll}</b><br>Die Person wird gesiezt. Deshalb schreibt man <b>${ok}</b> groß.`,
+      ex: zz('grossAnrede', [satz], 0, [voll], 0, 'Der Brief geht an jemanden, den du siezt.', `Die Anrede <b>${ok}</b> schreibt man dann immer groß.`, `<b>${voll}</b>`),
+    };
+  }
+  const grossKlein = () => U.wahl([[30, grossAntippen], [22, grossWort], [20, grossVerb], [14, grossWelches], [14, grossAnrede]]);
 
   // ---------- Thema: Silben und Worttrennung ----------
   const SILB = ['Was-ser', 'Som-mer', 'Scho-ko-la-de', 'El-tern', 'Fens-ter', 'Kat-ze', 'Zu-cker', 'Brü-cke', 'Ja-cke', 'Kin-der', 'Blu-me', 'Gar-ten', 'Schu-le', 'Leh-re-rin', 'Ap-fel', 'Vo-gel', 'Mut-ter', 'Son-ne', 'Tel-ler', 'Him-mel', 'Ta-sche', 'Fla-sche', 'Kü-che', 'la-chen', 'ko-chen', 'Tep-pich', 'Kar-tof-fel', 'To-ma-te', 'Ba-na-ne', 'Kis-te', 'Schwes-ter', 'Haus-tür', 'Fuß-ball', 'Schul-hof', 'Hand-tuch', 'Ba-de-wan-ne', 'Re-gen-bo-gen', 'Was-ser-fla-sche', 'Früh-stück', 'Ge-burts-tag', 'Fahr-rad', 'Com-pu-ter', 'Fe-ri-en', 'Kro-ko-dil', 'Pa-pa-gei', 'Schmet-ter-ling', 'Erd-bee-re', 'Wol-ke', 'Lam-pe', 'Win-ter', 'Mon-tag', 'Diens-tag', 'Mitt-woch', 'Don-ners-tag', 'Frei-tag', 'Sams-tag', 'Sonn-tag', 'sin-gen', 'Fin-ger', 'Stra-ße', 'Fü-ße', 'Leh-rer', 'fah-ren', 'Bäu-me', 'Häu-ser', 'Feu-er', 'Mau-er', 'sit-zen', 'Müt-ze', 'Städ-te', 'Som-mer-fe-ri-en'];
@@ -1442,7 +1701,32 @@
       hint: REGEL_SILB, solution: `<b>${x.t}</b><br>${REGEL_SILB}`, ex: exSilb('silbTippen', x),
     };
   }
-  const silben = () => U.wahl([[34, silbTrennen], [20, silbZahl], [26, silbWahl], [20, silbTippen]]);
+  // h, das die Silben trennt (Deutschbuch Kap. 10, S. 249): [falsch, richtig, Verlängerung]
+  const SILBH = [['sie siet', 'sie sieht', 'se-hen'], ['er get', 'er geht', 'ge-hen'], ['die Ku', 'die Kuh', 'Kü-he'], ['der Schu', 'der Schuh', 'Schu-he'],
+    ['es dret sich', 'es dreht sich', 'dre-hen'], ['das Re', 'das Reh', 'Re-he'], ['sie nät', 'sie näht', 'nä-hen'], ['sie stet', 'sie steht', 'ste-hen'], ['der Flo', 'der Floh', 'Flö-he'], ['er ru', 'er ruht', 'ru-hen']]
+    .map(([f, r, v]) => [f.replace('er ru', 'er rut'), r, v]);
+  function silbH() {
+    const [f, r, v] = pick(SILBH), ch = shuffle([r, f]), x = silbInfo(v);
+    return {
+      prompt: 'Welches Wort ist richtig geschrieben?', choices: ch, correct: ch.indexOf(r),
+      hint: 'Verlängere das Wort und sprich es in Silben: Hörst du zwischen zwei Silben ein h?',
+      solution: `<b>${r}</b><br>Verlängert: <b>${v}</b>. Das <b>h</b> trennt die beiden Silben. Es bleibt auch in der kurzen Form stehen.`,
+      ex: Object.assign(exSilb('silbH', x), { s1: 'Verlängere das Wort und sprich es in Silben.', merk: `<b>${v}</b>: Das h trennt die Silben. Deshalb: <b>${r}</b>.` }),
+    };
+  }
+  // offene Silbe (endet mit Vokal: Vokal lang) oder geschlossene Silbe (endet mit Konsonant: Vokal kurz)
+  const SILBOG = ['Ro-se', 'Blu-me', 'Schu-le', 'Vo-gel', 'Ha-se', 'Na-se', 'Ta-fel', 'Ho-se', 'Le-ben', 'Son-ne', 'Kat-ze', 'Mut-ter', 'Was-ser', 'Hal-le', 'Kis-te', 'Wol-ke', 'Pup-pe', 'Bril-le'];
+  function silbOffen() {
+    const x = silbInfo(pick(SILBOG)), erste = x.teile[0], offen = /[aeiouäöü]$/.test(erste);
+    return {
+      prompt: `Ist die erste Silbe <b>offen</b> oder <b>geschlossen</b>?<br><span class="bsp gross">${x.t}</span>`,
+      choices: ['offen: endet mit einem Vokal, der Vokal ist lang', 'geschlossen: endet mit einem Konsonanten, der Vokal ist kurz'], correct: offen ? 0 : 1,
+      hint: 'Schau auf den letzten Buchstaben der ersten Silbe. Ein Vokal (a, e, i, o, u, ä, ö, ü)? Dann ist sie offen.',
+      solution: `<b>${x.t}</b>: Die erste Silbe „${erste}“ endet mit ${offen ? `dem Vokal <b>${erste.slice(-1)}</b>. Sie ist <b>offen</b>, der Vokal wird lang gesprochen.` : `dem Konsonanten <b>${erste.slice(-1)}</b>. Sie ist <b>geschlossen</b>, der Vokal wird kurz gesprochen.`}`,
+      ex: Object.assign(exSilb('silbOffen', x), { merk: `<b>${x.t}</b>: „${erste}“ ist ${offen ? 'offen, der Vokal ist lang' : 'geschlossen, der Vokal ist kurz'}.` }),
+    };
+  }
+  const silben = () => U.wahl([[28, silbTrennen], [16, silbZahl], [20, silbWahl], [14, silbTippen], [11, silbH], [11, silbOffen]]);
 
 
   // =====================================================
@@ -1907,14 +2191,14 @@
     'd5-attribute': { attrAntippen, attrWeglassen, attrBezug },
     'd5-nebensatz': { nsVerb, nsBau, hsOderNs },
     'd5-satzarten': { sartBestimmen, sartWelcher, sartZeichen, sartVerb },
-    'd5-komma': { kommaAufz, kommaWahl, kommaGef },
+    'd5-komma': { kommaAufz, kommaWahl, kommaGef, kommaAppo },
     'd5-rede': { redeRichtig, redeZeichen, redeTeil },
     'd5-lang': { langLuecke, langArt, langTippen },
     'd5-kurz': { kurzLuecke, kurzLang, kurzTippen, kurzWarum },
     'd5-ableiten': { auslLuecke, umlLuecke, verlaengern, auslTippen, stamm_ },
     'd5-slaute': { slLuecke, slRegel, slTippen },
-    'd5-gross': { grossAntippen, grossWort, grossVerb, grossWelches },
-    'd5-silben': { silbTrennen, silbZahl, silbWahl, silbTippen },
+    'd5-gross': { grossAntippen, grossWort, grossVerb, grossWelches, grossAnrede },
+    'd5-silben': { silbTrennen, silbZahl, silbWahl, silbTippen, silbH, silbOffen },
     'd5-zusammen': { zusArtikel, zusBauen, zusBedeutung, zusTrennen },
     'd5-ableitung': { vorsilbe, nachWortart, nachBauen, nachWahl },
     'd5-wortfamilie': { famNicht, famDazu, famStamm },
@@ -1925,6 +2209,10 @@
     'd5-textsorten': { tsErkennen, tsMerkmal, tsReihe, tsWFrage },
     'd5-sachtext': { sachFrage, sachTitel, sachTabelle, sachBild },
     'd5-zeitformen': { erkennen, einsetzen, bilden, antippen, hilfsverb, grundform, welcherSatz },
+    'd5-praep': { prAntippen, prFall, prWechsel, prPasst },
+    'd5-adverb': { advAntippen, advFrage, advLuecke, advOderAdj },
+    'd5-adverbial': { abBestimmen, abAntippen, abFrage },
+    'd5-satzreihe': { begSatz, begWort, reiheKomma, reiheOderGefuege },
   };
 
   // =====================================================
@@ -1938,6 +2226,8 @@
         { id: 'd5-faelle', title: 'Die vier Fälle', icon: '❓', gen: faelle },
         { id: 'd5-pronomen', title: 'Pronomen', icon: '👉', gen: pronomen },
         { id: 'd5-adjektive', title: 'Adjektive steigern', icon: '📶', gen: adjektive },
+        { id: 'd5-praep', title: 'Präpositionen: auf, unter, mit …', icon: '📍', gen: praepositionen },
+        { id: 'd5-adverb', title: 'Adverbien: heute, dort, gern …', icon: '🕰', gen: adverbien },
         { id: 'd5-verbformen', title: 'Verbformen: Person, Partizip, Aufforderung', icon: '🧩', gen: verbformen },
         { id: 'd5-zeitformen', title: 'Zeitformen', icon: '⏳', gen: zeitformen },
         { id: 'd5-wortarten', title: 'Wortarten erkennen', icon: '🔎', gen: wortarten },
@@ -1946,10 +2236,12 @@
         { id: 'd5-satzglieder', title: 'Satzglieder und Umstellprobe', icon: '🚃', gen: satzglieder },
         { id: 'd5-subjekt', title: 'Subjekt und Prädikat', icon: '👤', gen: subjektPraedikat },
         { id: 'd5-objekte', title: 'Dativ- und Akkusativobjekt', icon: '🎁', gen: objekte },
+        { id: 'd5-adverbial', title: 'Adverbiale Bestimmungen: wann, wo, wie, warum', icon: '🧭', gen: adverbiale },
         { id: 'd5-attribute', title: 'Attribute', icon: '🎨', gen: attribute },
         { id: 'd5-nebensatz', title: 'Hauptsatz und Nebensatz', icon: '🔗', gen: nebensatz },
+        { id: 'd5-satzreihe', title: 'Satzreihe: aber, denn – und weil, da', icon: '⛓', gen: satzreihe },
         { id: 'd5-satzarten', title: 'Satzarten und Satzschlusszeichen', icon: '❔', gen: satzarten },
-        { id: 'd5-komma', title: 'Komma: Aufzählung und Satzgefüge', icon: '❜', gen: komma },
+        { id: 'd5-komma', title: 'Komma: Aufzählung, Satzgefüge, Apposition', icon: '❜', gen: komma },
         { id: 'd5-rede', title: 'Wörtliche Rede', icon: '💬', gen: rede },
       ] },
       { id: 'd5-recht', nr: 3, title: 'Rechtschreibung', topics: [

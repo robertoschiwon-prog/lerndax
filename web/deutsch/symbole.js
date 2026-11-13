@@ -15,6 +15,14 @@ window.DeDaxIcons = (function () {
     // Verbformen: Wortstamm mit ansteckbarer Endung
     'd5-verbformen': `<rect x="2.5" y="8" width="11" height="8" rx="1.5"/><rect x="16" y="8" width="5.5" height="8" rx="1.5" ${F}/><path d="M13.5 12h2.5"/>`,
     // Wortarten erkennen: drei verschiedene Formen
+    // Präpositionen: Kasten und ein Punkt darunter (unter dem Tisch)
+    'd5-praep': `<path d="M3 10h18M6 10v9M18 10v9"/><circle cx="12" cy="16.5" r="2.6" ${F}/>`,
+    // Adverbien: Uhr mit Pfeil (wann? wo?)
+    'd5-adverb': `<circle cx="10" cy="12" r="7"/><path d="M10 8v4l3 2"/><path d="M19 6l3 3-3 3" />`,
+    // adverbiale Bestimmungen: Kompass
+    'd5-adverbial': `<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z" ${F}/>`,
+    // Satzreihe: zwei gleich große Kästen, verbunden
+    'd5-satzreihe': `<rect x="2" y="7" width="8.5" height="9" rx="1.5"/><rect x="13.5" y="7" width="8.5" height="9" rx="1.5" ${F}/><path d="M10.5 11.5h3"/>`,
     'd5-wortarten': `<circle cx="7" cy="7.5" r="4"/><rect x="13.5" y="3.5" width="7.5" height="7.5" rx="1.2" ${F}/><path d="M12 13.5l5.5 8h-11z"/>`,
     // Satzglieder: drei Wagen hintereinander
     'd5-satzglieder': `<rect x="1.5" y="8" width="6" height="7" rx="1.2"/><rect x="9" y="8" width="6" height="7" rx="1.2" ${F}/><rect x="16.5" y="8" width="6" height="7" rx="1.2"/><path d="M3 18.5h18"/>`,

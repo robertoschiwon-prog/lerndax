@@ -509,13 +509,17 @@
   }
   thema('d5-pronomen', 'Pronomen: kleine Wörter für große', '0 0 360 150');
   thema('d5-adjektive', 'Adjektive steigern', '0 0 360 180');
+  thema('d5-praep', 'Präpositionen: wie Dinge zueinander stehen', '0 0 360 150');
+  thema('d5-adverb', 'Adverbien: wann, wo, wie, warum', '0 0 360 120');
   thema('d5-verbformen', 'Verbformen: ein Verb, viele Formen', '0 0 360 150');
   thema('d5-wortarten', 'Wortarten erkennen', '0 0 360 156');
   thema('d5-satzglieder', 'Satzglieder: der Satz als Zug', '0 0 360 100');
   thema('d5-subjekt', 'Subjekt und Prädikat', '0 0 360 150');
+  thema('d5-adverbial', 'Adverbiale Bestimmungen', '0 0 360 100');
   thema('d5-objekte', 'Objekte: Wem? Wen oder was?', '0 0 360 100');
   thema('d5-attribute', 'Attribute: genauer beschreiben', '0 0 360 120');
   thema('d5-nebensatz', 'Hauptsatz und Nebensatz', '0 0 360 150');
+  thema('d5-satzreihe', 'Satzreihe: zwei Hauptsätze', '0 0 360 120');
   thema('d5-satzarten', 'Satzarten', '0 0 360 120');
   thema('d5-komma', 'Das Komma', '0 0 360 120');
   thema('d5-rede', 'Wörtliche Rede', '0 0 360 120');

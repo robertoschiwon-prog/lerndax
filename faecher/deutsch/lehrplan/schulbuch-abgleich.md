@@ -25,29 +25,29 @@ Bildungssprache) · 8 Sachtexte, Schaubilder, Tabellen · **9 Wortarten und Satz
 | Nomen in vier Fällen (Kasus) | 201 | `d5-faelle` ✓ |
 | Adjektive: beschreiben und vergleichen | 202 | `d5-adjektive` ✓ |
 | Personalpronomen, Possessivpronomen | 204, 205 | `d5-pronomen` ✓ |
-| **Präpositionen** | 206 | nur am Rand in `d5-wortarten` → **fehlt als eigenes Thema** |
-| **Adverbien** | 207 | **fehlt** |
+| Präpositionen | 206 | `d5-praep` ✓ **neu v79** (erkennen, Fall, Wo?/Wohin?, passende Präposition) |
+| Adverbien | 207 | `d5-adverb` ✓ **neu v79** |
 | Verben: Infinitiv und Personalformen | 208 | `d5-verbformen` ✓ |
 | Präsens, Futur, Perfekt, Präteritum, Plusquamperfekt | 210–215 | `d5-zeitformen` ✓ |
 | Wortarten unterscheiden | 216 | `d5-wortarten` ✓ (Konjunktion fehlt dort) |
 | Wortzusammensetzungen, Wörter ableiten, Wortfamilie | 218–220 | `d5-zusammen`, `d5-ableitung`, `d5-wortfamilie` ✓ |
 | Umstellprobe; Prädikat, Subjekt, Objekte | 226, 227 | `d5-satzglieder`, `d5-subjekt`, `d5-objekte` ✓ |
-| **Adverbiale Bestimmungen** | 228 | **fehlt** (DeDax hat stattdessen `d5-attribute`) |
+| Adverbiale Bestimmungen | 228 | `d5-adverbial` ✓ **neu v79** (Zeit, Ort, Art und Weise, Grund) |
 | Satzarten | 230 | `d5-satzarten` ✓ |
-| **Satzreihe** und Satzgefüge | 231, 232 | `d5-nebensatz` (Satzgefüge) ✓; **Satzreihe fehlt** |
+| Satzreihe und Satzgefüge | 231, 232 | `d5-nebensatz` ✓, `d5-satzreihe` ✓ **neu v79** (auch weil, da, denn) |
 | Schwingen (Silben) | 234 | `d5-silben` ✓ (Wort „Schwingen“ nicht benutzt) |
 | Verlängern (b/p, d/t, g/k), Zerlegen, Ableitungsprobe | 235–239 | `d5-ableiten` ✓ |
 | Nomenprobe | 240 | `d5-gross` ✓ (Begriff „Nomenprobe“ prüfen) |
-| **Offene und geschlossene Silben**, doppelte Konsonanten | 242, 243 | `d5-lang`, `d5-kurz` ✓ (Begriffe „offene/geschlossene Silbe“ fehlen) |
+| Offene und geschlossene Silben, doppelte Konsonanten | 242, 243 | `d5-lang`, `d5-kurz` ✓; offen/geschlossen in `d5-silben` (v79) |
 | s, ss oder ß | 245 | `d5-slaute` ✓ |
 | i oder ie | 246 | in `d5-lang` |
-| **h, das die Silben trennt** (ge-hen) | 249 | **fehlt** |
+| h, das die Silben trennt (ge-hen) | 249 | in `d5-silben` (v79) |
 | Merkwörter | 261 | am Rand |
 
 ## Lücken aus den anderen Kapiteln
-- Komma bei **Appositionen** (Kap. 4, S. 112): `d5-komma` hat Aufzählung und Satzgefüge, aber keine Apposition.
-- **weil, da, denn**: Stellung des Verbs (Kap. 2, S. 49).
-- **Anredepronomen im Brief** (du/Sie, dein/Ihr; Kap. 1, S. 28).
+- ~~Komma bei Appositionen~~ in `d5-komma` (v79).
+- ~~weil, da, denn~~ in `d5-satzreihe` (v79).
+- ~~Anredepronomen im Brief~~ in `d5-gross` (v79).
 - Gedichte: **Metrum** und **Metapher** (Kap. 5); `d5-gedicht` und `d5-bilder` prüfen.
 - Theaterszene: Monolog, Dialog, Regieanweisung (Kap. 6) – neues Thema möglich.
 - Einstellungsgrößen und Kameraperspektiven (Kap. 7) – am Bildschirm gut zeigbar.
