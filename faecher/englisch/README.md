@@ -7,7 +7,7 @@ Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. 
 | Schritt | Stand | Datei |
 |---|---|---|
 | 1 Lehrplan auswerten | **erledigt (12.11.2026)**. Wichtig: Klasse 5 und 6 sind gemeinsam beschrieben, die Aufteilung macht das Schulbuch | `lehrplan/sachsen-gymnasium.md` |
-| 2 Schulbuch abgleichen | offen: Titel, Ausgabe, ISBN und Foto des Inhaltsverzeichnisses fehlen | `lehrplan/schulbuch-abgleich.md` (anlegen) |
+| 2 Schulbuch abgleichen | Buch bekannt (13.11.2026): **Green Line 1, Ausgabe ab 2021**. Offen: Foto des Inhaltsverzeichnisses (Grammatik je Unit) | `lehrplan/schulbuch-abgleich.md` (anlegen) |
 | 3 Themenplan | **Vorschlag liegt vor (12.11.2026)**, wartet auf Zustimmung; Entscheidungen stehen dort | `themenplan.md` |
 | 4 Themen bauen | **46 Themen gebaut, Bereich 1 bis 6 gebaut, EnDax steht auf der Startseite** (to be v55; Pronomen und „to be verneinen und fragen“ v57; have got und a/an v58; Mehrzahl v59; there is/are und this/that v60; my/your und ’s/of v61; Aufforderungen und can/must v62; present simple (3 Themen) v63; Fragewörter, Satzbau, Wie oft v64; present progressive, simple oder progressive, me/him/her v65; some/any und much/many v66; Wo? (mit Bild) und Wann? v67; Zahlen, Datum, Uhrzeit v68; was/were, -ed, unregelmäßige Verben v69; 11 Wortfelder v70; Im Alltag und Lesen v71; Entdecken v72; Knobeln v73; Alphabet v74; Knobeln für alle Themen v75), live; Rest offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
 
@@ -21,7 +21,7 @@ Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. 
 | Ordner | `web/englisch/` (anzulegen), Lernstand im Browser unter eigenem Schlüssel, Vorschlag `endax.v1`, Namensraum `window.EnDax` |
 | Zuerst | Klasse 5, Gymnasium Sachsen; später Klasse 4 und 6, dann 3–10 |
 | Leitidee | verstehen statt pauken; anschauliche, animierte Erklärungen; nach jeder Antwort die Lösung; „Entdecken“ zum Neugierigwerden |
-| Schulbuch | laut Fächerplan „Green Line 1“ (Klett). **Titel, Ausgabe und ISBN sind nicht geprüft**, das ist nur eine Annahme. |
+| Schulbuch | **Green Line 1, Ausgabe ab 2021** (Klett, ISBN 978-3-12-864011-2, flexibler Einband, 255 Seiten), geprüft 13.11.2026. Aufbau: Hello! (Übergang von der Grundschule), Unit 1 A new school, Unit 2 At home, Across cultures 1 (Greenwich), Unit 3 Our Greenwich, Across cultures 2 (How does it taste?), Unit 4 Happy Birthday, Extra line. Vier Units im Schuljahr. |
 | Datenbank | keine Änderung nötig: Der Lernstand wird je Fach gespeichert (`subject = 'englisch'`, ist im Schema schon erlaubt) |
 
 Regeln wie bei MaDax und DeDax: genau der sächsische Lehrplan, alles darüber hinaus in „Entdecken“; keine Namen von
@@ -44,7 +44,7 @@ in der Reihenfolge des Buchs übernehmen, sondern eigene Wortlisten nach Themen 
 
 ## Was vor dem Bauen zu klären ist (mit dem Auftraggeber, einzeln)
 
-1. **Welches Englischbuch genau** (Titel, Ausgabe, ISBN auf der Rückseite, Foto des Inhaltsverzeichnisses)?
+1. ~~Welches Englischbuch genau~~ Green Line 1, Ausgabe ab 2021 (13.11.2026). Es fehlt noch das Foto des Inhaltsverzeichnisses.
 2. **Womit anfangen**: Welche Unit ist gerade dran, steht eine Arbeit oder ein Vokabeltest an, was fällt schwer?
 3. **Sprache der App**: Aufgabenstellung, Tipp und Lösungsweg auf Deutsch (Vorschlag für Klasse 5) oder teils Englisch?
 4. **Vokabeln**: eigene Wortlisten nach Themen (Vorschlag), oder will er die Vokabeln der aktuellen Unit selbst

@@ -1,6 +1,6 @@
 # EnDax Klasse 5 – Themenplan (Vorschlag)
 
-Stand 12.11.2026. Grundlage: `lehrplan/sachsen-gymnasium.md`. **Das Schulbuch ist noch nicht bekannt**; der Lehrplan
+Stand 12.11.2026. Grundlage: `lehrplan/sachsen-gymnasium.md`. **Schulbuch seit 13.11.2026 bekannt: Green Line 1, Ausgabe ab 2021 (Klett, 978-3-12-864011-2);** der Abgleich mit den Units wartet auf das Inhaltsverzeichnis. Der Lehrplan
 beschreibt Klasse 5 und 6 gemeinsam. Die Auswahl für Klasse 5 ist deshalb eine begründete Annahme (das, was in den
 üblichen Büchern in Klasse 5 steht) und wird mit dem Buch abgeglichen, sobald Titel und Inhaltsverzeichnis da sind.
 
@@ -8,7 +8,7 @@ beschreibt Klasse 5 und 6 gemeinsam. Die Auswahl für Klasse 5 ist deshalb eine 
 
 | Frage | Entscheidung |
 |---|---|
-| Schulbuch | noch unbekannt, wird nachgereicht (Titel, ISBN, Foto Inhaltsverzeichnis) |
+| Schulbuch | **Green Line 1, Ausgabe ab 2021** (ISBN 978-3-12-864011-2, 13.11.2026); Foto Inhaltsverzeichnis fehlt noch |
 | Womit anfangen | **Grammatik vom Schuljahresanfang** |
 | Sprache der App | **Deutsch** (Aufgabenstellung, Tipp, Lösungsweg); nur die Übungssätze sind englisch |
 | Vorlesen | **Ja, mit fertigen Aufnahmen**, Stimme des Geräts abgelehnt. **Zwei Aussprachen zur Wahl** (Umschalter auf der Startseite): amerikanisch „Frau B“ (Kokoro `af_bella`, Voreinstellung), britisch „Mann 2“ (`bm_fable`). Einzelheiten in `README.md`, Abschnitt „Ton“. |

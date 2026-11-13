@@ -3,7 +3,11 @@
 Stand 12.11.2026: **noch nicht möglich, das Inhaltsverzeichnis fehlt.**
 
 ## Welches Buch?
-Bekannt ist nur „Deutschbuch 5 Gymnasium (Cornelsen), mit digitalen Medien“. Davon gibt es mehrere Ausgaben:
+**Update 13.11.2026:** Die ISBN auf der Rückseite ist **978-3-06-061189-8** (Deutschbuch Gymnasium 5, Cornelsen). Das ist
+**keine** der drei Ausgaben in der Tabelle unten; die Vermutung „Länderausgabe 2019“ ist damit hinfällig. Welche Ausgabe es
+genau ist, war im Netz nicht eindeutig zu finden; das Inhaltsverzeichnis klärt es.
+
+Bisher bekannt war nur „Deutschbuch 5 Gymnasium (Cornelsen), mit digitalen Medien“. Davon gibt es mehrere Ausgaben:
 
 | Ausgabe | Schulbuch Klasse 5 | Bemerkung |
 |---|---|---|

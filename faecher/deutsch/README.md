@@ -7,7 +7,7 @@ Die Abschnitte unten ab „Vorgehen“ beschreiben den Weg dorthin und sind als 
 | Schritt | Stand | Datei |
 |---|---|---|
 | 1 Lehrplan auswerten | ✅ 12.11.2026 | `lehrplan/sachsen-gymnasium.md` |
-| 2 Schulbuch abgleichen | wartet: ISBN und Foto des Inhaltsverzeichnisses | `lehrplan/schulbuch-abgleich.md` |
+| 2 Schulbuch abgleichen | ISBN da (13.11.2026: 978-3-06-061189-8); wartet auf Foto des Inhaltsverzeichnisses | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | Vorschlag (5 Bereiche, 31 Themen), noch nicht entschieden | `themenplan.md` |
 | 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. **Bereich Satzbau und Satzzeichen fertig (8 Themen).** **Alle fünf Bereiche sind gebaut (30 Themen).** **„Entdecken“ hat sechs Entdeckungen.** Knobel-Aufgaben zu allen Themen. Offen: Schulbuch-Abgleich | `web/deutsch/`, Test `tests/dedax.py` |
 
@@ -26,7 +26,7 @@ Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`.
 | Ordner | `web/deutsch/` (noch anzulegen), Lernstand im Browser unter eigenem Schlüssel, Vorschlag `dedax.v1` |
 | Zuerst | Klasse 5, Gymnasium Sachsen; später Klasse 4 und 6, dann 1–10 |
 | Leitidee | verstehen statt pauken; anschauliche, animierte Erklärungen; nach jeder Antwort die Lösung; „Entdecken“ zum Neugierigwerden |
-| Schulbuch | laut Fächerplan „Deutschbuch 5“ (Cornelsen). **Ausgabe und ISBN noch nicht geprüft.** |
+| Schulbuch | **Deutschbuch Gymnasium 5** (Cornelsen), ISBN 978-3-06-061189-8 (13.11.2026). Nicht die vermutete Länderausgabe; die genaue Ausgabe klärt das Inhaltsverzeichnis. |
 
 Regeln wie bei MaDax: genau der sächsische Lehrplan, alles darüber hinaus in „Entdecken“; keine Namen von Schule,
 Lehrkraft oder Kind im öffentlichen Code; Aufgaben aus dem Schulbuch werden nicht abgeschrieben.
@@ -45,7 +45,7 @@ Lehrkraft oder Kind im öffentlichen Code; Aufgaben aus dem Schulbuch werden nic
 ## Was vor dem Bauen zu klären ist
 
 **Mit dem Auftraggeber**
-- Welches Deutschbuch genau (Titel, Ausgabe, ISBN auf der Rückseite)?
+- ~~Welches Deutschbuch genau~~ ISBN 978-3-06-061189-8 (13.11.2026); Foto des Inhaltsverzeichnisses fehlt noch.
 - Womit anfangen: Was ist gerade im Unterricht dran, steht eine Klassenarbeit an, was fällt dem Kind schwer?
 - Soll es wie bei Mathe eine Trainingsseite für eine bestimmte Arbeit geben?
 

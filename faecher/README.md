@@ -74,7 +74,7 @@ Das kann später neu entschieden werden.
 **Phase 1: Klasse 5 fertig bauen, alle Fächer**
 1. MaDax ✅ inhaltlich fertig (36 Themen, Knobel-Stufe, Abgleich mit Buch und Lehrplan; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
 2. DeDax ✅ gebaut (30 Themen, Entdecken, Knobeln; Schulbuch-Abgleich und Test mit dem Kind stehen aus)
-3. **EnDax: als Nächstes, Startpunkt `faecher/englisch/README.md`** (Schulbuch vermutlich Green Line 1, Klett; nicht geprüft)
+3. **EnDax: als Nächstes, Startpunkt `faecher/englisch/README.md`** (Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
 4. BioDax (Linder 5), GeoDax (Terra 5), GeDax (Anno 1)
 5. TecDax (Technik/Computer)
 6. Vielleicht: MuDax, KuDax, EthDax
@@ -103,3 +103,14 @@ Das kann später neu entschieden werden.
 
 Quellen: Stundentafel Gymnasium Sekundarstufe I (Anlage 4a) und Grundschule (Anlage 1a) der
 VwV Stundentafeln, Abkürzungsliste der Fächer (Gymnasium), alle auf https://www.revosax.sachsen.de.
+
+## Schulbücher Klasse 5 (geprüft 13.11.2026, ISBN von der Rückseite)
+
+| Fach | Buch | Verlag | ISBN |
+|---|---|---|---|
+| Mathe | Lambacher Schweizer Mathematik 5, Ausgabe Sachsen (ab 2019) | Klett | 978-3-12-733150-9 |
+| Deutsch | Deutschbuch Gymnasium 5 (Ausgabe noch zu klären, siehe `deutsch/lehrplan/schulbuch-abgleich.md`) | Cornelsen | 978-3-06-061189-8 |
+| Englisch | Green Line 1, Ausgabe ab 2021 (flexibler Einband) | Klett | 978-3-12-864011-2 |
+| Geografie | TERRA Geographie 5, Ausgabe Sachsen Gymnasium (ab 2019) | Klett | 978-3-12-104320-0 |
+| Geschichte | ANNO 1, Ausgabe 2019 für Gymnasien in Sachsen | Westermann | 978-3-14-115406-1 |
+| Biologie | LINDER Biologie SI 5, Ausgabe 2020 für Sachsen | Westermann | 978-3-14-153000-1 |

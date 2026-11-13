@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v75`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v76`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -189,6 +189,15 @@ Weitere Dokumente:
   finden, passende Antwort im Gespräch), Unterricht (Fehler, Anweisung der Lehrerin auf Englisch), Einkaufen (Preise addieren,
   Wechselgeld, Fehler), Weg (Karte mit ähnlichen Sätzen zur Auswahl, Fehler), Alphabet (Abkürzungen wie „C U“, „R U OK?“, „B4“;
   rückwärts buchstabierte Wörter), Lesen (zwei Stellen im Text kombinieren). `tests/endax_knobel.py` verlangt jetzt Knobeln für alle Themen.
+- **v76 (13.11.2026): Schulbücher bekannt** (ISBN von der Rückseite, nur Doku geändert, die App nicht):
+  Mathe **Lambacher Schweizer 5, Ausgabe Sachsen** (Klett, 978-3-12-733150-9) – **bestätigt**, der MaDax-Abgleich stimmt also.
+  Englisch **Green Line 1, Ausgabe ab 2021** (Klett, 978-3-12-864011-2, flexibler Einband): Hello! (Übergang), Unit 1 A new school,
+  Unit 2 At home, Unit 3 Our Greenwich, Unit 4 Happy Birthday. Deutsch **Deutschbuch Gymnasium 5** (Cornelsen, 978-3-06-061189-8) –
+  **nicht** die vermutete Länderausgabe 978-3-06-200082-9; welche Ausgabe genau, klärt das Inhaltsverzeichnis.
+  Außerdem (für spätere Fächer): Geografie TERRA 5 Sachsen Gymnasium (Klett, 978-3-12-104320-0), Geschichte ANNO 1 Sachsen
+  (Westermann, 978-3-14-115406-1), Biologie LINDER Biologie SI 5 Sachsen (Westermann, 978-3-14-153000-1).
+  **Als Nächstes:** Fotos der Inhaltsverzeichnisse von Green Line 1 und Deutschbuch, dann EnDax mit den Units und DeDax mit den
+  Kapiteln abgleichen (Reihenfolge, Grammatik je Unit, Begriffe).
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -216,7 +225,7 @@ Weitere Dokumente:
 2. Schriftliches Minus: Rechnet die Klasse mit **Ergänzen** oder **Entbündeln**? Danach die passende Animation bauen
    (bisher zeigt die Lösung nur die Probe mit Plus).
 3. Schrägbild: Annahme „Kanten nach hinten unter 45°, halb so lang“ mit dem Buch abgleichen.
-4. Prüfen, ob das Schulbuch die ISBN 978-3-12-733150-9 hat (Grundlage des Buch-Abgleichs).
+4. ~~Prüfen, ob das Schulbuch die ISBN 978-3-12-733150-9 hat~~ **erledigt 13.11.2026: ja** (Foto der Rückseite).
 5. Oberflächeninhalt zusammengesetzter Körper (bisher nur Volumen).
 6. Danach „MaDax Klasse 5 abnehmen“.
 Die Trainingsseite für die Arbeit am 24.11.2026 ist unverändert (8 Themen aus der Themenliste der Schule).
@@ -1226,6 +1235,9 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v76: Schulbücher eingetragen** (13.11.2026): ISBN aller Klasse-5-Bücher bestimmt. Geändert nur Doku: `STAND.md`,
+  `faecher/README.md`, `faecher/englisch/README.md`, `faecher/englisch/themenplan.md`, `faecher/deutsch/README.md`,
+  `faecher/deutsch/lehrplan/schulbuch-abgleich.md`; dazu `web/sw.js` (Version). Keine Tests nötig, die App ist unverändert.
 - **v75: EnDax Knobeln für Alltag** (13.11.2026): geändert `web/englisch/themen/klasse5-knobel.js`, `tests/endax_knobel.py`, `web/sw.js`.
   Test `endax_knobel.py` ohne Meldung.
 - **v74: EnDax Alphabet** (13.11.2026): Thema `e5-a-abc`. Geändert: `web/englisch/` (Themen, Erklärungen, Symbole, Aufnahmen-Pakete),
