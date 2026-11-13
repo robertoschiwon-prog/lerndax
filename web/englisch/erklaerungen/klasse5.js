@@ -610,4 +610,209 @@
       };
     },
   };
+
+  // =====================================================
+  // there is / there are: eins oder mehrere?
+  // =====================================================
+  //   ctx: { mode:'form'|'kf'|'neg'|'frage'|'kurz', g, form, was, wo, de, n, ja }
+  EX['e5-there'] = {
+    title: 'there is und there are',
+    titleFor: (ctx) => ({ form: ctx && ctx.form ? `Warum „there ${ctx.form}“?` : '', kf: 'Kurzform: so geht’s', neg: 'Verneinen: so geht’s', frage: 'Fragen: so geht’s', kurz: 'Kurzantwort: so geht’s' }[(ctx && ctx.mode) || ''] || 'there is und there are'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, frei = [], Z = null, punkte = null;
+      if (mode !== 'frei') {
+        if (ctx.post) S0 = ctx;
+        else {
+          const pool = (mode === 'kf' || mode === 'neg' ? T.TH1 : mode === 'frage' || mode === 'kurz' ? T.TQ : T.TH).filter((s) => s.g === ctx.g && (s.was !== ctx.was || s.wo !== ctx.wo));
+          S0 = Object.assign({}, U.pick(pool), { ja: ctx.ja });
+        }
+      }
+      const neuFrei = () => { frei = [0, 1].map((g) => U.pick(T.TQ.filter((s) => s.g === g))); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const kn = (s) => T.TNEG[s.form][0];
+      const neu = (teile, y) => { if (Z) Z.g.remove(); Z = zeile(api, teile, y || 46); return Z; };
+      const aussage = (s) => neu([{ t: 'There' }, { t: s.form, c: BLAU }, { t: s.was }, { t: s.wo + '.' }]);
+      // so viele Punkte, wie Dinge da sind (0 = viele)
+      function zeigePunkte(s) {
+        if (punkte) punkte.remove();
+        punkte = el('g', {}, api.svg);
+        const n = s.n || 7, r = 11, gap = 30, x0 = 180 - ((n - 1) * gap) / 2;
+        for (let k = 0; k < n; k++) el('circle', { cx: x0 + k * gap, cy: 150, r, fill: s.g === 0 ? '#dfe9ff' : '#ffe2d6', stroke: 'var(--ink)', 'stroke-width': 2 }, punkte);
+        el('text', { x: 180, y: 192, 'text-anchor': 'middle', class: 'ex-s', text: s.g === 0 ? 'eins → there is' : (s.n ? 'mehrere' : 'viele') + ' → there are', style: 'font-size:14px' }, punkte);
+      }
+      async function form(s, pause) {
+        neu([{ t: 'There' }, { t: '___' }, { t: s.was, c: ORANGE }, { t: s.wo + '.' }]);
+        api.say(`Schau auf das, was <b>hinter</b> der Lücke steht: <b>${s.was}</b>. Wie viele sind das?`);
+        await api.wait(pause);
+        zeigePunkte(s);
+        api.say(s.g === 0 ? `<b>${s.was}</b>: Das ist <b>eins</b>. Deshalb <b>there is</b>.` : `<b>${s.was}</b>: Das sind <b>mehrere</b>. Deshalb <b>there are</b>.`);
+        await api.wait(pause);
+        neu([{ t: 'There' }, { t: s.form, c: BLAU }, { t: s.was, c: ORANGE }, { t: s.wo + '.' }]);
+      }
+      async function fragen(s) {
+        const a = aussage(s);
+        api.say(`Bei der Frage <b>tauschen</b> there und ${s.form} die Plätze.`);
+        await api.wait(2400);
+        const b = zeile(api, [{ t: T.gross(s.form), c: BLAU }, { t: 'there' }, { t: s.was }, { t: s.wo + '?' }], 46);
+        await gleite(api, a, b, [[a.els[0], b.els[1]], [a.els[1], b.els[0]], [a.els[2], b.els[2]], [a.els[3], b.els[3]]], 1100);
+        Z = b;
+      }
+      function antwort(s, ja, y) {
+        zeile(api, ja ? [{ t: 'Yes,' }, { t: 'there' }, { t: s.form + '.', c: BLAU }] : [{ t: 'No,' }, { t: 'there' }, { t: kn(s) + '.', c: BLAU }], y);
+        return ja ? `<b>${T.thJa(s)}</b> In der Antwort steht wieder there und dieselbe Form (${s.form}). ${U.say(T.thJa(s))}`
+          : `<b>${T.thNein(s)}</b> In der Antwort steht wieder there. Nach No wird verneint: ${kn(s)}. ${U.say(T.thNein(s))}`;
+      }
+      return {
+        reset() {
+          api.clear(); Z = null; punkte = null;
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          const s = S0 || frei[0];
+          if (mode === 'frei') neu([{ t: 'there is', c: BLAU }, { t: '= es gibt' }]);
+          else if (mode === 'form') neu([{ t: 'There' }, { t: '___' }, { t: s.was }, { t: s.wo + '.' }]);
+          else if (mode === 'kurz') neu([{ t: T.gross(s.form), c: BLAU }, { t: 'there' }, { t: s.was }, { t: s.wo + '?' }]);
+          else aussage(s);
+        },
+        async play() {
+          const s = S0;
+          if (mode === 'form') {
+            api.say('<b>there is</b> und <b>there are</b> heißen: Da ist etwas, es gibt etwas.');
+            await api.wait(2400);
+            await form(s, 2600);
+            api.say(`Also: There <b>${s.form}</b> ${s.was} ${s.wo}. ${U.say(`There ${s.form} ${s.was} ${s.wo}.`)}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (mode === 'kf') {
+            api.say('Beim Sprechen rücken <b>There</b> und <b>is</b> zusammen.');
+            await api.wait(2400);
+            zeile(api, [{ t: 'There’s', c: BLAU }, { t: s.was }, { t: s.wo + '.' }], 92);
+            api.say(`There is → <b>There’s</b>. Das i fällt weg, dafür steht der Apostroph. ${U.say(T.thKurz(s))}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (mode === 'neg') {
+            const a = aussage(s);
+            api.say('Zum Verneinen brauchst du nur ein Wort: <b>not</b>.');
+            await api.wait(2200);
+            const b = zeile(api, [{ t: 'There' }, { t: 'is', c: BLAU }, { t: 'not', c: ORANGE }, { t: s.was }, { t: s.wo + '.' }], 46);
+            await gleite(api, a, b, [[a.els[0], b.els[0]], [a.els[1], b.els[1]], [a.els[2], b.els[3]], [a.els[3], b.els[4]]]);
+            Z = b;
+            api.say('<b>not</b> kommt direkt hinter <b>is</b>.');
+            await api.wait(2400);
+            zeile(api, [{ t: 'There' }, { t: 'isn’t', c: BLAU }, { t: s.was }, { t: s.wo + '.' }], 92);
+            api.say(`Beim Sprechen: is not → <b>isn’t</b>. ${U.say(T.thNeg(s))}`);
+            return;
+          }
+          if (mode === 'frage') {
+            await fragen(s);
+            api.say(`<b>${T.thFrage(s)}</b> Erst ${T.gross(s.form)}, dann there. ${U.say(T.thFrage(s))}`);
+            return;
+          }
+          if (mode === 'kurz') {
+            api.say(`Die Kurzantwort nimmt die beiden Wörter vom Anfang der Frage: <b>${T.gross(s.form)} there</b> …`);
+            await api.wait(2800);
+            api.say(antwort(s, s.ja, 92));
+            return;
+          }
+          api.say('<b>there is</b> und <b>there are</b> heißen: Da ist etwas, es gibt etwas. Welches passt, hängt davon ab, <b>wie viele</b> es sind.');
+          await api.wait(3400);
+          for (const f of frei) {
+            await form(f, 2200);
+            api.say(`There <b>${f.form}</b> ${f.was} ${f.wo}. ${U.say(f.text)}<br><small>${f.de}</small>`);
+            await api.wait(3000);
+          }
+          if (punkte) punkte.remove();
+          const f = frei[1];
+          await fragen(f);
+          api.say(`Frage: <b>${T.thFrage(f)}</b> ${U.say(T.thFrage(f))}`);
+          await api.wait(2800);
+          api.say(antwort(f, true, 92) + '<br>Merke: eins → <b>there is</b>, mehrere → <b>there are</b>.');
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // this, that, these, those: zwei Fragen, vier Felder
+  // =====================================================
+  //   ctx: { mode:'wort'|'be', wort, viele, fern, ding, ort, be, adj, de }
+  EX['e5-this'] = {
+    title: 'this, that, these, those',
+    titleFor: (ctx) => (ctx && ctx.wort ? (ctx.mode === 'be' ? `Warum „${ctx.be}“?` : `Warum „${ctx.wort.toLowerCase()}“?`) : 'this, that, these, those'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!ctx.wort;
+      let S0 = null, frei = [], Z = null, felder = {}, kopf = {};
+      if (task) S0 = ctx.post ? ctx : U.pick(T.DS.filter((s) => s.wort === ctx.wort && s.ding !== ctx.ding));
+      const neuFrei = () => { frei = T.DEMO.map(([w]) => U.pick(T.DS.filter((s) => s.wort === w))); };
+      if (!task) { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const X = [112, 232], Y = [84, 142], FW = 112, FH = 50;
+      function gitter() {
+        felder = {}; kopf = {};
+        ['eins', 'mehrere'].forEach((t, i) => { kopf['s' + i] = el('text', { x: X[i] + FW / 2, y: 74, 'text-anchor': 'middle', class: 'ex-s', text: t, style: 'font-size:13px' }, api.svg); });
+        [['nah', 'here'], ['weit weg', 'over there']].forEach(([t, e], i) => {
+          kopf['z' + i] = el('text', { x: 100, y: Y[i] + 22, 'text-anchor': 'end', class: 'ex-s', text: t, style: 'font-size:13px' }, api.svg);
+          el('text', { x: 100, y: Y[i] + 38, 'text-anchor': 'end', class: 'ex-s', text: e, style: `font-size:11px;fill:${ORANGE}` }, api.svg);
+        });
+        T.DEMO.forEach(([w, viele, fern]) => {
+          const r = el('rect', { x: X[viele], y: Y[fern], width: FW, height: FH, rx: 10, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: X[viele] + FW / 2, y: Y[fern] + 32, 'text-anchor': 'middle', class: 'ex-b', text: w.toLowerCase(), style: `fill:${BLAU};font-size:20px` }, api.svg);
+          felder[w] = r;
+        });
+      }
+      const leuchte = (test) => T.DEMO.forEach(([w, viele, fern]) => felder[w].setAttribute('fill', test(w, viele, fern) ? '#dfe9ff' : '#fff'));
+      const satz = (teile) => { if (Z) Z.g.remove(); Z = zeile(api, teile, 40, 18); };
+      async function zeige(s, pause) {
+        leuchte(() => false);
+        satz([{ t: '___' }, { t: s.ding, c: ORANGE }, { t: s.ort }, { t: s.be }, { t: s.adj + '.' }]);
+        api.say(`Erste Frage: eins oder mehrere? <b>${s.ding}</b>: ${s.viele ? 'mehrere' : 'eins'}.`);
+        leuchte((w, viele) => viele === s.viele);
+        await api.wait(pause);
+        satz([{ t: '___' }, { t: s.ding }, { t: s.ort, c: ORANGE }, { t: s.be }, { t: s.adj + '.' }]);
+        api.say(`Zweite Frage: nah oder weit weg? <b>${s.ort}</b>: ${s.fern ? 'weit weg' : 'nah'}.`);
+        leuchte((w) => w === s.wort);
+        await api.wait(pause);
+        satz([{ t: s.wort, c: BLAU }, { t: s.ding }, { t: s.ort }, { t: s.be }, { t: s.adj + '.' }]);
+      }
+      return {
+        reset() {
+          api.clear(); Z = null;
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          gitter();
+          if (task && S0.mode !== 'be' && ctx.mode !== 'be') satz([{ t: '___' }, { t: S0.ding }, { t: S0.ort }, { t: S0.be }, { t: S0.adj + '.' }]);
+          else if (task) satz([{ t: S0.wort }, { t: S0.ding }, { t: S0.ort }, { t: '___' }, { t: S0.adj + '.' }]);
+          else satz([{ t: 'Welches Wort?', c: BLAU }]);
+        },
+        async play() {
+          if (task && ctx.mode === 'be') {
+            const s = S0;
+            leuchte((w) => w === s.wort);
+            api.say(`<b>${s.wort.toLowerCase()}</b> steht in der Spalte „${s.viele ? 'mehrere' : 'eins'}“.`);
+            await api.wait(2600);
+            satz([{ t: s.wort, c: ORANGE }, { t: s.ding }, { t: s.ort }, { t: s.be, c: BLAU }, { t: s.adj + '.' }]);
+            api.say(`${s.viele ? 'Bei mehreren heißt es <b>are</b>' : 'Bei einem heißt es <b>is</b>'}: ${s.wort} ${s.ding} ${s.ort} <b>${s.be}</b> ${s.adj}. ${U.say(`${s.wort} ${s.ding} ${s.ort} ${s.be} ${s.adj}.`)}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (task) {
+            const s = S0;
+            await zeige(s, 2800);
+            api.say(`Also: <b>${s.wort}</b> ${s.ding} ${s.ort} ${s.be} ${s.adj}. ${U.say(`${s.wort} ${s.ding} ${s.ort} ${s.be} ${s.adj}.`)}<br><small>${s.de}</small>`);
+            return;
+          }
+          api.say('Vier Wörter zum Zeigen. Du brauchst nur <b>zwei Fragen</b>: Eins oder mehrere? Nah oder weit weg?');
+          await api.wait(3200);
+          for (const s of frei) {
+            await zeige(s, 1900);
+            api.say(`<b>${s.wort}</b> ${s.ding} ${s.ort} ${s.be} ${s.adj}. ${U.say(s.text)}<br><small>${s.de}</small>`);
+            await api.wait(2600);
+          }
+          leuchte(() => false);
+          satz([{ t: 'this → these', c: BLAU }, { t: '·' }, { t: 'that → those', c: BLAU }]);
+          api.say('Merke: <b>this</b> und <b>these</b> sind nah (here), <b>that</b> und <b>those</b> sind weit weg (over there).');
+        },
+      };
+    },
+  };
 })();

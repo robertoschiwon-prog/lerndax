@@ -28,8 +28,8 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 | 4 | have got / has got (gebaut, v58) | Lücke: „My brother ___ got a bike.“ · Verneine: „I have got a pet.“ · Frage: „___ you got a pen?“ |
 | 5 | a oder an (gebaut, v58) | „___ apple“, „___ book“, „___ hour“ (es zählt der Laut, nicht der Buchstabe) |
 | 6 | Mehrzahl (Plural) (gebaut, v59) | Tippe die Mehrzahl: box → boxes, baby → babies, child → children · Welches Wort ist falsch geschrieben? |
-| 7 | there is / there are | „___ two cats in the garden.“ · Bild-Aufgabe: Was liegt auf dem Tisch? |
-| 8 | this, that, these, those | nah oder fern, eins oder mehrere: „___ books over there“ |
+| 7 | there is / there are (gebaut, v60) | „___ two cats in the garden.“ · Bild-Aufgabe: Was liegt auf dem Tisch? |
+| 8 | this, that, these, those (gebaut, v60) | nah oder fern, eins oder mehrere: „___ books over there“ |
 | 9 | my, your, his, her … (Possessivbegleiter) | „Lisa has got a dog. ___ dog is black.“ · he → his, they → their · its oder it’s? |
 | 10 | Wem gehört es? ’s und of | „the bike of Ben“ → Ben’s bike · „the girls’ room“: ein Mädchen oder mehrere? |
 | 11 | Aufforderungen (Imperativ) | „Open the window.“ verneinen → Don’t open the window. · Was passt im Klassenraum? |

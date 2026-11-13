@@ -16,6 +16,10 @@ window.EnDaxIcons = (function () {
     'e5-a-an': `<circle cx="6" cy="14" r="3.4"/><circle cx="18" cy="14" r="3.4" ${F}/><path d="M6 9.5c3-4.5 9-4.5 12 0"/>`,
     // Mehrzahl: eine Kiste links, zwei Kisten rechts
     'e5-plural': `<rect x="2.5" y="10" width="6" height="6" rx="1.2"/><path d="M11 13h2.4"/><rect x="15" y="5.5" width="6" height="6" rx="1.2" ${F}/><rect x="15" y="13.5" width="6" height="6" rx="1.2" ${F}/>`,
+    // there is / there are: ein Punkt in einem Rahmen, daneben drei
+    'e5-there': `<rect x="2.5" y="6" width="8" height="12" rx="1.6"/><circle cx="6.5" cy="12" r="1.8" ${F}/><rect x="13.5" y="6" width="8" height="12" rx="1.6"/><circle cx="17.5" cy="9" r="1.4" ${F}/><circle cx="15.8" cy="14.5" r="1.4" ${F}/><circle cx="19.2" cy="14.5" r="1.4" ${F}/>`,
+    // this / that: ein naher großer Punkt und ein ferner kleiner, mit Zeigepfeil
+    'e5-this': `<circle cx="6" cy="16" r="3.2" ${F}/><circle cx="19" cy="6.5" r="1.8"/><path d="M9.5 13.5l6-4.6"/><path d="M12.6 8.4l3-.1-.6 3"/>`,
   };
   function svg(id) {
     const body = I[id];

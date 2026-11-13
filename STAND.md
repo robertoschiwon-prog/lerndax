@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v59`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v60`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -84,6 +84,12 @@ Weitere Dokumente:
   `e5-plural` „Mehrzahl: one box, two boxes“: 41 Wörter, 5 Aufgabenarten (Mehrzahl tippen und wählen, Einzahl, Regel
   erkennen, passendes Wort finden), Animation „auf das Wortende kommt es an“. Jetzt 292 Aufnahmen je Aussprache.
   Als Nächstes laut Themenplan: there is/are, this/that, my/your, ’s, Imperativ, can/must.
+- **EnDax v60 (13.11.2026): Themen 7 und 8**, auf GitHub und live. `e5-there` „there is und there are“ (8 Aufgabenarten:
+  Form, Satz, Kurzform There’s, verneinen, Frage, Kurzantwort; Animation mit Punkten „eins oder mehrere“) und `e5-this`
+  „this, that, these, those“ (5 Aufgabenarten, 40 Sätze mit here / over there; Animation „zwei Fragen, vier Felder“).
+  Jetzt 8 Themen und 383 Aufnahmen je Aussprache in 8 Paketen. Bewusst weggelassen: verneinte Mehrzahl und Fragen mit
+  „any“ (There aren’t any …), das gehört zu some/any (Thema 22). Als Nächstes laut Themenplan: my/your/his/her,
+  ’s und of, Imperativ, can/must.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1107,3 +1113,6 @@ Infos zur ersten Arbeit:
   Geprüft: alle 251 bisherigen Aufnahmen liegen byte-gleich in den Paketen; 14 100 erzeugte Aufgaben ohne Fehler;
   `tests/endax.py` 8 Runden (6 Themen, 288 Antworten, 96 Animationen, 46 Lautsprecher angetippt) ohne Fehler; Wiedergabe
   im Test-Browser gemessen (Aufnahme läuft bis zum Ende, auch wenn das Paket beim Antippen noch fehlt). Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden, 360 Antworten), `eltern`, `hub`.
+- **v60: EnDax, Themen 7 und 8** (13.11.2026): `e5-there` und `e5-this`. Nur `web/englisch/` und `sw.js` geändert.
+  Geprüft: 13 000 erzeugte Aufgaben der beiden Themen ohne Fehler; `tests/endax.py` 8 Runden (8 Themen, 384 Antworten,
+  128 Animationen, 64 Lautsprecher angetippt) ohne Fehler. Die neuen Aufnahmen hat noch niemand angehört.

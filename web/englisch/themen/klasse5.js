@@ -750,6 +750,216 @@
   Object.assign(D.arten, { 'e5-plural': { plTippen, plWahl, plEinzahl, plRegel, plWelches } });
 
   // =====================================================
+  // there is / there are
+  // =====================================================
+  const TFORM = ['is', 'are'];
+  const TNEG = { is: ['isn’t', 'isn\'t', 'is not'], are: ['aren’t', 'aren\'t', 'are not'] };
+  // [Gruppe (0 = eins, 1 = mehrere), was, wo, Deutsch, Anzahl fürs Bild (0 = viele)]
+  const TH = [
+    [0, 'a cat', 'in the garden', 'Im Garten ist eine Katze.', 1],
+    [0, 'a book', 'on the table', 'Auf dem Tisch liegt ein Buch.', 1],
+    [0, 'an apple', 'in my bag', 'In meiner Tasche ist ein Apfel.', 1],
+    [0, 'a park', 'near my house', 'In der Nähe meines Hauses gibt es einen Park.', 1],
+    [0, 'a dog', 'under the table', 'Unter dem Tisch ist ein Hund.', 1],
+    [0, 'a new girl', 'in our class', 'In unserer Klasse gibt es ein neues Mädchen.', 1],
+    [0, 'a ball', 'behind the door', 'Hinter der Tür liegt ein Ball.', 1],
+    [0, 'a big tree', 'in front of the school', 'Vor der Schule steht ein großer Baum.', 1],
+    [1, 'two cats', 'in the garden', 'Im Garten sind zwei Katzen.', 2],
+    [1, 'three books', 'on the table', 'Auf dem Tisch liegen drei Bücher.', 3],
+    [1, 'many children', 'in the park', 'Im Park sind viele Kinder.', 0],
+    [1, 'four chairs', 'in the kitchen', 'In der Küche stehen vier Stühle.', 4],
+    [1, 'two boys', 'in the car', 'Im Auto sind zwei Jungen.', 2],
+    [1, 'five apples', 'in my bag', 'In meiner Tasche sind fünf Äpfel.', 5],
+    [1, 'twenty desks', 'in our classroom', 'In unserem Klassenzimmer stehen zwanzig Tische.', 0],
+    [1, 'some pens', 'in the box', 'In der Kiste sind ein paar Stifte.', 0],
+  ].map(([g, was, wo, de, n]) => ({ g, form: TFORM[g], was, wo, de, n, text: `There ${TFORM[g]} ${was} ${wo}.` }));
+  const TH1 = TH.filter((s) => s.g === 0);
+  const TQ = TH.filter((s) => !s.was.startsWith('some'));   // Fragen: ohne „some“ (in Fragen stünde „any“)
+  const thKurz = (s) => `There’s ${s.was} ${s.wo}.`;
+  const thNeg = (s) => `There ${TNEG[s.form][0]} ${s.was} ${s.wo}.`;
+  const thFrage = (s) => `${gross(s.form)} there ${s.was} ${s.wo}?`;
+  const thJa = (s) => `Yes, there ${s.form}.`;
+  const thNein = (s) => `No, there ${TNEG[s.form][0]}.`;
+  const thWarum = (s) => (s.g === 0
+    ? `<b>${s.was}</b>: Das ist <b>eins</b>. Deshalb <b>there is</b>.`
+    : `<b>${s.was}</b>: Das sind <b>mehrere</b>. Deshalb <b>there are</b>.`);
+  const thLoesung = (s) => `<span lang="en">There <b class="vb">${s.form}</b> ${s.was} ${s.wo}.</span> ${U.say(s.text)}<br>${thWarum(s)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const TH_TIPP = '<b>there is</b> und <b>there are</b> sagen, dass es irgendwo etwas gibt. Schau auf das, was <b>danach</b> kommt: <b>eins</b> → there is · <b>mehrere</b> → there are.';
+  const TEX = (s, mode, ja) => ({ mode: mode || 'form', g: s.g, form: s.form, was: s.was, wo: s.wo, de: s.de, n: s.n, ja: !!ja });
+  // A: is oder are auswählen
+  function thLuecke() {
+    const s = pick(TH);
+    return { prompt: `Was gehört in die Lücke?${en(`There ___ ${s.was} ${s.wo}.`)}`, choices: ['is', 'are', 'am'], correct: s.g, hint: TH_TIPP, solution: thLoesung(s), ex: TEX(s) };
+  }
+  // B: eintippen
+  function thTippen() {
+    const s = pick(TH);
+    return {
+      prompt: 'Setze ein: <b>is</b> oder <b>are</b>.', layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.form, prefix: 'There', suffix: `${s.was} ${s.wo}.`, label: 'is oder are' }],
+      hint: TH_TIPP, solution: thLoesung(s), ex: TEX(s),
+    };
+  }
+  // C: richtigen Satz finden
+  function thSatz() {
+    const s = pick(TH);
+    const ch = shuffle([s.text, `There ${TFORM[1 - s.g]} ${s.was} ${s.wo}.`, `There ${s.was} ${s.form} ${s.wo}.`]);
+    return {
+      prompt: 'Nur ein Satz ist richtig. Welcher?',
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.text),
+      hint: `${TH_TIPP} Die Reihenfolge ist immer: There + is/are + was + wo.`, solution: thLoesung(s), ex: TEX(s),
+    };
+  }
+  // D: Kurzform (nur bei there is)
+  function thKurzform() {
+    const s = pick(TH1);
+    return {
+      prompt: `Schreibe die <b>Kurzform</b> von <b lang="en">There is</b>.${en(s.text)}`,
+      fields: [{ type: 'text', ci: true, answer: ['There’s', 'There\'s'], label: 'Kurzform' }], answerText: 'There’s',
+      hint: 'is wird zu <b>’s</b>: Das i fällt weg, dafür steht der Apostroph. Wie bei he is → he’s.',
+      solution: `<span lang="en">There is</span> → <b class="vb" lang="en">There’s</b><br><span lang="en">${thKurz(s)}</span> ${U.say(thKurz(s))}<br>Für „there are“ schreibt man keine Kurzform.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: TEX(s, 'kf'),
+    };
+  }
+  // E: verneinen (mit a/an)
+  function thVerneinen() {
+    const s = pick(TH1);
+    return {
+      prompt: `Verneine den Satz: Setze die <b>verneinte</b> Form ein.${en(s.text)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: TNEG.is, prefix: 'There', suffix: `${s.was} ${s.wo}.`, label: 'verneinte Form' }],
+      answerText: 'isn’t (oder: is not)',
+      hint: 'Wie bei to be: <b>not</b> kommt hinter is. Kurz: <b>isn’t</b>.',
+      solution: `<span lang="en">There <b class="vb">is not</b> ${s.was} ${s.wo}.</span><br>Kurz: <span lang="en">There <b class="vb">isn’t</b> ${s.was} ${s.wo}.</span> ${U.say(thNeg(s))}<br><b>not</b> kommt hinter is. Beide Formen sind richtig.`,
+      ex: TEX(s, 'neg'),
+    };
+  }
+  const TFRAGE_TIPP = 'Bei der Frage tauschen <b>there</b> und <b>is/are</b> die Plätze: Is there …? Are there …?';
+  const thFrageLoesung = (s) => `<span lang="en">There <b>${s.form}</b> ${s.was} ${s.wo}.</span> → <span lang="en"><b class="vb">${gross(s.form)} there</b> ${s.was} ${s.wo}?</span> ${U.say(thFrage(s))}<br>${TFRAGE_TIPP}`;
+  // F: richtige Frage auswählen
+  function thFrageWahl() {
+    const s = pick(TQ), richtig = thFrage(s);
+    const ch = shuffle([richtig, `${gross(TFORM[1 - s.g])} there ${s.was} ${s.wo}?`, `${gross(s.form)} there ${s.form} ${s.was} ${s.wo}?`]);
+    return {
+      prompt: `Mache aus dem Satz eine Frage. Welche ist richtig?${en(s.text)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: TFRAGE_TIPP, solution: thFrageLoesung(s), ex: TEX(s, 'frage'),
+    };
+  }
+  // G: Frage eintippen
+  function thFrageTippen() {
+    const s = pick(TQ);
+    return {
+      prompt: `Mache aus dem Satz eine Frage und schreibe sie auf.${en(s.text)}`,
+      fields: [{ type: 'text', ci: true, answer: thFrage(s), label: 'Frage' }],
+      hint: TFRAGE_TIPP, solution: thFrageLoesung(s), ex: TEX(s, 'frage'),
+    };
+  }
+  // H: Kurzantwort
+  function thAntwort() {
+    const s = pick(TQ), ja = Math.random() < 0.5, anders = TFORM[1 - s.g];
+    const richtig = ja ? thJa(s) : thNein(s);
+    const falsch = ja ? [`Yes, there ${anders}.`, `Yes, ${s.g === 0 ? 'it is' : 'they are'}.`] : [`No, there ${TNEG[anders][0]}.`, `No, ${s.g === 0 ? 'it isn’t' : 'they aren’t'}.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Antworte kurz mit <b>${ja ? 'Ja' : 'Nein'}</b>.${en(thFrage(s))}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: 'Die Kurzantwort nimmt die beiden Wörter vom Anfang der Frage: Is there …? → Yes, there is. Are there …? → Yes, there are.',
+      solution: `<span lang="en">${thFrage(s)}</span><br><span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>In der Antwort steht wieder <b>there</b>, nicht it oder they. Die Form (${s.form}) ist dieselbe wie in der Frage.${ja ? '' : ` Nach No wird verneint: ${TNEG[s.form][0]}.`}`,
+      ex: TEX(s, 'kurz', ja),
+    };
+  }
+  const thereIs = () => U.wahl([[22, thLuecke], [22, thTippen], [12, thSatz], [6, thKurzform], [10, thVerneinen], [10, thFrageWahl], [8, thFrageTippen], [10, thAntwort]]);
+
+  // =====================================================
+  // this, that, these, those
+  // =====================================================
+  // [Einzahl, Mehrzahl, Eigenschaft, dieser/diese/dieses, der/die/das, deutsches Wort, deutsche Mehrzahl, deutsche Eigenschaft]
+  const DING = [
+    ['book', 'books', 'new', 'Dieses', 'Das', 'Buch', 'Bücher', 'neu'],
+    ['pen', 'pens', 'red', 'Dieser', 'Der', 'Stift', 'Stifte', 'rot'],
+    ['apple', 'apples', 'big', 'Dieser', 'Der', 'Apfel', 'Äpfel', 'groß'],
+    ['dog', 'dogs', 'nice', 'Dieser', 'Der', 'Hund', 'Hunde', 'lieb'],
+    ['chair', 'chairs', 'old', 'Dieser', 'Der', 'Stuhl', 'Stühle', 'alt'],
+    ['bag', 'bags', 'small', 'Diese', 'Die', 'Tasche', 'Taschen', 'klein'],
+    ['car', 'cars', 'fast', 'Dieses', 'Das', 'Auto', 'Autos', 'schnell'],
+    ['shoe', 'shoes', 'dirty', 'Dieser', 'Der', 'Schuh', 'Schuhe', 'schmutzig'],
+    ['key', 'keys', 'old', 'Dieser', 'Der', 'Schlüssel', 'Schlüssel', 'alt'],
+    ['box', 'boxes', 'heavy', 'Diese', 'Die', 'Kiste', 'Kisten', 'schwer'],
+  ];
+  // Die vier Wörter: [Wort, mehrere?, weit weg?]
+  const DEMO = [['This', 0, 0], ['That', 0, 1], ['These', 1, 0], ['Those', 1, 1]];
+  const DS = [];
+  DING.forEach(([sg, pl, adj, dies, art, deSg, dePl, deAdj]) => DEMO.forEach(([wort, viele, fern]) => DS.push({
+    wort, viele, fern, ding: viele ? pl : sg, sg, pl, adj, ort: fern ? 'over there' : 'here', be: viele ? 'are' : 'is',
+    text: `${wort} ${viele ? pl : sg} ${fern ? 'over there' : 'here'} ${viele ? 'are' : 'is'} ${adj}.`,
+    de: viele ? `${fern ? 'Die' : 'Diese'} ${dePl} ${fern ? 'da drüben' : 'hier'} sind ${deAdj}.` : `${fern ? art : dies} ${deSg} ${fern ? 'da drüben' : 'hier'} ist ${deAdj}.`,
+  })));
+  const DEMO_TEXT = { This: 'eins, nah', That: 'eins, weit weg', These: 'mehrere, nah', Those: 'mehrere, weit weg' };
+  const dWarum = (s) => `<b>${s.ding}</b>: ${s.viele ? 'mehrere' : 'eins'}. <b>${s.ort}</b>: ${s.fern ? 'weit weg' : 'nah'}. Dazu passt <b>${s.wort.toLowerCase()}</b>.`;
+  const dLoesung = (s) => `<span lang="en"><b class="vb">${s.wort}</b> ${s.ding} ${s.ort} ${s.be} ${s.adj}.</span> ${U.say(s.text)}<br>${dWarum(s)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const D_TIPP = 'Stell dir zwei Fragen. <b>Eins oder mehrere?</b> Und: <b>nah</b> (here) oder <b>weit weg</b> (over there)? this = eins, nah · that = eins, weit weg · these = mehrere, nah · those = mehrere, weit weg.';
+  const DEX = (s, mode) => ({ mode: mode || 'wort', wort: s.wort, viele: s.viele, fern: s.fern, ding: s.ding, ort: s.ort, be: s.be, adj: s.adj, de: s.de });
+  const DW = DEMO.map((d) => d[0]);
+  // A: passendes Wort auswählen
+  function dWahl() {
+    const s = pick(DS), ch = shuffle(DW);
+    return { prompt: `Was gehört in die Lücke?${en(`___ ${s.ding} ${s.ort} ${s.be} ${s.adj}.`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.wort), hint: D_TIPP, solution: dLoesung(s), ex: DEX(s) };
+  }
+  // B: eintippen
+  function dTippen() {
+    const s = pick(DS);
+    return {
+      prompt: 'Setze ein: <b>this</b>, <b>that</b>, <b>these</b> oder <b>those</b>.', layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.wort, suffix: `${s.ding} ${s.ort} ${s.be} ${s.adj}.`, label: 'this, that, these oder those' }],
+      hint: D_TIPP, solution: dLoesung(s), ex: DEX(s),
+    };
+  }
+  // C: die Bedeutung der vier Wörter
+  function dBedeutung() {
+    const [wort] = pick(DEMO), richtung = Math.random() < 0.5;
+    const s = pick(DS.filter((x) => x.wort === wort));
+    if (richtung) {
+      const ch = shuffle(DW);
+      return { prompt: `Welches Wort bedeutet: <b>${DEMO_TEXT[wort]}</b>?`, choices: ch.map((c) => `<span lang="en">${c.toLowerCase()}</span>`), correct: ch.indexOf(wort), hint: D_TIPP, solution: `<b class="vb" lang="en">${wort.toLowerCase()}</b> = ${DEMO_TEXT[wort]}<br>Ein Beispiel: <span lang="en">${s.text}</span> ${U.say(s.text)}<br><small>${s.de}</small>`, ex: DEX(s) };
+    }
+    const ch = shuffle(DW);
+    return { prompt: `Was bedeutet <b lang="en">${wort.toLowerCase()}</b>?`, choices: ch.map((c) => DEMO_TEXT[c]), correct: ch.indexOf(wort), hint: D_TIPP, solution: `<b class="vb" lang="en">${wort.toLowerCase()}</b> = ${DEMO_TEXT[wort]}<br>Ein Beispiel: <span lang="en">${s.text}</span> ${U.say(s.text)}<br><small>${s.de}</small>`, ex: DEX(s) };
+  }
+  // D: is oder are hinter this/that/these/those
+  function dIsAre() {
+    const s = pick(DS);
+    return {
+      prompt: 'Setze ein: <b>is</b> oder <b>are</b>.', layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.be, prefix: `${s.wort} ${s.ding} ${s.ort}`, suffix: `${s.adj}.`, label: 'is oder are' }],
+      hint: '<b>this</b> und <b>that</b> stehen für <b>eins</b>: is. <b>these</b> und <b>those</b> stehen für <b>mehrere</b>: are.',
+      solution: `<span lang="en">${s.wort} ${s.ding} ${s.ort} <b class="vb">${s.be}</b> ${s.adj}.</span> ${U.say(s.text)}<br><b>${s.wort.toLowerCase()}</b> steht für ${s.viele ? 'mehrere, deshalb <b>are</b>' : 'eins, deshalb <b>is</b>'}.<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: DEX(s, 'be'),
+    };
+  }
+  // E: von eins zu mehreren und zurück (this ↔ these, that ↔ those)
+  function dWechsel() {
+    const s = pick(DS), z = DS.find((x) => x.sg === s.sg && x.fern === s.fern && x.viele !== s.viele);
+    return {
+      prompt: `Aus ${s.viele ? 'mehreren wird eins' : 'einem werden mehrere'}. Welches Wort gehört jetzt an den Anfang?${en(s.text)}`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: z.wort, suffix: `${z.ding} ${z.ort} ${z.be} ${z.adj}.`, label: 'this, that, these oder those' }],
+      hint: 'Nah bleibt nah, weit weg bleibt weit weg. Es wechselt nur eins ↔ mehrere: this ↔ these, that ↔ those.',
+      solution: `<span lang="en">${s.text}</span> → ${dLoesung(z)}`, ex: DEX(z),
+    };
+  }
+  const dieseJene = () => U.wahl([[28, dWahl], [24, dTippen], [16, dBedeutung], [16, dIsAre], [16, dWechsel]]);
+
+  Object.assign(D.daten, { TFORM, TNEG, TH, TH1, TQ, thKurz, thNeg, thFrage, thJa, thNein, DS, DEMO, DEMO_TEXT });
+  const themenVorThere = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorThere(), {
+    'e5-there': [...TH.map((s) => s.text), ...TH1.map(thKurz), ...TH1.map(thNeg), ...TQ.map(thFrage), 'Yes, there is.', 'No, there isn’t.', 'Yes, there are.', 'No, there aren’t.'],
+    'e5-this': DS.map((s) => s.text),
+  });
+  Object.assign(D.arten, {
+    'e5-there': { thLuecke, thTippen, thSatz, thKurzform, thVerneinen, thFrageWahl, thFrageTippen, thAntwort },
+    'e5-this': { dWahl, dTippen, dBedeutung, dIsAre, dWechsel },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -762,6 +972,8 @@
         { id: 'e5-have', title: 'have got und has got', icon: '🎒', gen: haveGot },
         { id: 'e5-a-an', title: 'a oder an', icon: '🍎', gen: aOderAn },
         { id: 'e5-plural', title: 'Mehrzahl: one box, two boxes', icon: '📦', gen: mehrzahl },
+        { id: 'e5-there', title: 'there is und there are', icon: '👀', gen: thereIs },
+        { id: 'e5-this', title: 'this, that, these, those', icon: '👉', gen: dieseJene },
       ] },
     ],
   };
