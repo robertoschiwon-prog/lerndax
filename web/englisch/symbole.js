@@ -34,6 +34,12 @@ window.EnDaxIcons = (function () {
     'e5-ps-neg': `<circle cx="12" cy="12" r="7.5"/><path d="M6.8 17.2L17.2 6.8"/>`,
     // fragen: ein Fragezeichen in einer Sprechblase
     'e5-ps-frage': `<path d="M4 5h16v11H11l-4 3.5V16H4z"/><path d="M9.8 9a2.3 2.3 0 1 1 3.3 2.1c-.7.4-1.1.8-1.1 1.6"/><circle cx="12" cy="14.3" r=".8" ${F}/>`,
+    // Fragewörter: eine Lupe
+    'e5-fragewort': `<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/><path d="M8.6 9a2 2 0 1 1 2.9 1.8c-.6.3-1 .7-1 1.3"/>`,
+    // Satzbau: fünf Bausteine in einer Reihe
+    'e5-satzbau': `<rect x="2" y="9" width="3.4" height="6" rx=".8" ${F}/><rect x="6.2" y="9" width="3.4" height="6" rx=".8"/><rect x="10.4" y="9" width="3.4" height="6" rx=".8"/><rect x="14.6" y="9" width="3.4" height="6" rx=".8"/><rect x="18.8" y="9" width="3.4" height="6" rx=".8"/>`,
+    // Wie oft: eine Leiter mit fünf Punkten, einer gefüllt
+    'e5-oft': `<path d="M3 12h18"/><circle cx="3.5" cy="12" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="12.5" cy="12" r="1.6" ${F}/><circle cx="17" cy="12" r="1.6"/><circle cx="21" cy="12" r="1.6"/>`,
   };
   function svg(id) {
     const body = I[id];

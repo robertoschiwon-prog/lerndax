@@ -42,9 +42,9 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 | 13 | present simple: Aussagen (he, she, it – das s muss mit) (gebaut, v63) | „Tom ___ (play) football.“ · go → goes, watch → watches, carry → carries |
 | 14 | present simple: verneinen (don’t / doesn’t) (gebaut, v63) | „She likes tea.“ → She doesn’t like tea. · don’t oder doesn’t? |
 | 15 | present simple: Fragen mit do / does, Kurzantworten (gebaut, v63) | „___ your sister play tennis?“ – „No, she ___.“ |
-| 16 | Fragewörter (who, what, where, when, why, how) | Welches Fragewort passt zur Antwort „At eight o’clock.“? |
-| 17 | Satzbau: wer – tut – was – wo – wann | Wörter in die richtige Reihenfolge bringen (Aufgabenform seit v63 vorhanden) |
-| 18 | Wie oft? always, often, sometimes, never | An welche Stelle gehört „often“? (Stelle antippen) |
+| 16 | Fragewörter (who, what, where, when, why, how) (gebaut, v64) | Welches Fragewort passt zur Antwort „At eight o’clock.“? |
+| 17 | Satzbau: wer – tut – was – wo – wann (gebaut, v64) | Wörter in die richtige Reihenfolge bringen (Aufgabenform seit v63 vorhanden) |
+| 18 | Wie oft? always, often, sometimes, never (gebaut, v64) | An welche Stelle gehört „often“? (Stelle antippen) |
 | 19 | present progressive (am/is/are + -ing) | „Look! The dog ___ (run).“ · -ing-Form: make → making, sit → sitting |
 | 20 | simple oder progressive? | Signalwörter: every day, now, at the moment, on Mondays |
 | 21 | me, him, her, us, them (Objektpronomen) | „I like Ben.“ → I like him. · he oder him? |

@@ -1295,4 +1295,192 @@
   EX['e5-ps'] = psErklaerung('present simple: he, she, it – das s muss mit', 'Das present simple sagt, was jemand <b>regelmäßig</b> tut. Bei he, she, it bekommt das Verb ein <b>s</b>.');
   EX['e5-ps-neg'] = psErklaerung('present simple: don’t und doesn’t', 'Verneint wird mit <b>don’t</b> oder <b>doesn’t</b>. Dahinter steht das Verb in der Grundform.');
   EX['e5-ps-frage'] = psErklaerung('present simple: Fragen mit do und does', 'Fragen beginnen mit <b>Do</b> oder <b>Does</b>. Dahinter stehen die Person und das Verb in der Grundform.');
+
+  // =====================================================
+  // Fragewörter: sechs Karten
+  // =====================================================
+  //   ctx: { mode:'frage', wort, rest, antwort, de } | { mode:'wort', wort }
+  EX['e5-fragewort'] = {
+    title: 'Fragewörter: who, what, where …',
+    titleFor: (ctx) => (ctx && ctx.wort ? `Warum „${ctx.wort.toLowerCase()}“?` : 'Fragewörter: who, what, where …'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let Q0 = null, frei = [], Z = [], karten = {};
+      if (mode === 'frage') Q0 = ctx.post ? ctx : U.pick(T.FW.filter((q) => q.wort === ctx.wort && q.rest !== ctx.rest)) || U.pick(T.FW.filter((q) => q.rest !== ctx.rest));
+      const neuFrei = () => { frei = U.shuffle(T.FW6).slice(0, 3).map((w) => U.pick(T.FW.filter((q) => q.wort === w))); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const weg = () => { Z.forEach((z) => z.remove()); Z = []; };
+      const zeig = (teile, y, fs) => { const t = tzeile(api, teile, y, fs || 19); Z.push(t); return t; };
+      function kartenZeichnen() {
+        karten = {};
+        T.FW6.forEach((w, i) => {
+          const x = 14 + (i % 3) * 112, y = 92 + Math.floor(i / 3) * 56;
+          const r = el('rect', { x, y, width: 108, height: 50, rx: 10, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: x + 54, y: y + 23, 'text-anchor': 'middle', class: 'ex-b', text: w.toLowerCase(), style: `fill:${BLAU};font-size:18px` }, api.svg);
+          el('text', { x: x + 54, y: y + 41, 'text-anchor': 'middle', class: 'ex-s', text: T.FW_DE[w], style: 'font-size:12px' }, api.svg);
+          karten[w] = r;
+        });
+      }
+      const leuchte = (w) => T.FW6.forEach((k) => karten[k].setAttribute('fill', w && k === w.split(' ')[0] ? '#dfe9ff' : '#fff'));
+      async function zeige(q, pause) {
+        weg(); leuchte('');
+        zeig([['– ' + q.antwort, ORANGE]], 66, 18);
+        api.say(`Die Antwort heißt: <b>${q.antwort}</b> Was nennt sie?`);
+        await api.wait(pause);
+        leuchte(q.wort);
+        api.say(`Sie nennt <b>${T.FW_ART[q.wort]}</b>. Danach fragt <b>${q.wort.toLowerCase()}</b> (${T.FW_DE[q.wort]}).`);
+        await api.wait(pause);
+        zeig([[q.wort, BLAU], [' ' + q.rest + '?']], 36);
+      }
+      return {
+        reset() {
+          api.clear(); Z = []; kartenZeichnen();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : mode === 'wort' ? 'Das Wort aus deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'frage') { zeig([['___ ' + Q0.rest + '?']], 36); zeig([['– ' + Q0.antwort]], 66, 18); }
+          else zeig([['Wonach wird gefragt?', BLAU]], 50);
+        },
+        async play() {
+          if (mode === 'frage') {
+            const q = Q0;
+            await zeige(q, 2800);
+            api.say(`<b>${q.wort}</b> ${q.rest}? – ${q.antwort} ${U.say(`${q.wort} ${q.rest}? ${q.antwort}`)}<br><small>${q.de}</small>`);
+            return;
+          }
+          if (mode === 'wort') {
+            leuchte(ctx.wort);
+            weg(); zeig([[ctx.wort.toLowerCase(), BLAU], [' = ' + T.FW_DE[ctx.wort]]], 50, 24);
+            api.say(`<b>${ctx.wort.toLowerCase()}</b> heißt <b>${T.FW_DE[ctx.wort]}</b> und fragt nach: ${T.FW_ART[ctx.wort]}.${ctx.wort === 'Who' || ctx.wort === 'Where' ? ' Vorsicht: <b>who</b> = wer, <b>where</b> = wo.' : ''}`);
+            return;
+          }
+          api.say('Mit einem Fragewort fragst du nach etwas Bestimmtem. Es steht immer ganz <b>vorn</b>.');
+          await api.wait(3000);
+          for (const q of frei) {
+            await zeige(q, 2100);
+            api.say(`<b>${q.wort}</b> ${q.rest}? – ${q.antwort} ${U.say(q.text)}<br><small>${q.de}</small>`);
+            await api.wait(3000);
+          }
+          leuchte('');
+          api.say('Merke: <b>who</b> = wer, <b>where</b> = wo. Diese beiden werden am häufigsten verwechselt.');
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // Satzbau: fünf Plätze
+  // =====================================================
+  //   ctx: { mode:'voll'|'kurz', teile:[wer, tut, was, wo, wann], de }
+  EX['e5-satzbau'] = {
+    title: 'Satzbau: wer – tut – was – wo – wann',
+    titleFor: () => 'Satzbau: wer – tut – was – wo – wann',
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const task = !!ctx.teile;
+      let S0 = null, zeilen = [];
+      const nimm = () => U.pick(T.SB.filter((s) => !task || s.teile.join() !== ctx.teile.join()));
+      if (task && ctx.post) S0 = { teile: ctx.teile, de: ctx.de }; else S0 = nimm();
+      if (!task) api.chips([{ label: 'Anderes Beispiel', onClick() { S0 = nimm(); api.replay(); } }]);
+      const n = () => (task && ctx.mode === 'kurz' ? 4 : 5);
+      const FARBE = ['#c2410c', BLAU, '#0d6b49', '#7c3aed', '#b45309'];
+      function plaetze() {
+        zeilen = [];
+        for (let k = 0; k < n(); k++) {
+          const y = 16 + k * 37;
+          el('rect', { x: 14, y, width: 332, height: 31, rx: 9, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+          el('text', { x: 28, y: y + 21, class: 'ex-s', text: T.SB_FRAGE[k], style: `font-size:13px;fill:${FARBE[k]}` }, api.svg);
+          zeilen.push(el('text', { x: 100, y: y + 22, class: 'ex-b', text: '', style: `font-size:17px;fill:${k === 1 ? BLAU : 'var(--ink)'}` }, api.svg));
+        }
+      }
+      return {
+        reset() {
+          api.clear(); plaetze();
+          api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+        },
+        async play() {
+          const s = S0, t = s.teile.slice(0, n());
+          api.say('Der englische Satz hat feste Plätze. Stell die Fragen der Reihe nach.');
+          await api.wait(2400);
+          const text = ['<b>Wer</b> tut etwas?', 'Was <b>tut</b> er oder sie? Das Verb kommt gleich an zweiter Stelle.', '<b>Was</b> (wen oder was)? Das bleibt direkt beim Verb.', '<b>Wo</b> (oder wohin)? Der Ort kommt vor der Zeit.', '<b>Wann</b>? Die Zeit steht am Ende.'];
+          for (let k = 0; k < t.length; k++) {
+            zeilen[k].textContent = t[k];
+            api.say(`${text[k]} → <b>${t[k]}</b>`);
+            await api.wait(2300);
+          }
+          const satz = `${t.join(' ')}.`;
+          api.say(`<b>${satz}</b> ${t.length === 5 ? U.say(satz) : ''}<br><small>${t.length === 5 ? s.de : 'wer – tut – was – wo'}</small>`);
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // Wie oft? Eine Leiter von nie bis immer
+  // =====================================================
+  //   ctx: { mode:'stelle', be, wer, adv, verb, rest, de } | { mode:'wort', adv }
+  EX['e5-oft'] = {
+    title: 'Wie oft? always, often, never',
+    titleFor: (ctx) => (ctx && ctx.mode === 'stelle' ? `Wohin gehört „${ctx.adv}“?` : 'Wie oft? always, often, never'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, frei = [], Z = null, marken = {};
+      if (mode === 'stelle') S0 = ctx.post ? ctx : U.pick(T.OALL.filter((s) => s.be === ctx.be && (s.wer !== ctx.wer || s.rest !== ctx.rest)));
+      const neuFrei = () => { frei = [U.pick(T.OV), U.pick(T.OB)]; };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      function leiter() {
+        marken = {};
+        el('line', { x1: 30, y1: 150, x2: 330, y2: 150, stroke: 'var(--ink)', 'stroke-width': 3, 'stroke-linecap': 'round' }, api.svg);
+        T.OFT.forEach((w, i) => {
+          const x = 30 + i * 75;
+          const c = el('circle', { cx: x, cy: 150, r: 9, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x, y: 132, 'text-anchor': 'middle', class: 'ex-b', text: w, style: `font-size:13px;fill:${BLAU}` }, api.svg);
+          el('text', { x, y: 178, 'text-anchor': 'middle', class: 'ex-s', text: T.OFT_DE[w], style: 'font-size:11px' }, api.svg);
+          marken[w] = c;
+        });
+        el('text', { x: 30, y: 200, 'text-anchor': 'middle', class: 'ex-s', text: '0 %', style: 'font-size:10px' }, api.svg);
+        el('text', { x: 330, y: 200, 'text-anchor': 'middle', class: 'ex-s', text: '100 %', style: 'font-size:10px' }, api.svg);
+      }
+      const leuchte = (w) => T.OFT.forEach((k) => marken[k].setAttribute('fill', k === w ? ORANGE : '#fff'));
+      const satz = (teile) => { if (Z) Z.g.remove(); Z = zeile(api, teile, 60, 19); };
+      async function zeige(s, pause) {
+        leuchte(s.adv);
+        satz(s.be ? [{ t: s.wer }, { t: s.verb, c: BLAU }, { t: s.rest + '.' }] : [{ t: s.wer }, { t: s.verb, c: BLAU }, { t: s.rest + '.' }]);
+        api.say(`<b>${s.adv}</b> heißt <b>${T.OFT_DE[s.adv]}</b>. Wohin damit im Satz? Suche zuerst das Verb: <b>${s.verb}</b>.`);
+        await api.wait(pause);
+        const a = Z;
+        const b = zeile(api, s.be ? [{ t: s.wer }, { t: s.verb, c: BLAU }, { t: s.adv, c: ORANGE }, { t: s.rest + '.' }] : [{ t: s.wer }, { t: s.adv, c: ORANGE }, { t: s.verb, c: BLAU }, { t: s.rest + '.' }], 60, 19);
+        await gleite(api, a, b, s.be ? [[a.els[0], b.els[0]], [a.els[1], b.els[1]], [a.els[2], b.els[3]]] : [[a.els[0], b.els[0]], [a.els[1], b.els[2]], [a.els[2], b.els[3]]]);
+        Z = b;
+        return s.be
+          ? `Bei <b>am, is, are</b> steht es <b>dahinter</b>: ${s.wer} ${s.verb} <b>${s.adv}</b> ${s.rest}. ${U.say(`${s.wer} ${s.verb} ${s.adv} ${s.rest}.`)}<br><small>${s.de}</small>`
+          : `Es steht <b>vor</b> dem Verb: ${s.wer} <b>${s.adv}</b> ${s.verb} ${s.rest}. ${U.say(`${s.wer} ${s.adv} ${s.verb} ${s.rest}.`)}<br><small>${s.de}</small>`;
+      }
+      return {
+        reset() {
+          api.clear(); Z = null; leiter();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : mode === 'wort' ? 'Das Wort aus deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'stelle') satz([{ t: S0.wer }, { t: S0.verb }, { t: S0.rest + '.' }]);
+          else satz([{ t: 'Wie oft?', c: BLAU }]);
+        },
+        async play() {
+          if (mode === 'stelle') { api.say(await zeige(S0, 3000)); return; }
+          if (mode === 'wort') {
+            leuchte(ctx.adv);
+            satz([{ t: ctx.adv, c: BLAU }, { t: '=' }, { t: T.OFT_DE[ctx.adv] }]);
+            api.say(`<b>${ctx.adv}</b> heißt <b>${T.OFT_DE[ctx.adv]}</b>. Die Leiter geht von nie (never) bis immer (always).`);
+            return;
+          }
+          api.say('Fünf Wörter sagen, <b>wie oft</b> etwas passiert: von nie bis immer.');
+          await api.wait(3000);
+          for (const s of frei) { api.say(await zeige(s, 2400)); await api.wait(3600); }
+          leuchte('');
+          api.say('Merke: <b>vor</b> dem Verb (I often play), aber <b>hinter</b> am, is, are (She is often late).');
+        },
+      };
+    },
+  };
 })();

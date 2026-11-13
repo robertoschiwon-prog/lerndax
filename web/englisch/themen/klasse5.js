@@ -1599,6 +1599,256 @@
   });
 
   // =====================================================
+  // Fragewörter: who, what, where, when, why, how
+  // =====================================================
+  const FW_DE = { Who: 'wer', What: 'was', Where: 'wo', When: 'wann', Why: 'warum', How: 'wie', 'How old': 'wie alt', 'How many': 'wie viele' };
+  const FW_ART = { Who: 'eine Person', What: 'eine Sache', Where: 'ein Ort', When: 'eine Zeit', Why: 'ein Grund (because …)', How: 'die Art und Weise', 'How old': 'ein Alter', 'How many': 'eine Anzahl' };
+  // [Fragewort, Rest der Frage in Teilen (für „Wörter ordnen“), Antwort, Deutsch]
+  const FW = [
+    ['Where', ['do', 'you', 'live'], 'In Dresden.', 'Wo wohnst du?'],
+    ['Where', ['is', 'my bag'], 'Under the table.', 'Wo ist meine Tasche?'],
+    ['When', ['does', 'school', 'start'], 'At eight o’clock.', 'Wann beginnt die Schule?'],
+    ['When', ['is', 'your birthday'], 'In May.', 'Wann hast du Geburtstag?'],
+    ['What', ['is', 'your name'], 'My name is Tom.', 'Wie heißt du? (wörtlich: Was ist dein Name?)'],
+    ['What', ['do', 'you', 'eat', 'for breakfast'], 'Toast and jam.', 'Was isst du zum Frühstück?'],
+    ['Who', ['is', 'your teacher'], 'Mr Brown.', 'Wer ist dein Lehrer?'],
+    ['Who', ['lives', 'in this house'], 'My grandparents.', 'Wer wohnt in diesem Haus?'],
+    ['Why', ['are', 'you', 'late'], 'Because my bike is broken.', 'Warum bist du zu spät?'],
+    ['Why', ['is', 'she', 'happy'], 'Because it is her birthday.', 'Warum ist sie glücklich?'],
+    ['How', ['are', 'you'], 'I’m fine, thank you.', 'Wie geht es dir?'],
+    ['How', ['do', 'you', 'go', 'to school'], 'By bus.', 'Wie kommst du zur Schule?'],
+    ['How old', ['are', 'you'], 'I’m eleven.', 'Wie alt bist du?'],
+    ['How many', ['brothers', 'have', 'you', 'got'], 'Two.', 'Wie viele Brüder hast du?'],
+  ].map(([wort, teile, antwort, de]) => ({ wort, teile, antwort, de, rest: teile.join(' '), frage: `${wort} ${teile.join(' ')}?`, text: `${wort} ${teile.join(' ')}? ${antwort}` }));
+  const FW6 = ['Who', 'What', 'Where', 'When', 'Why', 'How'];
+  const fwLoesung = (q) => `<span lang="en"><b class="vb">${q.wort}</b> ${q.rest}? – ${q.antwort}</span> ${U.say(q.text)}<br>Die Antwort nennt <b>${FW_ART[q.wort]}</b>. Danach fragt <b>${q.wort.toLowerCase()}</b> (${FW_DE[q.wort]}).<br><small>Auf Deutsch: ${q.de}</small>`;
+  const FW_TIPP = 'Schau auf die <b>Antwort</b>: Nennt sie eine Person (who), eine Sache (what), einen Ort (where), eine Zeit (when), einen Grund (why) oder die Art und Weise (how)? Achtung: <b>who</b> heißt wer, <b>where</b> heißt wo.';
+  const FEX = (q) => ({ mode: 'frage', wort: q.wort, rest: q.rest, antwort: q.antwort, de: q.de });
+  const fwAngebote = (q) => shuffle([q.wort, ...shuffle([...FW6, ...(q.wort.includes(' ') ? ['How old', 'How many'] : [])].filter((w) => w !== q.wort && !(q.wort.startsWith('How ') && w === 'How'))).slice(0, 3)]);
+  // A: Fragewort auswählen
+  function fwWahl() {
+    const q = pick(FW), ch = fwAngebote(q);
+    return { prompt: `Welches Fragewort passt zur Antwort?${en(`___ ${q.rest}? – ${q.antwort}`)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(q.wort), hint: FW_TIPP, solution: fwLoesung(q), ex: FEX(q) };
+  }
+  // B: Fragewort eintippen
+  function fwTippen() {
+    const q = pick(FW);
+    return {
+      prompt: `Welches Fragewort fehlt? Die Antwort lautet: <b lang="en">${q.antwort}</b>`, layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: q.wort, suffix: `${q.rest}?`, label: 'Fragewort' }],
+      hint: FW_TIPP, solution: fwLoesung(q), ex: FEX(q),
+    };
+  }
+  // C: Bedeutung (wer = who, wo = where …)
+  function fwBedeutung() {
+    const w = pick(FW6), hin = Math.random() < 0.5, q = pick(FW.filter((x) => x.wort === w));
+    const ch = shuffle([w, ...shuffle(FW6.filter((x) => x !== w)).slice(0, 3)]);
+    const lo = `<b class="vb" lang="en">${w.toLowerCase()}</b> = ${FW_DE[w]}${w === 'Who' || w === 'Where' ? '<br>Vorsicht, die beiden werden oft verwechselt: <b>who</b> = wer, <b>where</b> = wo.' : ''}<br>Ein Beispiel: <span lang="en">${q.text}</span> ${U.say(q.text)}`;
+    return hin
+      ? { prompt: `Wie heißt <b>${FW_DE[w]}</b> auf Englisch?`, choices: ch.map((c) => `<span lang="en">${c.toLowerCase()}</span>`), correct: ch.indexOf(w), hint: 'who = wer · what = was · where = wo · when = wann · why = warum · how = wie', solution: lo, ex: { mode: 'wort', wort: w } }
+      : { prompt: `Was bedeutet <b lang="en">${w.toLowerCase()}</b>?`, choices: ch.map((c) => FW_DE[c]), correct: ch.indexOf(w), hint: 'who = wer · what = was · where = wo · when = wann · why = warum · how = wie', solution: lo, ex: { mode: 'wort', wort: w } };
+  }
+  // D: passende Antwort zur Frage
+  function fwAntwort() {
+    const q = pick(FW);
+    const andere = shuffle(FW.filter((x) => x.wort !== q.wort && x.wort.split(' ')[0] !== q.wort.split(' ')[0])).filter((x, i, a) => a.findIndex((y) => y.wort === x.wort) === i).slice(0, 2);
+    const ch = shuffle([q, ...andere]);
+    return {
+      prompt: `Welche Antwort passt?${en(q.frage)}`,
+      choices: ch.map((c) => `<span lang="en">${c.antwort}</span>`), correct: ch.indexOf(q),
+      hint: `<b lang="en">${q.wort}</b> heißt <b>${FW_DE[q.wort]}</b>. Gesucht ist also ${FW_ART[q.wort]}.`,
+      solution: fwLoesung(q), ex: FEX(q),
+    };
+  }
+  // E: Frage ordnen
+  function fwOrdnen() {
+    const q = pick(FW.filter((x) => x.teile.length >= 2));
+    return {
+      prompt: `Bilde die Frage: <b>${q.de}</b>`,
+      order: U.ordne([q.wort, ...q.teile], '?'),
+      hint: 'Das <b>Fragewort</b> steht ganz vorn. Danach geht es weiter wie bei einer Frage ohne Fragewort: do/does oder is/are, dann die Person.',
+      solution: fwLoesung(q), ex: FEX(q),
+    };
+  }
+  const fragewoerter = () => U.wahl([[26, fwWahl], [20, fwTippen], [20, fwBedeutung], [18, fwAntwort], [16, fwOrdnen]]);
+
+  // =====================================================
+  // Satzbau: wer – tut – was – wo – wann
+  // =====================================================
+  // [wer, tut, was, wo, wann, Deutsch]
+  const SB = [
+    ['I', 'play', 'football', 'in the park', 'on Saturdays', 'Ich spiele samstags im Park Fußball.'],
+    ['We', 'eat', 'lunch', 'at school', 'at one o’clock', 'Wir essen um ein Uhr in der Schule zu Mittag.'],
+    ['Tom', 'reads', 'a book', 'in his room', 'every evening', 'Tom liest jeden Abend in seinem Zimmer ein Buch.'],
+    ['She', 'does', 'her homework', 'in the kitchen', 'after school', 'Sie macht nach der Schule in der Küche ihre Hausaufgaben.'],
+    ['My dad', 'washes', 'the car', 'in the garden', 'on Sundays', 'Mein Papa wäscht sonntags im Garten das Auto.'],
+    ['They', 'watch', 'TV', 'at home', 'in the evening', 'Sie sehen abends zu Hause fern.'],
+    ['Lisa', 'meets', 'her friends', 'in town', 'on Fridays', 'Lisa trifft freitags in der Stadt ihre Freunde.'],
+    ['He', 'rides', 'his bike', 'to school', 'every day', 'Er fährt jeden Tag mit dem Fahrrad zur Schule.'],
+    ['My sister', 'plays', 'the piano', 'at home', 'every afternoon', 'Meine Schwester spielt jeden Nachmittag zu Hause Klavier.'],
+    ['We', 'visit', 'our grandparents', 'in Berlin', 'in the summer', 'Wir besuchen im Sommer unsere Großeltern in Berlin.'],
+  ].map(([wer, tut, was, wo, wann, de]) => ({ wer, tut, was, wo, wann, de, teile: [wer, tut, was, wo, wann], text: `${wer} ${tut} ${was} ${wo} ${wann}.`, kurz: `${wer} ${tut} ${was}.` }));
+  const SB_FRAGE = ['Wer?', 'Tut?', 'Was?', 'Wo?', 'Wann?'];
+  const sbFarbig = (s) => `<span lang="en">${s.wer} <b class="vb">${s.tut}</b> ${s.was} ${s.wo} ${s.wann}.</span>`;
+  const SB_TIPP = 'Der englische Satz hat eine feste Reihenfolge: <b>wer – tut – was – wo – wann</b>. Verb und „was“ bleiben immer zusammen. Der Ort steht vor der Zeit.';
+  const sbLoesung = (s) => `${sbFarbig(s)} ${U.say(s.text)}<br>wer: <b>${s.wer}</b> · tut: <b>${s.tut}</b> · was: <b>${s.was}</b> · wo: <b>${s.wo}</b> · wann: <b>${s.wann}</b><br><small>Auf Deutsch: ${s.de}</small>`;
+  const SEX = (s, mode) => ({ mode: mode || 'voll', teile: s.teile, de: s.de });
+  const zeitVorn = (s) => `${s.wann} ${s.wer} ${s.tut} ${s.was} ${s.wo}`;
+  // A: ganzer Satz mit fünf Teilen
+  function sbOrdnen() {
+    const s = pick(SB);
+    return {
+      prompt: `Bilde den Satz: <b>${s.de}</b>`,
+      order: U.ordne(s.teile, '.', [zeitVorn(s)]),
+      hint: SB_TIPP,
+      solution: `${sbLoesung(s)}<br>Auch richtig: Die Zeit darf ganz nach vorn (<span lang="en">${gross(s.wann)} ${subjKlein(s.wer)} ${s.tut} …</span>).`,
+      ex: SEX(s),
+    };
+  }
+  // B: kurzer Satz (wer – tut – was – wo)
+  function sbOrdnenKurz() {
+    const s = pick(SB);
+    return {
+      prompt: 'Bringe die Teile in die richtige Reihenfolge.',
+      order: U.ordne([s.wer, s.tut, s.was, s.wo]),
+      hint: SB_TIPP,
+      solution: `<span lang="en">${s.wer} <b class="vb">${s.tut}</b> ${s.was} ${s.wo}.</span><br>wer – tut – was – wo. Das Verb steht direkt hinter „wer“, und „was“ folgt gleich danach.`,
+      ex: SEX(s, 'kurz'),
+    };
+  }
+  // C: richtigen Satz erkennen (deutsche Wortstellung als Falle)
+  function sbWahl() {
+    const s = pick(SB);
+    const ch = shuffle([s.text, `${s.wer} ${s.tut} ${s.wann} ${s.was} ${s.wo}.`, `${s.wer} ${s.was} ${s.tut} ${s.wo} ${s.wann}.`]);
+    return {
+      prompt: 'Nur ein Satz hat die richtige Reihenfolge. Welcher?',
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.text),
+      hint: SB_TIPP,
+      solution: `${sbLoesung(s)}<br>Im Deutschen darf zwischen Verb und „was“ etwas stehen (Ich spiele <i>samstags</i> Fußball). Im Englischen nicht.`,
+      ex: SEX(s),
+    };
+  }
+  // D: Ort vor Zeit
+  function sbOrtZeit() {
+    const s = pick(SB);
+    const ch = shuffle([`${s.wo} ${s.wann}`, `${s.wann} ${s.wo}`]);
+    return {
+      prompt: `Wie geht der Satz weiter?${en(`${s.wer} ${s.tut} ${s.was} …`)}`,
+      choices: ch.map((c) => `<span lang="en">… ${c}.</span>`), correct: ch.indexOf(`${s.wo} ${s.wann}`),
+      hint: 'Am Satzende gilt: erst der <b>Ort</b> (wo?), dann die <b>Zeit</b> (wann?).',
+      solution: `${sbLoesung(s)}<br>Merke: <b>Ort vor Zeit</b>.`, ex: SEX(s),
+    };
+  }
+  // E: Satzteile erkennen
+  function sbTeil() {
+    const s = pick(SB), k = pick([1, 2, 3, 4]);
+    const frage = ['', 'Welcher Teil ist das <b>Verb</b> (was jemand tut)?', 'Welcher Teil sagt, <b>was</b> (wen oder was)?', 'Welcher Teil sagt, <b>wo</b> (oder wohin)?', 'Welcher Teil sagt, <b>wann</b>?'][k];
+    return {
+      prompt: `${frage} Tippe ihn an. ${U.say(s.text)}`,
+      tap: { tokens: s.teile.map((t, i) => (i === 4 ? t + '.' : t)), correct: [k], one: true },
+      answerText: s.teile[k],
+      hint: SB_TIPP, solution: sbLoesung(s), ex: SEX(s),
+    };
+  }
+  const satzbau = () => U.wahl([[26, sbOrdnen], [18, sbOrdnenKurz], [20, sbWahl], [18, sbOrtZeit], [18, sbTeil]]);
+
+  // =====================================================
+  // Wie oft? always, usually, often, sometimes, never
+  // =====================================================
+  const OFT_DE = { always: 'immer', usually: 'meistens', often: 'oft', sometimes: 'manchmal', never: 'nie' };
+  const OFT = ['never', 'sometimes', 'often', 'usually', 'always'];
+  // mit Vollverb: [wer, wie oft, Verb, Rest, Deutsch]   ·   mit to be: [wer, be, wie oft, Rest, Deutsch]
+  const OV = [
+    ['I', 'always', 'get up', 'at seven', 'Ich stehe immer um sieben auf.'],
+    ['She', 'often', 'plays', 'football', 'Sie spielt oft Fußball.'],
+    ['We', 'sometimes', 'go', 'to the cinema', 'Wir gehen manchmal ins Kino.'],
+    ['He', 'never', 'eats', 'fish', 'Er isst nie Fisch.'],
+    ['They', 'usually', 'walk', 'to school', 'Sie gehen meistens zu Fuß zur Schule.'],
+    ['My dad', 'often', 'cooks', 'dinner', 'Mein Papa kocht oft das Abendessen.'],
+    ['Tom', 'never', 'watches', 'TV in the morning', 'Tom sieht morgens nie fern.'],
+    ['I', 'sometimes', 'help', 'my mum', 'Ich helfe manchmal meiner Mama.'],
+  ].map(([wer, adv, verb, rest, de]) => ({ be: false, wer, adv, verb, rest, de, vor: [wer], nach: [verb, rest], text: `${wer} ${adv} ${verb} ${rest}.`, falsch: `${wer} ${verb} ${adv} ${rest}.` }));
+  const OB = [
+    ['She', 'is', 'always', 'late', 'Sie ist immer zu spät.'],
+    ['I', 'am', 'never', 'tired in the morning', 'Ich bin morgens nie müde.'],
+    ['They', 'are', 'often', 'at home', 'Sie sind oft zu Hause.'],
+    ['He', 'is', 'sometimes', 'sad', 'Er ist manchmal traurig.'],
+    ['We', 'are', 'usually', 'happy', 'Wir sind meistens fröhlich.'],
+  ].map(([wer, verb, adv, rest, de]) => ({ be: true, wer, adv, verb, rest, de, vor: [wer, verb], nach: [rest], text: `${wer} ${verb} ${adv} ${rest}.`, falsch: `${wer} ${adv} ${verb} ${rest}.` }));
+  const OALL = [...OV, ...OB];
+  const oftWarum = (s) => (s.be
+    ? `Bei <b>am, is, are</b> steht das Wort <b>dahinter</b>: ${s.wer} ${s.verb} <b>${s.adv}</b> …`
+    : `Das Wort steht <b>vor</b> dem Verb: ${s.wer} <b>${s.adv}</b> ${s.verb} … Zwischen Verb und Rest darf es nicht stehen.`);
+  const oftLoesung = (s) => `<span lang="en">${s.be ? `${s.wer} ${s.verb} <b class="vb">${s.adv}</b> ${s.rest}.` : `${s.wer} <b class="vb">${s.adv}</b> ${s.verb} ${s.rest}.`}</span> ${U.say(s.text)}<br>${oftWarum(s)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const OFT_TIPP = 'Wörter wie always, often, never stehen <b>vor dem Verb</b> (I often play …). Nur bei <b>am, is, are</b> stehen sie <b>dahinter</b> (She is often …).';
+  const OEX = (s, mode) => ({ mode: mode || 'stelle', be: s.be, wer: s.wer, adv: s.adv, verb: s.verb, rest: s.rest, de: s.de });
+  // A: die richtige Stelle antippen
+  function oftStelle() {
+    const s = pick(OALL), tokens = [...s.vor, ...s.nach].flatMap((t) => t.split(' '));
+    tokens[tokens.length - 1] += '.';
+    return {
+      prompt: `An welche Stelle gehört <b lang="en">${s.adv}</b> (${OFT_DE[s.adv]})? Tippe die Lücke an.`,
+      tap: { tokens, correct: [s.vor.join(' ').split(' ').length - 1], gaps: true, one: true, mark: '▾', eng: tokens.length > 5 },
+      answerText: s.text,
+      hint: OFT_TIPP, solution: oftLoesung(s), ex: OEX(s),
+    };
+  }
+  // B: Satz ordnen
+  function oftOrdnen() {
+    const s = pick(OALL), teile = s.be ? [s.wer, s.verb, s.adv, s.rest] : [s.wer, s.adv, s.verb, s.rest];
+    const frei = ['sometimes', 'usually', 'often'].includes(s.adv);
+    return {
+      prompt: `Bilde den Satz: <b>${s.de}</b>`,
+      order: U.ordne(teile, '.', frei ? [`${s.adv} ${s.wer} ${s.verb} ${s.rest}`, `${s.wer} ${s.verb} ${s.rest} ${s.adv}`] : []),
+      hint: OFT_TIPP, solution: oftLoesung(s), ex: OEX(s),
+    };
+  }
+  // C: richtigen Satz erkennen
+  function oftWahl() {
+    const s = pick(OALL), ch = shuffle([s.text, s.falsch]);
+    return {
+      prompt: 'Welcher Satz ist richtig?',
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.text),
+      hint: OFT_TIPP, solution: oftLoesung(s), ex: OEX(s),
+    };
+  }
+  // D: Bedeutung
+  function oftBedeutung() {
+    const w = pick(OFT), hin = Math.random() < 0.5, s = pick(OALL.filter((x) => x.adv === w));
+    const ch = shuffle([w, ...shuffle(OFT.filter((x) => x !== w)).slice(0, 3)]);
+    const lo = `<b class="vb" lang="en">${w}</b> = ${OFT_DE[w]}<br>Ein Beispiel: <span lang="en">${s.text}</span> ${U.say(s.text)}<br><small>${s.de}</small>`;
+    return hin
+      ? { prompt: `Wie heißt <b>${OFT_DE[w]}</b> auf Englisch?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(w), hint: 'Von nie bis immer: never · sometimes · often · usually · always.', solution: lo, ex: { mode: 'wort', adv: w } }
+      : { prompt: `Was bedeutet <b lang="en">${w}</b>?`, choices: ch.map((c) => OFT_DE[c]), correct: ch.indexOf(w), hint: 'Von nie bis immer: never · sometimes · often · usually · always.', solution: lo, ex: { mode: 'wort', adv: w } };
+  }
+  // E: Was passiert häufiger?
+  function oftMehr() {
+    const [a, b] = shuffle(OFT).slice(0, 2), mehr = OFT.indexOf(a) > OFT.indexOf(b) ? a : b;
+    const ch = [a, b];
+    return {
+      prompt: 'Welches Wort bedeutet: <b>häufiger</b>?',
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(mehr),
+      hint: 'Von nie bis immer: never · sometimes · often · usually · always.',
+      solution: `<b class="vb" lang="en">${mehr}</b> (${OFT_DE[mehr]}) ist häufiger als <span lang="en">${mehr === a ? b : a}</span> (${OFT_DE[mehr === a ? b : a]}).<br>Die Reihe von nie bis immer: never · sometimes · often · usually · always.`,
+      ex: { mode: 'wort', adv: mehr },
+    };
+  }
+  const wieOft = () => U.wahl([[26, oftStelle], [22, oftOrdnen], [20, oftWahl], [18, oftBedeutung], [14, oftMehr]]);
+
+  Object.assign(D.daten, { FW, FW6, FW_DE, FW_ART, SB, SB_FRAGE, OFT, OFT_DE, OV, OB, OALL });
+  const themenVorFW = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorFW(), {
+    'e5-fragewort': FW.map((q) => q.text),
+    'e5-satzbau': SB.map((s) => s.text),
+    'e5-oft': OALL.map((s) => s.text),
+  });
+  Object.assign(D.arten, {
+    'e5-fragewort': { fwWahl, fwTippen, fwBedeutung, fwAntwort, fwOrdnen },
+    'e5-satzbau': { sbOrdnen, sbOrdnenKurz, sbWahl, sbOrtZeit, sbTeil },
+    'e5-oft': { oftStelle, oftOrdnen, oftWahl, oftBedeutung, oftMehr },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -1622,6 +1872,9 @@
         { id: 'e5-ps', title: 'present simple: he, she, it – das s muss mit', icon: '🔁', gen: presentSimple },
         { id: 'e5-ps-neg', title: 'present simple: don’t und doesn’t', icon: '🚫', gen: psNeg },
         { id: 'e5-ps-frage', title: 'present simple: Fragen mit do und does', icon: '❔', gen: psFrage },
+        { id: 'e5-fragewort', title: 'Fragewörter: who, what, where …', icon: '🔎', gen: fragewoerter },
+        { id: 'e5-satzbau', title: 'Satzbau: wer – tut – was – wo – wann', icon: '🧱', gen: satzbau },
+        { id: 'e5-oft', title: 'Wie oft? always, often, never', icon: '📅', gen: wieOft },
       ] },
     ],
   };
