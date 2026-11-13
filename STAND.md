@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v83`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v84`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -233,6 +233,11 @@ Weitere Dokumente:
   Bücherei und Klassenzimmer). Foto von Roberto, 13.11. Passende EnDax-Themen: `e5-there`, `e5-ort`, `e5-w-schule`. Ergänzt:
   6 Sätze zu Klassenzimmer und Bücherei in `e5-there`; Wortfeld Schule + desk, clock, noticeboard, map, library, magazine,
   newspaper; Medien + headphones.
+- **v84 (13.11.2026): Durchsicht EnDax gegen das Buch, drei Lücken geschlossen.** (1) Kurzantworten mit Personenwechsel in
+  `e5-be-neg` (`kurzIch`: Are you …? – Yes, I am. / we / Am I …? – you). (2) Uhrzeit mit Minuten in `e5-zahl` (`UHRM`: five/ten/
+  twenty/twenty-five past und to; Uhr-Bild, digital, Hören). (3) Entdeckung `en-greenwich` (Nullmeridian, Zeitzonen, Aussprache).
+  Der Mehrzahl-Genitiv (girls’) war schon da (`gWieViele`, `gApostroph`). **Offen und nur mit Buchseiten zu klären:** Benutzt
+  Green Line „have got“ oder „have“? Vokabeln je Unit (eigene Listen treffen sie nur ungefähr).
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1270,6 +1275,8 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v84: EnDax Kurzantworten mit I/we/you, Uhrzeit mit Minuten, Entdeckung Greenwich** (13.11.2026): `web/englisch/themen/klasse5.js`,
+  `erklaerungen/klasse5.js`, `erklaerungen/entdecken.js`, `index.html`, Aufnahmen, `sw.js`.
 - **v83: EnDax Unit 1 Station 2 ergänzt** (13.11.2026): `web/englisch/themen/klasse5.js` (TH, Schule, Medien), Aufnahmen, `sw.js`.
 - **v82: EnDax Lautschrift** (13.11.2026). Geändert: `web/englisch/themen/klasse5.js` (LS, LZ, LS_SILB, `lautschrift`),
   `klasse5-knobel.js`, `erklaerungen/klasse5.js` (`EX['e5-laut']`), `symbole.js`, Aufnahmen (e5-laut), `faecher.js` (53), `sw.js`.

@@ -389,21 +389,42 @@
       hint: KURZ_TIPP, solution: kurzLoesung(s, ja), ex: NEX(s, 'kurz', ja),
     };
   }
-  const beNeg = () => U.wahl([[18, negWahl], [20, negTippen], [18, frageWahl], [14, frageTippen], [15, kurzWahl], [15, kurzTippen]]);
+  // G: Kurzantwort, bei der die Person wechselt (Green Line 1, Unit 1, Station 1): Are you …? – Yes, I am.
+  // [Frage, Pronomen der Antwort, Form, Deutsch]
+  const KI = [['Are you hungry?', 'I', 'am', 'Hast du Hunger?'], ['Are you from Germany?', 'I', 'am', 'Kommst du aus Deutschland?'], ['Are you eleven?', 'I', 'am', 'Bist du elf?'],
+    ['Are you tired?', 'I', 'am', 'Bist du müde?'], ['Are you in Year 5?', 'I', 'am', 'Bist du in Klasse 5?'],
+    ['Are you and Ben friends?', 'we', 'are', 'Seid ihr Freunde, du und Ben?'], ['Are you and Lisa in the same class?', 'we', 'are', 'Seid ihr in derselben Klasse, du und Lisa?'],
+    ['Am I late?', 'you', 'are', 'Bin ich zu spät?'], ['Am I right?', 'you', 'are', 'Habe ich recht?']]
+    .map(([frage, pr, form, de]) => ({ frage, pr, form, de, ja: `Yes, ${pr} ${form}.`, nein: pr === 'I' ? 'No, I’m not.' : `No, ${pr} aren’t.` }));
+  const KI_TIPP = 'Achtung, die Person wechselt: Wer nach <b>you</b> gefragt wird, antwortet mit <b>I</b> (oder <b>we</b>, wenn mehrere gemeint sind). Wer „Am I …?“ fragt, bekommt <b>you</b> zur Antwort.';
+  function kurzIch() {
+    const x = pick(KI), ja = Math.random() < 0.5, richtig = ja ? x.ja : x.nein;
+    const andere = x.pr === 'I' ? 'you' : 'I';
+    const falsch = ja
+      ? [andere === 'I' ? 'Yes, I am.' : 'Yes, you are.', x.pr === 'I' ? 'Yes, I’m.' : `Yes, ${x.pr}’re.`]
+      : [andere === 'I' ? 'No, I’m not.' : 'No, you aren’t.', x.pr === 'I' ? 'No, I amn’t.' : `No, ${x.pr} not.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Antworte kurz mit <b>${ja ? 'Ja' : 'Nein'}</b>.${en(x.frage)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig), hint: KI_TIPP,
+      solution: `<span lang="en">${x.frage}</span> <small>(${x.de})</small><br><span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>${x.pr === 'I' ? 'Gefragt wird nach <b>you</b>, du antwortest über dich: <b>I</b>.' : x.pr === 'we' ? 'Gefragt wird nach euch beiden, du antwortest mit <b>we</b>.' : 'Jemand fragt nach sich selbst (I), du antwortest ihm mit <b>you</b>.'}${ja ? ' Nach Yes gibt es keine Kurzform.' : x.pr === 'I' ? ' „amn’t“ gibt es nicht: I’m not.' : ''}`,
+      ex: { mode: 'ich', i: KI.indexOf(x), ja },
+    };
+  }
+  const beNeg = () => U.wahl([[17, negWahl], [18, negTippen], [16, frageWahl], [13, frageTippen], [13, kurzWahl], [12, kurzTippen], [11, kurzIch]]);
 
-  D.daten = { FORM, KURZ, BE, PRONS, GRUPPE_TEXT, warum, kurzText, PS, PRON_ART, PRON_WORT, ALLE_PRON, NEG, FQ, KA, negText, frageText, jaText, neinText, subjKlein, gross };
+  D.daten = { KI, FORM, KURZ, BE, PRONS, GRUPPE_TEXT, warum, kurzText, PS, PRON_ART, PRON_WORT, ALLE_PRON, NEG, FQ, KA, negText, frageText, jaText, neinText, subjKlein, gross };
   // Alle Texte, zu denen es eine Aufnahme geben muss, nach Themen geordnet (für tests/endax_audio.py und den Test).
   // Jedes Thema bekommt eine Sammeldatei; ein Text, der in mehreren Themen vorkommt, liegt beim ersten.
   D.audioThemen = () => ({
     'e5-be': [...BE.map((s) => s.text), ...PRONS.map(kurzText)],
     'e5-pron': [...PS.map((s) => s.neu), ...PS.filter((s) => s.art === 'w').map((s) => s.text), 'Ben and I are in the same class.'],
-    'e5-be-neg': [...BE.map(negText), ...FQ.map(frageText), ...KA.map(jaText), ...KA.map(neinText)],
+    'e5-be-neg': [...BE.map(negText), ...FQ.map(frageText), ...KA.map(jaText), ...KA.map(neinText), ...KI.flatMap((x) => [x.ja, x.nein])],
   });
   D.audioTexte = () => [...new Set(Object.values(D.audioThemen()).flat())];
   D.arten = {
     'e5-be': { beLuecke, beTippen, beSatz, beWer, beKurz, beLang, beDeutsch, beAntippen },
     'e5-pron': { pronWahl, pronTippen, pronWer, pronDeutsch, pronEnglisch, pronIch },
-    'e5-be-neg': { negWahl, negTippen, frageWahl, frageTippen, kurzWahl, kurzTippen },
+    'e5-be-neg': { negWahl, negTippen, frageWahl, frageTippen, kurzWahl, kurzTippen, kurzIch },
   };
 
   // =====================================================
@@ -2621,14 +2642,34 @@
     const satz = (a) => (a === 'quarter to' ? `It’s quarter to ${STUNDE(u.h + 1)}.` : `It’s ${a} ${STUNDE(u.h)}.`);
     return { prompt: `Es ist <b>${u.digi}</b> Uhr. Wie sagt man das?`, choices: ch.map((a) => `<span lang="en">${satz(a)}</span>`), correct: ch.indexOf(UHR_ART[u.m]), hint: UHR_TIPP, solution: uhrLoesung(u), ex: { mode: 'uhr', h: u.h, m: u.m } };
   }
-  const zahlenZeit = () => U.wahl([[14, zahlTippen], [12, zahlWahl], [12, zahlHoeren], [10, ordTippen], [8, ordWahl], [10, datumWahl], [6, monatTippen], [16, uhrWahl], [12, uhrDigital]]);
+  // Uhrzeit mit Minuten (Green Line 1, Unit 2, Station 3): five past, ten past, twenty past, twenty-five past / … to
+  const minText = (h, m) => (m < 30 ? `It’s ${zahlWort(m)} past ${STUNDE(h)}.` : `It’s ${zahlWort(60 - m)} to ${STUNDE(h + 1)}.`);
+  const UHRM = [];
+  for (let h = 1; h <= 12; h++) for (const m of [5, 10, 20, 25, 35, 40, 50, 55]) UHRM.push({ h, m, text: minText(h, m), digi: `${h}:${String(m).padStart(2, '0')}`, de: `Es ist ${h}:${String(m).padStart(2, '0')} Uhr.` });
+  const UHRM_TIPP = 'Rechte Hälfte der Uhr (bis zur 6): Minuten <b>past</b> = nach der Stunde. Linke Hälfte: Minuten <b>to</b> = vor der <b>nächsten</b> Stunde. 3:40 → twenty to four.';
+  const minLoesung = (u) => `<b class="vb" lang="en">${u.text}</b> ${U.say(u.text)}<br>${u.m < 30 ? `${u.m} Minuten <b>nach</b> ${u.h}: <b>past</b>.` : `Es fehlen noch ${60 - u.m} Minuten bis ${(u.h % 12) + 1}: <b>to</b> und die nächste Stunde.`}`;
+  const minFalsch = (u) => [u.m < 30 ? `It’s ${zahlWort(u.m)} to ${STUNDE(u.h)}.` : `It’s ${zahlWort(60 - u.m)} past ${STUNDE(u.h)}.`, u.m < 30 ? `It’s ${zahlWort(u.m)} past ${STUNDE(u.h + 1)}.` : `It’s ${zahlWort(60 - u.m)} to ${STUNDE(u.h)}.`];
+  function uhrMinuten() {
+    const u = pick(UHRM), ch = shuffle([u.text, ...minFalsch(u)]);
+    return { prompt: 'Wie spät ist es? Achte auf die Minuten.', figure: uhrBild(u.h, u.m), choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(u.text), hint: UHRM_TIPP, solution: minLoesung(u), ex: { mode: 'uhr', h: u.h, m: u.m } };
+  }
+  function uhrMinDigital() {
+    const u = pick(UHRM), ch = shuffle([u.text, ...minFalsch(u)]);
+    return { prompt: `Es ist <b>${u.digi}</b> Uhr. Wie sagt man das?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(u.text), hint: UHRM_TIPP, solution: minLoesung(u), ex: { mode: 'uhr', h: u.h, m: u.m } };
+  }
+  function uhrMinHoeren() {
+    const u = pick(UHRM), f = [u.m < 30 ? `${u.h}:${60 - u.m}` : `${(u.h % 12) + 1}:${String(u.m).padStart(2, '0')}`, u.m < 30 ? `${(u.h % 12) + 1}:${String(u.m).padStart(2, '0')}` : `${u.h}:${String(60 - u.m).padStart(2, '0')}`];
+    const ch = shuffle([u.digi, ...f]);
+    return { prompt: `Hör zu: Wie spät ist es? ${U.say(u.text)}`, choices: ch, correct: ch.indexOf(u.digi), hint: UHRM_TIPP, solution: `${minLoesung(u)}<br>Das ist <b>${u.digi}</b> Uhr.`, ex: { mode: 'uhr', h: u.h, m: u.m } };
+  }
+  const zahlenZeit = () => U.wahl([[12, zahlTippen], [10, zahlWahl], [10, zahlHoeren], [9, ordTippen], [7, ordWahl], [9, datumWahl], [5, monatTippen], [12, uhrWahl], [8, uhrDigital], [8, uhrMinuten], [5, uhrMinDigital], [5, uhrMinHoeren]]);
 
-  Object.assign(D.daten, { EINS, ZEHN, zahlWort, ordWort, ordEnde, ordRegel, zahlErkl, MONATE, MONATE_DE, DATEN, UHREN, uhrBild, uhrText, STUNDE, UHR_ART });
+  Object.assign(D.daten, { EINS, ZEHN, zahlWort, ordWort, ordEnde, ordRegel, zahlErkl, MONATE, MONATE_DE, DATEN, UHREN, UHRM, uhrBild, uhrText, STUNDE, UHR_ART });
   const themenVorZahl = D.audioThemen;
   D.audioThemen = () => Object.assign(themenVorZahl(), {
-    'e5-zahl': [...Array.from({ length: 101 }, (_, n) => zahlWort(n)), ...Array.from({ length: 31 }, (_, n) => ordWort(n + 1)), ...MONATE, ...DATEN.map((d) => d.text), ...UHREN.map((u) => u.text)],
+    'e5-zahl': [...Array.from({ length: 101 }, (_, n) => zahlWort(n)), ...Array.from({ length: 31 }, (_, n) => ordWort(n + 1)), ...MONATE, ...DATEN.map((d) => d.text), ...UHREN.map((u) => u.text), ...UHRM.map((u) => u.text)],
   });
-  Object.assign(D.arten, { 'e5-zahl': { zahlTippen, zahlWahl, zahlHoeren, ordTippen, ordWahl, datumWahl, monatTippen, uhrWahl, uhrDigital } });
+  Object.assign(D.arten, { 'e5-zahl': { zahlTippen, zahlWahl, zahlHoeren, ordTippen, ordWahl, datumWahl, monatTippen, uhrWahl, uhrDigital, uhrMinuten, uhrMinDigital, uhrMinHoeren } });
 
   // =====================================================
   // was und were
@@ -3482,7 +3523,7 @@
   Object.assign(D.daten, { ENT });
   const themenVorEnt = D.audioThemen;
   D.audioThemen = () => Object.assign(themenVorEnt(), {
-    'e5-entdecken': [...ENT.an.map((x) => x[0]), ...ENT.freunde.flatMap((x) => [x[0], x[3]]), ...ENT.britam.flatMap((x) => [x[0], x[1]]), ...ENT.stumm.map((x) => x[0]), 'one pound', 'one hundred pence'],
+    'e5-entdecken': [...ENT.an.map((x) => x[0]), ...ENT.freunde.flatMap((x) => [x[0], x[3]]), ...ENT.britam.flatMap((x) => [x[0], x[1]]), ...ENT.stumm.map((x) => x[0]), 'one pound', 'one hundred pence', 'Greenwich'],
   });
 
   // =====================================================

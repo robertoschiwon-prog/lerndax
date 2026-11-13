@@ -197,6 +197,45 @@
   });
 
   // =====================================================
+  // Greenwich: der Nullmeridian und die Zeitzonen (Green Line 1, Across cultures 1)
+  // Fakten: Nullmeridian durch die Sternwarte Greenwich, 1884 auf einer Konferenz in Washington festgelegt.
+  // Zeitunterschied zu Greenwich im Winter: Dresden +1, New York −5, Tokio +9.
+  // =====================================================
+  reg('en-greenwich', {
+    title: 'Greenwich: Hier beginnt die Zeit',
+    viewBox: '0 0 360 210',
+    discover: { icon: '🌍', q: 'Warum richtet sich die ganze Welt nach einer Uhr in London?', tag: 'Greenwich' },
+    create(api) {
+      return {
+        reset() { api.clear(); },
+        async play() {
+          api.say(`Im Englischbuch bist du in <b>Greenwich</b>, einem Stadtteil von London. Erste Überraschung: Man spricht es „Grennitsch“. Das w ist stumm! ${U.say('Greenwich')}`);
+          const erde = el('g', {}, api.svg);
+          el('circle', { cx: 180, cy: 92, r: 70, fill: '#1b3a6b', stroke: BLAU, 'stroke-width': 2 }, erde);
+          for (const rx of [22, 45, 62]) el('ellipse', { cx: 180, cy: 92, rx, ry: 70, fill: 'none', stroke: RAND, 'stroke-width': 1 }, erde);
+          el('line', { x1: 110, y1: 92, x2: 250, y2: 92, stroke: RAND, 'stroke-width': 1 }, erde);
+          await api.wait(4600);
+          const null0 = el('line', { x1: 180, y1: 22, x2: 180, y2: 162, stroke: ROT, 'stroke-width': 3, opacity: 0 }, api.svg);
+          await zeig(api, null0, 500);
+          const p = el('circle', { cx: 180, cy: 58, r: 5, fill: GELB, opacity: 0 }, api.svg); await zeig(api, p, 300);
+          txt(api.svg, 188, 54, 'Greenwich', 12, GELB, 'start');
+          api.say('Durch die Sternwarte von Greenwich läuft eine gedachte Linie vom Nordpol zum Südpol: der <b>Nullmeridian</b>. Von hier aus zählt man, wie weit ein Ort im Osten oder im Westen liegt.');
+          await api.wait(5200);
+          txt(api.svg, 120, 20, '← Westen', 12, DIM); txt(api.svg, 240, 20, 'Osten →', 12, DIM);
+          api.say('Seit <b>1884</b> gilt das für die ganze Welt. Damals fuhren die meisten Schiffe mit englischen Seekarten, deshalb einigten sich die Länder auf Greenwich. Auch die <b>Uhrzeit</b> wird von hier aus gerechnet.');
+          await api.wait(5600);
+          const uhr = async (x, y, ort, zeit, farbe) => { const g = el('g', { opacity: 0 }, api.svg); box(g, x - 44, y, 88, 38, FELD, farbe); txt(g, x, y + 15, ort, 11, DIM); txt(g, x, y + 32, zeit, 15, farbe); await zeig(api, g, 350); };
+          await uhr(180, 168, 'Greenwich', '12:00', GELB);
+          await uhr(52, 60, 'New York', '7:00', BLAU);
+          await uhr(272, 168, 'Dresden', '13:00', GRUEN);
+          await uhr(308, 60, 'Tokio', '21:00', ORANGE);
+          api.say('Ist es in Greenwich <b>12 Uhr</b> mittags, dann ist es bei dir in Dresden schon 13 Uhr, in Tokio 21 Uhr und in New York erst 7 Uhr morgens. Je weiter im Osten, desto später.<br><small>In Greenwich kannst du dich über die Linie stellen: ein Fuß im Osten der Welt, einer im Westen.</small>');
+        },
+      };
+    },
+  });
+
+  // =====================================================
   // Stumme Buchstaben
   // =====================================================
   reg('en-stumm', {

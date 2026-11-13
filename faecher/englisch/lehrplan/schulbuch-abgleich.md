@@ -49,6 +49,10 @@ Ob das Buch stattdessen „have“ benutzt, zeigt erst ein Blick in die Seiten; 
 - 13.11.2026: **Unit 1, Station 2** (S. 22–23). Dazu passen `e5-there`, `e5-ort`, `e5-w-schule` (in v83 mit Wörtern und Sätzen aus
   Bücherei und Klassenzimmer ergänzt).
 
+## Durchsicht 13.11.2026 (v84)
+Ergänzt: Kurzantworten mit I/we/you (Unit 1), Uhrzeit mit Minuten (Unit 2), Entdeckung Greenwich (Across cultures 1).
+Schon vorhanden: s’ in `e5-gen`.
+
 ## Noch offen
 
 - Den Auftraggeber fragen, welche Unit gerade dran ist (dann kann der Bereich oben stehen oder markiert werden).

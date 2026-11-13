@@ -261,14 +261,15 @@
   //   ctx: { mode:'neg'|'frage'|'kurz', subj, g, form, rest, pron, ja }
   EX['e5-be-neg'] = {
     title: 'to be: verneinen und fragen',
-    titleFor: (ctx) => (ctx && ctx.mode === 'neg' ? 'Verneinen: so geht’s' : ctx && ctx.mode === 'frage' ? 'Fragen: so geht’s' : ctx && ctx.mode === 'kurz' ? 'Kurzantwort: so geht’s' : 'to be: verneinen und fragen'),
+    titleFor: (ctx) => (ctx && ctx.mode === 'ich' ? 'Kurzantwort: Die Person wechselt' : ctx && ctx.mode === 'neg' ? 'Verneinen: so geht’s' : ctx && ctx.mode === 'frage' ? 'Fragen: so geht’s' : ctx && ctx.mode === 'kurz' ? 'Kurzantwort: so geht’s' : 'to be: verneinen und fragen'),
     viewBox: '0 0 360 210',
     create(api, ctx) {
       ctx = ctx || {};
       const mode = ctx.mode || 'frei';
       const voll = (s) => Object.assign({}, s, { pron: s.pron || s.subj.toLowerCase() });
       let S0 = null, frei = null;
-      if (mode !== 'frei') {
+      const ICH = mode === 'ich' ? (ctx.post ? T.KI[ctx.i] : U.pick(T.KI.filter((x, k) => k !== ctx.i && x.pr === T.KI[ctx.i].pr))) : null;
+      if (mode !== 'frei' && mode !== 'ich') {
         if (ctx.post) S0 = ctx;
         else {
           const pool = (mode === 'neg' ? T.BE : mode === 'frage' ? T.FQ : T.KA).filter((s) => s.g === ctx.g && (s.subj !== ctx.subj || s.rest !== ctx.rest));
@@ -314,12 +315,23 @@
         reset() {
           api.clear();
           api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'ich') { zeile(api, [{ t: ICH.frage }], 60); return; }
           const s = S0 || frei;
           if (mode === 'kurz') zeile(api, [{ t: T.gross(s.form), c: BLAU }, { t: T.subjKlein(s.subj) }, { t: s.rest + '?' }], 60);
           else aussage(s, 60);
         },
         async play() {
           api.clear();
+          if (mode === 'ich') {
+            const x = ICH, antw = ctx.ja ? x.ja : x.nein, w = x.frage.split(' ');
+            zeile(api, [{ t: w[0] }, { t: w[1], c: ORANGE }, { t: w.slice(2).join(' ') }], 60);
+            api.say(x.pr === 'you' ? 'Jemand fragt nach <b>sich selbst</b> (I). Du antwortest ihm mit <b>you</b>.' : x.pr === 'we' ? 'Gefragt wird nach <b>euch beiden</b>. Du antwortest mit <b>we</b>.' : 'Gefragt wird nach <b>you</b>. Du antwortest über dich selbst: <b>I</b>.');
+            await api.wait(3200);
+            const a = antw.replace('.', '').split(' ');
+            zeile(api, [{ t: a[0] }, { t: a[1], c: ORANGE }, { t: a.slice(2).join(' ') + '.', c: BLAU }], 116);
+            api.say(`<b>${antw}</b> ${U.say(antw)}<br>Die Person wechselt: ${w[1] === 'I' ? 'I → you' : x.pr === 'we' ? 'you and … → we' : 'you → I'}.`);
+            return;
+          }
           if (mode === 'neg') { api.say(await verneinen(S0, 60)); return; }
           if (mode === 'frage') {
             await fragen(S0, 70);
@@ -2095,7 +2107,7 @@
         if (mode === 'hoeren') { const p = U.pick([[13, 30], [14, 40], [15, 50], [16, 60], [17, 70], [18, 80], [19, 90]].filter((x) => x[0] !== ctx.paar[0])); S0 = { n: ctx.n < 20 ? p[0] : p[1], paar: p }; }
         if (mode === 'ord') S0 = { n: U.pick([1, 2, 3, 5, 8, 9, 12, 20, 21, 22, 23, 4, 6, 7, 10, 11].filter((x) => x !== ctx.n)) };
         if (mode === 'datum') { const d = U.pick(T.DATEN.filter((x) => x.m !== ctx.m)); S0 = { t: d.t, m: d.m, monat: ctx.monat }; }
-        if (mode === 'uhr') { const u = U.pick(T.UHREN.filter((x) => x.m === ctx.m && x.h !== ctx.h)); S0 = { h: u.h, m: u.m }; }
+        if (mode === 'uhr') { const u = U.pick([...T.UHREN, ...T.UHRM].filter((x) => x.m === ctx.m && x.h !== ctx.h)); S0 = { h: u.h, m: u.m }; }
       }
       const zeig = (teile, y, fs) => { if (oben) oben.remove(); oben = tzeile(api, teile, y || 40, fs || 20); return oben; };
       const txt = (x, y, t, st) => el('text', { x, y, 'text-anchor': 'middle', class: 'ex-b', text: t, style: st || '' }, api.svg);
@@ -2114,8 +2126,14 @@
         return { stell, seite, aus: () => halb.setAttribute('opacity', 0) };
       }
       async function zeigeUhr(h, m, pause) {
-        const u = T.UHREN.find((x) => x.h === h && x.m === m);
+        const u = [...T.UHREN, ...T.UHRM].find((x) => x.h === h && x.m === m);
         await api.tw(1100, (t) => zg.stell(((h % 12) * 60 + m) * t + 0));
+        if (m % 15) {
+          const past = m < 30, n = T.zahlWort(past ? m : 60 - m);
+          zg.seite(past); zeig([[`${n} `, BLAU], [past ? 'past ' : 'to ', ORANGE], [T.STUNDE(past ? h : h + 1), BLAU]], 28, 18);
+          api.say(`<b>${u.text}</b> ${U.say(u.text)}<br>${past ? `Rechte Hälfte: ${m} Minuten <b>past</b> (nach) ${h}.` : `Linke Hälfte: noch ${60 - m} Minuten <b>to</b> (bis) ${(h % 12) + 1}.`}`);
+          await api.wait(pause); return;
+        }
         if (m === 0) { zg.aus(); zeig([[`${T.STUNDE(h)} `, BLAU], ['o’clock']], 28, 18); }
         else if (m === 45) { zg.seite(false); zeig([['quarter ', BLAU], ['to ', ORANGE], [T.STUNDE(h + 1), BLAU]], 28, 18); }
         else { zg.seite(true); zeig([[m === 15 ? 'quarter ' : 'half ', BLAU], ['past ', ORANGE], [T.STUNDE(h), BLAU]], 28, 18); }
