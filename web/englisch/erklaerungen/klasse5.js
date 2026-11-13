@@ -143,4 +143,207 @@
       };
     },
   };
+
+  // Wörter nebeneinander als einzelne Textstücke (damit sie sich bewegen können), zusammen zentriert.
+  //   teile: [{ t:'She', c:'#farbe'? }] → { g, els } (jedes el kennt _x)
+  function zeile(api, teile, y, fs) {
+    fs = fs || 20;
+    const g = el('g', {}, api.svg);
+    const els = teile.map((p) => el('text', { y, class: 'ex-b', text: p.t, style: `font-size:${fs}px;${p.c ? `fill:${p.c}` : ''}` }, g));
+    const gap = fs * 0.3;
+    let ws = [];
+    try { ws = els.map((e) => e.getComputedTextLength()); } catch (e) { ws = teile.map((p) => p.t.length * fs * 0.55); }
+    const total = ws.reduce((a, b) => a + b, 0) + gap * (els.length - 1);
+    if (total > 336 && fs > 11) { g.remove(); return zeile(api, teile, y, fs - 1); }
+    let x = 180 - total / 2;
+    els.forEach((e, i) => { e.setAttribute('x', x); e._x = x; x += ws[i] + gap; });
+    return { g, els, fs };
+  }
+  // von einer Zeile zur nächsten gleiten: paare = [[altes el, neues el]], neue Zeile wird danach sichtbar
+  async function gleite(api, alt, neu, paare, ms) {
+    neu.g.setAttribute('opacity', 0);
+    await api.tw(ms || 800, (t) => paare.forEach(([a, b]) => a.setAttribute('x', lerp(a._x, b._x, t))));
+    alt.g.remove(); neu.g.setAttribute('opacity', 1);
+  }
+  const ORANGE = '#c2410c';
+
+  // =====================================================
+  // Personalpronomen: sieben Kärtchen
+  // =====================================================
+  //   ctx: { mode:'satz', subj, art, be, rest, pron, de } | { mode:'wort', pron } | { mode:'ich', text }
+  const KARTEN = [['I', 'ich', 1], ['You', 'du, ihr', 2], ['He', 'er', 1], ['She', 'sie', 1], ['It', 'es', 1], ['We', 'wir', 3], ['They', 'sie', 3]];
+  EX['e5-pron'] = {
+    title: 'I, you, he, she, it, we, they',
+    titleFor: (ctx) => (ctx && ctx.mode === 'satz' ? `Warum „${ctx.pron.toLowerCase()}“?` : ctx && ctx.mode === 'ich' ? 'I schreibt man groß' : 'I, you, he, she, it, we, they'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, Z = null, karten = {}, frei = [];
+      if (mode === 'satz') S0 = ctx.post ? ctx : U.pick(T.PS.filter((s) => s.art === ctx.art && s.subj !== ctx.subj));
+      const neuFrei = () => { frei = ['m', 'f', 'n', 'p', 'w'].map((a) => U.pick(T.PS.filter((s) => s.art === a))); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const KW = 44, KX = 8, KY = 118, KH = 78;
+      function kaertchen() {
+        karten = {};
+        KARTEN.forEach(([p, de, n], i) => {
+          const x = KX + i * (KW + 6);
+          const r = el('rect', { x, y: KY, width: KW, height: KH, rx: 9, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          for (let k = 0; k < n; k++) el('circle', { cx: x + KW / 2 + (k - (n - 1) / 2) * 9, cy: KY + 14, r: 3.2, fill: 'var(--ink)' }, api.svg);
+          el('text', { x: x + KW / 2, y: KY + 44, 'text-anchor': 'middle', class: 'ex-b', text: p === 'I' ? 'I' : p.toLowerCase(), style: `fill:${BLAU};font-size:17px` }, api.svg);
+          el('text', { x: x + KW / 2, y: KY + 64, 'text-anchor': 'middle', class: 'ex-s', text: de, style: 'font-size:10.5px' }, api.svg);
+          karten[p] = r;
+        });
+      }
+      const leuchte = (p) => Object.keys(karten).forEach((k) => karten[k].setAttribute('fill', k === p ? '#dfe9ff' : '#fff'));
+      const satz = (teile) => { if (Z) Z.g.remove(); Z = zeile(api, teile, 52); };
+      async function zeigeSatz(s, pause) {
+        satz([{ t: s.subj, c: ORANGE }, { t: s.be }, { t: s.rest + '.' }]);
+        api.say(`Wer oder was ist <b>${s.subj}</b>? Das ${'mfn'.includes(s.art) ? 'ist' : 'sind'} ${T.PRON_ART[s.art]}.`);
+        await api.wait(pause);
+        leuchte(s.pron);
+        api.say(`Dafür steht <b>${s.pron.toLowerCase()}</b>, auf Deutsch: ${T.PRON_WORT[s.pron]}.`);
+        await api.wait(pause);
+        satz([{ t: s.pron, c: BLAU }, { t: s.be }, { t: s.rest + '.' }]);
+      }
+      return {
+        reset() {
+          api.clear(); Z = null;
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : mode === 'satz' ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
+          kaertchen();
+          if (mode === 'satz') satz([{ t: S0.subj }, { t: S0.be }, { t: S0.rest + '.' }]);
+          else if (mode === 'ich') satz([{ t: ctx.text }]);
+          else satz([{ t: 'Wer?', c: BLAU }]);
+        },
+        async play() {
+          if (mode === 'satz') {
+            const s = S0;
+            api.say('Ein Pronomen steht <b>für</b> eine Person oder Sache, damit man den Namen nicht immer wiederholen muss.');
+            await api.wait(2600);
+            await zeigeSatz(s, 2400);
+            api.say(`Also: <b>${s.pron}</b> ${s.be} ${s.rest}. ${U.say(s.neu)}<br><small>${s.de}</small>`);
+            return;
+          }
+          if (mode === 'wort') {
+            const p = ctx.pron;
+            leuchte(p);
+            satz([{ t: p === 'I' ? 'I' : p.toLowerCase(), c: BLAU }, { t: '=' }, { t: T.PRON_WORT[p] }]);
+            api.say(`<b>${p === 'I' ? 'I' : p.toLowerCase()}</b> heißt auf Deutsch: ${T.PRON_WORT[p]}. Die Punkte zeigen: einer oder mehrere.${p === 'You' ? ' <b>you</b> heißt beides, du und ihr.' : ''}${p === 'I' ? ' <b>I</b> schreibt man immer groß.' : ''}`);
+            return;
+          }
+          if (mode === 'ich') {
+            leuchte('I');
+            api.say('Alle Pronomen schreibt man klein, außer am Satzanfang. Nur eines nicht:');
+            await api.wait(2400);
+            const teile = ctx.text.split(/\bI\b/);
+            satz([teile[0].trim() ? { t: teile[0].trim() } : null, { t: 'I', c: BLAU }, { t: teile[1].trim() }].filter(Boolean));
+            api.say(`<b>I</b> (ich) schreibt man <b>immer groß</b>, auch mitten im Satz. ${U.say(ctx.text)}`);
+            return;
+          }
+          api.say('Sieben kleine Wörter stehen für Personen und Sachen. Die Punkte zeigen: <b>einer</b> oder <b>mehrere</b>.');
+          await api.wait(3000);
+          for (const s of frei) {
+            await zeigeSatz(s, 2000);
+            api.say(`<b>${s.pron}</b> ${s.be} ${s.rest}. ${U.say(s.neu)}<br><small>${s.de}</small>`);
+            await api.wait(2400);
+          }
+          leuchte('');
+          satz([{ t: 'he · she · it', c: BLAU }, { t: '→ einer, eine, eins' }]);
+          api.say('Merke: <b>he</b> für einen Jungen oder Mann, <b>she</b> für ein Mädchen oder eine Frau, <b>it</b> für eine Sache. <b>they</b> für mehrere, <b>we</b>, wenn du selbst dabei bist.');
+        },
+      };
+    },
+  };
+
+  // =====================================================
+  // to be: verneinen und fragen
+  // =====================================================
+  //   ctx: { mode:'neg'|'frage'|'kurz', subj, g, form, rest, pron, ja }
+  EX['e5-be-neg'] = {
+    title: 'to be: verneinen und fragen',
+    titleFor: (ctx) => (ctx && ctx.mode === 'neg' ? 'Verneinen: so geht’s' : ctx && ctx.mode === 'frage' ? 'Fragen: so geht’s' : ctx && ctx.mode === 'kurz' ? 'Kurzantwort: so geht’s' : 'to be: verneinen und fragen'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      const voll = (s) => Object.assign({}, s, { pron: s.pron || s.subj.toLowerCase() });
+      let S0 = null, frei = null;
+      if (mode !== 'frei') {
+        if (ctx.post) S0 = ctx;
+        else {
+          const pool = (mode === 'neg' ? T.BE : mode === 'frage' ? T.FQ : T.KA).filter((s) => s.g === ctx.g && (s.subj !== ctx.subj || s.rest !== ctx.rest));
+          S0 = Object.assign(voll(U.pick(pool)), { ja: ctx.ja });
+        }
+      }
+      const neuFrei = () => { frei = voll(U.pick(T.KA)); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Anderes Beispiel', onClick() { neuFrei(); api.replay(); } }]); }
+      const kn = (s) => T.NEG[s.form][0];
+      const aussage = (s, y) => zeile(api, [{ t: s.subj }, { t: s.form, c: BLAU }, { t: s.rest + '.' }], y);
+
+      async function verneinen(s, y) {
+        let a = aussage(s, y);
+        api.say('Zum Verneinen brauchst du nur ein Wort: <b>not</b>.');
+        await api.wait(2200);
+        const b = zeile(api, [{ t: s.subj }, { t: s.form, c: BLAU }, { t: 'not', c: ORANGE }, { t: s.rest + '.' }], y);
+        await gleite(api, a, b, [[a.els[0], b.els[0]], [a.els[1], b.els[1]], [a.els[2], b.els[3]]]);
+        api.say(`<b>not</b> kommt direkt hinter <b>${s.form}</b>: ${s.subj} ${s.form} not ${s.rest}.`);
+        await api.wait(2600);
+        const kurz = s.g === 0 ? [{ t: 'I’m', c: BLAU }, { t: 'not', c: ORANGE }, { t: s.rest + '.' }] : [{ t: s.subj }, { t: kn(s), c: BLAU }, { t: s.rest + '.' }];
+        zeile(api, kurz, y + 44);
+        return s.g === 0
+          ? `Beim Sprechen kürzt man: I am not → <b>I’m not</b>. „amn’t“ gibt es nicht. Zum Eintragen in die Lücke: <b>am not</b>. ${U.say(T.negText(s))}`
+          : `Beim Sprechen rücken ${s.form} und not zusammen: ${s.form} not → <b>${kn(s)}</b>. Das o fällt weg, dafür steht der Apostroph. ${U.say(T.negText(s))}`;
+      }
+      async function fragen(s, y) {
+        const a = aussage(s, y);
+        api.say('Bei einer Frage mit to be <b>tauschen</b> die ersten beiden Teile die Plätze.');
+        await api.wait(2400);
+        const b = zeile(api, [{ t: T.gross(s.form), c: BLAU }, { t: T.subjKlein(s.subj) }, { t: s.rest + '?' }], y);
+        await gleite(api, a, b, [[a.els[0], b.els[1]], [a.els[1], b.els[0]], [a.els[2], b.els[2]]], 1100);
+        return b;
+      }
+      async function antworten(s, ja, y) {
+        api.say(`Die Kurzantwort nimmt zwei Dinge aus der Frage: das Pronomen${s.pron !== s.subj.toLowerCase() ? ` (für ${s.subj}: <b>${s.pron}</b>)` : ''} und die Form <b>${s.form}</b>.`);
+        await api.wait(3000);
+        zeile(api, ja ? [{ t: 'Yes,' }, { t: s.pron }, { t: s.form + '.', c: BLAU }] : [{ t: 'No,' }, { t: s.pron }, { t: kn(s) + '.', c: BLAU }], y);
+        return ja
+          ? `<b>${T.jaText(s)}</b> Die Form ist <b>${s.form}</b>, wie in der Frage. Nach Yes gibt es keine Kurzform. ${U.say(T.jaText(s))}`
+          : `<b>${T.neinText(s)}</b> Nach No wird verneint: ${s.form} not, kurz <b>${kn(s)}</b>. ${U.say(T.neinText(s))}`;
+      }
+      return {
+        reset() {
+          api.clear();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          const s = S0 || frei;
+          if (mode === 'kurz') zeile(api, [{ t: T.gross(s.form), c: BLAU }, { t: T.subjKlein(s.subj) }, { t: s.rest + '?' }], 60);
+          else aussage(s, 60);
+        },
+        async play() {
+          api.clear();
+          if (mode === 'neg') { api.say(await verneinen(S0, 60)); return; }
+          if (mode === 'frage') {
+            await fragen(S0, 70);
+            api.say(`<b>${T.frageText(S0)}</b> Erst ${T.gross(S0.form)}, dann die Person. Am Ende steht ein Fragezeichen. ${U.say(T.frageText(S0))}`);
+            return;
+          }
+          if (mode === 'kurz') {
+            zeile(api, [{ t: T.gross(S0.form), c: BLAU }, { t: T.subjKlein(S0.subj) }, { t: S0.rest + '?' }], 60);
+            api.say(await antworten(S0, S0.ja, 110));
+            return;
+          }
+          const s = frei;
+          api.say(await verneinen(s, 44));
+          await api.wait(3600);
+          api.clear();
+          await fragen(s, 50);
+          api.say(`<b>${T.frageText(s)}</b> ${U.say(T.frageText(s))}`);
+          await api.wait(2600);
+          api.say(await antworten(s, true, 96));
+          await api.wait(3200);
+          zeile(api, [{ t: 'No,' }, { t: s.pron }, { t: kn(s) + '.', c: BLAU }], 138);
+          api.say(`Oder: <b>${T.neinText(s)}</b> ${U.say(T.neinText(s))}<br>Merke: <b>not</b> hinter am, is, are. Bei der Frage Plätze tauschen.`);
+        },
+      };
+    },
+  };
 })();

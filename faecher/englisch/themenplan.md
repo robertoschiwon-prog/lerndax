@@ -23,8 +23,8 @@ wenn die Aufgabe nicht ausdrücklich eine davon verlangt. Apostroph „’“ un
 | Nr. | Thema | Beispiel-Aufgaben |
 |---|---|---|
 | 1 | **to be: am, is, are** (gebaut, v55) | Lücke: „She ___ my sister.“ (am / is / are) · Kurzform eintippen: „I am“ → I’m · Welcher Satz stimmt? „We is friends.“ / „We are friends.“ |
-| 2 | Personalpronomen (I, you, he, she, it, we, they) | Ersetze: „**Tom and I** are late.“ → We · „**The dog** is brown.“ → It · Wer ist gemeint? „they“ → mehrere |
-| 3 | to be: verneinen und fragen | Verneine: „He is ten.“ → He isn’t ten. · Bau die Frage: „you / are / ready / ?“ · Kurzantwort: „Is she at home?“ – „Yes, she ___.“ |
+| 2 | Personalpronomen (I, you, he, she, it, we, they) (gebaut, v57) | Ersetze: „**Tom and I** are late.“ → We · „**The dog** is brown.“ → It · Wer ist gemeint? „they“ → mehrere |
+| 3 | to be: verneinen und fragen (gebaut, v57; ohne Fragen mit I und ohne Kurzantworten mit you/we) | Verneine: „He is ten.“ → He isn’t ten. · Bau die Frage: „you / are / ready / ?“ · Kurzantwort: „Is she at home?“ – „Yes, she ___.“ |
 | 4 | have got / has got | Lücke: „My brother ___ got a bike.“ · Verneine: „I have got a pet.“ · Frage: „___ you got a pen?“ |
 | 5 | a oder an | „___ apple“, „___ book“, „___ hour“ (es zählt der Laut, nicht der Buchstabe) |
 | 6 | Mehrzahl (Plural) | Tippe die Mehrzahl: box → boxes, baby → babies, child → children · Welches Wort ist falsch geschrieben? |

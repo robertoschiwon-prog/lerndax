@@ -180,10 +180,232 @@
   }
   const tobe = () => U.wahl([[22, beLuecke], [22, beTippen], [14, beSatz], [12, beWer], [10, beKurz], [8, beLang], [7, beDeutsch], [5, beAntippen]]);
 
-  D.daten = { FORM, KURZ, BE, PRONS, GRUPPE_TEXT, warum, kurzText };
+  // =====================================================
+  // Personalpronomen: I, you, he, she, it, we, they
+  // =====================================================
+  const PRON_ART = { m: 'ein Junge oder Mann', f: 'ein Mädchen oder eine Frau', n: 'eine Sache', p: 'mehrere', w: 'mehrere, und ich bin dabei', y: 'mehrere, und du bist dabei' };
+  const PRON_VON = { m: 'He', f: 'She', n: 'It', p: 'They', w: 'We', y: 'You' };
+  const PRON_WORT = { I: 'ich', You: 'du oder ihr', He: 'er', She: 'sie (eine)', It: 'es', We: 'wir', They: 'sie (mehrere)' };
+  // [Subjekt, Art, Form von to be, Rest, Deutsch]
+  const PS = [
+    ['Tom', 'm', 'is', 'in the garden', 'Tom ist im Garten.'],
+    ['My dad', 'm', 'is', 'a good cook', 'Mein Papa ist ein guter Koch.'],
+    ['Mr Brown', 'm', 'is', 'our teacher', 'Herr Brown ist unser Lehrer.'],
+    ['My brother', 'm', 'is', 'twelve', 'Mein Bruder ist zwölf.'],
+    ['Lisa', 'f', 'is', 'at school', 'Lisa ist in der Schule.'],
+    ['My mum', 'f', 'is', 'very nice', 'Meine Mama ist sehr nett.'],
+    ['Mrs Green', 'f', 'is', 'from London', 'Frau Green ist aus London.'],
+    ['My sister', 'f', 'is', 'in the kitchen', 'Meine Schwester ist in der Küche.'],
+    ['The book', 'n', 'is', 'very old', 'Das Buch ist sehr alt.'],
+    ['My bike', 'n', 'is', 'new', 'Mein Fahrrad ist neu.'],
+    ['The ball', 'n', 'is', 'under the table', 'Der Ball ist unter dem Tisch.'],
+    ['Our house', 'n', 'is', 'small', 'Unser Haus ist klein.'],
+    ['Tom and Lisa', 'p', 'are', 'at home', 'Tom und Lisa sind zu Hause.'],
+    ['The children', 'p', 'are', 'in the park', 'Die Kinder sind im Park.'],
+    ['My parents', 'p', 'are', 'at work', 'Meine Eltern sind bei der Arbeit.'],
+    ['The books', 'p', 'are', 'on the table', 'Die Bücher sind auf dem Tisch.'],
+    ['My shoes', 'p', 'are', 'under the bed', 'Meine Schuhe sind unter dem Bett.'],
+    ['Tom and I', 'w', 'are', 'friends', 'Tom und ich sind Freunde.'],
+    ['My sister and I', 'w', 'are', 'in the garden', 'Meine Schwester und ich sind im Garten.'],
+    ['My friends and I', 'w', 'are', 'at school', 'Meine Freunde und ich sind in der Schule.'],
+    ['You and Ben', 'y', 'are', 'late', 'Du und Ben, ihr seid spät dran.'],
+    ['You and your sister', 'y', 'are', 'very funny', 'Du und deine Schwester, ihr seid sehr lustig.'],
+  ].map(([subj, art, be, rest, de]) => ({ subj, art, be, rest, de, pron: PRON_VON[art], text: `${subj} ${be} ${rest}.`, neu: `${PRON_VON[art]} ${be} ${rest}.` }));
+  const ALLE_PRON = ['I', 'You', 'He', 'She', 'It', 'We', 'They'];
+  const pronWarum = (s) => `<b>${s.subj}</b>: Das ${s.art === 'm' || s.art === 'f' || s.art === 'n' ? 'ist' : 'sind'} ${PRON_ART[s.art]}. Dafür steht <b lang="en">${s.pron.toLowerCase()}</b>, auf Deutsch: ${PRON_WORT[s.pron]}.`;
+  const pronLoesung = (s) => `<span lang="en"><b>${s.subj}</b> ${s.be} ${s.rest}.</span> → <span lang="en"><b class="vb">${s.pron}</b> ${s.be} ${s.rest}.</span> ${U.say(s.neu)}<br>${pronWarum(s)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const PRON_TIPP = 'Frag dich: Wer oder was ist das? <b>Ein</b> Junge oder Mann → he · <b>ein</b> Mädchen oder eine Frau → she · <b>eine</b> Sache → it · <b>mehrere</b> → they · mehrere <b>mit mir</b> → we · mehrere <b>mit dir</b> → you.';
+  const PEX = (s, mode) => ({ mode: mode || 'satz', subj: s.subj, art: s.art, be: s.be, rest: s.rest, pron: s.pron, de: s.de });
+
+  // A: Pronomen für das markierte Subjekt auswählen
+  function pronWahl() {
+    const s = pick(PS);
+    const ch = shuffle([s.pron, ...shuffle(ALLE_PRON.filter((x) => x !== s.pron && x !== 'I')).slice(0, 3)]);
+    return {
+      prompt: `Welches Wort kann für den <b>fett</b> gedruckten Teil stehen?${en(`<b>${s.subj}</b> ${s.be} ${s.rest}.`)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.pron),
+      hint: PRON_TIPP, solution: pronLoesung(s), ex: PEX(s),
+    };
+  }
+  // B: Pronomen eintippen
+  function pronTippen() {
+    const s = pick(PS);
+    return {
+      prompt: `Ersetze <b lang="en">${s.subj}</b> durch ein Pronomen (he, she, it, we, you, they).${en(`${s.subj} ${s.be} ${s.rest}.`)}`,
+      layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.pron, suffix: `${s.be} ${s.rest}.`, label: 'Pronomen' }],
+      hint: PRON_TIPP, solution: pronLoesung(s), ex: PEX(s),
+    };
+  }
+  // C: Für wen kann das Pronomen stehen?
+  function pronWer() {
+    const art = pick(['m', 'f', 'n', 'p', 'w']);
+    const s = pick(PS.filter((x) => x.art === art));
+    const andere = shuffle(['m', 'f', 'n', 'p', 'w', 'y'].filter((a) => a !== art)).slice(0, 3).map((a) => pick(PS.filter((x) => x.art === a)));
+    const ch = shuffle([s, ...andere]);
+    return {
+      prompt: `Für wen oder was kann <b lang="en">${s.pron.toLowerCase()}</b> stehen?`,
+      choices: ch.map((c) => `<span lang="en">${c.subj}</span>`), correct: ch.indexOf(s),
+      hint: `<b lang="en">${s.pron.toLowerCase()}</b> heißt auf Deutsch: ${PRON_WORT[s.pron]}. ${PRON_TIPP}`,
+      solution: pronLoesung(s), ex: PEX(s),
+    };
+  }
+  // D: Deutsch → Englisch
+  const DE_EN = [['ich', 'I'], ['du', 'You'], ['er', 'He'], ['sie (ein Mädchen oder eine Frau)', 'She'], ['es', 'It'], ['wir', 'We'], ['ihr', 'You'], ['sie (mehrere)', 'They']];
+  const klein = (p) => (p === 'I' ? 'I' : p.toLowerCase());
+  function pronDeutsch() {
+    const [de, p] = pick(DE_EN);
+    const ch = shuffle([p, ...shuffle(ALLE_PRON.filter((x) => x !== p)).slice(0, 3)]);
+    return {
+      prompt: `Wie heißt <b>${de}</b> auf Englisch?`,
+      choices: ch.map((c) => `<span lang="en">${klein(c)}</span>`), correct: ch.indexOf(p),
+      hint: 'Die sieben Wörter heißen: I (ich) · you (du, ihr) · he (er) · she (sie, eine) · it (es) · we (wir) · they (sie, mehrere).',
+      solution: `${de} = <b class="vb" lang="en">${klein(p)}</b>${p === 'You' ? '<br>Das englische <b>you</b> heißt beides: du und ihr.' : ''}${p === 'I' ? '<br><b>I</b> schreibt man immer groß.' : ''}`,
+      ex: { mode: 'wort', pron: p },
+    };
+  }
+  // E: Englisch → Deutsch
+  function pronEnglisch() {
+    const p = pick(ALLE_PRON);
+    const ch = shuffle([p, ...shuffle(ALLE_PRON.filter((x) => x !== p)).slice(0, 3)]);
+    return {
+      prompt: `Was bedeutet <b lang="en">${klein(p)}</b>?`,
+      choices: ch.map((c) => PRON_WORT[c]), correct: ch.indexOf(p),
+      hint: 'Die sieben Wörter heißen: I (ich) · you (du, ihr) · he (er) · she (sie, eine) · it (es) · we (wir) · they (sie, mehrere).',
+      solution: `<b class="vb" lang="en">${klein(p)}</b> = ${PRON_WORT[p]}${p === 'You' ? '<br>Das englische <b>you</b> heißt beides: du und ihr.' : ''}`,
+      ex: { mode: 'wort', pron: p },
+    };
+  }
+  // F: I schreibt man immer groß
+  function pronIch() {
+    const s = pick([...BE.filter((x) => x.subj === 'I').map((x) => x.text), ...PS.filter((x) => x.art === 'w').map((x) => x.text), 'Ben and I are in the same class.']);
+    const mitI = s.startsWith('I ');
+    const falsch = mitI ? [s.replace(/^I /, 'i '), s.replace(/^I am /, 'I Am ')] : [s.replace(' I ', ' i '), s.replace(' I ', ' Me ')];
+    const ch = shuffle([s, ...falsch]);
+    return {
+      prompt: 'Welcher Satz ist richtig geschrieben?',
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s),
+      hint: 'Achte auf das Wort für „ich“.',
+      solution: `<span lang="en">${s.replace(/\bI\b/, '<b class="vb">I</b>')}</span> ${U.say(s)}<br><b>I</b> (ich) schreibt man immer groß, auch mitten im Satz. Alle anderen Pronomen schreibt man klein, außer am Satzanfang.`,
+      ex: { mode: 'ich', text: s },
+    };
+  }
+  const pronomen = () => U.wahl([[26, pronWahl], [26, pronTippen], [16, pronWer], [12, pronDeutsch], [12, pronEnglisch], [8, pronIch]]);
+
+  // =====================================================
+  // to be: verneinen und fragen
+  // =====================================================
+  const NEG = { am: ['am not'], is: ['isn’t', 'isn\'t', 'is not'], are: ['aren’t', 'aren\'t', 'are not'] };
+  const gross = (t) => t[0].toUpperCase() + t.slice(1);
+  const subjKlein = (t) => (/^(My|The|He|She|It|We|They|You)\b/.test(t) ? t[0].toLowerCase() + t.slice(1) : t);
+  const negText = (s) => (s.g === 0 ? `I’m not ${s.rest}.` : `${s.subj} ${NEG[s.form][0]} ${s.rest}.`);
+  const frageText = (s) => `${gross(s.form)} ${subjKlein(s.subj)} ${s.rest}?`;
+  // Fragen: ohne „I“ und ohne Sätze mit „my …“ hinter dem Verb (die Frage klänge seltsam)
+  const FQ = BE.filter((s) => s.g !== 0 && !/\bmy\b/.test(s.rest));
+  // Kurzantworten: nur he, she, it, they (bei you und we wechselt die Person in der Antwort)
+  const pronVon = (s) => s.pron || s.subj.toLowerCase();
+  const KA = FQ.filter((s) => ['he', 'she', 'it', 'they'].includes(pronVon(s)));
+  const jaText = (s) => `Yes, ${pronVon(s)} ${s.form}.`;
+  const neinText = (s) => `No, ${pronVon(s)} ${NEG[s.form][0]}.`;
+  const NEG_TIPP = 'Zum Verneinen kommt <b>not</b> hinter am, is oder are: is not, are not, am not. Kurz: <b>isn’t</b>, <b>aren’t</b>. Nur bei I heißt es <b>I’m not</b>.';
+  const FRAGE_TIPP = 'Bei der Frage tauschen die ersten beiden Teile die Plätze: Erst kommt <b>Am, Is</b> oder <b>Are</b>, dann die Person.';
+  const NEX = (s, mode, ja) => ({ mode, subj: s.subj, g: s.g, form: s.form, rest: s.rest, pron: pronVon(s), ja: !!ja });
+  const negLoesung = (s) => (s.g === 0
+    ? `<span lang="en">I <b class="vb">am not</b> ${s.rest}.</span><br>Kurz: <span lang="en"><b class="vb">I’m not</b> ${s.rest}.</span> ${U.say(negText(s))}<br><b>not</b> kommt hinter am. „amn’t“ gibt es nicht.`
+    : `<span lang="en">${s.subj} <b class="vb">${s.form} not</b> ${s.rest}.</span><br>Kurz: <span lang="en">${s.subj} <b class="vb">${NEG[s.form][0]}</b> ${s.rest}.</span> ${U.say(negText(s))}<br><b>not</b> kommt hinter ${s.form}. Beide Formen sind richtig, beim Sprechen nimmt man meist die kurze.`);
+
+  // A: verneinten Satz auswählen
+  function negWahl() {
+    const s = pick(BE);
+    const richtig = negText(s);
+    const falsch = s.g === 0
+      ? [`I amn’t ${s.rest}.`, `I not am ${s.rest}.`]
+      : [`${s.subj} not ${s.form} ${s.rest}.`, `${s.subj} ${NEG[s.form === 'is' ? 'are' : 'is'][0]} ${s.rest}.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Verneine den Satz. Welcher Satz ist richtig?${en(s.text)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: NEG_TIPP, solution: negLoesung(s), ex: NEX(s, 'neg'),
+    };
+  }
+  // B: verneinte Form eintippen
+  function negTippen() {
+    const s = pick(BE);
+    return {
+      prompt: `Verneine den Satz: Setze die <b>verneinte</b> Form von to be ein.${en(s.text)}`,
+      layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: NEG[s.form], prefix: s.subj, suffix: s.rest + '.', label: 'verneinte Form' }],
+      answerText: s.g === 0 ? 'am not' : `${NEG[s.form][0]} (oder: ${s.form} not)`,
+      hint: NEG_TIPP, solution: negLoesung(s), ex: NEX(s, 'neg'),
+    };
+  }
+  const frageLoesung = (s) => `<span lang="en">${s.subj} <b>${s.form}</b> ${s.rest}.</span> → <span lang="en"><b class="vb">${gross(s.form)}</b> ${subjKlein(s.subj)} ${s.rest}?</span> ${U.say(frageText(s))}<br>${FRAGE_TIPP} Am Ende steht ein Fragezeichen.`;
+  // C: richtige Frage auswählen
+  function frageWahl() {
+    const s = pick(FQ);
+    const richtig = frageText(s);
+    const ch = shuffle([richtig, `${gross(s.form === 'is' ? 'are' : 'is')} ${subjKlein(s.subj)} ${s.rest}?`, `${gross(s.form)} ${s.rest} ${subjKlein(s.subj)}?`]);
+    return {
+      prompt: `Mache aus dem Satz eine Frage. Welche ist richtig?${en(s.text)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: FRAGE_TIPP, solution: frageLoesung(s), ex: NEX(s, 'frage'),
+    };
+  }
+  // D: Frage eintippen
+  function frageTippen() {
+    const s = pick(FQ);
+    return {
+      prompt: `Mache aus dem Satz eine Frage und schreibe sie auf.${en(s.text)}`,
+      fields: [{ type: 'text', ci: true, answer: frageText(s), label: 'Frage' }],
+      hint: FRAGE_TIPP, solution: frageLoesung(s), ex: NEX(s, 'frage'),
+    };
+  }
+  const kurzLoesung = (s, ja) => `<span lang="en">${frageText(s)}</span><br><span lang="en"><b class="vb">${ja ? jaText(s) : neinText(s)}</b></span> ${U.say(ja ? jaText(s) : neinText(s))}<br>${s.pron ? `Für <b>${s.subj}</b> steht in der Antwort <b>${s.pron}</b>. ` : ''}Die Form von to be aus der Frage kommt in der Antwort wieder. ${ja ? 'Nach <b>Yes</b> gibt es keine Kurzform.' : 'Nach <b>No</b> wird verneint: ' + NEG[s.form][0] + '.'}`;
+  const KURZ_TIPP = 'Die Kurzantwort hat drei Teile: Yes oder No, dann das Pronomen (he, she, it, they), dann dieselbe Form von to be wie in der Frage.';
+  // E: Kurzantwort auswählen
+  function kurzWahl() {
+    const s = pick(KA), ja = Math.random() < 0.5, pr = pronVon(s), anders = s.form === 'is' ? 'are' : 'is';
+    const richtig = ja ? jaText(s) : neinText(s);
+    const falsch = ja
+      ? [`Yes, ${pr}${s.form === 'is' ? '’s' : '’re'}.`, `Yes, ${pr} ${anders}.`]
+      : [`No, ${pr} not.`, `No, ${pr} ${NEG[anders][0]}.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Antworte kurz mit <b>${ja ? 'Ja' : 'Nein'}</b>.${en(frageText(s))}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: KURZ_TIPP, solution: kurzLoesung(s, ja), ex: NEX(s, 'kurz', ja),
+    };
+  }
+  // F: Kurzantwort ergänzen
+  function kurzTippen() {
+    const s = pick(KA), ja = Math.random() < 0.5, pr = pronVon(s);
+    return {
+      prompt: `Ergänze die Kurzantwort.${en(frageText(s))}`,
+      layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: ja ? s.form : NEG[s.form], prefix: `${ja ? 'Yes' : 'No'}, ${pr}`, suffix: '.', label: 'Form von to be' }],
+      answerText: ja ? s.form : NEG[s.form][0],
+      hint: KURZ_TIPP, solution: kurzLoesung(s, ja), ex: NEX(s, 'kurz', ja),
+    };
+  }
+  const beNeg = () => U.wahl([[18, negWahl], [20, negTippen], [18, frageWahl], [14, frageTippen], [15, kurzWahl], [15, kurzTippen]]);
+
+  D.daten = { FORM, KURZ, BE, PRONS, GRUPPE_TEXT, warum, kurzText, PS, PRON_ART, PRON_WORT, ALLE_PRON, NEG, FQ, KA, negText, frageText, jaText, neinText, subjKlein, gross };
   // alle Texte, zu denen es eine Aufnahme geben muss (für tests/endax_audio.py und den Test)
-  D.audioTexte = () => { const t = new Set(); BE.forEach((s) => t.add(s.text)); PRONS.forEach((s) => t.add(kurzText(s))); return [...t]; };
-  D.arten = { 'e5-be': { beLuecke, beTippen, beSatz, beWer, beKurz, beLang, beDeutsch, beAntippen } };
+  D.audioTexte = () => {
+    const t = new Set();
+    BE.forEach((s) => { t.add(s.text); t.add(negText(s)); });
+    PRONS.forEach((s) => t.add(kurzText(s)));
+    PS.forEach((s) => { t.add(s.neu); if (s.art === 'w') t.add(s.text); });
+    t.add('Ben and I are in the same class.');
+    FQ.forEach((s) => t.add(frageText(s)));
+    KA.forEach((s) => { t.add(jaText(s)); t.add(neinText(s)); });
+    return [...t];
+  };
+  D.arten = {
+    'e5-be': { beLuecke, beTippen, beSatz, beWer, beKurz, beLang, beDeutsch, beAntippen },
+    'e5-pron': { pronWahl, pronTippen, pronWer, pronDeutsch, pronEnglisch, pronIch },
+    'e5-be-neg': { negWahl, negTippen, frageWahl, frageTippen, kurzWahl, kurzTippen },
+  };
 
   // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
@@ -193,6 +415,8 @@
     lbs: [
       { id: 'e5-bausteine', nr: 1, title: 'Erste Bausteine', topics: [
         { id: 'e5-be', title: 'to be: am, is, are', icon: '🧩', gen: tobe },
+        { id: 'e5-pron', title: 'I, you, he, she, it, we, they', icon: '🧑', gen: pronomen },
+        { id: 'e5-be-neg', title: 'to be: verneinen und fragen', icon: '❓', gen: beNeg },
       ] },
     ],
   };

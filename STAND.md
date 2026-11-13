@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v56`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v57`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -63,6 +63,11 @@ Weitere Dokumente:
   Britische Aufnahmen in `web/englisch/audio/k5-gb/` (56 Dateien, 725 KB). `F.audio` kann jetzt eine Liste sein.
   **Seit 13.11.2026 auf GitHub und live (v55 und v56 zusammen hochgeladen)**, mit ausdrücklichem Ja des Auftraggebers.
   Das Vorschau-Artifact „EnDax – Vorschau: to be“ wird damit nicht mehr gebraucht.
+- **EnDax v57 (13.11.2026): zwei weitere Themen**, auf GitHub und live. `e5-pron` „I, you, he, she, it, we, they“
+  (6 Aufgabenarten, 22 Sätze, Animation „sieben Kärtchen“) und `e5-be-neg` „to be: verneinen und fragen“ (6 Aufgabenarten:
+  verneinen, Frage bilden, Kurzantwort; Animation mit wandernden Wörtern). Jetzt 141 Aufnahmen je Aussprache.
+  Bewusst weggelassen: Fragen mit „I“ und Kurzantworten mit you/we (dort wechselt die Person: Are you …? Yes, I am.).
+  Das wäre ein eigener Baustein, noch nicht gebaut. Als Nächstes laut Themenplan: have got, a/an, Mehrzahl.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1073,3 +1078,7 @@ Infos zur ersten Arbeit:
   Umschalter auf der Startseite des Fachs. Britische Aufnahmen (`bm_fable`) in `audio/k5-gb/`. `tests/endax_audio.py` erzeugt
   beide Sätze, `tests/endax.py` prüft beide Ordner und den Umschalter. Tests: endax (8 Runden) ohne Fehler; Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden, 360 Antworten), `eltern`.
   Die britischen Aufnahmen hat noch niemand angehört.
+- **v57: EnDax, Themen 2 und 3** (13.11.2026): `e5-pron` und `e5-be-neg`. Nur `web/englisch/` und `sw.js` geändert, die
+  gemeinsame App nicht. Geprüft: 10 000 erzeugte Aufgaben ohne Fehler (auch: jede Aufnahme steht in der Liste);
+  `tests/endax.py` 10 Runden (180 Antworten, 60 Animationen) ohne Fehler. Mathe und Deutsch nicht erneut getestet (unverändert).
+  Die neuen Aufnahmen hat noch niemand angehört.
