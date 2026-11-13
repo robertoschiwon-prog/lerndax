@@ -23,7 +23,7 @@ async def main():
         var = await pg.evaluate("() => Object.fromEntries(Object.entries(window.EnDax.knobelVarianten).map(([k, v]) => [k, v.length]))")
         alle = await pg.evaluate("() => window.EnDax.grades[5].lbs.flatMap(l => l.topics).map(t => t.id)")
         for t in alle:
-            if t not in var and not t.startswith('e5-a-'): meld.append(f'{t}: keine Knobel-Aufgaben')   # Alltag (e5-a-…) bewusst ohne Knobeln
+            if t not in var: meld.append(f'{t}: keine Knobel-Aufgaben')
         stats = {i: {'n': 8, 'hist': [1, 1, 1, 1, 1, 1, 0.5, 0], 'last': '2026-11-01'} for i in alle}
         await pg.evaluate("s => localStorage.setItem('endax.v1', JSON.stringify({name:'Max', grade:5, stats:s, days:[], total:0, seen:{}}))", stats)
         await pg.goto(URL)

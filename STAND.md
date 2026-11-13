@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v74`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v75`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -185,6 +185,10 @@ Weitere Dokumente:
   Auswahl), buchstabiertes Wort hören und eintippen (20 Wörter und Namen), „Welcher Buchstabe klingt wie eye, you, see …?“,
   Buchstabe davor oder danach. Erklärung: Tafel mit allen 26 Buchstaben, die tückischen sind blau. 46 Themen, 1607 Aufnahmen
   je Aussprache (jeder Buchstabe einzeln). Lautschrift ist weiter offen.
+- **EnDax v75 (13.11.2026): Knobel-Aufgaben auch für die 6 Alltag-Themen** – jetzt haben alle 46 Themen Knobeln. Hallo (Fehler
+  finden, passende Antwort im Gespräch), Unterricht (Fehler, Anweisung der Lehrerin auf Englisch), Einkaufen (Preise addieren,
+  Wechselgeld, Fehler), Weg (Karte mit ähnlichen Sätzen zur Auswahl, Fehler), Alphabet (Abkürzungen wie „C U“, „R U OK?“, „B4“;
+  rückwärts buchstabierte Wörter), Lesen (zwei Stellen im Text kombinieren). `tests/endax_knobel.py` verlangt jetzt Knobeln für alle Themen.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1222,6 +1226,8 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v75: EnDax Knobeln für Alltag** (13.11.2026): geändert `web/englisch/themen/klasse5-knobel.js`, `tests/endax_knobel.py`, `web/sw.js`.
+  Test `endax_knobel.py` ohne Meldung.
 - **v74: EnDax Alphabet** (13.11.2026): Thema `e5-a-abc`. Geändert: `web/englisch/` (Themen, Erklärungen, Symbole, Aufnahmen-Pakete),
   `web/plattform/faecher.js` (46 Themen), `web/sw.js`. Test `endax.py 3` ohne Meldung.
 - **v73: EnDax Knobel-Aufgaben** (13.11.2026): neu `web/englisch/themen/klasse5-knobel.js`, `tests/endax_knobel.py`; geändert

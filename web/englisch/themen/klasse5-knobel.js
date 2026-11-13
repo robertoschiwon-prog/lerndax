@@ -397,6 +397,79 @@
     if (einz.length >= 4) K(id, salat, satz); else K(id, satz);
   }
 
+  // =====================================================
+  // Bereich 6 – Im Alltag
+  // =====================================================
+  K('e5-a-hallo',
+    fehlerK([['How *is you?', 'are', 'you: How <b>are</b> you?'],
+      ['Nice to *meeting you.', 'meet', 'Nice to <b>meet</b> you. Hinter to steht die Grundform.'],
+      ['Where *is you from?', 'are', 'you: Where <b>are</b> you from?'],
+      ['My name *are Max.', 'is', 'my name ist eins: <b>is</b>.'],
+      ['I live *at Dresden.', 'in', 'In einer Stadt: <b>in</b> Dresden.']]),
+    wahlK('Was passt am besten?', [
+      ['Lisa: Hello! I’m Lisa. – Tom: Hi, Lisa! …', 'I’m Tom. Nice to meet you.', ['Goodbye, Lisa!', 'You’re welcome, Lisa.'], 'Lisa stellt sich vor. Tom stellt sich auch vor und freut sich: <b>I’m Tom. Nice to meet you.</b>'],
+      ['Ben: Thank you for the present! – Anna: …', 'You’re welcome.', ['Thank you too.', 'Nice to meet you.'], 'Auf Danke antwortet man <b>You’re welcome.</b>'],
+      ['Mrs Green: Good morning, Max! How are you? – Max: …', 'Fine, thanks. And you?', ['I’m eleven, thanks.', 'Good night, Mrs Green!'], 'Höflich: antworten und zurückfragen: <b>Fine, thanks. And you?</b>']], 'Wer sagt was zu wem? Was wäre höflich?'));
+
+  K('e5-a-klasse',
+    fehlerK([['Can I *opens the window, please?', 'open', 'Hinter Can I steht die Grundform: <b>open</b>.'],
+      ['Sorry, I *not understand.', 'don’t', 'Verneint mit <b>don’t</b>: I don’t understand.'],
+      ['Can you *saying that again, please?', 'say', 'Hinter can: Grundform <b>say</b>.'],
+      ['How do you *spelling that?', 'spell', 'Hinter do you: Grundform <b>spell</b>.']]),
+    wahlK('Wie sagt die Lehrerin das auf Englisch?', [
+      ['Schließt eure Bücher.', 'Close your books, please.', ['Open your books, please.', 'Close your eyes, please.'], 'schließen = close, Bücher = books.'],
+      ['Arbeitet zu zweit.', 'Work with a partner.', ['Work on your own.', 'Write with a pen.'], 'zu zweit = mit einem Partner: <b>with a partner</b>.'],
+      ['Schreibt das auf.', 'Write it down, please.', ['Read it, please.', 'Sit down, please.'], 'aufschreiben = <b>write down</b>.'],
+      ['Seid bitte leise.', 'Be quiet, please.', ['Be quick, please.', 'Be nice, please.'], 'leise = <b>quiet</b>. quick heißt schnell!']], 'Achte auf jedes Wort: close/open, quiet/quick …'));
+
+  const PREIS = (p) => (p < 100 ? `${p}p` : `£${Math.floor(p / 100)}.${String(p % 100).padStart(2, '0')}`);
+  K('e5-a-laden',
+    () => { const a = pick([120, 250, 80, 175, 99, 150]), b = pick([210, 60, 135, 300, 45]), s = a + b;
+      const [x, y] = pick([['an apple juice', 'a sandwich'], ['a cake', 'a cup of tea'], ['a comic', 'a pencil'], ['an ice cream', 'a bottle of water']]);
+      return wahl(`${en(`${x[0].toUpperCase() + x.slice(1)} is ${PREIS(a)} and ${y} is ${PREIS(b)}. How much is it together?`)}`, PREIS(s), [PREIS(s + 10), PREIS(s - 100 > 0 ? s - 100 : s + 100)], 'Rechne in Pence: £1 = 100p.', `${PREIS(a)} + ${PREIS(b)} = <b class="vb">${PREIS(s)}</b>`, true); },
+    () => { const p = pick([350, 275, 420, 180, 330, 95]), gibt = p <= 500 ? 500 : 1000, r = gibt - p;
+      return wahl(`${en(`The book is ${PREIS(p)}. You pay with a £${gibt / 100} note. How much change do you get?`)}<small>change = Wechselgeld</small>`, PREIS(r), [PREIS(r + 100), PREIS(Math.abs(r - 50) || 150)], 'Wechselgeld = bezahlt minus Preis.', `£${gibt / 100}.00 − ${PREIS(p)} = <b class="vb">${PREIS(r)}</b>`, true); },
+    fehlerK([['How *many is the cake?', 'much', 'Nach dem Preis fragt man mit <b>How much</b>.'],
+      ['I’d *likes a sandwich, please.', 'like', 'Hinter I’d steht die Grundform: <b>like</b>.'],
+      ['Can I *having an ice cream, please?', 'have', 'Hinter Can I: Grundform <b>have</b>.']]));
+
+  K('e5-a-weg',
+    () => { const W = D.daten.WEGE, w = pick(W.filter((x) => x.k !== 'gerade')), seite = w.k[0], nr = w.k[1];
+      const nah = W.filter((x) => x !== w && x.k !== 'gerade' && (x.k[0] === seite || x.k[1] === nr));
+      const ch = shuffle([w, ...nah.slice(0, 2)]);
+      return { prompt: 'Genau hinsehen: Welcher Satz beschreibt den Weg zum Stern?', figure: D.daten.wegKarte(w), choices: ch.map((x) => E(x.satz)), correct: ch.indexOf(w), hint: 'Zähle die Straßen von unten: first = die erste, second = die zweite. Dann: links (left) oder rechts (right)?', solution: `<b class="vb" lang="en">${w.satz}</b><br>${w.de}` }; },
+    fehlerK([['Go *straightly on.', 'straight', 'geradeaus = <b>straight on</b>.'],
+      ['Take the *one street on the right.', 'first', 'die erste = <b>first</b>.'],
+      ['Excuse *my, where is the station?', 'me', 'Entschuldigung = <b>Excuse me</b>.'],
+      ['Turn left at the bank, then *turning right.', 'turn', 'Aufforderung: Grundform <b>turn</b>.']]));
+
+  K('e5-a-abc',
+    wahlK('Geheimsprache in Nachrichten! Was bedeutet das?', [
+      ['C U', 'See you.', ['Can you?', 'Call you.'], 'C klingt wie <b>see</b>, U wie <b>you</b>.'],
+      ['R U OK?', 'Are you OK?', ['Run, you OK?', 'Are we OK?'], 'R klingt wie <b>are</b>, U wie <b>you</b>.'],
+      ['Y?', 'Why?', ['Yes?', 'You?'], 'Y klingt wie <b>why</b>.'],
+      ['I C', 'I see.', ['I can.', 'I see you.'], 'C klingt wie <b>see</b>: I see = Ich verstehe.'],
+      ['B4 school', 'before school', ['bye for school', 'be at school'], 'B klingt wie <b>be</b>, 4 wie <b>four</b>: be-four = <b>before</b>.'],
+      ['C U 2day', 'See you today.', ['See you tomorrow.', 'See you at two.'], '2 klingt wie <b>to</b>: 2day = <b>today</b>.']], 'Sprich die Buchstaben und Zahlen auf Englisch laut aus.'),
+    () => { const x = pick(D.daten.SPELL.filter((y) => y.w.length >= 4)), rueck = x.w.toUpperCase().split('').reverse().join(', ');
+      return luecken(`Jemand buchstabiert ein Wort <b>rückwärts</b>: <b lang="en">${rueck}</b><br>Welches Wort ist es?`, '___', [x.w], 'Lies die Buchstaben von hinten nach vorn.', `${rueck} → rückwärts gelesen: <b class="vb" lang="en">${x.w}</b>`); });
+
+  const LT = D.daten.LT;
+  K('e5-a-lesen',
+    wahlK('Lies den Text und kombiniere!', [
+      [`${LT[0].text}<br><br><b>How old is Emma’s brother?</b>`, 'six', ['eleven', 'twelve'], 'Emmas Bruder heißt Sam, und <b>Sam is six</b>. Zwei Sätze zusammen ergeben die Antwort.'],
+      [`${LT[1].text}<br><br><b>How many hours is Tom at school before lunch?</b>`, 'five hours', ['one hour', 'eight hours'], 'School starts at eight, lunch is at one: von 8 bis 13 Uhr sind es <b>fünf Stunden</b>.'],
+      [`${LT[2].text}<br><br><b>Why was Lena tired?</b>`, 'They were at the zoo all day.', ['She was ill.', 'She went to bed late.'], 'Sie waren den ganzen Tag im Zoo: Löwen, Affen, Mittagessen, erst nachmittags nach Hause. Krank war sie nicht.'],
+      [`${LT[3].text}<br><br><b>What is between the bed and the cupboard?</b>`, 'the desk', ['the shelf', 'the box'], 'My desk is between the bed and the cupboard.'],
+      [`${LT[4].text}<br><br><b>Why does Mr Brown buy eggs?</b>`, 'Because there isn’t any cheese.', ['Because eggs are cheap.', 'Because he doesn’t like apples.'], 'Er wollte Käse, aber es gab keinen. <b>So</b> he buys some eggs: Deshalb kauft er Eier.']], 'Die Antwort steht nicht in einem einzigen Satz. Verbinde zwei Stellen im Text.'),
+    (() => { const n = reihum([[0, 'Emma’s brother is younger than Emma.', true, 'Emma ist elf, ihr Bruder Sam ist sechs. Also ist er jünger.'],
+      [1, 'Tom has lunch before he plays football.', true, 'Mittagessen ist um eins, Fußball spielt er am Nachmittag, also danach.'],
+      [2, 'Lena saw the monkeys before the lions.', false, 'First they saw the lions. Then they watched the monkeys. Die Löwen kamen zuerst.'],
+      [3, 'The books are behind the door.', true, 'Die Bücher stehen im Regal, und das Regal steht hinter der Tür. Also sind auch die Bücher hinter der Tür.'],
+      [4, 'Mr Brown goes home with some cheese.', false, 'Es gab keinen Käse (there isn’t any cheese). Er kauft Eier statt Käse.']]);
+      return () => { const [ti, satz, wahr, w] = n(), ch = ['Ja, das stimmt.', 'Nein, das stimmt nicht.'];
+        return { prompt: `Lies den Text und kombiniere zwei Stellen.${en(LT[ti].text)}Stimmt das? <b lang="en">${satz}</b>`, choices: ch, correct: wahr ? 0 : 1, hint: 'Die Antwort steht nicht in einem einzigen Satz. Verbinde zwei Stellen im Text.', solution: `<b>${ch[wahr ? 0 : 1]}</b><br>${w}` }; }; })());
+
   D.knobelThemen = () => themen().filter((t) => t.knobel).map((t) => t.id);
   D.knobelVarianten = VAR;
 })();
