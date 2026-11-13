@@ -74,7 +74,7 @@ parts of the body · food and drink · colours · days, months, seasons.
 Je Wortfeld: Bedeutung wählen, Wort eintippen, Wort im Satz, was passt nicht dazu.
 Eigene Wortlisten nach Themen, nichts aus dem Schulbuch übernommen. **Geklärt (Roberto 13.11.):** erst feste Listen; selbst eintragen vielleicht später.
 
-## Bereich 6: Sprechen im Alltag und Lesen
+## Bereich 6: Sprechen im Alltag und Lesen – gebaut in v71 (5 Themen `e5-a-…`); Alphabet/Buchstabieren und Lautschrift noch offen
 
 Sich vorstellen, begrüßen, danken, im Klassenraum, einkaufen, nach dem Weg fragen, telefonieren (passende Antwort
 wählen, Dialog ordnen) · kurze selbst geschriebene Texte mit Fragen · Alphabet und Buchstabieren · Lautschrift lesen.

@@ -81,12 +81,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .topic .tt{font-weight:800;font-size:15px;line-height:1.2;flex:1}
 .stars{font-size:15px;letter-spacing:1px;color:#fff;-webkit-text-stroke:1px #8f8674;paint-order:stroke fill}
 .stars .on{color:#f5b301;-webkit-text-stroke:1px #6f4e00}
-.bg1{background:var(--c1)}.bg2{background:var(--c2)}.bg3{background:var(--c3)}.bg4{background:var(--c4)}.bg5{background:var(--c5)}
+.bg1{background:var(--c1)}.bg2{background:var(--c2)}.bg3{background:var(--c3)}.bg4{background:var(--c4)}.bg5{background:var(--c5)}.bg6{background:#12a3b0}.bg7{background:#e0559a}.bg8{background:#6b8f23}
 /* weiße Schrift ist auf Orange und Gelb zu schwach: dort dunkle Schrift */
 .tag.bg1,.tag.bg5,.lbh .nr.bg1,.lbh .nr.bg5,.topic .ti.bg1,.topic .ti.bg5{color:var(--ink)}
 .tag.bg2,.lbh .nr.bg2{background:#2f66e0}
 .tag.bg3,.lbh .nr.bg3{background:#0d8055}
 .tag.bg4,.lbh .nr.bg4{background:#7443e6}
+.tag.bg6,.lbh .nr.bg6{background:#0b7f8a}.tag.bg7,.lbh .nr.bg7{background:#c23a7e}.tag.bg8,.lbh .nr.bg8{background:#56751a}
 .foot{text-align:center;margin-top:10px}
 .trhero{margin-bottom:16px;background:#fff8ec}
 .trtop{display:flex;align-items:center;gap:10px}

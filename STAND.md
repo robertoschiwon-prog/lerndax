@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v70`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v71`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -160,6 +160,15 @@ Weitere Dokumente:
   falsche Wörter, die sicher nicht passen), „Was passt nicht dazu?“ (ohne zu nahe Themenpaare, `WF_NAH`; Wörter mit `kein` wie
   fish, chicken, cook nie als Außenseiter). Eine gemeinsame Erklärung für alle Felder: Wortkarten drehen sich von Deutsch auf Englisch.
   40 Themen, 1425 Aufnahmen je Aussprache. Als Nächstes: Bereich 6 Alltag und Lesen, dann „Entdecken“ für Englisch.
+- **EnDax v71 (13.11.2026): Bereich 6 „Im Alltag“ (Themen 41 bis 45)**, auf GitHub und live. `e5-a-hallo` (begrüßen, sich vorstellen),
+  `e5-a-klasse` (Sätze im Unterricht und Anweisungen der Lehrerin), `e5-a-laden` (einkaufen, Preise mit Preisschild und Hören),
+  `e5-a-weg` (nach dem Weg fragen, Karte mit Weg zum Stern), `e5-a-lesen` (5 kurze selbst geschriebene Texte mit Fragen und
+  „Stimmt das?“, jeder Text auch zum Anhören). Gemeinsamer Baukasten `ALT` (passende Antwort, Hören, Situation → Satz, Lücke), Daten
+  in `alFeld(...)`; Erklärung mit Sprechblasen, Preisschild, Karte; beim Lesen zeigt sie den Satz im Text, in dem die Antwort steht.
+  `web/plattform/fach.css`: Farben `bg6` bis `bg8` für Lernbereich 6 bis 8 ergänzt (vorher war das Themen-Schild im 6. Bereich weiß und leer);
+  ui2 und eltern danach ohne Fehler.
+  45 Themen, 1525 Aufnahmen je Aussprache. **Damit ist der Themenplan Klasse 5 (Bereiche 1 bis 6) gebaut.** Offen: Alphabet und
+  Buchstabieren, Lautschrift (die Stimme spricht einzelne Buchstaben nicht sicher richtig), „Entdecken“ und Knobeln für Englisch.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1197,6 +1206,9 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v71: EnDax, Themen 41 bis 45 (Im Alltag)** (13.11.2026): neuer Bereich `e5-alltag`. Geändert: `web/englisch/` (Themen, Erklärungen,
+  Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (45 Themen), `web/plattform/fach.css` (Farben bg6–bg8), `web/sw.js`.
+  Tests `endax.py 3`, `ui2.py`, `eltern.py` ohne Meldung.
 - **v70: EnDax, Themen 30 bis 40 (Wortfelder)** (13.11.2026): neuer Bereich `e5-woerter`. Geändert: `web/englisch/` (Themen, Erklärungen,
   Symbole, Aufnahmen-Pakete), `web/plattform/faecher.js` (40 Themen), `web/sw.js`. Test `tests/endax.py 3` ohne Meldung.
 - **v69: EnDax, Themen 27 bis 29** (13.11.2026): `e5-was`, `e5-ed`, `e5-irr`, neuer Bereich `e5-vergangen`. Geändert: `web/englisch/`

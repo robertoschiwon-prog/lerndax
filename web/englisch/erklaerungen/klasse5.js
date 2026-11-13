@@ -2423,4 +2423,177 @@
     },
   });
   for (const [id, titel] of WF_TITEL) EX[id] = wfErkl(id, titel);
+
+  // =====================================================
+  // Im Alltag: Sprechblasen, Preisschild, Karte, Lesen
+  // =====================================================
+  //   ctx: { mode:'dialog'|'situation'|'luecke', i } | { mode:'anweisung', e } | { mode:'preis', zeichen } | { mode:'weg', k } | { mode:'lesen', ti, qi }
+  function umbruch(api, text, x, y, maxW, fs, stil, anker) {
+    const t = el('text', { x, y, 'text-anchor': anker || 'start', class: 'ex-b', style: `font-size:${fs}px;${stil || ''}` }, api.svg);
+    const woerter = String(text).split(' ');
+    let zeile = [], n = 0;
+    const neu = () => { const ts = el('tspan', { x, dy: n ? fs * 1.25 : 0, text: '' }, t); n++; return ts; };
+    let ts = neu();
+    for (const w of woerter) {
+      ts.textContent = [...zeile, w].join(' ');
+      let breit = 0; try { breit = ts.getComputedTextLength(); } catch (e) { breit = ts.textContent.length * fs * 0.55; }
+      if (breit > maxW && zeile.length) { ts.textContent = zeile.join(' '); zeile = [w]; ts = neu(); ts.textContent = w; } else zeile.push(w);
+    }
+    return { t, zeilen: n, hoehe: n * fs * 1.25 };
+  }
+  function blase(api, text, rechts, y, farbe, fs) {
+    fs = fs || 16;
+    const maxW = 236, x0 = rechts ? 346 : 14;
+    const u = umbruch(api, text, 0, y, maxW, fs, farbe ? `fill:${farbe}` : '');
+    let b = { width: maxW }; try { b = u.t.getBBox(); } catch (e) {}
+    const w = Math.min(maxW, b.width) + 24, x = rechts ? x0 - w : x0;
+    u.t.querySelectorAll('tspan').forEach((ts) => ts.setAttribute('x', x + 12));
+    const r = el('rect', { x, y: y - fs - 6, width: w, height: u.hoehe + 16, rx: 14, fill: rechts ? '#dfe9ff' : '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+    api.svg.insertBefore(r, u.t);
+    const sx = rechts ? x + w - 24 : x + 24, sy = y - fs - 6 + u.hoehe + 16;
+    const sp = el('path', { d: `M${sx - 8} ${sy - 1}l${rechts ? 14 : -6} 12l${rechts ? -2 : 10} -12z`, fill: rechts ? '#dfe9ff' : '#fff', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' }, api.svg);
+    api.svg.insertBefore(sp, r);
+    return { g: [r, sp, u.t], unten: sy + 12, weg() { [r, sp, u.t].forEach((e) => e.remove()); } };
+  }
+  const AL_TITEL = [
+    ['e5-a-hallo', 'Hallo! How are you?'],
+    ['e5-a-klasse', 'Im Unterricht: Sorry, I don’t understand'],
+    ['e5-a-laden', 'Einkaufen: How much is it?'],
+    ['e5-a-weg', 'Nach dem Weg fragen'],
+  ];
+  const alErkl = (id, titel) => ({
+    title: titel,
+    titleFor: () => titel,
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const F = T.AL[id], mode = ctx.mode || 'frei';
+      const anders = (liste, i) => (ctx.post ? liste[i] : U.pick(liste.filter((x, k) => k !== i)));
+      let S0 = null, frei = [];
+      if (mode === 'dialog') S0 = anders(F.P, ctx.i);
+      if (mode === 'situation') S0 = anders(F.S, ctx.i);
+      if (mode === 'luecke') S0 = anders(F.L, ctx.i);
+      if (mode === 'anweisung') S0 = ctx.post ? T.ANW.find((x) => x.e === ctx.e) : U.pick(T.ANW.filter((x) => x.e !== ctx.e));
+      if (mode === 'preis') S0 = ctx.post ? T.PREISE.find((x) => x.zeichen === ctx.zeichen) : U.pick(T.PREISE.filter((x) => x.zeichen !== ctx.zeichen));
+      if (mode === 'weg') S0 = ctx.post ? T.WEGE.find((x) => x.k === ctx.k) : U.pick(T.WEGE.filter((x) => x.k !== ctx.k));
+      const neuFrei = () => { frei = U.shuffle(F.P).slice(0, 2); };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Anderes Gespräch', onClick() { neuFrei(); api.replay(); } }]); }
+      async function gespraech(x, pause) {
+        api.clear();
+        blase(api, x.frage, false, 40);
+        api.say(`Jemand sagt: <b>${x.frage}</b> ${U.say(x.frage)}`);
+        await api.wait(pause);
+        blase(api, x.antwort, true, 128, BLAU);
+        return `<b>${x.frage}</b> – <b>${x.antwort}</b> ${U.say(x.antwort)}<br><small>${x.de}</small>`;
+      }
+      function karte(w) {
+        const g = el('g', {}, api.svg);
+        g.innerHTML = T.wegKarte(null).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+        const pl = el('polyline', { points: w.pfad.map((p) => p.join(',')).join(' '), fill: 'none', stroke: BLAU, 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, api.svg);
+        let len = 0; for (let k = 1; k < w.pfad.length; k++) len += Math.hypot(w.pfad[k][0] - w.pfad[k - 1][0], w.pfad[k][1] - w.pfad[k - 1][1]);
+        pl.setAttribute('stroke-dasharray', len); pl.setAttribute('stroke-dashoffset', len);
+        const z = w.pfad[w.pfad.length - 1];
+        const stern = el('path', { d: `M${z[0]} ${z[1] - 14}l4 9h10l-8 6 3 10-9-6-9 6 3-10-8-6h10z`, fill: '#f2a516', stroke: '#2b2440', 'stroke-width': 1.5 }, api.svg);
+        return { pl, len, stern };
+      }
+      let K = null;
+      return {
+        reset() {
+          api.clear(); K = null;
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'dialog') blase(api, S0.frage, false, 40);
+          if (mode === 'situation') umbruch(api, S0.de, 180, 36, 320, 15, `fill:${GRAU}`, 'middle');
+          if (mode === 'luecke') blase(api, S0.satz, true, 60);
+          if (mode === 'anweisung') blase(api, S0.e, false, 44);
+          if (mode === 'preis') {
+            el('path', { d: 'M90 26h170l40 40-40 40H90z', fill: '#fff6d6', stroke: 'var(--ink)', 'stroke-width': 3, 'stroke-linejoin': 'round' }, api.svg);
+            el('circle', { cx: 270, cy: 66, r: 7, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 }, api.svg);
+            el('text', { x: 170, y: 82, 'text-anchor': 'middle', class: 'ex-b', text: S0.zeichen, style: 'font-size:42px' }, api.svg);
+          }
+          if (mode === 'weg') K = karte(S0);
+        },
+        async play() {
+          const x = S0;
+          if (mode === 'frei') {
+            for (const p of frei) { api.say(await gespraech(p, 2400)); await api.wait(4200); }
+            return;
+          }
+          if (mode === 'dialog') {
+            api.say(`Jemand sagt: <b>${x.frage}</b> ${U.say(x.frage)}<br>Welche Antwort passt dazu?`);
+            await api.wait(2600);
+            blase(api, x.antwort, true, 128, BLAU);
+            api.say(`<b>${x.frage}</b> – <b>${x.antwort}</b> ${U.say(x.antwort)}<br><small>${x.de}</small>`);
+            return;
+          }
+          if (mode === 'situation') {
+            api.say(`${x.de} Was sagst du auf Englisch?`);
+            await api.wait(2400);
+            blase(api, x.richtig, true, 120, BLAU, 18);
+            api.say(`<b>${x.richtig}</b> ${U.say(x.richtig)}<br><small>${x.de}</small>`);
+            return;
+          }
+          if (mode === 'luecke') {
+            api.say('Welches Wort fehlt im Satz?');
+            await api.wait(2000);
+            api.clear();
+            blase(api, x.text, true, 60, BLAU);
+            api.say(`${x.satz.replace('___', `<b>${x.antwort[0]}</b>`)} ${U.say(x.text)}<br><small>${x.de}</small>`);
+            return;
+          }
+          if (mode === 'anweisung') {
+            api.say(`Die Lehrerin sagt: <b>${x.e}</b> ${U.say(x.e)}`);
+            await api.wait(2400);
+            umbruch(api, `= ${x.de}`, 180, 150, 320, 20, `fill:${BLAU}`, 'middle');
+            api.say(`<b>${x.e}</b> heißt: <b>${x.de}</b>`);
+            return;
+          }
+          if (mode === 'preis') {
+            api.say(`Auf dem Schild steht <b>${x.zeichen}</b>. Wie sagt man das?`);
+            await api.wait(2400);
+            umbruch(api, x.text, 180, 160, 330, 22, `fill:${BLAU}`, 'middle');
+            api.say(`${x.zeichen} = <b>${x.text}</b> ${U.say(x.satz)}<br>£ heißt pound, p heißt pence. Erst die Pfund, dann die Pence.`);
+            return;
+          }
+          if (mode === 'weg') {
+            api.say('Du startest unten. Folge dem blauen Weg bis zum Stern.');
+            await api.wait(1600);
+            await api.tw(1800, (t) => K.pl.setAttribute('stroke-dashoffset', K.len * (1 - t)));
+            api.say(`<b>${x.satz}</b> ${U.say(x.satz)}<br>${x.de}`);
+          }
+        },
+      };
+    },
+  });
+  for (const [id, titel] of AL_TITEL) EX[id] = alErkl(id, titel);
+
+  EX['e5-a-lesen'] = {
+    title: 'Lesen: kurze Texte',
+    titleFor: () => 'Lesen: Wo steht die Antwort?',
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      const finde = (ti, qi) => T.LESE.find((x) => x.ti === ti && x.qi === qi);
+      let S0 = mode === 'lesen' ? (ctx.post ? finde(ctx.ti, ctx.qi) : U.pick(T.LESE.filter((x) => !(x.ti === ctx.ti && x.qi === ctx.qi) && x.art === finde(ctx.ti, ctx.qi).art))) : U.pick(T.LESE.filter((x) => x.art === 'frage'));
+      if (mode === 'frei') api.chips([{ label: 'Andere Frage', onClick() { S0 = U.pick(T.LESE.filter((x) => x.art === 'frage')); api.replay(); } }]);
+      return {
+        reset() {
+          api.clear();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          el('text', { x: 180, y: 26, 'text-anchor': 'middle', class: 'ex-s', text: `Text: ${T.LT[S0.ti].titel}`, style: `font-size:12px;fill:${GRAU}` }, api.svg);
+          umbruch(api, S0.art === 'stimmt' ? `Stimmt das? ${S0.frage}` : S0.frage, 180, 52, 330, 17, '', 'middle');
+        },
+        async play() {
+          const x = S0;
+          api.say('Suche im Text die Wörter aus der Frage. Die Antwort steht meist im selben Satz.');
+          await api.wait(2600);
+          el('rect', { x: 14, y: 80, width: 332, height: 74, rx: 10, fill: '#fff6d6', stroke: '#e0c97a', 'stroke-width': 2 }, api.svg);
+          umbruch(api, x.beleg, 180, 106, 310, 15, '', 'middle');
+          await api.wait(2400);
+          umbruch(api, x.richtig, 180, 186, 330, 19, `fill:${BLAU}`, 'middle');
+          api.say(`Im Text steht: <b>${x.beleg}</b> ${U.say(T.LT[x.ti].text)}<br>Antwort: <b>${x.richtig}</b>`);
+        },
+      };
+    },
+  };
 })();

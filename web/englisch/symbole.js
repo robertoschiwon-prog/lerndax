@@ -62,6 +62,11 @@ window.EnDaxIcons = (function () {
     'e5-w-essen': `<path d="M12 7c-4-3-8 0-8 5 0 5 4 9 8 9s8-4 8-9c0-5-4-8-8-5z"/><path d="M12 7c0-2 1-4 3-4"/>`,
     'e5-w-farben': `<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-2 0-3 4 0 5-2a9 9 0 0 0-7-11z"/><circle cx="8" cy="10" r="1.5" ${F}/><circle cx="12" cy="7" r="1.5" ${F}/><circle cx="16" cy="10" r="1.5" ${F}/>`,
     'e5-w-zeit': `<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><rect x="7" y="13" width="3" height="3" ${F}/>`,
+    'e5-a-hallo': `<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/>`,
+    'e5-a-klasse': `<circle cx="9" cy="6" r="2.5"/><path d="M5 21v-6a4 4 0 0 1 8 0v6M15 12l3-8"/>`,
+    'e5-a-laden': `<path d="M3 4h3l2 11h11l2-8H7"/><circle cx="10" cy="19" r="1.6" ${F}/><circle cx="17" cy="19" r="1.6" ${F}/>`,
+    'e5-a-weg': `<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z" ${F}/>`,
+    'e5-a-lesen': `<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>`,
   };
   function svg(id) {
     const body = I[id];

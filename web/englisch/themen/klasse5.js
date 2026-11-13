@@ -2947,6 +2947,227 @@
   for (const id of Object.keys(WF)) D.arten[id] = Object.fromEntries(Object.keys(WFT).filter((k) => k !== 'wBild' || wfMitBild(WF[id])).map((k) => [k, () => WFT[k](WF[id])]));
 
   // =====================================================
+  // Im Alltag: Gespräche, Einkaufen, Weg, Lesen
+  // =====================================================
+  // Paar: [Frage oder Satz, passende Antwort, [zwei Antworten, die sicher nicht passen], Deutsch]
+  // Situation: [Situation auf Deutsch, richtiger Satz, [zwei falsche Sätze]]
+  // Lücke: [Satz mit ___, Antwort (oder Liste), Deutsch]
+  const AL = {};
+  const alFeld = (id, kurz, paare, sit, luecken, tipp) => {
+    AL[id] = {
+      id, kurz, tipp,
+      P: paare.map(([frage, antwort, falsch, de]) => ({ frage, antwort, falsch, de })),
+      S: sit.map(([de, richtig, falsch]) => ({ de, richtig, falsch })),
+      L: luecken.map(([satz, antwort, de]) => { const a = [].concat(antwort); return { satz, antwort: a, de, text: satz.replace('___', a[0]) }; }),
+    };
+  };
+  alFeld('e5-a-hallo', 'Hallo und Tschüss', [
+    ['Hello! What’s your name?', 'My name is Max.', ['I’m eleven.', 'I’m from Germany.'], 'Hallo! Wie heißt du? – Ich heiße Max.'],
+    ['How are you?', 'I’m fine, thanks.', ['I’m Max.', 'I’m from Germany.'], 'Wie geht es dir? – Gut, danke.'],
+    ['How old are you?', 'I’m eleven.', ['I’m fine, thanks.', 'It’s Monday.'], 'Wie alt bist du? – Ich bin elf.'],
+    ['Where are you from?', 'I’m from Germany.', ['I’m eleven.', 'I’m fine, thanks.'], 'Woher kommst du? – Ich komme aus Deutschland.'],
+    ['Where do you live?', 'I live in Dresden.', ['I’m eleven.', 'My name is Max.'], 'Wo wohnst du? – Ich wohne in Dresden.'],
+    ['Nice to meet you.', 'Nice to meet you too.', ['I’m eleven.', 'It’s Monday.'], 'Schön, dich kennenzulernen. – Ich freue mich auch.'],
+    ['Thank you!', 'You’re welcome.', ['I’m from Germany.', 'How old are you?'], 'Danke! – Gern geschehen.'],
+    ['Goodbye!', 'Bye! See you tomorrow.', ['Hello! How are you?', 'I’m eleven.'], 'Auf Wiedersehen! – Tschüss! Bis morgen.'],
+    ['When is your birthday?', 'It’s in May.', ['I’m fine, thanks.', 'I live in Dresden.'], 'Wann hast du Geburtstag? – Im Mai.'],
+    ['Have you got any pets?', 'Yes, I’ve got a dog.', ['Yes, I am.', 'I’m eleven.'], 'Hast du Haustiere? – Ja, ich habe einen Hund.'],
+    ['What’s your favourite colour?', 'My favourite colour is blue.', ['I’m from Germany.', 'It’s in May.'], 'Was ist deine Lieblingsfarbe? – Meine Lieblingsfarbe ist Blau.'],
+    ['Sorry!', 'That’s OK.', ['You’re welcome.', 'Nice to meet you.'], 'Entschuldigung! – Schon gut.'],
+  ], [
+    ['Du begrüßt jemanden.', 'Hello!', ['Goodbye!', 'Sorry!']],
+    ['Du bedankst dich.', 'Thank you!', ['Please.', 'Sorry!']],
+    ['Du hast jemanden aus Versehen angerempelt.', 'Sorry!', ['Thank you!', 'You’re welcome.']],
+    ['Du willst wissen, wie alt jemand ist.', 'How old are you?', ['How are you?', 'Who are you?']],
+    ['Du willst wissen, wie es jemandem geht.', 'How are you?', ['How old are you?', 'Where are you?']],
+    ['Du verabschiedest dich abends vor dem Schlafen.', 'Good night!', ['Good morning!', 'Hello!']],
+    ['Du willst wissen, woher jemand kommt.', 'Where are you from?', ['Where are you?', 'What are you?']],
+    ['Du stellst deine Freundin Lisa vor.', 'This is my friend Lisa.', ['My name is Lisa.', 'Lisa, how are you?']],
+  ], [
+    ['My ___ is Max.', 'name', 'Ich heiße Max.'],
+    ['Nice to ___ you.', 'meet', 'Schön, dich kennenzulernen.'],
+    ['I’m ___ Germany.', 'from', 'Ich komme aus Deutschland.'],
+    ['How ___ are you? – I’m eleven.', 'old', 'Wie alt bist du? – Ich bin elf.'],
+    ['Thank you! – You’re ___.', 'welcome', 'Danke! – Gern geschehen.'],
+    ['I’m fine, ___.', ['thanks', 'thank you'], 'Mir geht es gut, danke.'],
+  ], 'Wer bist du? My name is … · Wie alt? I’m eleven. · Woher? I’m from … · Danke: Thank you! – You’re welcome.');
+  alFeld('e5-a-klasse', 'Im Unterricht', [
+    ['Have you got your homework?', 'Sorry, I haven’t got it.', ['Yes, I’m eleven.', 'Nice to meet you.'], 'Hast du deine Hausaufgaben? – Entschuldigung, ich habe sie nicht.'],
+    ['What’s the answer, Max?', 'Sorry, I don’t know.', ['You’re welcome.', 'Goodbye!'], 'Was ist die Antwort, Max? – Entschuldigung, ich weiß es nicht.'],
+    ['Can I borrow your ruler, please?', 'Yes, here you are.', ['I’m fine, thanks.', 'It’s in May.'], 'Kann ich mir dein Lineal ausleihen? – Ja, hier bitte.'],
+    ['Why are you late?', 'Sorry, I missed the bus.', ['I’m eleven.', 'Nice to meet you.'], 'Warum kommst du zu spät? – Entschuldigung, ich habe den Bus verpasst.'],
+    ['Do you understand?', 'Yes, I do.', ['Yes, I am.', 'Yes, please.'], 'Verstehst du das? – Ja.'],
+    ['Can I open the window, please?', 'Yes, of course.', ['I’m from Germany.', 'You’re welcome.'], 'Kann ich das Fenster öffnen? – Ja, natürlich.'],
+  ], [
+    ['Du hast etwas nicht verstanden.', 'Sorry, I don’t understand.', ['Sorry, I’m late.', 'Can I open the window, please?']],
+    ['Du kommst zu spät in den Unterricht.', 'Sorry, I’m late.', ['Sorry, I don’t understand.', 'Can I go to the toilet, please?']],
+    ['Die Lehrerin soll es noch einmal sagen.', 'Can you say that again, please?', ['Can you open the window, please?', 'Can I have a pen, please?']],
+    ['Du willst wissen, was „Tafel“ auf Englisch heißt.', 'What’s ‘Tafel’ in English?', ['What’s the time?', 'Where is the board?']],
+    ['Du musst auf die Toilette.', 'Can I go to the toilet, please?', ['Can I open the window, please?', 'Can you say that again, please?']],
+    ['Es ist heiß im Raum. Du willst das Fenster öffnen.', 'Can I open the window, please?', ['Can I go to the toilet, please?', 'Can you say that again, please?']],
+    ['Du weißt die Antwort nicht.', 'Sorry, I don’t know.', ['Sorry, I’m late.', 'Can I open the window, please?']],
+    ['Du willst wissen, wie man ein Wort schreibt.', 'How do you spell that?', ['How old are you?', 'What’s the time?']],
+  ], [
+    ['Can you say that ___, please?', 'again', 'Kannst du das bitte noch einmal sagen?'],
+    ['Sorry, I don’t ___.', ['understand', 'know'], 'Entschuldigung, ich verstehe es nicht.'],
+    ['Can I ___ the window, please?', ['open', 'close'], 'Kann ich bitte das Fenster öffnen?'],
+    ['How do you ___ that?', ['spell', 'say', 'write'], 'Wie schreibt man das?'],
+    ['Sorry, I’m ___.', ['late', 'sorry'], 'Entschuldigung, ich bin zu spät.'],
+  ], 'Wichtige Sätze: Sorry, I don’t understand. · Can you say that again, please? · How do you spell that? · Can I …, please?');
+  // Anweisungen der Lehrerin: [englisch, deutsch]
+  const ANW = [
+    ['Open your books, please.', 'Öffnet eure Bücher.'], ['Close your books, please.', 'Schließt eure Bücher.'], ['Listen, please.', 'Hört zu.'],
+    ['Work with a partner.', 'Arbeitet mit einem Partner.'], ['Write it down, please.', 'Schreibt es auf.'], ['Sit down, please.', 'Setzt euch hin.'],
+    ['Stand up, please.', 'Steht auf.'], ['Be quiet, please.', 'Seid bitte leise.'], ['Look at the board.', 'Schaut an die Tafel.'], ['Read the text.', 'Lest den Text.'],
+  ].map(([e, de]) => ({ e, de }));
+  alFeld('e5-a-laden', 'Einkaufen', [
+    ['Can I help you?', 'Yes, I’d like a sandwich, please.', ['No, I’m eleven.', 'Yes, I’m fine.'], 'Kann ich dir helfen? – Ja, ich hätte gern ein Sandwich.'],
+    ['How much is the apple juice?', 'It’s one pound twenty.', ['It’s on the table.', 'It’s Monday.'], 'Wie viel kostet der Apfelsaft? – Ein Pfund zwanzig.'],
+    ['Anything else?', 'No, thanks. That’s all.', ['Yes, I’m Max.', 'Nice to meet you.'], 'Sonst noch etwas? – Nein, danke. Das ist alles.'],
+    ['That’s three pounds fifty, please.', 'Here you are.', ['How are you?', 'Nice to meet you.'], 'Das macht drei Pfund fünfzig. – Hier, bitte.'],
+    ['Have you got any bananas?', 'Yes, they’re over there.', ['Yes, I’m fine.', 'No, I’m eleven.'], 'Haben Sie Bananen? – Ja, dort drüben.'],
+    ['Here’s your change.', 'Thank you. Goodbye!', ['How old are you?', 'I’m from Germany.'], 'Hier ist dein Wechselgeld. – Danke. Auf Wiedersehen!'],
+  ], [
+    ['Du willst wissen, was etwas kostet.', 'How much is it?', ['How many are there?', 'How old is it?']],
+    ['Du möchtest ein Eis kaufen.', 'I’d like an ice cream, please.', ['I like ice cream.', 'Where is the ice cream?']],
+    ['Du gibst dem Verkäufer das Geld.', 'Here you are.', ['You’re welcome.', 'How much is it?']],
+    ['Du brauchst nichts mehr.', 'That’s all, thanks.', ['Anything else?', 'Can I help you?']],
+    ['Du suchst Äpfel und fragst den Verkäufer.', 'Have you got any apples?', ['Have you got an apple tree?', 'Do you like apples?']],
+  ], [
+    ['How ___ is it?', 'much', 'Wie viel kostet es?'],
+    ['I’d ___ a sandwich, please.', 'like', 'Ich hätte gern ein Sandwich.'],
+    ['Here you ___.', 'are', 'Hier, bitte.'],
+    ['Anything ___?', 'else', 'Sonst noch etwas?'],
+    ['No, thanks. That’s ___.', 'all', 'Nein, danke. Das ist alles.'],
+  ], 'Fragen: How much is it? · Bestellen: I’d like …, please. · Geld geben: Here you are. · £ = pound, p = pence.');
+  // Preise: [Pfund, Pence]
+  const PREISE = [[1, 20], [2, 50], [3, 50], [5, 0], [2, 99], [0, 80], [10, 40], [4, 75], [1, 5], [6, 30], [0, 50], [12, 0]].map(([l, p]) => {
+    const w = (n) => zahlWort(n);
+    const text = l === 0 ? `${w(p)} pence` : p === 0 ? `${w(l)} pound${l === 1 ? '' : 's'}` : `${w(l)} pound${l === 1 ? '' : 's'} ${w(p)}`;
+    return { l, p, zeichen: l === 0 ? `${p}p` : `£${l}.${String(p).padStart(2, '0')}`, text, satz: `It’s ${text}.` };
+  });
+  alFeld('e5-a-weg', 'Nach dem Weg fragen', [
+    ['Excuse me, where is the station?', 'Go straight on. It’s on the left.', ['I’m eleven.', 'It’s three pounds.'], 'Entschuldigung, wo ist der Bahnhof? – Geh geradeaus. Er ist links.'],
+    ['Is it far?', 'No, it’s only five minutes.', ['Yes, I’m fine.', 'No, I’m from Germany.'], 'Ist es weit? – Nein, nur fünf Minuten.'],
+    ['Thank you for your help!', 'You’re welcome.', ['Turn left.', 'How much is it?'], 'Danke für deine Hilfe! – Gern geschehen.'],
+    ['Excuse me, how do I get to the park?', 'Take the first street on the right.', ['It’s in May.', 'Yes, I’ve got a dog.'], 'Entschuldigung, wie komme ich zum Park? – Nimm die erste Straße rechts.'],
+  ], [
+    ['Du suchst den Bahnhof und fragst jemanden.', 'Excuse me, where is the station?', ['Excuse me, how much is the station?', 'Excuse me, when is the station?']],
+    ['Du willst wissen, ob es weit ist.', 'Is it far?', ['Is it big?', 'Is it new?']],
+    ['Du bedankst dich für die Hilfe.', 'Thank you for your help!', ['You’re welcome.', 'Excuse me!']],
+  ], [
+    ['Turn ___ at the bank.', ['left', 'right'], 'Bieg an der Bank ab.'],
+    ['Go ___ on.', 'straight', 'Geh geradeaus.'],
+    ['___ me, where is the park?', 'Excuse', 'Entschuldigung, wo ist der Park?'],
+    ['Take the ___ street on the right.', ['first', 'second', 'third'], 'Nimm die erste Straße rechts.'],
+  ], 'straight on = geradeaus · turn left = links abbiegen · turn right = rechts abbiegen · the first street on the left = die erste Straße links.');
+  // Wege auf der Karte: Weg vom Start (unten) zum Ziel
+  const WEGE = [
+    { k: 'gerade', satz: 'Go straight on.', de: 'Geh geradeaus.', pfad: [[180, 200], [180, 30]] },
+    { k: 'l1', satz: 'Take the first street on the left.', de: 'Nimm die erste Straße links.', pfad: [[180, 200], [180, 140], [40, 140]] },
+    { k: 'r1', satz: 'Take the first street on the right.', de: 'Nimm die erste Straße rechts.', pfad: [[180, 200], [180, 140], [320, 140]] },
+    { k: 'l2', satz: 'Take the second street on the left.', de: 'Nimm die zweite Straße links.', pfad: [[180, 200], [180, 70], [40, 70]] },
+    { k: 'r2', satz: 'Take the second street on the right.', de: 'Nimm die zweite Straße rechts.', pfad: [[180, 200], [180, 70], [320, 70]] },
+  ];
+  const wegKarte = (w) => {
+    const strasse = 'stroke="#d9d2c3" stroke-width="26" stroke-linecap="square"';
+    const pfad = w ? `<polyline points="${w.pfad.map((p) => p.join(',')).join(' ')}" fill="none" stroke="#1f55d6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 12"/>` : '';
+    const z = w ? w.pfad[w.pfad.length - 1] : null;
+    return `<svg viewBox="0 10 360 205" role="img" aria-label="Karte"><rect x="0" y="10" width="360" height="205" fill="#eef5e6"/><line x1="180" y1="14" x2="180" y2="212" ${strasse}/><line x1="20" y1="140" x2="340" y2="140" ${strasse}/><line x1="20" y1="70" x2="340" y2="70" ${strasse}/>${pfad}<circle cx="180" cy="200" r="9" fill="#2b2440"/><text x="198" y="205" style="font:800 13px Nunito,system-ui,sans-serif;fill:#2b2440">du</text>${z ? `<path d="M${z[0]} ${z[1] - 14}l4 9h10l-8 6 3 10-9-6-9 6 3-10-8-6h10z" fill="#f2a516" stroke="#2b2440" stroke-width="1.5"/>` : ''}</svg>`;
+  };
+  // Lesetexte: [Titel, Text, Fragen: [Frage, richtig, [falsch, falsch], Beleg-Satz] oder Stimmt-das: [Satz, true/false, Beleg]]
+  const LT = [
+    { titel: 'Hi, I’m Emma', text: 'Hi! My name is Emma and I’m eleven years old. I live in Bristol with my mum, my dad and my little brother Sam. Sam is six. We’ve got a cat called Tiger. My favourite subject at school is art. After school I often play the piano. On Saturdays I go swimming with my friend Mia.',
+      fragen: [['How old is Emma?', 'She’s eleven.', ['She’s six.', 'She’s twelve.'], 'My name is Emma and I’m eleven years old.'],
+        ['Who is Sam?', 'Emma’s brother', ['Emma’s dad', 'Emma’s friend'], 'I live in Bristol with my mum, my dad and my little brother Sam.'],
+        ['What is Tiger?', 'a cat', ['a dog', 'a rabbit'], 'We’ve got a cat called Tiger.'],
+        ['What does Emma do on Saturdays?', 'She goes swimming.', ['She plays the piano.', 'She goes to school.'], 'On Saturdays I go swimming with my friend Mia.']],
+      stimmt: [['Emma’s favourite subject is maths.', false, 'My favourite subject at school is art.'], ['Emma lives in Bristol.', true, 'I live in Bristol with my mum, my dad and my little brother Sam.']] },
+    { titel: 'Tom’s day', text: 'Tom gets up at seven o’clock. He has breakfast with his sister. Then he goes to school by bus. School starts at eight. At one o’clock Tom has lunch at school. In the afternoon he plays football with his friends. In the evening he does his homework and watches TV. He goes to bed at nine.',
+      fragen: [['When does Tom get up?', 'at seven o’clock', ['at eight o’clock', 'at nine o’clock'], 'Tom gets up at seven o’clock.'],
+        ['How does Tom go to school?', 'by bus', ['by bike', 'by car'], 'Then he goes to school by bus.'],
+        ['What does Tom do in the afternoon?', 'He plays football.', ['He does his homework.', 'He watches TV.'], 'In the afternoon he plays football with his friends.'],
+        ['When does Tom go to bed?', 'at nine', ['at seven', 'at one'], 'He goes to bed at nine.']],
+      stimmt: [['Tom has breakfast with his brother.', false, 'He has breakfast with his sister.'], ['School starts at eight.', true, 'School starts at eight.']] },
+    { titel: 'A day at the zoo', text: 'Last Sunday Lena and her grandpa went to the zoo. It was sunny and warm. First they saw the lions. Then they watched the monkeys. The monkeys were very funny! At twelve o’clock they had sandwiches and apple juice. In the afternoon it started to rain, so they went home. Lena was tired but happy.',
+      fragen: [['Who went to the zoo?', 'Lena and her grandpa', ['Lena and her mum', 'Lena and her friends'], 'Last Sunday Lena and her grandpa went to the zoo.'],
+        ['What did they see first?', 'the lions', ['the monkeys', 'the elephants'], 'First they saw the lions.'],
+        ['What did they have for lunch?', 'sandwiches', ['pizza', 'ice cream'], 'At twelve o’clock they had sandwiches and apple juice.'],
+        ['Why did they go home?', 'It started to rain.', ['Lena was ill.', 'The zoo closed.'], 'In the afternoon it started to rain, so they went home.']],
+      stimmt: [['The monkeys were funny.', true, 'The monkeys were very funny!'], ['It was cold in the morning.', false, 'It was sunny and warm.']] },
+    { titel: 'My room', text: 'This is my room. My bed is next to the window. There is a big shelf behind the door. My books are on the shelf. My desk is between the bed and the cupboard. Under my desk there is a box with my old toys. On the wall there is a poster of my favourite football team. I love my room!',
+      fragen: [['Where is the bed?', 'next to the window', ['behind the door', 'under the desk'], 'My bed is next to the window.'],
+        ['Where are the books?', 'on the shelf', ['in the box', 'under the bed'], 'My books are on the shelf.'],
+        ['What is under the desk?', 'a box with old toys', ['a poster', 'the books'], 'Under my desk there is a box with my old toys.']],
+      stimmt: [['The shelf is behind the door.', true, 'There is a big shelf behind the door.'], ['The desk is next to the window.', false, 'My desk is between the bed and the cupboard.']] },
+    { titel: 'At the market', text: 'On Saturday mornings Mr Brown goes to the market. He buys apples, carrots and potatoes. The apples are one pound twenty a kilo. Today he also wants some cheese, but there isn’t any cheese. So he buys some eggs. He pays five pounds and goes home.',
+      fragen: [['When does Mr Brown go to the market?', 'on Saturday mornings', ['on Sunday evenings', 'every day'], 'On Saturday mornings Mr Brown goes to the market.'],
+        ['What isn’t there today?', 'cheese', ['eggs', 'apples'], 'Today he also wants some cheese, but there isn’t any cheese.'],
+        ['How much does he pay?', 'five pounds', ['one pound twenty', 'ten pounds'], 'He pays five pounds and goes home.']],
+      stimmt: [['Mr Brown buys some eggs.', true, 'So he buys some eggs.'], ['The apples are two pounds a kilo.', false, 'The apples are one pound twenty a kilo.']] },
+  ];
+  const AL_ART = { 'e5-a-hallo': 'Hallo', 'e5-a-klasse': 'Unterricht', 'e5-a-laden': 'Einkaufen', 'e5-a-weg': 'Weg' };
+  const alPaarLoesung = (x) => `<span lang="en">${x.frage}</span> ${U.say(x.frage)}<br>→ <b class="vb" lang="en">${x.antwort}</b> ${U.say(x.antwort)}<br><small>Auf Deutsch: ${x.de}</small>`;
+  const ALT = {
+    aAntwort(F) { const x = pick(F.P), ch = shuffle([x.antwort, ...x.falsch]); return { prompt: `Was passt als Antwort?${en(x.frage)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(x.antwort), hint: F.tipp, solution: alPaarLoesung(x), ex: { mode: 'dialog', i: F.P.indexOf(x) } }; },
+    aHoeren(F) { const x = pick(F.P), ch = shuffle([x.antwort, ...x.falsch]); return { prompt: `Hör zu: Was antwortest du? ${U.say(x.frage)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(x.antwort), hint: 'Tippe auf den Lautsprecher. Du kannst die Frage so oft hören, wie du willst.', solution: alPaarLoesung(x), ex: { mode: 'dialog', i: F.P.indexOf(x) } }; },
+    aSituation(F) { const x = pick(F.S), ch = shuffle([x.richtig, ...x.falsch]); return { prompt: `${x.de} Was sagst du?`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(x.richtig), hint: F.tipp, solution: `<b class="vb" lang="en">${x.richtig}</b> ${U.say(x.richtig)}<br><small>${x.de}</small>`, ex: { mode: 'situation', i: F.S.indexOf(x) } }; },
+    aLuecke(F) {
+      const x = pick(F.L), [a, b] = x.satz.split('___');
+      return { prompt: 'Welches Wort fehlt?', layout: 'satz', fields: [{ type: 'text', ci: true, answer: x.antwort, prefix: a.trim(), suffix: b.trim(), label: 'fehlendes Wort' }], hint: F.tipp, solution: `<span lang="en">${x.satz.replace('___', `<b class="vb">${x.antwort[0]}</b>`)}</span> ${U.say(x.text)}<br><small>Auf Deutsch: ${x.de}</small>`, ex: { mode: 'luecke', i: F.L.indexOf(x) } };
+    },
+  };
+  // besondere Aufgaben
+  function anweisung() {
+    const x = pick(ANW), ch = shuffle([x, ...shuffle(ANW.filter((y) => y !== x)).slice(0, 2)]);
+    return { prompt: `Die Lehrerin sagt: ${en(x.e)} Was sollst du tun?`, choices: ch.map((y) => y.de), correct: ch.indexOf(x), hint: 'open = öffnen · close = schließen · listen = zuhören · write = schreiben · read = lesen · stand up = aufstehen · sit down = sich hinsetzen', solution: `<b class="vb" lang="en">${x.e}</b> ${U.say(x.e)}<br>= ${x.de}`, ex: { mode: 'anweisung', e: x.e } };
+  }
+  function preisLesen() {
+    const x = pick(PREISE), andere = shuffle(PREISE.filter((y) => y !== x && y.zeichen !== x.zeichen)).slice(0, 2), ch = shuffle([x, ...andere]);
+    return { prompt: `Was kostet es? Wie sagt man den Preis?`, figure: `<svg viewBox="0 0 360 120" role="img" aria-label="Preisschild"><path d="M90 20h170l40 40-40 40H90z" fill="#fff6d6" stroke="#2b2440" stroke-width="3" stroke-linejoin="round"/><circle cx="270" cy="60" r="7" fill="none" stroke="#2b2440" stroke-width="3"/><text x="170" y="76" text-anchor="middle" style="font:800 44px Nunito,system-ui,sans-serif;fill:#2b2440">${x.zeichen}</text></svg>`, choices: ch.map((y) => `<span lang="en">${y.text}</span>`), correct: ch.indexOf(x), hint: '£ heißt pound (Mehrzahl pounds), p heißt pence. £2.50 sagt man „two pounds fifty“.', solution: `${x.zeichen} = <b class="vb" lang="en">${x.text}</b> ${U.say(x.satz)}<br>Erst die Pfund (pounds), dann die Pence. Das Wort „pence“ lässt man nach den Pfund meist weg.`, ex: { mode: 'preis', zeichen: x.zeichen } };
+  }
+  function preisHoeren() {
+    const x = pick(PREISE.filter((y) => y.l > 0 && y.p >= 10)), falsch = [`£${x.p}.${String(x.l).padStart(2, '0')}`, `£${x.l + 1}.${String(x.p).padStart(2, '0')}`];
+    const ch = shuffle([x.zeichen, ...[...new Set(falsch)].filter((f) => f !== x.zeichen)]);
+    return { prompt: `Hör zu: Was kostet es? ${U.say(x.satz)}`, choices: ch, correct: ch.indexOf(x.zeichen), hint: 'Erst kommen die Pfund (pounds), dann die Pence. Achte auf -teen und -ty: fifteen = 15, fifty = 50.', solution: `<b class="vb" lang="en">${x.satz}</b> ${U.say(x.satz)}<br>= ${x.zeichen}`, ex: { mode: 'preis', zeichen: x.zeichen } };
+  }
+  function wegBild() {
+    const w = pick(WEGE), ch = shuffle([w, ...shuffle(WEGE.filter((y) => y !== w)).slice(0, 2)]);
+    return { prompt: 'Wie kommst du zum Stern? Welcher Satz passt?', figure: wegKarte(w), choices: ch.map((y) => `<span lang="en">${y.satz}</span>`), correct: ch.indexOf(w), hint: 'Du gehst von unten los. first = die erste Straße, second = die zweite. left = links, right = rechts.', solution: `<b class="vb" lang="en">${w.satz}</b> ${U.say(w.satz)}<br>${w.de}`, ex: { mode: 'weg', k: w.k } };
+  }
+  function wegHoeren() {
+    const w = pick(WEGE), ch = shuffle([w, ...shuffle(WEGE.filter((y) => y !== w)).slice(0, 2)]);
+    return { prompt: `Hör zu: Wo ist das Ziel? ${U.say(w.satz)}`, choices: ch.map((y) => y.de), correct: ch.indexOf(w), hint: 'first = erste, second = zweite, left = links, right = rechts, straight on = geradeaus.', solution: `<b class="vb" lang="en">${w.satz}</b> ${U.say(w.satz)}<br>= ${w.de}`, ex: { mode: 'weg', k: w.k } };
+  }
+  // Lesen
+  const LESE = LT.flatMap((t, ti) => [
+    ...t.fragen.map(([frage, richtig, falsch, beleg], qi) => ({ ti, qi, art: 'frage', frage, richtig, falsch, beleg })),
+    ...t.stimmt.map(([satz, wahr, beleg], si) => ({ ti, qi: 100 + si, art: 'stimmt', frage: satz, richtig: wahr ? 'Ja, das stimmt.' : 'Nein, das stimmt nicht.', falsch: [wahr ? 'Nein, das stimmt nicht.' : 'Ja, das stimmt.'], beleg, wahr })),
+  ]);
+  function lesen() {
+    const x = pick(LESE), t = LT[x.ti], ch = x.art === 'stimmt' ? ['Ja, das stimmt.', 'Nein, das stimmt nicht.'] : shuffle([x.richtig, ...x.falsch]);
+    return {
+      prompt: `Lies den Text <b>„${t.titel}“</b> ${U.say(t.text)} ${x.art === 'stimmt' ? `Stimmt das? <b lang="en">${x.frage}</b>` : `<b lang="en">${x.frage}</b>`}<div class="bsp" lang="en" style="font-size:.92em;line-height:1.45;margin-top:8px">${t.text}</div>`,
+      choices: ch.map((c) => (x.art === 'stimmt' ? c : `<span lang="en">${c}</span>`)), correct: ch.indexOf(x.richtig),
+      hint: 'Suche im Text nach den Wörtern aus der Frage. Die Antwort steht meist im selben Satz.',
+      solution: `Im Text steht: <b lang="en">${x.beleg}</b><br>${x.art === 'stimmt' ? `Deshalb: <b>${x.richtig}</b>` : `Antwort: <b class="vb" lang="en">${x.richtig}</b>`}<br><small>Den ganzen Text kannst du dir anhören: ${U.say(t.text)}</small>`,
+      ex: { mode: 'lesen', ti: x.ti, qi: x.qi },
+    };
+  }
+  const alGen = (id, extra) => () => { const F = AL[id]; return U.wahl([[22, () => ALT.aAntwort(F)], [14, () => ALT.aHoeren(F)], [22, () => ALT.aSituation(F)], [18, () => ALT.aLuecke(F)], ...extra]); };
+  Object.assign(D.daten, { AL, ANW, PREISE, WEGE, wegKarte, LT, LESE });
+  const themenVorAlltag = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorAlltag(),
+    Object.fromEntries(Object.values(AL).map((F) => [F.id, [...F.P.flatMap((x) => [x.frage, x.antwort]), ...F.S.map((x) => x.richtig), ...F.L.map((x) => x.text),
+      ...(F.id === 'e5-a-klasse' ? ANW.map((x) => x.e) : []), ...(F.id === 'e5-a-laden' ? PREISE.map((x) => x.satz) : []), ...(F.id === 'e5-a-weg' ? WEGE.map((x) => x.satz) : [])]])),
+    { 'e5-a-lesen': LT.map((t) => t.text) });
+  for (const id of Object.keys(AL)) D.arten[id] = Object.fromEntries(Object.keys(ALT).map((k) => [k, () => ALT[k](AL[id])]));
+  Object.assign(D.arten['e5-a-klasse'], { anweisung });
+  Object.assign(D.arten['e5-a-laden'], { preisLesen, preisHoeren });
+  Object.assign(D.arten['e5-a-weg'], { wegBild, wegHoeren });
+  D.arten['e5-a-lesen'] = { lesen };
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -3001,6 +3222,13 @@
         { id: 'e5-w-essen', title: 'Essen und Trinken: bread, milk …', icon: '🍎', gen: wfGen('e5-w-essen') },
         { id: 'e5-w-farben', title: 'Farben: red, blue …', icon: '🎨', gen: wfGen('e5-w-farben') },
         { id: 'e5-w-zeit', title: 'Tage und Jahreszeiten: Monday, summer …', icon: '🗓️', gen: wfGen('e5-w-zeit') },
+      ] },
+      { id: 'e5-alltag', nr: 6, title: 'Im Alltag', topics: [
+        { id: 'e5-a-hallo', title: 'Hallo! How are you?', icon: '👋', gen: alGen('e5-a-hallo', []) },
+        { id: 'e5-a-klasse', title: 'Im Unterricht: Sorry, I don’t understand', icon: '🙋', gen: alGen('e5-a-klasse', [[18, anweisung]]) },
+        { id: 'e5-a-laden', title: 'Einkaufen: How much is it?', icon: '🛒', gen: alGen('e5-a-laden', [[16, preisLesen], [12, preisHoeren]]) },
+        { id: 'e5-a-weg', title: 'Nach dem Weg fragen', icon: '🧭', gen: alGen('e5-a-weg', [[22, wegBild], [12, wegHoeren]]) },
+        { id: 'e5-a-lesen', title: 'Lesen: kurze Texte', icon: '📖', gen: lesen },
       ] },
     ],
   };
