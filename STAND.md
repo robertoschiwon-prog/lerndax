@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v57`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v58`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -68,6 +68,12 @@ Weitere Dokumente:
   verneinen, Frage bilden, Kurzantwort; Animation mit wandernden Wörtern). Jetzt 141 Aufnahmen je Aussprache.
   Bewusst weggelassen: Fragen mit „I“ und Kurzantworten mit you/we (dort wechselt die Person: Are you …? Yes, I am.).
   Das wäre ein eigener Baustein, noch nicht gebaut. Als Nächstes laut Themenplan: have got, a/an, Mehrzahl.
+- **EnDax v58 (13.11.2026): Themen 4 und 5**, auf GitHub und live. `e5-have` „have got und has got“ (8 Aufgabenarten:
+  Form, Satz, Kurzform, verneinen, Frage, Kurzantwort; Animation „zwei Fächer“) und `e5-a-an` „a oder an“ (5 Aufgabenarten,
+  31 Wörter, mit den Sonderfällen an hour und a uniform; Animation „das n ist eine Brücke“). Jetzt 251 Aufnahmen je Aussprache.
+  **Achtung OneDrive:** Die 220 neuen MP3 von v58 (110 je Aussprache) liegen **nur auf GitHub**, nicht im OneDrive-Ordner
+  (einzeln zurückschreiben ist sehr aufwendig). Code und Doku sind in OneDrive aktuell. Wer lokal testet, holt die MP3 aus
+  dem Repository oder erzeugt sie mit `tests/endax_audio.py`. Als Nächstes laut Themenplan: Mehrzahl, there is/are.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1082,3 +1088,6 @@ Infos zur ersten Arbeit:
   gemeinsame App nicht. Geprüft: 10 000 erzeugte Aufgaben ohne Fehler (auch: jede Aufnahme steht in der Liste);
   `tests/endax.py` 10 Runden (180 Antworten, 60 Animationen) ohne Fehler. Mathe und Deutsch nicht erneut getestet (unverändert).
   Die neuen Aufnahmen hat noch niemand angehört.
+- **v58: EnDax, Themen 4 und 5** (13.11.2026): `e5-have` und `e5-a-an`. Nur `web/englisch/` und `sw.js` geändert.
+  Geprüft: 10 400 erzeugte Aufgaben der beiden Themen ohne Fehler; `tests/endax.py` 10 Runden (5 Themen, 300 Antworten,
+  100 Animationen) ohne Fehler. Die neuen Aufnahmen hat noch niemand angehört.

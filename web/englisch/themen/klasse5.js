@@ -408,6 +408,238 @@
   };
 
   // =====================================================
+  // have got / has got
+  // =====================================================
+  // Gruppe: 0 = I, you, we, they (have got), 1 = he, she, it (has got)
+  const HAVE = ['have', 'has'];
+  const HKURZ = { I: 'I’ve', You: 'You’ve', He: 'He’s', She: 'She’s', It: 'It’s', We: 'We’ve', They: 'They’ve' };
+  const HNEG = { have: ['haven’t', 'haven\'t', 'have not'], has: ['hasn’t', 'hasn\'t', 'has not'] };
+  const HGRUPPE = ['Bei <b>I, you, we, they</b> (und bei mehreren) heißt es <b>have got</b>.', 'Bei <b>he, she, it</b> (eine Person oder Sache) heißt es <b>has got</b>.'];
+  // [Subjekt, Gruppe, was man hat, Deutsch, Pronomen (nur wenn das Subjekt kein Pronomen ist)]
+  const HG = [
+    ['I', 0, 'a new bike', 'Ich habe ein neues Fahrrad.'],
+    ['I', 0, 'two sisters', 'Ich habe zwei Schwestern.'],
+    ['You', 0, 'a nice room', 'Du hast ein schönes Zimmer.'],
+    ['You', 0, 'my pen', 'Du hast meinen Stift.'],
+    ['He', 1, 'a brother', 'Er hat einen Bruder.'],
+    ['He', 1, 'a red cap', 'Er hat eine rote Mütze.'],
+    ['She', 1, 'a cat', 'Sie hat eine Katze.'],
+    ['She', 1, 'long hair', 'Sie hat lange Haare.'],
+    ['It', 1, 'four legs', 'Es hat vier Beine.'],
+    ['It', 1, 'a long tail', 'Es hat einen langen Schwanz.'],
+    ['We', 0, 'a big garden', 'Wir haben einen großen Garten.'],
+    ['We', 0, 'a new teacher', 'Wir haben einen neuen Lehrer.'],
+    ['They', 0, 'three dogs', 'Sie haben drei Hunde.'],
+    ['They', 0, 'a small house', 'Sie haben ein kleines Haus.'],
+    ['My dad', 1, 'a car', 'Mein Papa hat ein Auto.', 'he'],
+    ['Lisa', 1, 'a blue bag', 'Lisa hat eine blaue Tasche.', 'she'],
+    ['The dog', 1, 'a ball', 'Der Hund hat einen Ball.', 'it'],
+    ['Tom and Lisa', 0, 'a rabbit', 'Tom und Lisa haben ein Kaninchen.', 'they'],
+    ['My friends', 0, 'new bikes', 'Meine Freunde haben neue Fahrräder.', 'they'],
+    ['My sister and I', 0, 'a dog', 'Meine Schwester und ich haben einen Hund.', 'we'],
+  ].map(([subj, g, obj, de, pron]) => ({ subj, g, form: HAVE[g], obj, de, pron: pron || '', text: `${subj} ${HAVE[g]} got ${obj}.` }));
+  const HPRON = HG.filter((s) => !s.pron);
+  const hKurz = (s) => `${HKURZ[s.subj]} got ${s.obj}.`;
+  const hNeg = (s) => `${s.subj} ${HNEG[s.form][0]} got ${s.obj}.`;
+  const hFrage = (s) => `${gross(s.form)} ${subjKlein(s.subj)} got ${s.obj}?`;
+  const HQ = HG.filter((s) => s.subj !== 'I' && !/ I$/.test(s.subj));   // Fragen ohne „I“
+  const hPron = (s) => s.pron || s.subj.toLowerCase();
+  const HKA = HQ.filter((s) => ['he', 'she', 'it', 'they'].includes(hPron(s)));
+  const hJa = (s) => `Yes, ${hPron(s)} ${s.form}.`;
+  const hNein = (s) => `No, ${hPron(s)} ${HNEG[s.form][0]}.`;
+  const hMark = (s) => `<span lang="en">${s.subj} <b class="vb">${s.form} got</b> ${s.obj}.</span>`;
+  function hWarum(s) {
+    if (!s.pron) return HGRUPPE[s.g];
+    return `<b>${s.subj}</b> ${s.g === 0 ? 'sind mehrere' : 'ist eine Person oder Sache'}: Dafür kannst du <b>${s.pron}</b> sagen. ${s.g === 0 ? 'Bei mehreren heißt es <b>have got</b>.' : 'Bei he, she, it heißt es <b>has got</b>.'}`;
+  }
+  const hLoesung = (s) => `${hMark(s)} ${U.say(s.text)}<br>${hWarum(s)}<br><small>Auf Deutsch: ${s.de}</small>`;
+  const H_TIPP = '<b>have got</b> heißt <b>haben</b> (besitzen). Schau auf das erste Wort: <b>he, she, it</b> (einer, eine, eins) → <b>has</b> got. Alle anderen → <b>have</b> got.';
+  const HEX = (s, mode, ja) => ({ mode: mode || 'form', subj: s.subj, g: s.g, form: s.form, obj: s.obj, pron: s.pron, de: s.de, ja: !!ja });
+
+  // A: have oder has auswählen
+  function hgLuecke() {
+    const s = pick(HG);
+    return {
+      prompt: `Was gehört in die Lücke?${en(`${s.subj} ___ got ${s.obj}.`)}`,
+      choices: ['have', 'has', 'haves'], correct: s.g,
+      hint: H_TIPP, solution: hLoesung(s), ex: HEX(s),
+    };
+  }
+  // B: have oder has eintippen
+  function hgTippen() {
+    const s = pick(HG);
+    return {
+      prompt: 'Setze ein: <b>have</b> oder <b>has</b>.',
+      layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: s.form, prefix: s.subj, suffix: `got ${s.obj}.`, label: 'have oder has' }],
+      hint: H_TIPP, solution: hLoesung(s), ex: HEX(s),
+    };
+  }
+  // C: richtigen Satz finden (auch: got gehört direkt hinter have/has)
+  function hgSatz() {
+    const s = pick(HG);
+    const ch = shuffle([s.text, `${s.subj} ${HAVE[1 - s.g]} got ${s.obj}.`, `${s.subj} ${s.form} ${s.obj} got.`]);
+    return {
+      prompt: 'Nur ein Satz ist richtig. Welcher?',
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(s.text),
+      hint: `${H_TIPP} Und: <b>got</b> steht direkt hinter have oder has, nicht am Satzende.`,
+      solution: `${hLoesung(s)}<br>Anders als im Deutschen wandert nichts ans Satzende: have und got bleiben zusammen.`, ex: HEX(s),
+    };
+  }
+  // D: Kurzform
+  function hgKurz() {
+    const s = pick(HPRON), k = HKURZ[s.subj];
+    return {
+      prompt: `Schreibe die <b>Kurzform</b> von <b lang="en">${s.subj} ${s.form}</b>.${en(s.text)}`,
+      fields: [{ type: 'text', ci: true, answer: [k, k.replace('’', "'")], label: 'Kurzform' }],
+      answerText: k,
+      hint: 'Aus have wird <b>’ve</b>, aus has wird <b>’s</b>. Der Apostroph steht für die Buchstaben, die wegfallen. Beispiel: we have → we’ve.',
+      solution: `<span lang="en">${s.subj} ${s.form}</span> → <b class="vb" lang="en">${k}</b><br><span lang="en">${hKurz(s)}</span> ${U.say(hKurz(s))}${s.g === 1 ? `<br>Achtung: <b lang="en">${k}</b> kann „${s.subj.toLowerCase()} is“ oder „${s.subj.toLowerCase()} has“ heißen. Steht <b>got</b> dahinter, ist es has.` : ''}<br><small>Auf Deutsch: ${s.de}</small>`,
+      ex: HEX(s, 'kf'),
+    };
+  }
+  const hNegLoesung = (s) => `<span lang="en">${s.subj} <b class="vb">${s.form} not</b> got ${s.obj}.</span><br>Kurz: <span lang="en">${s.subj} <b class="vb">${HNEG[s.form][0]}</b> got ${s.obj}.</span> ${U.say(hNeg(s))}<br><b>not</b> kommt zwischen ${s.form} und got. Beide Formen sind richtig, beim Sprechen nimmt man meist die kurze.`;
+  const HNEG_TIPP = 'Zum Verneinen kommt <b>not</b> zwischen have/has und got: have not got, has not got. Kurz: <b>haven’t got</b>, <b>hasn’t got</b>.';
+  // E: verneinen
+  function hgNeg() {
+    const s = pick(HG);
+    return {
+      prompt: `Verneine den Satz: Setze die <b>verneinte</b> Form ein.${en(s.text)}`,
+      layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: HNEG[s.form], prefix: s.subj, suffix: `got ${s.obj}.`, label: 'verneinte Form' }],
+      answerText: `${HNEG[s.form][0]} (oder: ${s.form} not)`,
+      hint: HNEG_TIPP, solution: hNegLoesung(s), ex: HEX(s, 'neg'),
+    };
+  }
+  const HFRAGE_TIPP = 'Bei der Frage tauschen have/has und die Person die Plätze: Erst <b>Have</b> oder <b>Has</b>, dann die Person, dann <b>got</b>.';
+  const hFrageLoesung = (s) => `<span lang="en">${s.subj} <b>${s.form}</b> got ${s.obj}.</span> → <span lang="en"><b class="vb">${gross(s.form)}</b> ${subjKlein(s.subj)} got ${s.obj}?</span> ${U.say(hFrage(s))}<br>${HFRAGE_TIPP}`;
+  // F: richtige Frage auswählen
+  function hgFrageWahl() {
+    const s = pick(HQ);
+    const richtig = hFrage(s);
+    const ch = shuffle([richtig, `${gross(HAVE[1 - s.g])} ${subjKlein(s.subj)} got ${s.obj}?`, `${gross(s.form)} got ${subjKlein(s.subj)} ${s.obj}?`]);
+    return {
+      prompt: `Mache aus dem Satz eine Frage. Welche ist richtig?${en(s.text)}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: HFRAGE_TIPP, solution: hFrageLoesung(s), ex: HEX(s, 'frage'),
+    };
+  }
+  // G: Frage eintippen
+  function hgFrageTippen() {
+    const s = pick(HQ);
+    return {
+      prompt: `Mache aus dem Satz eine Frage und schreibe sie auf.${en(s.text)}`,
+      fields: [{ type: 'text', ci: true, answer: hFrage(s), label: 'Frage' }],
+      hint: HFRAGE_TIPP, solution: hFrageLoesung(s), ex: HEX(s, 'frage'),
+    };
+  }
+  // H: Kurzantwort
+  function hgAntwort() {
+    const s = pick(HKA), ja = Math.random() < 0.5, pr = hPron(s), anders = HAVE[1 - s.g];
+    const richtig = ja ? hJa(s) : hNein(s);
+    const falsch = ja ? [`Yes, ${pr} ${anders}.`, `Yes, ${pr}${s.g === 1 ? '’s' : '’ve'}.`] : [`No, ${pr} ${HNEG[anders][0]}.`, `No, ${pr} not ${s.form}.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Antworte kurz mit <b>${ja ? 'Ja' : 'Nein'}</b>.${en(hFrage(s))}`,
+      choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: 'Die Kurzantwort hat drei Teile: Yes oder No, dann das Pronomen (he, she, it, they), dann have oder has wie in der Frage. Das Wort got fällt weg.',
+      solution: `<span lang="en">${hFrage(s)}</span><br><span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>${s.pron ? `Für <b>${s.subj}</b> steht in der Antwort <b>${s.pron}</b>. ` : ''}In der Kurzantwort steht nur ${s.form}, ohne got. ${ja ? 'Nach <b>Yes</b> gibt es keine Kurzform.' : `Nach <b>No</b> wird verneint: ${HNEG[s.form][0]}.`}`,
+      ex: HEX(s, 'kurz', ja),
+    };
+  }
+  const haveGot = () => U.wahl([[20, hgLuecke], [20, hgTippen], [12, hgSatz], [8, hgKurz], [14, hgNeg], [10, hgFrageWahl], [8, hgFrageTippen], [8, hgAntwort]]);
+
+  // =====================================================
+  // a oder an
+  // =====================================================
+  // [Wort, Artikel, Deutsch, besonderer Hinweis zum Anfangslaut]
+  const AAN = [
+    ['book', 'a', 'ein Buch'], ['dog', 'a', 'ein Hund'], ['cat', 'a', 'eine Katze'], ['pen', 'a', 'ein Stift'],
+    ['table', 'a', 'ein Tisch'], ['bike', 'a', 'ein Fahrrad'], ['teacher', 'a', 'ein Lehrer'], ['friend', 'a', 'ein Freund'],
+    ['banana', 'a', 'eine Banane'], ['horse', 'a', 'ein Pferd'], ['house', 'a', 'ein Haus'],
+    ['uniform', 'a', 'eine Uniform', 'Man schreibt u, aber man spricht am Anfang „ju“. Das j ist kein Vokal-Laut.'],
+    ['big apple', 'a', 'ein großer Apfel'], ['red umbrella', 'a', 'ein roter Regenschirm'], ['new idea', 'a', 'eine neue Idee'], ['small egg', 'a', 'ein kleines Ei'],
+    ['apple', 'an', 'ein Apfel'], ['egg', 'an', 'ein Ei'], ['orange', 'an', 'eine Orange'], ['umbrella', 'an', 'ein Regenschirm'],
+    ['ice cream', 'an', 'ein Eis'], ['elephant', 'an', 'ein Elefant'], ['idea', 'an', 'eine Idee'],
+    ['hour', 'an', 'eine Stunde', 'Man schreibt h, aber man spricht es nicht. Man hört am Anfang „au“, also einen Vokal-Laut.'],
+    ['uncle', 'an', 'ein Onkel'], ['aunt', 'an', 'eine Tante'], ['animal', 'an', 'ein Tier'], ['exercise book', 'an', 'ein Heft'],
+    ['old car', 'an', 'ein altes Auto'], ['English book', 'an', 'ein Englischbuch'], ['easy question', 'an', 'eine leichte Frage'],
+  ].map(([wort, art, de, laut]) => ({ wort, art, de, laut: laut || '', text: `${art} ${wort}` }));
+  const A_TIPP = 'Sprich das Wort leise. Hörst du am Anfang einen <b>Vokal</b> (a, e, i, o, u)? Dann <b>an</b>. Sonst <b>a</b>. Es zählt, was du <b>hörst</b>, nicht, was du schreibst.';
+  const aWarum = (w) => (w.laut ? w.laut + ` Deshalb: <b>${w.art}</b>.`
+    : w.art === 'an' ? `<b>${w.wort}</b> beginnt mit <b>${w.wort[0].toLowerCase()}</b>, einem Vokal (Selbstlaut). Mit <b>an</b> lässt es sich leichter sprechen.`
+      : `<b>${w.wort}</b> beginnt mit <b>${w.wort[0].toLowerCase()}</b>, einem Konsonanten (Mitlaut). Deshalb <b>a</b>.`);
+  const aLoesung = (w) => `<span lang="en"><b class="vb">${w.art}</b> ${w.wort}</span> ${U.say(w.text)}<br>${aWarum(w)}${/ /.test(w.wort) && !w.laut ? ' Es zählt das Wort direkt hinter a oder an.' : ''}<br><small>Auf Deutsch: ${w.de}</small>`;
+  const AEX = (w) => ({ wort: w.wort, art: w.art, de: w.de, laut: w.laut });
+  // A: a oder an auswählen
+  function aanWahl() {
+    const w = pick(AAN);
+    return { prompt: `<b>a</b> oder <b>an</b>?${en(`___ ${w.wort}`)}`, choices: ['a', 'an'], correct: w.art === 'a' ? 0 : 1, hint: A_TIPP, solution: aLoesung(w), ex: AEX(w) };
+  }
+  // B: eintippen
+  function aanTippen() {
+    const w = pick(AAN);
+    return {
+      prompt: 'Setze ein: <b>a</b> oder <b>an</b>.', layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: w.art, suffix: w.wort, label: 'a oder an' }],
+      hint: A_TIPP, solution: aLoesung(w), ex: AEX(w),
+    };
+  }
+  // C: im Satz
+  function aanSatz() {
+    const w = pick(AAN), rahmen = pick([['This is', '.'], ['It is', '.'], ['Look, there is', '!']]);
+    return {
+      prompt: 'Setze ein: <b>a</b> oder <b>an</b>.', layout: 'satz',
+      fields: [{ type: 'text', ci: true, answer: w.art, prefix: rahmen[0], suffix: w.wort + rahmen[1], label: 'a oder an' }],
+      hint: A_TIPP, solution: aLoesung(w), ex: AEX(w),
+    };
+  }
+  // D: Welches Wort braucht an (oder a)?
+  function aanWelches() {
+    const art = pick(['a', 'an']);
+    const w = pick(AAN.filter((x) => x.art === art));
+    const ch = shuffle([w, ...shuffle(AAN.filter((x) => x.art !== art)).slice(0, 2)]);
+    return {
+      prompt: `Vor welches Wort gehört <b>${art}</b>?`,
+      choices: ch.map((c) => `<span lang="en">${c.wort}</span>`), correct: ch.indexOf(w),
+      hint: A_TIPP,
+      solution: `${aLoesung(w)}<br>Die anderen beiden: ${ch.filter((c) => c !== w).map((c) => `<span lang="en">${c.text}</span>`).join(', ')}.`, ex: AEX(w),
+    };
+  }
+  // E: die beiden Sonderfälle verstehen
+  function aanWarum() {
+    const w = pick(AAN.filter((x) => x.laut));
+    const richtig = w.wort === 'hour' ? 'Das h wird nicht gesprochen. Man hört zuerst einen Vokal-Laut.' : 'Man spricht am Anfang „ju“. Das ist kein Vokal-Laut.';
+    const falsch = w.wort === 'hour'
+      ? ['Vor h steht immer an.', 'Das ist eine Ausnahme ohne Grund.']
+      : ['Vor u steht immer a.', 'Das ist eine Ausnahme ohne Grund.'];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Es heißt <b lang="en">${w.text}</b>. Warum?`,
+      choices: ch, correct: ch.indexOf(richtig),
+      hint: 'Sprich das Wort leise und achte auf den allerersten Laut, den du hörst.',
+      solution: `${aLoesung(w)}<br>${w.wort === 'hour' ? 'Zum Vergleich: <span lang="en">a house, a horse</span>. Dort hört man das h.' : 'Zum Vergleich: <span lang="en">an umbrella, an uncle</span>. Dort hört man am Anfang „a“.'}`, ex: AEX(w),
+    };
+  }
+  const aOderAn = () => U.wahl([[30, aanWahl], [22, aanTippen], [22, aanSatz], [18, aanWelches], [8, aanWarum]]);
+
+  Object.assign(D.daten, { HAVE, HKURZ, HNEG, HGRUPPE, HG, HPRON, HQ, HKA, hKurz, hNeg, hFrage, hJa, hNein, hPron, AAN });
+  const audioBisher = D.audioTexte;
+  D.audioTexte = () => {
+    const t = new Set(audioBisher());
+    HG.forEach((s) => { t.add(s.text); t.add(hNeg(s)); });
+    HPRON.forEach((s) => t.add(hKurz(s)));
+    HQ.forEach((s) => t.add(hFrage(s)));
+    HKA.forEach((s) => { t.add(hJa(s)); t.add(hNein(s)); });
+    AAN.forEach((w) => t.add(w.text));
+    return [...t];
+  };
+  Object.assign(D.arten, {
+    'e5-have': { hgLuecke, hgTippen, hgSatz, hgKurz, hgNeg, hgFrageWahl, hgFrageTippen, hgAntwort },
+    'e5-a-an': { aanWahl, aanTippen, aanSatz, aanWelches, aanWarum },
+  });
+
+  // =====================================================
   // Lernbereiche Klasse 5 (Themenplan: faecher/englisch/themenplan.md)
   // =====================================================
   D.grades = D.grades || {};
@@ -417,6 +649,8 @@
         { id: 'e5-be', title: 'to be: am, is, are', icon: '🧩', gen: tobe },
         { id: 'e5-pron', title: 'I, you, he, she, it, we, they', icon: '🧑', gen: pronomen },
         { id: 'e5-be-neg', title: 'to be: verneinen und fragen', icon: '❓', gen: beNeg },
+        { id: 'e5-have', title: 'have got und has got', icon: '🎒', gen: haveGot },
+        { id: 'e5-a-an', title: 'a oder an', icon: '🍎', gen: aOderAn },
       ] },
     ],
   };
