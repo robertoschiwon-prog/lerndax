@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v73`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v74`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -180,6 +180,11 @@ Weitere Dokumente:
   homework = much, lying, stayed), längere Sätze ordnen, kleine Rätsel (Datum morgen, Uhrzeit plus 30 Minuten, wer sitzt wo).
   Wortfelder: Buchstabensalat und Lückensatz ohne Auswahl. **Bewusst ohne Knobeln:** die 5 Alltag-Themen (`e5-a-…`).
   Neuer Test `tests/endax_knobel.py` (spielt jede Variante: 400 Aufgaben, keine Fehler). `index.html` und `sw.js` laden die Datei.
+- **EnDax v74 (13.11.2026): Thema 46 „Alphabet und Buchstabieren“** (`e5-a-abc` im Bereich „Im Alltag“). **Roberto hat die Hörprobe
+  A–Z beider Stimmen am 13.11. freigegeben („passt“).** Aufgaben: Buchstaben hören (mit leicht verwechselbaren Buchstaben als
+  Auswahl), buchstabiertes Wort hören und eintippen (20 Wörter und Namen), „Welcher Buchstabe klingt wie eye, you, see …?“,
+  Buchstabe davor oder danach. Erklärung: Tafel mit allen 26 Buchstaben, die tückischen sind blau. 46 Themen, 1607 Aufnahmen
+  je Aussprache (jeder Buchstabe einzeln). Lautschrift ist weiter offen.
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1217,6 +1222,8 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v74: EnDax Alphabet** (13.11.2026): Thema `e5-a-abc`. Geändert: `web/englisch/` (Themen, Erklärungen, Symbole, Aufnahmen-Pakete),
+  `web/plattform/faecher.js` (46 Themen), `web/sw.js`. Test `endax.py 3` ohne Meldung.
 - **v73: EnDax Knobel-Aufgaben** (13.11.2026): neu `web/englisch/themen/klasse5-knobel.js`, `tests/endax_knobel.py`; geändert
   `web/englisch/index.html`, `web/sw.js`. Test `endax_knobel.py` ohne Meldung.
 - **v72: EnDax „Entdecken“** (13.11.2026): neu `web/englisch/erklaerungen/entdecken.js`; geändert `web/englisch/index.html`,

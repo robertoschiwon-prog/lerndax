@@ -2566,6 +2566,68 @@
   });
   for (const [id, titel] of AL_TITEL) EX[id] = alErkl(id, titel);
 
+  // =====================================================
+  // Alphabet: alle 26 Buchstaben als Tafel
+  // =====================================================
+  //   ctx: { mode:'buchstabe', b } | { mode:'wort', w }
+  EX['e5-a-abc'] = {
+    title: 'Alphabet und Buchstabieren',
+    titleFor: (ctx) => (ctx && ctx.mode === 'wort' ? 'Buchstabieren' : 'Das englische Alphabet'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei', ABC = T.ABC;
+      const GRUPPE = { A: 'EI', E: 'AI', I: 'AE', G: 'J', J: 'G', B: 'PV', P: 'BV', V: 'BW', W: 'VU', U: 'WQ', Q: 'U', M: 'N', N: 'M', H: 'K', K: 'H', Y: 'I', R: 'A', Z: 'C', C: 'SZ', S: 'C' };
+      let S0 = null, zellen = {}, unten = null;
+      if (mode === 'buchstabe') S0 = ctx.post ? ctx.b : (GRUPPE[ctx.b] ? U.pick(GRUPPE[ctx.b].split('')) : U.pick(ABC.filter((x) => x !== ctx.b)));
+      if (mode === 'wort') S0 = ctx.post ? T.SPELL.find((x) => x.w === ctx.w) : U.pick(T.SPELL.filter((x) => x.w !== ctx.w));
+      const TOUR = ['A', 'E', 'I', 'G', 'J', 'H', 'W', 'Y', 'Z'];
+      function tafel() {
+        zellen = {};
+        ABC.forEach((b, i) => {
+          const x = 9 + (i % 9) * 38, y = 12 + Math.floor(i / 9) * 42;
+          const r = el('rect', { x, y, width: 36, height: 38, rx: 7, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+          el('text', { x: x + 18, y: y + 26, 'text-anchor': 'middle', class: 'ex-b', text: b, style: `font-size:18px;fill:${T.ABC_KLANG[b] ? BLAU : 'var(--ink)'}` }, api.svg);
+          zellen[b] = r;
+        });
+      }
+      const leuchte = (b) => ABC.forEach((x) => { zellen[x].setAttribute('fill', x === b ? '#dfe9ff' : '#fff'); zellen[x].setAttribute('stroke', x === b ? BLAU : '#cfc8ba'); });
+      const zeig = (teile, fs) => { if (unten) unten.remove(); unten = tzeile(api, teile, 176, fs || 20); };
+      async function einer(b, pause) {
+        leuchte(b);
+        zeig([[b, BLAU], ['  ·  '], [T.ABC_KLANG[b] ? `gesprochen: ${T.ABC_KLANG[b]}` : 'Hör dir den Buchstaben an.', GRAU]], 16);
+        api.say(`<b>${b}</b> ${U.say(b)}${T.ABC_KLANG[b] ? `<br>Gesprochen etwa: <b>${T.ABC_KLANG[b]}</b>` : ''}`);
+        await api.wait(pause);
+      }
+      return {
+        reset() {
+          api.clear(); unten = null; tafel();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+        },
+        async play() {
+          if (mode === 'buchstabe') { api.say('Der gesuchte Buchstabe leuchtet gleich auf.'); await api.wait(1400); await einer(S0, 0); return; }
+          if (mode === 'wort') {
+            const x = S0, bs = x.w.toUpperCase().split('');
+            api.say(`Hör zu: ${U.say(x.text)} Jeder Buchstabe leuchtet auf, wenn er dran ist.`);
+            await api.wait(1600);
+            const fertig = [];
+            for (const b of bs) { leuchte(b); fertig.push(b); zeig([[fertig.join(' '), BLAU]], 22); await api.wait(900); }
+            leuchte('');
+            zeig([[x.text.replace(/\.$/, ''), GRAU], ['  →  '], [x.w, BLAU]], 18);
+            api.say(`<b>${x.text}</b> ${U.say(x.text)}<br>= <b>${x.w}</b>`);
+            return;
+          }
+          api.say('Das englische Alphabet hat dieselben 26 Buchstaben wie das deutsche. Aber viele klingen anders. Die <b style="color:#1f55d6">blauen</b> sind besonders tückisch.');
+          await api.wait(3600);
+          for (const b of TOUR) await einer(b, 2600);
+          leuchte('');
+          zeig([['A = ei · E = ii · I = ai', BLAU]], 18);
+          api.say('Am wichtigsten: <b>A</b> klingt „ei“, <b>E</b> klingt „ii“, <b>I</b> klingt „ai“. Und G und J sind fast vertauscht.');
+        },
+      };
+    },
+  };
+
   EX['e5-a-lesen'] = {
     title: 'Lesen: kurze Texte',
     titleFor: () => 'Lesen: Wo steht die Antwort?',

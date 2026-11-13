@@ -66,6 +66,7 @@ window.EnDaxIcons = (function () {
     'e5-a-klasse': `<circle cx="9" cy="6" r="2.5"/><path d="M5 21v-6a4 4 0 0 1 8 0v6M15 12l3-8"/>`,
     'e5-a-laden': `<path d="M3 4h3l2 11h11l2-8H7"/><circle cx="10" cy="19" r="1.6" ${F}/><circle cx="17" cy="19" r="1.6" ${F}/>`,
     'e5-a-weg': `<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z" ${F}/>`,
+    'e5-a-abc': `<path d="M3 18l3.5-10L10 18M4.3 15h3.4"/><path d="M13 8h3a2 2 0 0 1 0 4h-3zM13 12h3.5a2 2 0 0 1 0 4H13z"/>`,
     'e5-a-lesen': `<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/>`,
   };
   function svg(id) {

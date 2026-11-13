@@ -3168,6 +3168,45 @@
   D.arten['e5-a-lesen'] = { lesen };
 
   // =====================================================
+  // Alphabet und Buchstabieren (Hörprobe A–Z von Roberto am 13.11. für beide Stimmen freigegeben)
+  // =====================================================
+  const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  // Buchstaben, die deutsche Kinder leicht verwechseln
+  const ABC_GRUPPEN = ['AEIRY', 'GJ', 'BPVDT', 'MN', 'QUW', 'CSZX', 'HK', 'FSX', 'OU'];
+  const abcAehnlich = (b) => [...new Set(ABC_GRUPPEN.filter((g) => g.includes(b)).join('').replace(new RegExp(b, 'g'), '').split(''))];
+  // Hinweis zur Aussprache in deutscher Schreibweise (nur zur Orientierung)
+  const ABC_KLANG = { A: 'ei (wie in „okay“)', E: 'ii (wie ein langes i)', I: 'ai (wie „Ei“)', G: 'dschii', J: 'dschei', H: 'eitsch', R: 'aa (britisch) oder ar', U: 'juu', W: 'dabbel-juu', Y: 'wai', Z: 'zed (britisch) oder zii (amerikanisch)', Q: 'kjuu', V: 'wii', X: 'eks', C: 'ssii', K: 'kei' };
+  const SPELL = ['Max', 'Lisa', 'Emma', 'Ben', 'Jack', 'water', 'house', 'school', 'apple', 'green', 'Friday', 'quiet', 'juice', 'happy', 'yellow', 'zoo', 'eight', 'jeans', 'giraffe', 'week']
+    .map((w) => ({ w, text: `${w.toUpperCase().split('').join(', ')}.` }));
+  // Buchstaben, die genau wie ein Wort klingen
+  const KLANG = [['I', 'eye', 'Auge'], ['U', 'you', 'du'], ['C', 'see', 'sehen'], ['B', 'bee', 'Biene'], ['T', 'tea', 'Tee'], ['Y', 'why', 'warum'], ['R', 'are', 'sind'], ['Q', 'queue', 'Warteschlange'], ['P', 'pea', 'Erbse']];
+  const ABC_TIPP = 'Achtung, verwechselbar: A klingt „ei“, E klingt „ii“, I klingt „ai“. G klingt „dschii“, J klingt „dschei“.';
+  const abcLoesung = (b) => `<b class="vb" lang="en">${b}</b> ${U.say(b)}${ABC_KLANG[b] ? `<br>Gesprochen etwa: <b>${ABC_KLANG[b]}</b>` : ''}`;
+  function abcHoeren() {
+    const b = pick(ABC), ch = shuffle([b, ...shuffle(abcAehnlich(b)).slice(0, 3)]);
+    while (ch.length < 4) { const x = pick(ABC); if (!ch.includes(x)) ch.push(x); }
+    const c2 = shuffle(ch);
+    return { prompt: `Hör genau hin: Welcher Buchstabe ist das? ${U.say(b)}`, choices: c2, correct: c2.indexOf(b), hint: ABC_TIPP, solution: abcLoesung(b), ex: { mode: 'buchstabe', b } };
+  }
+  function abcWort() {
+    const x = pick(SPELL);
+    return { prompt: `Hör zu: Welches Wort wird buchstabiert? Tippe es ein. ${U.say(x.text)}`, fields: [{ type: 'text', ci: true, answer: x.w, label: 'Wort' }], hint: `${ABC_TIPP} Schreib die Buchstaben beim Hören mit.`, solution: `<span lang="en">${x.text}</span> ${U.say(x.text)}<br>= <b class="vb" lang="en">${x.w}</b>`, ex: { mode: 'wort', w: x.w } };
+  }
+  function abcKlang() {
+    const [b, wort, de] = pick(KLANG), ch = shuffle([b, ...shuffle(ABC.filter((x) => x !== b && !KLANG.some((k) => k[0] === x))).slice(0, 3)]);
+    return { prompt: `Welcher Buchstabe klingt genauso wie das englische Wort <b lang="en">${wort}</b> (${de})?`, choices: ch, correct: ch.indexOf(b), hint: 'Sprich die Buchstaben auf Englisch leise vor dich hin.', solution: `<b class="vb">${b}</b> ${U.say(b)} klingt genau wie <b lang="en">${wort}</b> (${de}).<br>Deshalb schreibt man in Nachrichten manchmal „C U“ für „see you“.`, ex: { mode: 'buchstabe', b } };
+  }
+  function abcFolge() {
+    const i = R(1, 24), vor = Math.random() < 0.5, b = ABC[i], r = vor ? ABC[i - 1] : ABC[i + 1], ch = shuffle([r, ABC[vor ? i + 1 : i - 1], ABC[vor ? i - 2 < 0 ? i + 2 : i - 2 : i + 2 > 25 ? i - 2 : i + 2]]);
+    return { prompt: `Welcher Buchstabe kommt im Alphabet <b>${vor ? 'vor' : 'nach'}</b> <b>${b}</b>?`, choices: [...new Set(ch)], correct: [...new Set(ch)].indexOf(r), hint: 'Sag das Alphabet leise auf, bis du zu dem Buchstaben kommst.', solution: `${vor ? `<b class="vb">${r}</b> – ${b}` : `${b} – <b class="vb">${r}</b>`}<br>${U.say(r)} Das englische Alphabet hat dieselben 26 Buchstaben wie das deutsche, nur ohne ä, ö, ü und ß.`, ex: { mode: 'buchstabe', b: r } };
+  }
+  const alphabet = () => U.wahl([[32, abcHoeren], [30, abcWort], [20, abcKlang], [18, abcFolge]]);
+  Object.assign(D.daten, { ABC, ABC_KLANG, SPELL, KLANG });
+  const themenVorAbc = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorAbc(), { 'e5-a-abc': [...ABC, ...SPELL.map((x) => x.text)] });
+  D.arten['e5-a-abc'] = { abcHoeren, abcWort, abcKlang, abcFolge };
+
+  // =====================================================
   // Daten für „Entdecken“ (Animationen in erklaerungen/entdecken.js)
   // =====================================================
   const ENT = {
@@ -3250,6 +3289,7 @@
         { id: 'e5-a-klasse', title: 'Im Unterricht: Sorry, I don’t understand', icon: '🙋', gen: alGen('e5-a-klasse', [[18, anweisung]]) },
         { id: 'e5-a-laden', title: 'Einkaufen: How much is it?', icon: '🛒', gen: alGen('e5-a-laden', [[16, preisLesen], [12, preisHoeren]]) },
         { id: 'e5-a-weg', title: 'Nach dem Weg fragen', icon: '🧭', gen: alGen('e5-a-weg', [[22, wegBild], [12, wegHoeren]]) },
+        { id: 'e5-a-abc', title: 'Alphabet und Buchstabieren', icon: '🔤', gen: alphabet },
         { id: 'e5-a-lesen', title: 'Lesen: kurze Texte', icon: '📖', gen: lesen },
       ] },
     ],
