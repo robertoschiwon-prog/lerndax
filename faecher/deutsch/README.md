@@ -1,13 +1,13 @@
 # DeDax (Deutsch) – Startpunkt
 
 Stand 12.11.2026 (`lerndax-v54`): **Klasse 5 ist gebaut** (30 Themen in 5 Bereichen, „Entdecken“, Knobel-Aufgaben) und steht
-auf der Startseite. Offen: Abgleich mit dem Schulbuch (ISBN und Inhaltsverzeichnis fehlen) und der Test mit dem Kind.
+auf der Startseite. Abgleich mit dem Deutschbuch: `lehrplan/schulbuch-abgleich.md` (13.11.2026). Offen: Lücken schließen, „Nomen oder Substantiv“, Test mit dem Kind.
 Die Abschnitte unten ab „Vorgehen“ beschreiben den Weg dorthin und sind als Vorbild für das nächste Fach stehen geblieben.
 
 | Schritt | Stand | Datei |
 |---|---|---|
 | 1 Lehrplan auswerten | ✅ 12.11.2026 | `lehrplan/sachsen-gymnasium.md` |
-| 2 Schulbuch abgleichen | ISBN da (13.11.2026: 978-3-06-061189-8); wartet auf Foto des Inhaltsverzeichnisses | `lehrplan/schulbuch-abgleich.md` |
+| 2 Schulbuch abgleichen | **abgeglichen (13.11.2026)**: Lücken und die Frage „Nomen oder Substantiv“ stehen in der Datei | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | Vorschlag (5 Bereiche, 31 Themen), noch nicht entschieden | `themenplan.md` |
 | 4 Themen bauen | **Bereich Wortarten fertig (7 Themen):** Substantive, Die vier Fälle, Pronomen, Adjektive steigern, Verbformen, Zeitformen, Wortarten erkennen. **Bereich Satzbau und Satzzeichen fertig (8 Themen).** **Alle fünf Bereiche sind gebaut (30 Themen).** **„Entdecken“ hat sechs Entdeckungen.** Knobel-Aufgaben zu allen Themen. Offen: Schulbuch-Abgleich | `web/deutsch/`, Test `tests/dedax.py` |
 
@@ -45,7 +45,7 @@ Lehrkraft oder Kind im öffentlichen Code; Aufgaben aus dem Schulbuch werden nic
 ## Was vor dem Bauen zu klären ist
 
 **Mit dem Auftraggeber**
-- ~~Welches Deutschbuch genau~~ ISBN 978-3-06-061189-8 (13.11.2026); Foto des Inhaltsverzeichnisses fehlt noch.
+- ~~Welches Deutschbuch genau~~ ISBN 978-3-06-061189-8, Inhaltsverzeichnis ausgewertet (13.11.2026). Offen: „Nomen“ oder „Substantiv“?
 - Womit anfangen: Was ist gerade im Unterricht dran, steht eine Klassenarbeit an, was fällt dem Kind schwer?
 - Soll es wie bei Mathe eine Trainingsseite für eine bestimmte Arbeit geben?
 

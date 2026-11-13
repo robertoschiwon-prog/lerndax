@@ -62,6 +62,14 @@ window.EnDaxIcons = (function () {
     'e5-w-essen': `<path d="M12 7c-4-3-8 0-8 5 0 5 4 9 8 9s8-4 8-9c0-5-4-8-8-5z"/><path d="M12 7c0-2 1-4 3-4"/>`,
     'e5-w-farben': `<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-2 0-3 4 0 5-2a9 9 0 0 0-7-11z"/><circle cx="8" cy="10" r="1.5" ${F}/><circle cx="12" cy="7" r="1.5" ${F}/><circle cx="16" cy="10" r="1.5" ${F}/>`,
     'e5-w-zeit': `<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><rect x="7" y="13" width="3" height="3" ${F}/>`,
+    // Gefühle: lachendes Gesicht
+    'e5-w-gefuehle': `<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.2" ${F}/><circle cx="15" cy="10" r="1.2" ${F}/><path d="M8 14.5c1 1.6 2.4 2.4 4 2.4s3-.8 4-2.4"/>`,
+    // Party: Luftballon an einer Schnur
+    'e5-w-party': `<path d="M12 3c3.3 0 5.5 2.6 5.5 5.8S15 15 12 15s-5.5-3-5.5-6.2S8.7 3 12 3z"/><path d="M11 15l1 1.5 1-1.5"/><path d="M12 16.5c-1 1.5 1 2.5 0 4.5"/>`,
+    // Beschreiben: großes und kleines Quadrat
+    'e5-w-adj': `<rect x="3" y="6" width="11" height="13" rx="1.5"/><rect x="16.5" y="13" width="4.5" height="6" rx="1" ${F}/>`,
+    // a few, a little: Flasche
+    'e5-wenig': `<path d="M10 3h4v4l2 3v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10l2-3z"/><path d="M8 14h8v6H8z" ${F}/>`,
     'e5-a-hallo': `<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/>`,
     'e5-a-klasse': `<circle cx="9" cy="6" r="2.5"/><path d="M5 21v-6a4 4 0 0 1 8 0v6M15 12l3-8"/>`,
     'e5-a-laden': `<path d="M3 4h3l2 11h11l2-8H7"/><circle cx="10" cy="19" r="1.6" ${F}/><circle cx="17" cy="19" r="1.6" ${F}/>`,

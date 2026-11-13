@@ -7,9 +7,9 @@ Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`. 
 | Schritt | Stand | Datei |
 |---|---|---|
 | 1 Lehrplan auswerten | **erledigt (12.11.2026)**. Wichtig: Klasse 5 und 6 sind gemeinsam beschrieben, die Aufteilung macht das Schulbuch | `lehrplan/sachsen-gymnasium.md` |
-| 2 Schulbuch abgleichen | Buch bekannt (13.11.2026): **Green Line 1, Ausgabe ab 2021**. Offen: Foto des Inhaltsverzeichnisses (Grammatik je Unit) | `lehrplan/schulbuch-abgleich.md` (anlegen) |
+| 2 Schulbuch abgleichen | **erledigt (13.11.2026, v77)**: Green Line 1, Ausgabe ab 2021. Die Bereiche heißen jetzt wie die Units | `lehrplan/schulbuch-abgleich.md` |
 | 3 Themenplan | **Vorschlag liegt vor (12.11.2026)**, wartet auf Zustimmung; Entscheidungen stehen dort | `themenplan.md` |
-| 4 Themen bauen | **46 Themen gebaut, Bereich 1 bis 6 gebaut, EnDax steht auf der Startseite** (to be v55; Pronomen und „to be verneinen und fragen“ v57; have got und a/an v58; Mehrzahl v59; there is/are und this/that v60; my/your und ’s/of v61; Aufforderungen und can/must v62; present simple (3 Themen) v63; Fragewörter, Satzbau, Wie oft v64; present progressive, simple oder progressive, me/him/her v65; some/any und much/many v66; Wo? (mit Bild) und Wann? v67; Zahlen, Datum, Uhrzeit v68; was/were, -ed, unregelmäßige Verben v69; 11 Wortfelder v70; Im Alltag und Lesen v71; Entdecken v72; Knobeln v73; Alphabet v74; Knobeln für alle Themen v75), live; Rest offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
+| 4 Themen bauen | **46 Themen gebaut, Bereich 1 bis 6 gebaut, EnDax steht auf der Startseite** (to be v55; Pronomen und „to be verneinen und fragen“ v57; have got und a/an v58; Mehrzahl v59; there is/are und this/that v60; my/your und ’s/of v61; Aufforderungen und can/must v62; present simple (3 Themen) v63; Fragewörter, Satzbau, Wie oft v64; present progressive, simple oder progressive, me/him/her v65; some/any und much/many v66; Wo? (mit Bild) und Wann? v67; Zahlen, Datum, Uhrzeit v68; was/were, -ed, unregelmäßige Verben v69; 11 Wortfelder v70; Im Alltag und Lesen v71; Entdecken v72; Knobeln v73; Alphabet v74; Knobeln für alle Themen v75; nach Green Line 1 geordnet und 4 neue Themen v77, jetzt 50), live; Rest offen | `web/englisch/`, Tests `tests/endax.py`, Aufnahmen `tests/endax_audio.py` |
 
 ## Was feststeht
 
@@ -44,7 +44,7 @@ in der Reihenfolge des Buchs übernehmen, sondern eigene Wortlisten nach Themen 
 
 ## Was vor dem Bauen zu klären ist (mit dem Auftraggeber, einzeln)
 
-1. ~~Welches Englischbuch genau~~ Green Line 1, Ausgabe ab 2021 (13.11.2026). Es fehlt noch das Foto des Inhaltsverzeichnisses.
+1. ~~Welches Englischbuch genau~~ Green Line 1, Ausgabe ab 2021 (13.11.2026), abgeglichen in v77.
 2. **Womit anfangen**: Welche Unit ist gerade dran, steht eine Arbeit oder ein Vokabeltest an, was fällt schwer?
 3. **Sprache der App**: Aufgabenstellung, Tipp und Lösungsweg auf Deutsch (Vorschlag für Klasse 5) oder teils Englisch?
 4. **Vokabeln**: eigene Wortlisten nach Themen (Vorschlag), oder will er die Vokabeln der aktuellen Unit selbst

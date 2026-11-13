@@ -51,7 +51,7 @@ Klassen laut Stundentafel Sachsen (Grundschule Kl. 1–4, Gymnasium Sekundarstuf
 |---|---|---|---|---|---|
 | **MaDax** | Mathe | Ma | 1–10 | Hauptfach | ✅ Klasse 5 |
 | **DeDax** | Deutsch | De | 1–10 | Hauptfach | ✅ Klasse 5 |
-| **EnDax** | Englisch | En | 3–10 | Hauptfach | **als Nächstes** |
+| **EnDax** | Englisch | En | 3–10 | Hauptfach | ✅ Klasse 5 |
 | **SuDax** | Sachunterricht | Su | 1–4 | Sachfach | geplant |
 | **BioDax** | Biologie | Bio | 5–10 | Sachfach | geplant |
 | **GeDax** | Geschichte | Ge | 5–10 | Sachfach | geplant |
@@ -74,7 +74,7 @@ Das kann später neu entschieden werden.
 **Phase 1: Klasse 5 fertig bauen, alle Fächer**
 1. MaDax ✅ inhaltlich fertig (36 Themen, Knobel-Stufe, Abgleich mit Buch und Lehrplan; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
 2. DeDax ✅ gebaut (30 Themen, Entdecken, Knobeln; Schulbuch-Abgleich und Test mit dem Kind stehen aus)
-3. **EnDax: als Nächstes, Startpunkt `faecher/englisch/README.md`** (Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
+3. EnDax ✅ gebaut (50 Themen nach den Units des Buchs, Entdecken, Knobeln; Startpunkt `faecher/englisch/README.md`; Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
 4. BioDax (Linder 5), GeoDax (Terra 5), GeDax (Anno 1)
 5. TecDax (Technik/Computer)
 6. Vielleicht: MuDax, KuDax, EthDax

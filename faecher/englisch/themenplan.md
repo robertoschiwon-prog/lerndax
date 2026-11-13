@@ -1,6 +1,6 @@
 # EnDax Klasse 5 – Themenplan (Vorschlag)
 
-Stand 12.11.2026. Grundlage: `lehrplan/sachsen-gymnasium.md`. **Schulbuch seit 13.11.2026 bekannt: Green Line 1, Ausgabe ab 2021 (Klett, 978-3-12-864011-2);** der Abgleich mit den Units wartet auf das Inhaltsverzeichnis. Der Lehrplan
+Stand 12.11.2026. Grundlage: `lehrplan/sachsen-gymnasium.md`. **Schulbuch seit 13.11.2026 bekannt: Green Line 1, Ausgabe ab 2021 (Klett, 978-3-12-864011-2);** **seit v77 sind die Bereiche in der App die Units des Buchs** (Hello!, Unit 1–4, Extra), siehe `lehrplan/schulbuch-abgleich.md`. Die Bereiche unten sind die ursprüngliche Planung. Der Lehrplan
 beschreibt Klasse 5 und 6 gemeinsam. Die Auswahl für Klasse 5 ist deshalb eine begründete Annahme (das, was in den
 üblichen Büchern in Klasse 5 steht) und wird mit dem Buch abgeglichen, sobald Titel und Inhaltsverzeichnis da sind.
 

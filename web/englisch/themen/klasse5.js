@@ -1953,7 +1953,22 @@
       ex: PPEX(s, 'frage'),
     };
   }
-  const progressive = () => U.wahl([[18, ppBe], [18, ppIng], [14, ppIngForm], [16, ppBeides], [12, ppOrdnen], [11, ppNeg], [11, ppFrage]]);
+  // H: Kurzantwort (Green Line 1, Unit 4: Fragen und Kurzantworten)
+  const PPKA = PP.filter((s) => s.pr);
+  const ppKurz = (s, ja) => (ja ? `Yes, ${s.pr} ${s.be}.` : `No, ${s.pr} ${s.be === 'is' ? 'isn’t' : 'aren’t'}.`);
+  function ppKurzantwort() {
+    const s = pick(PPKA), ja = Math.random() < 0.5, richtig = ppKurz(s, ja), d = s.be === 'is' ? 'does' : 'do';
+    const kurzform = s.pr === 'they' ? 'they’re' : `${s.pr}’s`;
+    const falsch = ja ? [`Yes, ${s.pr} ${d}.`, `Yes, ${kurzform}.`] : [`No, ${s.pr} ${d === 'does' ? 'doesn’t' : 'don’t'}.`, `No, ${s.pr} not.`];
+    const ch = shuffle([richtig, ...falsch]);
+    return {
+      prompt: `Antworte kurz mit <b>${ja ? 'Ja' : 'Nein'}</b>.${en(s.frage)}`, choices: ch.map((c) => `<span lang="en">${c}</span>`), correct: ch.indexOf(richtig),
+      hint: 'Die Kurzantwort nimmt <b>is</b> oder <b>are</b> aus der Frage wieder auf: Yes, she is. / No, she isn’t. Nach Yes gibt es keine Kurzform.',
+      solution: `<span lang="en">${s.frage}</span><br><span lang="en"><b class="vb">${richtig}</b></span> ${U.say(richtig)}<br>${s.subj.toLowerCase() !== s.pr ? `Für <b>${s.subj}</b> steht in der Antwort <b>${s.pr}</b>. ` : ''}Die Frage beginnt mit <b>${gross(s.be)}</b>, also steht in der Antwort ${ja ? s.be : (s.be === 'is' ? 'isn’t' : 'aren’t')}. do und does gehören hier nicht hin.${ja ? ` <b>${kurzform}</b> geht am Ende nicht.` : ''}`,
+      ex: PPEX(s, 'frage'),
+    };
+  }
+  const progressive = () => U.wahl([[17, ppBe], [17, ppIng], [13, ppIngForm], [15, ppBeides], [11, ppOrdnen], [10, ppNeg], [9, ppFrage], [8, ppKurzantwort]]);
 
   // =====================================================
   // simple oder progressive?
@@ -2112,12 +2127,12 @@
   Object.assign(D.daten, { PP, PPQ, INGS, ingRegel, SP, SIG_S, SIG_P, OBJ, OBJ_DE, OS, OSO, OBJ_ART });
   const themenVorPP = D.audioThemen;
   D.audioThemen = () => Object.assign(themenVorPP(), {
-    'e5-pp': [...PP.map((s) => s.text), ...PP.map((s) => s.neg), ...PPQ.map((s) => s.frage)],
+    'e5-pp': [...PP.map((s) => s.text), ...PP.map((s) => s.neg), ...PPQ.map((s) => s.frage), ...new Set(PPKA.flatMap((s) => [ppKurz(s, true), ppKurz(s, false)]))],
     'e5-sp': SP.flatMap((s) => [s.textS, s.textP]),
     'e5-obj': [...OS.map((s) => s.text), ...OSO.map((s) => s.text)],
   });
   Object.assign(D.arten, {
-    'e5-pp': { ppBe, ppIng, ppIngForm, ppBeides, ppOrdnen, ppNeg, ppFrage },
+    'e5-pp': { ppBe, ppIng, ppIngForm, ppBeides, ppOrdnen, ppNeg, ppFrage, ppKurzantwort },
     'e5-sp': { spWahl, spTippen, spSignal, spSortieren, spBedeutung },
     'e5-obj': { obWahl, obTippen, obPaar, obVornHinten, obDeutsch },
   });
@@ -2258,6 +2273,78 @@
     'e5-some': { saWahl, saTippen, saRichtig, saUmbau, saBedeutung },
     'e5-much': { mmHow, mmTippen, mmZaehlbar, mmNeg, mmLot },
   });
+
+  // =====================================================
+  // a few, a little, a couple of, Mengenangaben mit of (Green Line 1, Unit 4, Station 1)
+  // =====================================================
+  // [Satz mit ___, Wort hinter der Lücke, zählbar?, Deutsch]
+  const WL = [
+    ['There are ___ apples in the bowl.', 'apples', true, 'In der Schüssel sind ein paar Äpfel.'],
+    ['We need ___ eggs for the cake.', 'eggs', true, 'Wir brauchen ein paar Eier für den Kuchen.'],
+    ['There are ___ children in the park.', 'children', true, 'Im Park sind ein paar Kinder.'],
+    ['Can I have ___ grapes, please?', 'grapes', true, 'Kann ich bitte ein paar Weintrauben haben?'],
+    ['Tom has ___ friends in London.', 'friends', true, 'Tom hat ein paar Freunde in London.'],
+    ['I know ___ songs in English.', 'songs', true, 'Ich kenne ein paar Lieder auf Englisch.'],
+    ['There is ___ milk in the fridge.', 'milk', false, 'Im Kühlschrank ist ein bisschen Milch.'],
+    ['Can I have ___ sugar in my tea, please?', 'sugar', false, 'Kann ich bitte ein bisschen Zucker in meinen Tee haben?'],
+    ['We have ___ time before the film.', 'time', false, 'Wir haben ein bisschen Zeit vor dem Film.'],
+    ['Put ___ cheese on the pizza.', 'cheese', false, 'Tu ein bisschen Käse auf die Pizza.'],
+    ['I speak ___ French.', 'French', false, 'Ich spreche ein bisschen Französisch.'],
+    ['There is ___ water in the bottle.', 'water', false, 'In der Flasche ist ein bisschen Wasser.'],
+  ].map(([satz, wort, z, de]) => { const form = z ? 'a few' : 'a little'; return { satz, wort, z, de, form, text: satz.replace('___', form) }; });
+  // [Deutsch, Mengenwort, Ding, [zwei Mengenwörter, die sicher nicht passen], weitere richtige Mengenwörter beim Eintippen, Satz mit ___, Deutsch des Satzes]
+  const MO = [
+    ['eine Flasche Wasser', 'bottle', 'water', ['slice', 'bar'], [], 'Can I have a ___ of water, please?', 'Kann ich bitte eine Flasche Wasser haben?'],
+    ['ein Glas Milch', 'glass', 'milk', ['slice', 'bar'], [], 'I drink a ___ of milk every morning.', 'Ich trinke jeden Morgen ein Glas Milch.'],
+    ['eine Tasse Tee', 'cup', 'tea', ['slice', 'bar'], [], 'Would you like a ___ of tea?', 'Möchtest du eine Tasse Tee?'],
+    ['eine Dose Cola', 'can', 'cola', ['slice', 'piece'], ['tin'], 'He buys a ___ of cola.', 'Er kauft eine Dose Cola.'],
+    ['ein Stück Kuchen', 'piece', 'cake', ['bottle', 'glass'], [], 'Can I have a ___ of cake, please?', 'Kann ich bitte ein Stück Kuchen haben?'],
+    ['eine Scheibe Brot', 'slice', 'bread', ['bottle', 'cup'], [], 'I eat a ___ of bread with cheese.', 'Ich esse eine Scheibe Brot mit Käse.'],
+    ['eine Tafel Schokolade', 'bar', 'chocolate', ['bottle', 'glass'], [], 'Mum buys a ___ of chocolate.', 'Mama kauft eine Tafel Schokolade.'],
+    ['eine Tüte Chips', 'packet', 'crisps', ['bottle', 'glass'], ['bag'], 'We need a ___ of crisps for the party.', 'Wir brauchen eine Tüte Chips für die Party.'],
+    ['ein Kilo Äpfel', 'kilo', 'apples', ['cup', 'glass'], ['kilogram'], 'We need a ___ of apples.', 'Wir brauchen ein Kilo Äpfel.'],
+  ].map(([de, m, ding, falsch, auch, satz, sde]) => ({ de, m, ding, falsch, auch, satz, sde, wendung: `a ${m} of ${ding}`, text: satz.replace('___', m) }));
+  // Bedeutung: Gruppe p = ein paar, b = ein bisschen, l = viel
+  const WLB = [['a few', 'ein paar (bei Dingen, die man zählen kann)', 'p'], ['a couple of', 'zwei, ein paar', 'p'], ['a little', 'ein bisschen (bei Dingen, die man nicht zählen kann)', 'b'],
+    ['a lot of', 'viel, viele', 'l'], ['lots of', 'viel, viele', 'l']].map(([w, de, g]) => ({ w, de, g }));
+  const WL_TIPP = 'Kann man es <b>zählen</b> (two apples)? Dann <b>a few</b> = ein paar. Kann man es <b>nicht zählen</b> (milk, time)? Dann <b>a little</b> = ein bisschen.';
+  const MO_TIPP = 'Dinge, die man nicht zählen kann, zählt man mit einem Mengenwort: a <b>bottle</b> of water, a <b>piece</b> of cake. Dazwischen steht immer <b>of</b>.';
+  const wlMark = (x) => `<span lang="en">${x.satz.replace('___', `<b class="vb">${x.form}</b>`)}</span>`;
+  const wlLoesung = (x) => `${wlMark(x)} ${U.say(x.text)}<br><b>${x.wort}</b> kann man ${x.z ? '<b>zählen</b>' : '<b>nicht zählen</b>'}. Deshalb <b>${x.form}</b> (${x.z ? 'ein paar' : 'ein bisschen'}).<br><small>Auf Deutsch: ${x.de}</small>`;
+  const moLoesung = (x) => `<span lang="en">a <b class="vb">${x.m}</b> of ${x.ding}</span> ${U.say(x.wendung)} = ${x.de}<br>Im Satz: <span lang="en">${x.text}</span> ${U.say(x.text)}<br><small>${x.sde}</small>`;
+  const WLEX = (x) => ({ mode: 'wl', satz: x.satz, wort: x.wort, z: x.z, form: x.form, de: x.de });
+  const MOEX = (x) => ({ mode: 'mo', de: x.de, m: x.m, ding: x.ding });
+  const wlCh = ['a few', 'a little'].map((c) => `<span lang="en">${c}</span>`);
+  function wlWahl() { const x = pick(WL); return { prompt: `Was gehört in die Lücke?${en(x.satz)}`, choices: wlCh, correct: x.z ? 0 : 1, hint: WL_TIPP, solution: wlLoesung(x), ex: WLEX(x) }; }
+  function wlTippen() {
+    const x = pick(WL), [a, b] = x.satz.split('___');
+    return { prompt: '<b>a few</b> oder <b>a little</b>? Tippe es ein.', layout: 'satz', fields: [{ type: 'text', ci: true, answer: x.form, prefix: a.trim(), suffix: b.trim(), label: 'a few oder a little' }], hint: WL_TIPP, solution: wlLoesung(x), ex: WLEX(x) };
+  }
+  function moDeEn() {
+    const x = pick(MO), ch = shuffle([x.m, ...x.falsch]);
+    return { prompt: `Wie heißt <b>${x.de}</b> auf Englisch?`, choices: ch.map((m) => `<span lang="en">a ${m} of ${x.ding}</span>`), correct: ch.indexOf(x.m), hint: MO_TIPP, solution: moLoesung(x), ex: MOEX(x) };
+  }
+  function moLuecke() {
+    const x = pick(MO), ch = shuffle([x.m, ...x.falsch]);
+    return { prompt: `Welches Wort passt in die Lücke?${en(x.satz)}`, choices: ch.map((m) => `<span lang="en">${m}</span>`), correct: ch.indexOf(x.m), hint: MO_TIPP, solution: moLoesung(x), ex: MOEX(x) };
+  }
+  function moTippen() {
+    const x = pick(MO);
+    return { prompt: `Tippe das fehlende Wort ein: <b>${x.de}</b>`, layout: 'satz', fields: [{ type: 'text', ci: true, answer: [x.m, ...x.auch], prefix: 'a', suffix: `of ${x.ding}`, label: 'Mengenwort' }], hint: MO_TIPP, solution: moLoesung(x), ex: MOEX(x) };
+  }
+  function wlBedeutung() {
+    const w = pick(WLB), andere = ['p', 'b', 'l'].filter((g) => g !== w.g).map((g) => pick(WLB.filter((y) => y.g === g)));
+    const ch = shuffle([w, ...andere]);
+    return {
+      prompt: `Was bedeutet <b lang="en">${w.w}</b>?`, choices: ch.map((y) => y.de), correct: ch.indexOf(w), hint: 'a few und a couple of: ein paar. a little: ein bisschen. a lot of und lots of: viel.',
+      solution: `<b class="vb" lang="en">${w.w}</b> ${U.say(w.w)} = ${w.de}${w.w === 'a couple of' ? '<br>Ein couple ist ein Paar. a couple of heißt also „zwei“ oder „ein paar“.' : ''}`, ex: { mode: 'bed', w: w.w },
+    };
+  }
+  const wenigMengen = () => U.wahl([[22, wlWahl], [18, wlTippen], [16, moDeEn], [16, moLuecke], [14, moTippen], [14, wlBedeutung]]);
+  Object.assign(D.daten, { WL, MO, WLB });
+  const themenVorWenig = D.audioThemen;
+  D.audioThemen = () => Object.assign(themenVorWenig(), { 'e5-wenig': [...WL.map((x) => x.text), ...MO.map((x) => x.wendung), ...MO.map((x) => x.text), ...WLB.map((x) => x.w)] });
+  D.arten['e5-wenig'] = { wlWahl, wlTippen, moDeEn, moLuecke, moTippen, wlBedeutung };
 
   // =====================================================
   // Wo? in, on, under, next to, behind, in front of, between – mit Bild
@@ -2888,7 +2975,11 @@
     ['Monday', 'Montag'], ['Tuesday', 'Dienstag'], ['Wednesday', 'Mittwoch'], ['Thursday', 'Donnerstag'], ['Friday', 'Freitag'], ['Saturday', 'Samstag'], ['Sunday', 'Sonntag'],
     ['spring', 'Frühling'], ['summer', 'Sommer'], ['autumn', 'Herbst', { alt: ['fall'] }], ['winter', 'Winter'], ['today', 'heute'], ['tomorrow', 'morgen (der nächste Tag)'], ['yesterday', 'gestern'],
     ['day', 'Tag'], ['week', 'Woche'], ['weekend', 'Wochenende'], ['month', 'Monat'], ['year', 'Jahr'],
+    ['January', 'Januar'], ['February', 'Februar'], ['March', 'März'], ['April', 'April'], ['May', 'Mai'], ['June', 'Juni'],
+    ['July', 'Juli'], ['August', 'August'], ['September', 'September'], ['October', 'Oktober'], ['November', 'November'], ['December', 'Dezember'],
   ], [
+    ['The first month of the year is ___.', 'January', ['June', 'March', 'October'], 'Der erste Monat des Jahres ist Januar.'],
+    ['Christmas is in ___.', 'December', ['March', 'June', 'August'], 'Weihnachten ist im Dezember.'],
     ['The day after Monday is ___.', 'Tuesday', ['Thursday', 'Sunday', 'Friday'], 'Der Tag nach Montag ist Dienstag.'],
     ['The day before Friday is ___.', 'Thursday', ['Tuesday', 'Saturday', 'Monday'], 'Der Tag vor Freitag ist Donnerstag.'],
     ['Saturday and Sunday are the ___.', 'weekend', ['week', 'month', 'year'], 'Samstag und Sonntag sind das Wochenende.'],
@@ -2897,11 +2988,56 @@
     ['A week has seven ___.', 'days', ['months', 'years', 'weekends'], 'Eine Woche hat sieben Tage.'],
     ['A year has twelve ___.', 'months', ['days', 'weeks', 'weekends'], 'Ein Jahr hat zwölf Monate.'],
     ['Yesterday was Monday, so today is ___.', 'Tuesday', ['Sunday', 'Wednesday', 'Monday'], 'Gestern war Montag, also ist heute Dienstag.'],
-  ], 'Wochentage schreibt man im Englischen immer groß: Monday, Tuesday … Achtung: Wednesday spricht man „Wens-day“.');
+  ], 'Wochentage und Monate schreibt man im Englischen immer groß: Monday, January … Achtung: Wednesday spricht man „Wens-day“.');
+  wfFeld('e5-w-gefuehle', 'Gefühle', [
+    ['happy', 'froh, glücklich', { bild: '😀' }], ['sad', 'traurig', { bild: '😢' }], ['angry', 'wütend', { alt: ['cross', 'mad'], bild: '😠' }], ['tired', 'müde', { bild: '😴' }],
+    ['scared', 'ängstlich, erschrocken', { alt: ['afraid', 'frightened'], bild: '😨' }], ['excited', 'aufgeregt (vor Freude)', { g: 'aufg' }], ['nervous', 'nervös', { g: 'aufg' }],
+    ['bored', 'gelangweilt'], ['surprised', 'überrascht'], ['worried', 'besorgt', { alt: ['anxious'] }], ['hungry', 'hungrig'], ['thirsty', 'durstig'],
+    ['ill', 'krank', { alt: ['sick'], bild: '🤒' }], ['fine', 'gut (Antwort auf „How are you?“)', { alt: ['OK', 'okay'] }],
+  ], [
+    ['It’s my birthday today! I’m very ___.', 'happy', ['sad', 'bored', 'tired'], 'Heute ist mein Geburtstag! Ich bin sehr froh.'],
+    ['I want to go to bed. I’m ___.', 'tired', ['thirsty', 'angry', 'surprised'], 'Ich will ins Bett. Ich bin müde.'],
+    ['Can I have some water, please? I’m ___.', 'thirsty', ['tired', 'bored', 'sad'], 'Kann ich bitte etwas Wasser haben? Ich habe Durst.'],
+    ['There is nothing to do. I’m ___.', 'bored', ['hungry', 'thirsty', 'scared'], 'Es gibt nichts zu tun. Mir ist langweilig.'],
+    ['My cat is ill. I’m ___.', 'sad', ['happy', 'bored', 'excited'], 'Meine Katze ist krank. Ich bin traurig.'],
+    ['Look, a big spider! I’m ___.', 'scared', ['bored', 'thirsty', 'hungry'], 'Schau, eine große Spinne! Ich habe Angst.'],
+    ['My brother always takes my phone. I’m ___.', 'angry', ['thirsty', 'hungry', 'bored'], 'Mein Bruder nimmt immer mein Handy. Ich bin wütend.'],
+    ['Can I have a sandwich, please? I’m ___.', 'hungry', ['tired', 'sad', 'scared'], 'Kann ich bitte ein Sandwich haben? Ich habe Hunger.'],
+  ], 'Wie fühlst du dich? I’m happy, sad, tired, angry … Achtung: „Ich habe Hunger“ heißt I’m hungry, „mir ist langweilig“ heißt I’m bored.');
+  wfFeld('e5-w-party', 'Party und Geburtstag', [
+    ['party', 'Party, Feier', { bild: '🎉' }], ['birthday', 'Geburtstag'], ['present', 'Geschenk', { alt: ['gift'], bild: '🎁' }], ['birthday cake', 'Geburtstagstorte', { bild: '🎂', kein: true }],
+    ['balloon', 'Luftballon', { bild: '🎈' }], ['candle', 'Kerze', { bild: '🕯️' }], ['card', 'Karte', { alt: ['birthday card'] }], ['invitation', 'Einladung'],
+    ['invite', 'einladen'], ['guest', 'Gast'], ['celebrate', 'feiern'], ['costume', 'Kostüm', { alt: ['fancy dress'] }], ['fancy dress party', 'Kostümparty, Mottoparty', { alt: ['costume party', 'theme party'] }],
+    ['Happy birthday', 'Alles Gute zum Geburtstag'],
+  ], [
+    ['Ten people are coming to my ___ on Saturday.', 'party', ['candle', 'balloon', 'card'], 'Zehn Leute kommen am Samstag zu meiner Party.'],
+    ['There are eleven ___ on my birthday cake.', 'candles', ['presents', 'guests', 'invitations'], 'Auf meiner Geburtstagstorte sind elf Kerzen.'],
+    ['Thank you for the ___! I love the new football.', 'present', ['guest', 'candle', 'invitation'], 'Danke für das Geschenk! Ich liebe den neuen Fußball.'],
+    ['Can you come to my party? Here is your ___.', 'invitation', ['guest', 'candle', 'music'], 'Kannst du zu meiner Party kommen? Hier ist deine Einladung.'],
+    ['We blow up ___ for the party.', 'balloons', ['candles', 'guests', 'invitations'], 'Wir blasen Luftballons für die Party auf.'],
+    ['Everybody sings “Happy ___ to you”.', 'birthday', ['party', 'present', 'card'], 'Alle singen „Happy Birthday to you“.'],
+  ], 'Zum Geburtstag: party, present, birthday cake, candles, balloons. Gratulieren: Happy birthday!');
+  wfFeld('e5-w-adj', 'Beschreiben', [
+    ['big', 'groß', { alt: ['large'] }], ['small', 'klein', { alt: ['little'] }], ['old', 'alt'], ['new', 'neu'], ['young', 'jung'], ['long', 'lang'], ['short', 'kurz'],
+    ['fast', 'schnell', { alt: ['quick'] }], ['slow', 'langsam'], ['loud', 'laut', { alt: ['noisy'] }], ['quiet', 'leise, ruhig'], ['interesting', 'interessant'], ['boring', 'langweilig'],
+    ['cheap', 'billig'], ['expensive', 'teuer'], ['famous', 'berühmt'], ['busy', 'belebt, voller Leute'], ['beautiful', 'schön', { alt: ['pretty', 'lovely'] }], ['funny', 'lustig'],
+  ], [
+    ['An elephant is very ___.', 'big', ['small', 'cheap', 'short'], 'Ein Elefant ist sehr groß.'],
+    ['A mouse is very ___.', 'small', ['big', 'loud', 'expensive'], 'Eine Maus ist sehr klein.'],
+    ['My grandpa is 80. He is ___.', 'old', ['young', 'new', 'expensive'], 'Mein Opa ist 80. Er ist alt.'],
+    ['A car is fast, but a snail is very ___.', 'slow', ['fast', 'loud', 'big'], 'Ein Auto ist schnell, aber eine Schnecke ist sehr langsam.'],
+    ['This book isn’t interesting. It’s ___.', 'boring', ['exciting', 'interesting', 'great'], 'Dieses Buch ist nicht interessant. Es ist langweilig.'],
+    ['The phone costs 900 pounds. It’s very ___.', 'expensive', ['cheap', 'slow', 'young'], 'Das Handy kostet 900 Pfund. Es ist sehr teuer.'],
+    ['Please be ___. The baby is sleeping.', 'quiet', ['loud', 'busy', 'famous'], 'Bitte sei leise. Das Baby schläft.'],
+    ['Everybody knows Big Ben. It’s very ___.', 'famous', ['cheap', 'young', 'quiet'], 'Jeder kennt Big Ben. Er ist sehr berühmt.'],
+    ['There are a lot of people at the market. It’s very ___.', 'busy', ['quiet', 'slow', 'cheap'], 'Auf dem Markt sind viele Leute. Es ist sehr voll.'],
+  ], 'Gegensätze lernt man gut zusammen: big – small, old – new, old – young, fast – slow, loud – quiet, cheap – expensive.');
   // Paare, die sich beim „passt nicht dazu“ zu nah sind
   // Tagesablauf nur mit Tieren und Farben mischen: die Ausdrücke passen sonst halb zu Haus, Schule, Essen, Kleidung, Körper …
   const WF_NAH = new Set(['e5-w-haus|e5-w-schule', 'e5-w-freizeit|e5-w-schule', 'e5-w-essen|e5-w-haus',
-    ...['e5-w-familie', 'e5-w-haus', 'e5-w-schule', 'e5-w-kleidung', 'e5-w-freizeit', 'e5-w-koerper', 'e5-w-essen', 'e5-w-zeit'].map((x) => [x, 'e5-w-tag'].sort().join('|'))]);
+    ...['e5-w-familie', 'e5-w-haus', 'e5-w-schule', 'e5-w-kleidung', 'e5-w-freizeit', 'e5-w-koerper', 'e5-w-essen', 'e5-w-zeit', 'e5-w-gefuehle', 'e5-w-party', 'e5-w-adj'].map((x) => [x, 'e5-w-tag'].sort().join('|')),
+    // Gefühle und Beschreiben sind beide Adjektive (bored – boring); die Party hat Essen, Musik, Tanzen und Monate
+    'e5-w-adj|e5-w-gefuehle', 'e5-w-essen|e5-w-party', 'e5-w-freizeit|e5-w-party', 'e5-w-party|e5-w-zeit', 'e5-w-adj|e5-w-farben', 'e5-w-adj|e5-w-tiere', 'e5-w-adj|e5-w-koerper', 'e5-w-gefuehle|e5-w-koerper']);
   const wfAndere = (F, w, n, nur) => shuffle(F.W.filter((x) => x !== w && (!w.g || x.g !== w.g) && x.de !== w.de && (!nur || nur(x)))).slice(0, n);
   const wfBild = (w) => (w.bild
     ? `<svg viewBox="0 0 360 130" role="img" aria-label="Bild"><text x="180" y="104" text-anchor="middle" style="font-size:92px">${w.bild}</text></svg>`
@@ -3233,64 +3369,70 @@
   // =====================================================
   D.grades = D.grades || {};
   D.grades[5] = {
+    // Reihenfolge wie im Schulbuch Green Line 1 (Klett, Ausgabe ab 2021), abgeglichen am 13.11.2026:
+    // faecher/englisch/lehrplan/schulbuch-abgleich.md. Die Themen-IDs bleiben, damit kein Lernstand verloren geht.
     lbs: [
-      { id: 'e5-bausteine', nr: 1, title: 'Erste Bausteine', topics: [
+      { id: 'e5-u0', nr: 1, title: 'Hello!', topics: [
         { id: 'e5-be', title: 'to be: am, is, are', icon: '🧩', gen: tobe },
-        { id: 'e5-pron', title: 'I, you, he, she, it, we, they', icon: '🧑', gen: pronomen },
-        { id: 'e5-be-neg', title: 'to be: verneinen und fragen', icon: '❓', gen: beNeg },
-        { id: 'e5-have', title: 'have got und has got', icon: '🎒', gen: haveGot },
+        { id: 'e5-a-hallo', title: 'Hallo! How are you?', icon: '👋', gen: alGen('e5-a-hallo', []) },
+        { id: 'e5-w-farben', title: 'Farben: red, blue …', icon: '🎨', gen: wfGen('e5-w-farben') },
+        { id: 'e5-w-schule', title: 'Schule: pen, ruler …', icon: '🏫', gen: wfGen('e5-w-schule') },
+        { id: 'e5-a-abc', title: 'Alphabet und Buchstabieren', icon: '🔤', gen: alphabet },
+      ] },
+      { id: 'e5-u1', nr: 2, title: 'Unit 1: A new school', topics: [
+        { id: 'e5-w-gefuehle', title: 'Gefühle: happy, sad, tired …', icon: '😊', gen: wfGen('e5-w-gefuehle') },
+        { id: 'e5-w-kleidung', title: 'Kleidung: T-shirt, jeans …', icon: '👕', gen: wfGen('e5-w-kleidung') },
         { id: 'e5-a-an', title: 'a oder an', icon: '🍎', gen: aOderAn },
         { id: 'e5-plural', title: 'Mehrzahl: one box, two boxes', icon: '📦', gen: mehrzahl },
+        { id: 'e5-be-neg', title: 'to be: verneinen und fragen', icon: '❓', gen: beNeg },
         { id: 'e5-there', title: 'there is und there are', icon: '👀', gen: thereIs },
-        { id: 'e5-this', title: 'this, that, these, those', icon: '👉', gen: dieseJene },
-        { id: 'e5-poss', title: 'my, your, his, her …', icon: '🎁', gen: possessiv },
-        { id: 'e5-gen', title: 'Wem gehört es? ’s und of', icon: '🏷️', gen: genitiv },
-        { id: 'e5-imp', title: 'Aufforderungen: Open … / Don’t …', icon: '📣', gen: imperativ },
+        { id: 'e5-ort', title: 'Wo? in, on, under, next to …', icon: '🐈', gen: praepOrt },
         { id: 'e5-can', title: 'can und must', icon: '💪', gen: canMust },
+        { id: 'e5-imp', title: 'Aufforderungen: Open … / Don’t …', icon: '📣', gen: imperativ },
+        { id: 'e5-pron', title: 'I, you, he, she, it, we, they', icon: '🧑', gen: pronomen },
+        { id: 'e5-poss', title: 'my, your, his, her …', icon: '🎁', gen: possessiv },
+        { id: 'e5-a-klasse', title: 'Im Unterricht: Sorry, I don’t understand', icon: '🙋', gen: alGen('e5-a-klasse', [[18, anweisung]]) },
       ] },
-      { id: 'e5-gegenwart', nr: 2, title: 'Sätze in der Gegenwart', topics: [
+      { id: 'e5-u2', nr: 3, title: 'Unit 2: It’s fun at home', topics: [
+        { id: 'e5-w-haus', title: 'Haus: kitchen, bedroom …', icon: '🏠', gen: wfGen('e5-w-haus') },
+        { id: 'e5-zahl', title: 'Zahlen, Datum und Uhrzeit', icon: '🔢', gen: zahlenZeit },
+        { id: 'e5-gen', title: 'Wem gehört es? ’s und of', icon: '🏷️', gen: genitiv },
+        { id: 'e5-w-familie', title: 'Familie: mother, father …', icon: '👪', gen: wfGen('e5-w-familie') },
         { id: 'e5-ps', title: 'present simple: he, she, it – das s muss mit', icon: '🔁', gen: presentSimple },
+        { id: 'e5-w-tag', title: 'Mein Tag: get up, go to bed …', icon: '⏰', gen: wfGen('e5-w-tag') },
+        { id: 'e5-w-zeit', title: 'Tage, Monate, Jahreszeiten: Monday, May …', icon: '🗓️', gen: wfGen('e5-w-zeit') },
+        { id: 'e5-zeit', title: 'Wann? at, on, in', icon: '🕖', gen: praepZeit },
+        { id: 'e5-satzbau', title: 'Satzbau: wer – tut – was – wo – wann', icon: '🧱', gen: satzbau },
+        { id: 'e5-oft', title: 'Wie oft? always, often, never', icon: '📅', gen: wieOft },
+        { id: 'e5-obj', title: 'me, him, her, us, them', icon: '🎯', gen: objektPron },
+      ] },
+      { id: 'e5-u3', nr: 4, title: 'Unit 3: Our Greenwich', topics: [
+        { id: 'e5-w-adj', title: 'Beschreiben: big, old, boring …', icon: '📏', gen: wfGen('e5-w-adj') },
+        { id: 'e5-w-freizeit', title: 'Freizeit: swim, dance …', icon: '⚽', gen: wfGen('e5-w-freizeit') },
         { id: 'e5-ps-neg', title: 'present simple: don’t und doesn’t', icon: '🚫', gen: psNeg },
         { id: 'e5-ps-frage', title: 'present simple: Fragen mit do und does', icon: '❔', gen: psFrage },
         { id: 'e5-fragewort', title: 'Fragewörter: who, what, where …', icon: '🔎', gen: fragewoerter },
-        { id: 'e5-satzbau', title: 'Satzbau: wer – tut – was – wo – wann', icon: '🧱', gen: satzbau },
-        { id: 'e5-oft', title: 'Wie oft? always, often, never', icon: '📅', gen: wieOft },
-        { id: 'e5-pp', title: 'present progressive: is playing', icon: '⏱️', gen: progressive },
-        { id: 'e5-sp', title: 'simple oder progressive?', icon: '⚖️', gen: simpleProg },
-        { id: 'e5-obj', title: 'me, him, her, us, them', icon: '🎯', gen: objektPron },
+        { id: 'e5-a-weg', title: 'Nach dem Weg fragen', icon: '🧭', gen: alGen('e5-a-weg', [[22, wegBild], [12, wegHoeren]]) },
+        { id: 'e5-w-essen', title: 'Essen und Trinken: bread, milk …', icon: '🍎', gen: wfGen('e5-w-essen') },
       ] },
-      { id: 'e5-mengen', nr: 3, title: 'Mengen, Ort und Zeit', topics: [
+      { id: 'e5-u4', nr: 5, title: 'Unit 4: Happy birthday!', topics: [
+        { id: 'e5-w-party', title: 'Party und Geburtstag: present, candle …', icon: '🎉', gen: wfGen('e5-w-party') },
         { id: 'e5-some', title: 'some und any', icon: '🥛', gen: someAny },
         { id: 'e5-much', title: 'much, many, a lot of', icon: '🧮', gen: muchMany },
-        { id: 'e5-ort', title: 'Wo? in, on, under, next to …', icon: '🐈', gen: praepOrt },
-        { id: 'e5-zeit', title: 'Wann? at, on, in', icon: '🕖', gen: praepZeit },
-        { id: 'e5-zahl', title: 'Zahlen, Datum und Uhrzeit', icon: '🔢', gen: zahlenZeit },
+        { id: 'e5-wenig', title: 'a few, a little, a bottle of', icon: '🍫', gen: wenigMengen },
+        { id: 'e5-pp', title: 'present progressive: is playing', icon: '⏱️', gen: progressive },
+        { id: 'e5-sp', title: 'simple oder progressive?', icon: '⚖️', gen: simpleProg },
+        { id: 'e5-a-laden', title: 'Einkaufen: How much is it?', icon: '🛒', gen: alGen('e5-a-laden', [[16, preisLesen], [12, preisHoeren]]) },
       ] },
-      { id: 'e5-vergangen', nr: 4, title: 'Was war gestern?', topics: [
+      { id: 'e5-extra', nr: 6, title: 'Extra: nicht in Green Line 1', topics: [
+        { id: 'e5-have', title: 'have got und has got', icon: '🎒', gen: haveGot },
+        { id: 'e5-this', title: 'this, that, these, those', icon: '👉', gen: dieseJene },
+        { id: 'e5-w-tiere', title: 'Tiere: dog, cat …', icon: '🐶', gen: wfGen('e5-w-tiere') },
+        { id: 'e5-w-koerper', title: 'Körper: head, hand …', icon: '✋', gen: wfGen('e5-w-koerper') },
+        { id: 'e5-a-lesen', title: 'Lesen: kurze Texte', icon: '📖', gen: lesen },
         { id: 'e5-was', title: 'was und were', icon: '⏪', gen: wasWere },
         { id: 'e5-ed', title: 'past simple: played, danced, stopped', icon: '📆', gen: pastEd },
         { id: 'e5-irr', title: 'past simple: went, saw, had', icon: '🌀', gen: pastIrr },
-      ] },
-      { id: 'e5-woerter', nr: 5, title: 'Wörter', topics: [
-        { id: 'e5-w-familie', title: 'Familie: mother, father …', icon: '👪', gen: wfGen('e5-w-familie') },
-        { id: 'e5-w-haus', title: 'Haus: kitchen, bedroom …', icon: '🏠', gen: wfGen('e5-w-haus') },
-        { id: 'e5-w-schule', title: 'Schule: pen, ruler …', icon: '🏫', gen: wfGen('e5-w-schule') },
-        { id: 'e5-w-tag', title: 'Mein Tag: get up, go to bed …', icon: '⏰', gen: wfGen('e5-w-tag') },
-        { id: 'e5-w-kleidung', title: 'Kleidung: T-shirt, jeans …', icon: '👕', gen: wfGen('e5-w-kleidung') },
-        { id: 'e5-w-freizeit', title: 'Freizeit: swim, dance …', icon: '⚽', gen: wfGen('e5-w-freizeit') },
-        { id: 'e5-w-tiere', title: 'Tiere: dog, cat …', icon: '🐶', gen: wfGen('e5-w-tiere') },
-        { id: 'e5-w-koerper', title: 'Körper: head, hand …', icon: '✋', gen: wfGen('e5-w-koerper') },
-        { id: 'e5-w-essen', title: 'Essen und Trinken: bread, milk …', icon: '🍎', gen: wfGen('e5-w-essen') },
-        { id: 'e5-w-farben', title: 'Farben: red, blue …', icon: '🎨', gen: wfGen('e5-w-farben') },
-        { id: 'e5-w-zeit', title: 'Tage und Jahreszeiten: Monday, summer …', icon: '🗓️', gen: wfGen('e5-w-zeit') },
-      ] },
-      { id: 'e5-alltag', nr: 6, title: 'Im Alltag', topics: [
-        { id: 'e5-a-hallo', title: 'Hallo! How are you?', icon: '👋', gen: alGen('e5-a-hallo', []) },
-        { id: 'e5-a-klasse', title: 'Im Unterricht: Sorry, I don’t understand', icon: '🙋', gen: alGen('e5-a-klasse', [[18, anweisung]]) },
-        { id: 'e5-a-laden', title: 'Einkaufen: How much is it?', icon: '🛒', gen: alGen('e5-a-laden', [[16, preisLesen], [12, preisHoeren]]) },
-        { id: 'e5-a-weg', title: 'Nach dem Weg fragen', icon: '🧭', gen: alGen('e5-a-weg', [[22, wegBild], [12, wegHoeren]]) },
-        { id: 'e5-a-abc', title: 'Alphabet und Buchstabieren', icon: '🔤', gen: alphabet },
-        { id: 'e5-a-lesen', title: 'Lesen: kurze Texte', icon: '📖', gen: lesen },
       ] },
     ],
   };

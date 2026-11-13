@@ -1876,6 +1876,87 @@
   };
 
   // =====================================================
+  // a few, a little, Mengenangaben mit of
+  // =====================================================
+  //   ctx: { mode:'wl', satz, wort, z, form, de } | { mode:'mo', de, m, ding } | { mode:'bed', w }
+  EX['e5-wenig'] = {
+    title: 'a few, a little, a bottle of',
+    titleFor: (ctx) => (ctx && ctx.post ? (ctx.mode === 'wl' ? `Warum „${ctx.form}“?` : ctx.mode === 'mo' ? `a ${ctx.m} of ${ctx.ding}` : 'a few, a little, a couple of') : 'a few, a little, a bottle of'),
+    viewBox: '0 0 360 210',
+    create(api, ctx) {
+      ctx = ctx || {};
+      const mode = ctx.mode || 'frei';
+      let S0 = null, frei = [], oben = null, kaesten = [], band = null;
+      if (mode === 'wl') S0 = ctx.post ? ctx : U.pick(T.WL.filter((x) => x.z === ctx.z && x.satz !== ctx.satz));
+      if (mode === 'mo') S0 = ctx.post ? ctx : U.pick(T.MO.filter((x) => x.m !== ctx.m));
+      if (mode === 'bed') S0 = ctx.post ? T.WLB.find((x) => x.w === ctx.w) : U.pick(T.WLB.filter((x) => x.w !== ctx.w));
+      const neuFrei = () => { frei = [U.pick(T.WL.filter((x) => x.z)), U.pick(T.WL.filter((x) => !x.z))]; };
+      if (mode === 'frei') { neuFrei(); api.chips([{ label: 'Andere Beispiele', onClick() { neuFrei(); api.replay(); } }]); }
+      const zeig = (teile) => { if (oben) oben.remove(); oben = tzeile(api, teile, 40, 18); };
+      function bild() {
+        kaesten = [
+          { x: 14, titel: 'zählbar', unter: 'one, two, three …', form: 'a few', bsp: 'ein paar: a few apples' },
+          { x: 186, titel: 'nicht zählbar', unter: 'keine Mehrzahl', form: 'a little', bsp: 'ein bisschen: a little milk' },
+        ].map((k) => {
+          const r = el('rect', { x: k.x, y: 62, width: 160, height: 104, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+          el('text', { x: k.x + 80, y: 83, 'text-anchor': 'middle', class: 'ex-b', text: k.titel, style: 'font-size:15px' }, api.svg);
+          el('text', { x: k.x + 80, y: 100, 'text-anchor': 'middle', class: 'ex-s', text: k.unter, style: `font-size:11.5px;fill:${GRAU}` }, api.svg);
+          el('text', { x: k.x + 80, y: 130, 'text-anchor': 'middle', class: 'ex-b', text: k.form, style: `font-size:24px;fill:${BLAU}` }, api.svg);
+          el('text', { x: k.x + 80, y: 154, 'text-anchor': 'middle', class: 'ex-s', text: k.bsp, style: 'font-size:11.5px' }, api.svg);
+          return r;
+        });
+        band = el('rect', { x: 14, y: 174, width: 332, height: 28, rx: 10, fill: '#fff', stroke: '#cfc8ba', 'stroke-width': 2 }, api.svg);
+        const t = el('text', { x: 180, y: 193, 'text-anchor': 'middle', class: 'ex-s', style: 'font-size:12px' }, api.svg);
+        el('tspan', { text: 'a bottle of', style: `fill:${BLAU}` }, t); el('tspan', { text: ' water: So zählt man, was man nicht zählen kann.' }, t);
+      }
+      const leuchte = (i, b) => { kaesten.forEach((r, k) => r.setAttribute('fill', k === i ? '#dfe9ff' : '#fff')); band.setAttribute('fill', b ? '#dfe9ff' : '#fff'); };
+      async function loese(x, pause) {
+        const [a, b] = x.satz.split('___');
+        leuchte(-1, false);
+        zeig([[x.satz]]);
+        api.say(`Schau auf das Wort hinter der Lücke: <b>${x.wort}</b>. Kann man das zählen?`);
+        await api.wait(pause);
+        leuchte(x.z ? 0 : 1, false);
+        api.say(x.z ? `<b>${x.wort}</b> kann man zählen. Linker Kasten: <b>a few</b>.` : `<b>${x.wort}</b> kann man nicht zählen. Rechter Kasten: <b>a little</b>.`);
+        await api.wait(pause);
+        zeig([[a], [x.form, BLAU], [b]]);
+        return `${a}<b>${x.form}</b>${b} ${U.say(x.satz.replace('___', x.form))}<br>${x.z ? 'Zählbar: <b>a few</b> = ein paar.' : 'Nicht zählbar: <b>a little</b> = ein bisschen.'}`;
+      }
+      async function mengenwort(x) {
+        leuchte(1, true);
+        zeig([[x.de, ORANGE]]);
+        api.say(`<b>${x.ding}</b> zählt man mit einem Mengenwort. Was ist es hier?`);
+        await api.wait(2600);
+        zeig([['a '], [x.m, BLAU], [' of '], [x.ding, ORANGE]]);
+        return `<b>a ${x.m} of ${x.ding}</b> ${U.say(`a ${x.m} of ${x.ding}`)} = ${x.de}<br>Zwischen Mengenwort und Ding steht immer <b>of</b>.`;
+      }
+      return {
+        reset() {
+          api.clear(); oben = null; bild();
+          api.sub(mode === 'frei' ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
+          if (mode === 'wl') zeig([[S0.satz]]);
+          else if (mode === 'mo') zeig([[S0.de, ORANGE]]);
+          else if (mode === 'bed') zeig([[S0.w, BLAU]]);
+          else zeig([['a few oder a little?', BLAU]]);
+        },
+        async play() {
+          if (mode === 'wl') { api.say(await loese(S0, 2700)); return; }
+          if (mode === 'mo') { api.say(await mengenwort(S0)); return; }
+          if (mode === 'bed') {
+            leuchte(S0.g === 'p' ? 0 : S0.g === 'b' ? 1 : -1, false);
+            api.say(`<b>${S0.w}</b> ${U.say(S0.w)} heißt: ${S0.de}.${S0.g === 'l' ? ' Das passt zu beidem, zu Dingen zum Zählen und zu Dingen ohne Mehrzahl.' : S0.w === 'a couple of' ? ' Ein couple ist ein Paar.' : ''}`);
+            return;
+          }
+          api.say('<b>a few</b> und <b>a little</b> heißen beide „ein bisschen, ein paar“. Welches passt, hängt vom Wort dahinter ab.');
+          await api.wait(3200);
+          for (const x of frei) { api.say(await loese(x, 2200)); await api.wait(3800); }
+          api.say(await mengenwort(U.pick(T.MO)));
+        },
+      };
+    },
+  };
+
+  // =====================================================
   // Wo? Das Tier springt an seinen Platz
   // =====================================================
   //   ctx: { mode:'bild', prep, ding, tier }
@@ -2322,7 +2403,10 @@
     ['e5-w-koerper', 'Körper: head, hand …'],
     ['e5-w-essen', 'Essen und Trinken: bread, milk …'],
     ['e5-w-farben', 'Farben: red, blue …'],
-    ['e5-w-zeit', 'Tage und Jahreszeiten: Monday, summer …'],
+    ['e5-w-zeit', 'Tage, Monate, Jahreszeiten: Monday, May …'],
+    ['e5-w-gefuehle', 'Gefühle: happy, sad, tired …'],
+    ['e5-w-party', 'Party und Geburtstag: present, candle …'],
+    ['e5-w-adj', 'Beschreiben: big, old, boring …'],
   ];
   const passe = (t, maxW) => { try { let fs = parseFloat(t.style.fontSize) || 16; while (fs > 9 && t.getComputedTextLength() > maxW) { fs -= 1; t.style.fontSize = fs + 'px'; } } catch (e) {} };
   function wfKarte(api, x, y, w, h, wort, offen) {

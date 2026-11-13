@@ -314,6 +314,23 @@
       ['How *much children are in your class?', 'many', 'children kann man zählen: <b>many</b>.'],
       ['There isn’t *many water in the bottle.', 'much', 'water kann man nicht zählen: <b>much</b>.']]));
 
+  K('e5-wenig',
+    lueckenK('Setze <b>a few</b> oder <b>a little</b> ein.', [
+      ['We need ___ eggs and ___ milk for the pancakes.', ['a few', 'a little'], 'eggs kann man zählen: a few. milk nicht: a little.', 'Wir brauchen ein paar Eier und ein bisschen Milch für die Pfannkuchen.'],
+      ['I have ___ time, so I can read ___ pages.', ['a little', 'a few'], 'time nicht zählbar: a little. pages zählbar: a few.', 'Ich habe ein bisschen Zeit, also kann ich ein paar Seiten lesen.'],
+      ['Put ___ sugar and ___ strawberries on the cake.', ['a little', 'a few'], 'sugar nicht zählbar: a little. strawberries zählbar: a few.', 'Tu ein bisschen Zucker und ein paar Erdbeeren auf den Kuchen.']],
+    'Zählbar → a few. Nicht zählbar → a little.'),
+    fehlerK([['Can I have a *few milk, please?', 'little', 'milk kann man nicht zählen: a <b>little</b> milk.'],
+      ['There are a *little apples in the bowl.', 'few', 'apples kann man zählen: a <b>few</b> apples.'],
+      ['Would you like a cup *off tea?', 'of', 'Zwischen Mengenwort und Ding steht <b>of</b>, mit einem f.'],
+      ['Can I have a *bottle of cake, please?', 'piece', 'Kuchen kommt nicht in eine Flasche: a <b>piece</b> of cake.'],
+      ['I eat a *bar of bread every morning.', 'slice', 'Brot isst man scheibenweise: a <b>slice</b> of bread.']]),
+    wahlK('Welches Mengenwort passt? Denk nach!', [
+      ['a ___ of soup', 'bowl', ['slice', 'bar'], 'Suppe isst man aus einer Schüssel: a <b>bowl</b> of soup.'],
+      ['a ___ of pizza', 'slice', ['bottle', 'cup'], 'Ein Stück Pizza: a <b>slice</b> (oder piece) of pizza.'],
+      ['a ___ of orange juice', 'glass', ['slice', 'bar'], 'Saft trinkt man aus einem Glas: a <b>glass</b> of orange juice.'],
+      ['a ___ of paper', 'piece', ['bottle', 'cup'], 'Ein Blatt Papier heißt auf Englisch a <b>piece</b> of paper.']], 'Flüssiges: bottle, glass, cup. Festes: piece, slice, bar.'));
+
   K('e5-ort',
     wahlK('Denk um die Ecke!', [
       ['The cat is in front of the box. So the box is ___ the cat.', 'behind', ['in front of', 'next to', 'under'], 'Steht die Katze vor der Kiste, ist die Kiste <b>hinter</b> der Katze.'],

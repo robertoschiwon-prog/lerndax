@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v76`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 13.11.2026, Version `lerndax-v77`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -198,6 +198,15 @@ Weitere Dokumente:
   (Westermann, 978-3-14-115406-1), Biologie LINDER Biologie SI 5 Sachsen (Westermann, 978-3-14-153000-1).
   **Als Nächstes:** Fotos der Inhaltsverzeichnisse von Green Line 1 und Deutschbuch, dann EnDax mit den Units und DeDax mit den
   Kapiteln abgleichen (Reihenfolge, Grammatik je Unit, Begriffe).
+- **EnDax v77 (13.11.2026): nach dem Schulbuch geordnet.** Roberto hat das Inhaltsverzeichnis von Green Line 1 fotografiert.
+  Abgleich in `faecher/englisch/lehrplan/schulbuch-abgleich.md`. Die sechs Bereiche heißen jetzt wie im Buch: **Hello!, Unit 1 bis
+  Unit 4** und **„Extra: nicht in Green Line 1“** (have got, this/that, Tiere, Körper, Lesen und die Vergangenheit, die erst in
+  Klasse 6 kommt). Themen-IDs unverändert, also kein Lernstand verloren. **Neu (50 Themen):** Wortfelder Gefühle (Unit 1), Beschreiben
+  (Adjektive, Unit 3), Party und Geburtstag (Unit 4), Monate im Wortfeld Zeit, Thema `e5-wenig` „a few, a little, a bottle of“
+  (Unit 4), Kurzantworten im present progressive (Yes, she is). 1714 Aufnahmen je Aussprache.
+  **Deutschbuch** ebenfalls fotografiert: Abgleich in `faecher/deutsch/lehrplan/schulbuch-abgleich.md` (Lücken: Präpositionen,
+  Adverbien, adverbiale Bestimmungen, Satzreihe, silbentrennendes h, Apposition …). **Offene Frage an Roberto: „Nomen“ (wie
+  im Buch) oder „Substantiv“ (bisher in DeDax)?** Außerdem: britische Stimme als Voreinstellung, weil das Buch britisch ist?
 - Der Rest dieses Abschnitts ist der Verlauf der bisherigen Übergaben (MaDax, dann DeDax) und bleibt zum Nachlesen stehen.
 
 
@@ -1235,6 +1244,11 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v77: EnDax nach Green Line 1 geordnet, 4 neue Themen** (13.11.2026). Geändert: `web/englisch/themen/klasse5.js`
+  (Bereiche = Units, Wortfelder Gefühle, Party, Beschreiben, Monate, Thema `e5-wenig`, Kurzantworten `ppKurzantwort`),
+  `klasse5-knobel.js`, `erklaerungen/klasse5.js` (`EX['e5-wenig']`), `symbole.js`, Aufnahmen-Pakete, `web/plattform/faecher.js`
+  (50 Themen), `web/sw.js`; neu `faecher/englisch/lehrplan/schulbuch-abgleich.md`, neu geschrieben
+  `faecher/deutsch/lehrplan/schulbuch-abgleich.md`. Tests siehe unten.
 - **v76: Schulbücher eingetragen** (13.11.2026): ISBN aller Klasse-5-Bücher bestimmt. Geändert nur Doku: `STAND.md`,
   `faecher/README.md`, `faecher/englisch/README.md`, `faecher/englisch/themenplan.md`, `faecher/deutsch/README.md`,
   `faecher/deutsch/lehrplan/schulbuch-abgleich.md`; dazu `web/sw.js` (Version). Keine Tests nötig, die App ist unverändert.
