@@ -21,6 +21,17 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu. Näher am Schulbuch (lerndax-v90, 14.11.2026)
+
+Roberto wollte die Bilder aus dem Buch verwenden (Wiedererkennung). Das geht nicht, weil App und Code öffentlich sind.
+Stattdessen (seine Wahl „beides“):
+- **Seitenhinweis je Thema:** Jedes BioDax-Thema hat `buch: 'S. …'` (in `D.grades[5]`, `klasse5-3.js`). `fach.js` zeigt
+  „📖 Buch S. …“ auf der Themenkachel und über der Aufgabe. Gilt für alle Fächer, sobald ein Thema `buch` hat (bisher nur Bio).
+- **Wörter wie im Buch an den beschrifteten Bildern:** Feder mit **Federast** (S. 94), Skelett mit **Hüftknochen** statt Becken,
+  dazu **Schlüsselbein** und **Kniescheibe** (S. 153). Fisch (S. 21) und Ei (S. 107) passten schon.
+- Die Zeichnungen bleiben eigene, schlichte Zeichnungen; nichts ist abgezeichnet.
+- Tests: Generatoren (50 Themen, 0 Fehler), `biodax.py 2` für Feder, Skelett, Frosch, `hub.py`, `gedax.py 1` für ein Thema.
+
 ## 0. Übergabe vom 14.11.2026: BioDax gebaut (`lerndax-v89`)
 
 - **BioDax (Biologie) Klasse 5 ist gebaut und live** (Auftrag Roberto am 14.11.: „alles bauen, mit den Lurchen zuerst, ich schaue

@@ -210,7 +210,7 @@
 
   G.vogelFeder = baue('b5-vogel-feder', {
     h: 'Schwungfedern bilden die Tragfläche, Steuerfedern am Schwanz lenken und bremsen, Deckfedern schützen, Daunen wärmen.',
-    B: { svg: 'feder', teile: D.teile.feder, was: { 'Schaft': 'Er ist hohl und trotzdem fest und biegsam.', 'Fahne': 'Sie besteht aus vielen Ästen, die sich ineinander verhaken.', 'Spule': 'Mit der Spule steckt die Feder in der Haut.' } },
+    B: { svg: 'feder', teile: D.teile.feder, was: { 'Schaft': 'Er ist hohl und trotzdem fest und biegsam.', 'Fahne': 'Sie besteht aus vielen Ästen, die sich ineinander verhaken.', 'Spule': 'Mit der Spule steckt die Feder in der Haut.', 'Federast': 'Viele Federäste gehen links und rechts vom Schaft ab. Ihre Haken- und Bogenstrahlen verhaken sich.' } },
     S: { kats: ['Schwungfeder', 'Steuerfeder', 'Deckfeder', 'Daune'], f: (x) => `Welche Feder ist gemeint? <b>${x}</b>`, h: 'Schwung = Flügel, Steuer = Schwanz, Deck = außen am Körper, Daune = darunter.',
       items: [['sitzt am Flügel', 0], ['bildet die Tragfläche', 0], ['sitzt am Schwanz', 1], ['lenkt und bremst beim Landen', 1], ['bedeckt den Körper wie Dachziegel', 2], ['schützt vor Wind und Regen', 2], ['weich und flauschig, direkt am Körper', 3], ['hält warm', 3]] },
     F: [

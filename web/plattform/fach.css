@@ -609,3 +609,7 @@ body.noscroll{overflow:hidden}
 .ordleer{color:#8b8577;font-size:14px;font-weight:700;padding:0 4px}
 .ordpool{display:flex;flex-wrap:wrap;gap:6px;min-height:52px;margin:0 0 6px}
 .ordziel .tok{border-color:var(--ink);background:#dfe9ff}
+
+/* Seitenhinweis zum Schulbuch (Thema hat buch: 'S. …') */
+.topic .tt .tb{display:block;font-size:11.5px;font-weight:700;opacity:.65;margin-top:2px}
+.tbuch{display:inline-block;font-size:12px;font-weight:700;opacity:.7;margin:0 0 12px 8px;vertical-align:middle}

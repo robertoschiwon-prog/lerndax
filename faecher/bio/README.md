@@ -58,3 +58,8 @@ Lehrkraft oder Kind im öffentlichen Code; nichts aus dem Schulbuch abschreiben 
 2. Welche sechs Arten je Tiergruppe behandelt die Schule (Buch, Hefter)?
 3. Fortpflanzung des Menschen (Pubertät): **ja** (Roberto, 14.11.2026). Schutz vor Missbrauch: **ja, als kurzes Thema** (14.11.2026).
 4. Welcher Wahlbereich (Winter, Saurier, Tierhaltung)?
+
+## Nähe zum Schulbuch (seit v90)
+- Jedes Thema nennt die Buchseiten (`buch: 'S. …'` in `D.grades[5]`); die App zeigt „📖 Buch S. …“.
+- Beschriftete Bilder nutzen die Wörter aus dem Buch (Feder S. 94, Skelett S. 153, Fisch S. 21, Ei S. 107).
+- Bilder aus dem Buch werden nicht übernommen (App und Code sind öffentlich); alle Bilder sind selbst gezeichnet.

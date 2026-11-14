@@ -163,7 +163,7 @@
             <div class="twrap">
               <button class="topic" data-topic="${t.id}">
                 <span class="ti bg${nr}">${(F.icons && F.icons.svg(t.id)) || t.icon}</span>
-                <span class="tt">${t.title}</span>
+                <span class="tt">${t.title}${t.buch ? `<small class="tb">📖 Buch ${t.buch}</small>` : ''}</span>
                 ${starHtml(mastery(t.id).stars)}${(S.knobel || {})[t.id] && S.knobel[t.id].ok ? `<span class="knz" title="${S.knobel[t.id].ok} Knobel-Aufgaben geknackt">🧩 ${S.knobel[t.id].ok}</span>` : ''}
               </button>
               ${EXP[t.id] ? `<button class="explbtn" data-explain="${t.id}" aria-label="Erklärung zu ${t.title} ansehen">▶</button>` : ''}
@@ -393,7 +393,7 @@
     $app.innerHTML = `
       <div class="ptop"><button class="x" data-go="home" aria-label="Runde beenden">✕</button><div class="bar">${bar}</div></div>
       <div class="card">
-        <span class="tag bg${lb.nr}">${R.knobel ? '🧩 Knobeln · ' : ''}${topic.title}</span>
+        <span class="tag bg${lb.nr}">${R.knobel ? '🧩 Knobeln · ' : ''}${topic.title}</span>${topic.buch ? `<span class="tbuch">📖 Buch ${topic.buch}</span>` : ''}
         <p class="q">${task.prompt}</p>
         ${task.figure ? `<div class="fig">${task.figure}</div>` : ''}
         ${inputs}

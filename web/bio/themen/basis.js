@@ -174,9 +174,9 @@
     }[art];
     return S('0 0 200 120', bg('#e6f1fb') + s + kopf, 'Schnabel');
   }
-  // Feder mit Nummern: 1 Schaft (Kiel), 2 Fahne, 3 Spule
-  const FEDER_TEILE = ['Schaft', 'Fahne', 'Spule'];
-  const feder = () => S('0 0 200 120', bg('#f6efe2') + `<path d="M20 100 L176 22" stroke="#7a6a54" stroke-width="3.5" stroke-linecap="round"/><path d="M52 84 C60 40 130 14 176 22 C170 60 110 96 52 84Z" fill="#8fb0d8" opacity=".9"/><path d="M52 84 L176 22" stroke="#5a6f94" stroke-width="2.5"/>` + [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `<path d="M${64 + i * 13} ${78 - i * 6.5} l-2 -22 M${64 + i * 13} ${78 - i * 6.5} l20 6" stroke="#5a6f94" stroke-width="1"/>`).join('') + marken([[150, 80, 120, 50], [84, 20, 100, 46], [18, 70, 32, 94]]), 'Feder');
+  // Feder mit Nummern: 1 Schaft, 2 Fahne, 3 Spule, 4 Federast (Wörter wie im Buch S. 94)
+  const FEDER_TEILE = ['Schaft', 'Fahne', 'Spule', 'Federast'];
+  const feder = () => S('0 0 200 120', bg('#f6efe2') + `<path d="M20 100 L176 22" stroke="#7a6a54" stroke-width="3.5" stroke-linecap="round"/><path d="M52 84 C60 40 130 14 176 22 C170 60 110 96 52 84Z" fill="#8fb0d8" opacity=".9"/><path d="M52 84 L176 22" stroke="#5a6f94" stroke-width="2.5"/>` + [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `<path d="M${64 + i * 13} ${78 - i * 6.5} l-2 -22 M${64 + i * 13} ${78 - i * 6.5} l20 6" stroke="#5a6f94" stroke-width="1"/>`).join('') + `<path d="M142 39 l20 6" stroke="#22314f" stroke-width="2.2"/>` + marken([[150, 80, 120, 50], [84, 20, 100, 46], [18, 70, 32, 94], [186, 66, 156, 44]]), 'Feder');
   // Hühnerei im Schnitt: 1 Kalkschale, 2 Eiklar, 3 Dotter, 4 Keimscheibe, 5 Hagelschnur, 6 Luftkammer
   const EI_TEILE = ['Kalkschale', 'Eiklar', 'Dotter', 'Keimscheibe', 'Hagelschnur', 'Luftkammer'];
   const ei = () => S('0 0 200 120', bg('#f6efe2') + `<ellipse cx="100" cy="62" rx="74" ry="50" fill="#e8d2b0" stroke="#b08d57" stroke-width="4"/><ellipse cx="100" cy="62" rx="68" ry="44" fill="#fbfaf0"/><path d="M160 40 C172 52 172 72 160 84 C156 70 156 54 160 40Z" fill="#dfe9f2" stroke="#a9b9c9"/><path d="M36 62 q10 -8 18 0 q10 8 18 0 M124 62 q8 -8 16 0 q8 8 16 0" stroke="#c9c2a8" stroke-width="3" fill="none"/><circle cx="98" cy="62" r="26" fill="#f2b632"/><ellipse cx="98" cy="42" rx="7" ry="3.5" fill="#fff7d6" stroke="#c98a1e"/>` + marken([[20, 16, 44, 30], [56, 106, 70, 84], [100, 108, 100, 80], [100, 8, 98, 40], [186, 104, 140, 64], [184, 16, 164, 52]]), 'Hühnerei');
@@ -204,11 +204,12 @@
     }[art];
     return S('0 0 200 120', bg('#f6efe2') + g, 'Vordergliedmaße');
   }
-  // Skelett des Menschen mit Nummern: 1 Schädel, 2 Wirbelsäule, 3 Brustkorb, 4 Becken, 5 Oberarmknochen, 6 Oberschenkelknochen
-  const SKELETT_TEILE = ['Schädel', 'Wirbelsäule', 'Brustkorb', 'Becken', 'Oberarmknochen', 'Oberschenkelknochen'];
+  // Skelett des Menschen mit Nummern (Wörter wie im Buch S. 153): 1 Schädel, 2 Wirbelsäule, 3 Brustkorb, 4 Hüftknochen, 5 Oberarmknochen, 6 Oberschenkelknochen, 7 Schlüsselbein, 8 Kniescheibe
+  const SKELETT_TEILE = ['Schädel', 'Wirbelsäule', 'Brustkorb', 'Hüftknochen', 'Oberarmknochen', 'Oberschenkelknochen', 'Schlüsselbein', 'Kniescheibe'];
   const skelett = () => { const K = '#fbf6e6', L = '#8a7d5a'; const b = (d, w) => `<path d="${d}" stroke="${L}" stroke-width="${(w || 5) + 2}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${K}" stroke-width="${w || 5}" fill="none" stroke-linecap="round"/>`;
     return S('0 0 200 170', bg('#e9eef6', 200, 170) + b('M100 34 V96', 5) + `<ellipse cx="100" cy="20" rx="13" ry="15" fill="${K}" stroke="${L}" stroke-width="2"/><circle cx="95" cy="19" r="3" fill="${L}"/><circle cx="105" cy="19" r="3" fill="${L}"/>` + [44, 52, 60, 68].map((y) => `<path d="M100 ${y} C84 ${y - 4} 78 ${y + 4} 82 ${y + 8} M100 ${y} C116 ${y - 4} 122 ${y + 4} 118 ${y + 8}" stroke="${L}" stroke-width="2.5" fill="none"/>`).join('') + `<path d="M82 96 C86 88 114 88 118 96 C116 108 84 108 82 96Z" fill="${K}" stroke="${L}" stroke-width="2"/>` + b('M80 40 H120', 4) + b('M80 40 L70 72') + b('M70 72 L66 100', 4) + b('M120 40 L130 72') + b('M130 72 L134 100', 4) + b('M90 104 L86 136', 6) + b('M86 136 L84 164', 5) + b('M110 104 L114 136', 6) + b('M114 136 L116 164', 5)
-      + marken([[150, 14, 112, 18], [36, 86, 100, 84], [158, 50, 120, 58], [156, 104, 114, 100], [40, 50, 74, 56], [44, 126, 88, 120]]), 'Skelett des Menschen'); };
+      + `<circle cx="86" cy="136" r="4.5" fill="${K}" stroke="${L}" stroke-width="1.5"/><circle cx="114" cy="136" r="4.5" fill="${K}" stroke="${L}" stroke-width="1.5"/>`
+      + marken([[150, 12, 112, 18], [36, 86, 100, 84], [162, 62, 120, 60], [158, 106, 114, 100], [40, 50, 74, 56], [44, 126, 88, 120], [166, 36, 112, 40], [156, 142, 118, 137]]), 'Skelett des Menschen'); };
 
   const BILDER = {
     // Lurche
