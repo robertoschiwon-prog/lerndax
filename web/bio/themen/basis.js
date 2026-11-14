@@ -450,7 +450,7 @@
     armMensch: () => gliedmasse('mensch'), armMaulwurf: () => gliedmasse('maulwurf'), armFledermaus: () => gliedmasse('fledermaus'), armWal: () => gliedmasse('wal'), armPferd: () => gliedmasse('pferd'),
     skelett,
   };
-  // ---------------------------------------------------- Fotos (Test seit v97)
+  // ---------------------------------------------------- Fotos (seit v97; v98: alle 11 Lurche)
   // Frei nutzbare Fotos von Wikimedia Commons, direkt von dort geladen. Fotograf und Lizenz stehen im Bild und in web/bio/bildnachweis.html.
   // Lädt das Foto nicht (kein Netz), bleibt die Zeichnung darunter sichtbar.
   const FOTOS = {
@@ -458,6 +458,13 @@
     grasfrosch: { datei: 'Rana temporaria.jpg', von: 'Richard Bartz', liz: 'CC BY-SA 2.5' },
     laubfrosch: { datei: 'Laubfrosch (Hyla arborea).jpg', von: 'THAWonderland', liz: 'CC BY-SA 4.0' },
     erdkroete: { datei: 'Bufo bufo 2015 G3.jpg', von: 'George Chernilevsky', liz: 'gemeinfrei' },
+    kreuzkroete: { datei: 'Epidalea calamita 02 by-dpc.jpg', von: 'David Pérez (DPC)', liz: 'CC BY 3.0' },
+    rotbauchunke: { datei: 'Benny Trapp Bombina bombina Rotbauchunke.jpg', von: 'Benny Trapp', liz: 'CC BY-SA 3.0' },
+    gelbbauchunke: { datei: 'Gelbbauchunke-Bombina-variegata.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
+    feuersalamander: { datei: 'Salamandra salamandra 1.jpg', von: 'Joshua Lutz', liz: 'gemeinfrei' },
+    teichmolch: { datei: 'Teichmolch-triturus-vulgaris.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
+    bergmolch: { datei: 'Ichthyosaura alpestris Bergmolch.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
+    kammmolch: { datei: 'TriturusCristatus.jpg', von: 'Christian Fischer', liz: 'CC BY-SA 3.0' },
   };
   D.fotos = FOTOS;
   const fotoUrl = (datei, breite) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(datei.replace(/ /g, '_'))}?width=${breite || 640}`;

@@ -21,6 +21,14 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-8. Fotos für alle elf Lurche (lerndax-v98, 14.11.2026)
+
+Roberto: „Ein paar Bilder sind da. Mach mal weiter.“ Die Fotos laden also am Handy. Neu in `FOTOS`: Kreuzkröte (David Pérez,
+CC BY 3.0), Rotbauchunke (Benny Trapp, CC BY-SA 3.0), Gelbbauchunke (Holger Krisp, CC BY 3.0), Feuersalamander (Joshua Lutz,
+gemeinfrei), Teichmolch und Bergmolch (Holger Krisp, CC BY 3.0), Kammmolch (Christian Fischer, CC BY-SA 3.0). Lizenzen aus den
+Dateiseiten bei Wikimedia Commons (über die Suche gelesen). Ansehen konnte Claude die Fotos nicht. Bildnachweis ergänzt.
+Noch Zeichnungen: Laich und Kaulquappen, Fische, Kriechtiere, Vögel, alle Schaubilder.
+
 ## 0-neu-7. Test: echte Fotos statt Zeichnungen (lerndax-v97, 14.11.2026)
 
 Roberto gefallen die gezeichneten Bilder „überhaupt nicht“ (auch die neuen). Test mit freien Fotos von Wikimedia Commons für vier
