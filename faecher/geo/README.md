@@ -53,7 +53,7 @@ eintragen und in `bildnachweis.html` ergänzen.
 
 - Genau der sächsische Lehrplan, alles darüber hinaus in „Entdecken“.
 - Keine Namen von Kind, Schule oder Lehrkräften im Code (Repository ist öffentlich).
-- Nichts aus dem Schulbuch abschreiben, keine Bilder aus dem Buch. Seitenhinweise und die Fachwörter des Buchs: ja.
+- **Eng ans Schulbuch halten** (Roberto, 14.11.2026): Themen, Reihenfolge, Fachwörter und Erklärungen kommen aus dem Buch (Fotos in `notizen/`), in eigenen Worten und ohne Bilder aus dem Buch. Im Netz wird nur noch nachgeschlagen, was veralten kann (Einwohner, Mengen, Jahreszahlen der Gegenwart) oder im Buch nicht steht; das weiter mit Quelle festhalten.
 - Erklärungen: keine bloße Wiederholung der Frage; Merkzettel oder eine Animation, die etwas Neues zeigt.
 
 ## Tests
