@@ -11,9 +11,10 @@
   const txt = (p, x, y, text, size, fill, anchor) => el('text', { x, y, 'text-anchor': anchor || 'middle', class: 'k-txt', text, style: `font-size:${size || 14}px;fill:${fill || W}` }, p);
   const zeig = (api, e, ms) => api.tw(ms || 350, (t) => e.setAttribute('opacity', t));
   // Ein Bild aus D.bilder auf die Bühne setzen (Breite w, Verhältnis 200:120)
-  function bild(p, name, x, y, w, rahmen) {
+  // quelle: D.bilder (Fotos, wo es welche gibt) oder D.zeichnungen (eigene Zeichnungen, z. B. mit farbigen Knochen)
+  function bild(p, name, x, y, w, rahmen, quelle) {
     const g = el('g', { opacity: 0 }, p), h = w * 0.6;
-    g.innerHTML = D.bilder[name]().replace(/^<svg([^>]*)>/, (m, a) => `<svg${a.replace(/ (style|role|aria-label)="[^"]*"/g, '')} x="${x}" y="${y}" width="${w}" height="${h}">`);
+    g.innerHTML = (quelle || D.bilder)[name]().replace(/^<svg([^>]*)>/, (m, a) => `<svg${a.replace(/ (style|role|aria-label)="[^"]*"/g, '')} x="${x}" y="${y}" width="${w}" height="${h}">`);
     el('rect', { x, y, width: w, height: h, rx: 5, fill: 'none', stroke: rahmen || '#3a3e66', 'stroke-width': 2 }, g);
     return g;
   }
@@ -124,7 +125,7 @@
           await zeig(api, leg); await api.wait(3600);
           let alt = null, altT = null;
           for (const [name, label] of T) {
-            const b = bild(g, name, 70, 20, 220, GELB), t = txt(g, 180, 178, label, 16, GELB);
+            const b = bild(g, name, 70, 20, 220, GELB, D.zeichnungen || D.bilder), t = txt(g, 180, 178, label, 16, GELB);
             t.setAttribute('opacity', 0);
             await api.tw(450, (k) => { b.setAttribute('opacity', k); t.setAttribute('opacity', k); if (alt) { alt.setAttribute('opacity', 1 - k); altT.setAttribute('opacity', 1 - k); } });
             if (alt) { alt.remove(); altT.remove(); }

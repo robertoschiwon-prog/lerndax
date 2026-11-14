@@ -485,16 +485,79 @@
     schleiereule: { datei: 'Tyto alba (Scopoli, 1769).jpg', von: 'Michael Gäbler', liz: 'CC BY 3.0' },
     bussard: { datei: 'Buzzard.jpg', von: 'Andreas Trepte', liz: 'CC BY-SA 2.5' },
     buntspecht: { datei: 'Great spotted woodpecker (Dendrocopos major) male Drenthe.jpg', von: 'Charles J. Sharp', liz: 'CC BY-SA 4.0' },
+    // Entwicklung des Frosches
+    laich: { datei: 'Grasfroschlaich.jpg', von: 'soebe', liz: 'CC BY-SA 3.0', px: [799, 562] },
+    quappe1: { datei: 'Rana temporaria eggs 5.JPG', von: 'Mnolf, B kimmel', liz: 'CC BY-SA 3.0', px: [480, 360] },
+    quappe2: { datei: 'Pelophylax perezi 03 by-dpc.jpg', von: 'David Pérez', liz: 'CC BY 3.0', px: [1577, 1055] },
+    quappe3: { datei: 'Woodfrog tadpole.jpg', von: 'Brian Gratwicke', liz: 'CC BY 2.0', px: [3000, 2000] },
+    quappe4: { datei: 'Rana Temporaria - Larva Final Stage.jpg', von: 'Viridiflavus', liz: 'CC BY-SA 3.0', px: [1443, 1168] },
+    jungfrosch: { datei: 'Rana temporaria juv 01.JPG', von: 'Nicolas Weghaupt', liz: 'CC0', px: [4488, 3033], aus: [0.12, 0.2, 0.58, 0.78] },
+    // Bilder zum Beschriften: Nummern liegen auf dem Foto
+    fischNr: { datei: 'Cyprinus carpio 2008 G1.jpg', von: 'George Chernilevsky', liz: 'CC BY-SA 3.0', px: [3500, 1600], ganz: true, bg: '#f4f7fa',
+      nr: [[80, 10, 96, 28], [12, 100, 20, 70], [45, 108, 59, 80], [100, 110, 104, 90], [150, 106, 138, 76], [172, 12, 160, 58]] },
+    seitenlinie: { datei: 'Cyprinus carpio 2008 G1.jpg', von: 'George Chernilevsky', liz: 'CC BY-SA 3.0', px: [3500, 1600], ganz: true, bg: '#f4f7fa',
+      extra: '<path d="M151 54 C 125 51, 85 53, 44 57" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M151 54 C 125 51, 85 53, 44 57" fill="none" stroke="#e8432e" stroke-width="2" stroke-dasharray="4 3" stroke-linecap="round"/>'
+        + '<text x="100" y="11" text-anchor="middle" style="font:800 8px Nunito,sans-serif;fill:#e8432e">Seitenlinie</text>' },
+    feder: { datei: 'Feather of Otis tarda.jpg', von: 'Luis Miguel Bugallo Sánchez', liz: 'CC BY-SA 3.0', px: [703, 473],
+      nr: [[105, 104, 76, 63], [140, 96, 130, 48], [12, 74, 28, 87], [184, 82, 163, 56]] },
+    skelett: { datei: 'A Human skeleton.jpg', von: 'Stephanie cheks', liz: 'CC BY-SA 4.0', px: [2649, 3990], aus: [0.03, 0.01, 0.47, 0.985], ganz: true, bg: '#f3efe6', vb: [120, 200], breite: 1000,
+      nr: [[105, 14, 50, 16], [105, 80, 58, 80], [105, 52, 61, 58], [105, 98, 68, 90], [14, 70, 35, 69], [105, 124, 69, 125], [14, 44, 40, 44], [105, 150, 70, 149]] },
+    // Schnäbel
+    schnabelHaken: { datei: 'Buteo buteo -Hamerton Zoo, Cambridgeshire, England -head-8a.jpg', von: 'Spencer Wright', liz: 'CC BY 2.0', px: [4592, 3056] },
+    schnabelSeih: { datei: 'Anas platyrhynchos (male) head.jpg', von: 'Jopparn', liz: 'CC BY-SA 3.0', px: [4032, 3024] },
+    schnabelMeissel: { datei: 'Dendrocopos major (41554885581) (cropped).jpg', von: 'hedera.baltica', liz: 'CC BY-SA 2.0', px: [1452, 1088] },
+    schnabelKegel: { datei: 'Passer domesticus - Jardins du Carrousel.jpg', von: 'PierreSelim', liz: 'CC BY 3.0', px: [2132, 1421] },
+    schnabelPinzette: { datei: 'Rotkehlchenportrait aus ca. 1 Meter Entfernung.jpg', von: 'Joefrei', liz: 'CC BY-SA 3.0', px: [3508, 2480] },
+    // Gebisse
+    gebissFleisch: { datei: 'Canis-lupus-familiaris-german-shepherd4.jpg', von: 'Sven Volkens', liz: 'CC BY-SA 4.0', px: [1720, 1260] },
+    gebissPflanze: { datei: 'Bos primigenius f. taurus - cranium 3.jpg', von: 'MAKY.OREL', liz: 'CC0', px: [4608, 3456] },
+    gebissAlles: { datei: 'Sus scrofa 02 MWNH 404d.jpg', von: 'K. Rassinger, G. Cammerer, Museum Wiesbaden', liz: 'CC BY-SA 3.0', px: [4288, 2848] },
+    // Vordergliedmaßen (Skelette)
+    armMensch: { datei: 'Human-Skeleton.jpg', von: 'Sklmsta', liz: 'CC0', px: [900, 1510], aus: [0, 0.22, 0.2, 1], dreh: true, ganz: true, bg: '#3f4a5a', vb: [200, 56] },
+    armMaulwurf: { datei: 'European mole (Talpa europaea) 1 skeleton at the Royal Veterinary College anatomy museum.JPG', von: 'Mrjohncummings', liz: 'CC BY-SA 3.0', px: [3092, 3558], aus: [0.12, 0.38, 0.88, 0.82] },
+    armFledermaus: { datei: 'HK TST Science Museum Bones exhibit 03 蝙蝠 Bat Chiroptera.JPG', von: 'Amongesle', liz: 'CC BY-SA 3.0', px: [3264, 2448] },
+    armWal: { datei: 'Blue Whale skeleton CAS left lateral flipper.JPG', von: 'BrokenSphere', liz: 'CC BY-SA 3.0', px: [2288, 1712], aus: [0.25, 0.25, 1, 0.95] },
+    armPferd: { datei: 'Horse skeleton at MAV-USP.jpg', von: 'Museum of Veterinary Anatomy FMVZ USP', liz: 'CC BY-SA 4.0', px: [3872, 2592], ganz: true, bg: '#000' },
   };
   D.fotos = FOTOS;
   const fotoUrl = (datei, breite) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(datei.replace(/ /g, '_'))}?width=${breite || 640}`;
   D.fotoUrl = fotoUrl;
-  Object.keys(FOTOS).forEach((name) => {
-    const zeichnung = BILDER[name], f = FOTOS[name];
-    // Der Bildnachweis erscheint erst, wenn das Foto wirklich geladen ist (sonst stünde er unter der Zeichnung)
-    BILDER[name] = () => zeichnung().replace(/<\/svg>$/, `<g class="foto"><image href="${fotoUrl(f.datei)}" x="0" y="0" width="200" height="120" preserveAspectRatio="${f.pos || 'xMidYMid'} slice" onload="this.nextSibling.setAttribute('visibility','visible')"/>`
-      + `<g visibility="hidden"><rect x="0" y="111" width="200" height="9" fill="rgba(255,255,255,.78)"/><text x="3" y="117.6" style="font:600 5.6px Nunito,sans-serif;fill:#2b2540">Foto: ${f.von}, ${f.liz}, Wikimedia Commons</text></g></g></svg>`);
-  });
+  // Die eigenen Zeichnungen bleiben erreichbar (z. B. die farbigen Knochen im Entdecken-Teil)
+  D.zeichnungen = Object.assign({}, BILDER);
+  // Nummern-Marke für Fotos: weißer Rand um die Linie, damit sie auch auf dunklem Grund sichtbar ist
+  const nrF = (n, x, y, tx, ty) => `<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>` + nr(n, x, y, tx, ty).replace(/r="1.8"/, 'r="1.8" stroke="#fff" stroke-width="0.8"');
+  const r1 = (v) => +v.toFixed(1);
+  // Foto über die Zeichnung legen. f.px: Pixelgröße des Fotos; f.aus: Ausschnitt [x0, y0, x1, y1] (Anteile);
+  // f.ganz: ganzen Ausschnitt zeigen (Rand in f.bg), sonst füllen; f.dreh: um 90° nach links drehen; f.vb: eigene Bildgröße.
+  // Alles außer dem Foto selbst wird erst sichtbar, wenn das Foto geladen ist. Ohne Netz bleibt die Zeichnung stehen.
+  function fotoBild(zeichnung, f) {
+    const roh = zeichnung();
+    const vbAlt = (roh.match(/viewBox="([^"]+)"/) || [0, '0 0 200 120'])[1];
+    const [W, H] = f.vb || vbAlt.split(' ').slice(2).map(Number);
+    let inhalt = roh.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+    if (f.vb) inhalt = `<svg x="0" y="0" width="${W}" height="${H}" viewBox="${vbAlt}">${inhalt}</svg>`;
+    let img;
+    if (f.px) {
+      let [pw, ph] = f.px, [x0, y0, x1, y1] = f.aus || [0, 0, 1, 1];
+      if (f.dreh) { [x0, y0, x1, y1] = [y0, 1 - x1, y1, 1 - x0]; [pw, ph] = [ph, pw]; }
+      const cw = (x1 - x0) * pw, ch = (y1 - y0) * ph, s = (f.ganz ? Math.min : Math.max)(W / cw, H / ch);
+      const iw = pw * s, ih = ph * s, ix = W / 2 - (x0 + x1) / 2 * pw * s, iy = H / 2 - (y0 + y1) / 2 * ph * s;
+      const dw = Math.min(W, cw * s), dh = Math.min(H, ch * s), dx = (W - dw) / 2, dy = (H - dh) / 2;
+      const bild = f.dreh
+        ? `<image href="${fotoUrl(f.datei, f.breite)}" width="${r1(ih)}" height="${r1(iw)}" preserveAspectRatio="none" transform="translate(${r1(ix - dx)} ${r1(iy - dy + ih)}) rotate(-90)" onload="LADEN"/>`
+        : `<image href="${fotoUrl(f.datei, f.breite)}" x="${r1(ix - dx)}" y="${r1(iy - dy)}" width="${r1(iw)}" height="${r1(ih)}" preserveAspectRatio="none" onload="LADEN"/>`;
+      img = `<svg x="${r1(dx)}" y="${r1(dy)}" width="${r1(dw)}" height="${r1(dh)}" overflow="hidden">${bild}</svg>`;
+    } else {
+      img = `<image href="${fotoUrl(f.datei, f.breite)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="${f.pos || 'xMidYMid'} slice" onload="LADEN"/>`;
+    }
+    img = img.replace('LADEN', "this.closest('.foto').querySelectorAll('.fz').forEach(function(e){e.setAttribute('visibility','visible')})");
+    const fs = Math.max(4.2, Math.min(5.6, W / 36));
+    return `<svg viewBox="0 0 ${W} ${H}"${(roh.match(/^<svg[^>]*?( role="img".*?)>/) || [0, ''])[1]}>${inhalt}<g class="foto">`
+      + `<g class="fz" visibility="hidden"><rect width="${W}" height="${H}" fill="${f.bg || '#fff'}"/></g>${img}`
+      + `<g class="fz" visibility="hidden">${f.extra || ''}${(f.nr || []).map((m, i) => nrF(i + 1, m[0], m[1], m[2], m[3])).join('')}`
+      + `<rect x="0" y="${H - fs * 1.6}" width="${W}" height="${fs * 1.6}" fill="rgba(255,255,255,.78)"/><text x="2" y="${r1(H - fs * 0.45)}" style="font:600 ${r1(fs)}px Nunito,sans-serif;fill:#2b2540">Foto: ${f.von}, ${f.liz}, Wikimedia Commons</text></g></g></svg>`;
+  }
+  Object.keys(FOTOS).forEach((name) => { const zeichnung = BILDER[name], f = FOTOS[name]; BILDER[name] = () => fotoBild(zeichnung, f); });
   D.bilder = BILDER;
   D.teile = { fischNr: FISCH_TEILE, feder: FEDER_TEILE, ei: EI_TEILE, skelett: SKELETT_TEILE };
 

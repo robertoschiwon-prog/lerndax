@@ -179,8 +179,8 @@
 
   const ARM = [['armMaulwurf', 'Maulwurf', 'Kurze, kräftige Knochen und eine breite Grabhand: zum Graben.'], ['armFledermaus', 'Fledermaus', 'Sehr lange Fingerknochen spannen die Flughaut: zum Fliegen.'], ['armWal', 'Wal', 'Kurze Arm- und viele Fingerknochen in einer Flosse: zum Schwimmen.'], ['armPferd', 'Pferd', 'Lange Knochen und nur eine Zehe mit Huf: zum schnellen Laufen.'], ['armMensch', 'Mensch', 'Bewegliche Finger und ein Daumen, der den anderen Fingern gegenübersteht: zum Greifen.']];
   G.gliedmassen = baue('b5-gliedmassen', {
-    h: 'In Grabhand, Flügel, Flosse und Laufbein stecken die gleichen Knochen: Oberarm (rot), Unterarm (blau), Hand (gelb). Nur ihre Form ist verschieden.',
-    E: { f: 'Zu welchem Säugetier gehört diese Vordergliedmaße? (Oberarm rot, Unterarm blau, Hand gelb)', arten: ARM },
+    h: 'In Grabhand, Flügel, Flosse und Laufbein stecken die gleichen Knochen: ein Oberarmknochen, zwei Unterarmknochen, viele Handknochen. Nur ihre Form ist verschieden.',
+    E: { f: 'Zu welchem Säugetier gehört dieses Skelett? Achte auf die Vordergliedmaße.', arten: ARM },
     S: { kats: ['Maulwurf', 'Fledermaus', 'Delfin', 'Pferd'], f: (x) => `Zu welchem Tier passt das? <b>${x}</b>`, h: 'Boden, Luft, Wasser, Steppe: Der Körper passt zum Lebensraum.',
       items: [['Grabhände wie Schaufeln', 0], ['walzenförmiger Körper, kurzes Fell ohne Strich', 0], ['frisst Regenwürmer und Insektenlarven', 0], ['Flughaut zwischen den Fingern', 1], ['findet Beute mit Ultraschall', 1], ['schläft kopfüber hängend', 1],
         ['Vorderbeine sind Flossen', 2], ['atmet durch ein Blasloch oben am Kopf', 2], ['waagerechte Schwanzflosse (Fluke)', 2], ['tritt mit einer einzigen Zehe auf', 3], ['Unpaarhufer', 3], ['Fluchttier mit langen Beinen', 3]] },
