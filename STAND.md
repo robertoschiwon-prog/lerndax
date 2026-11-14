@@ -21,6 +21,14 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-4. Molche, Kaulquappen, Fische, Kriechtiere neu gezeichnet (lerndax-v94, 14.11.2026)
+
+Roberto: Der Stil der neuen Frösche passt, die übrigen Bilder genauso. In `web/bio/themen/basis.js` neu: `molch()` (4 Schwanzlurche),
+`stufe()` (Laich, 4 Kaulquappen), `fisch()` (Karpfen, Hecht, Forelle, Aal, Fisch mit Nummern, Seitenlinie), `echse()`, `schlange()`
+(Ringelnatter, Kreuzotter, Blindschleiche). Alles eigene Zeichnungen. Die Nummern am Fisch zeigen auf dieselben Stellen wie vorher.
+**Noch alt:** Vögel (Singvögel, Ente, Eule, Bussard, Specht), Schnäbel, Ei, Gebisse, Gliedmaßen, Skelett.
+Test: Generatoren, `biodax.py 1` für sieben Themen mit diesen Bildern.
+
 ## 0-neu-3. Frösche neu gezeichnet (lerndax-v93, 14.11.2026)
 
 - `frosch()` in `web/bio/themen/basis.js` neu: Umriss, gefaltetes Hinterbein mit Schwimmhaut, Vorderbein mit Fingern, Auge mit

@@ -77,57 +77,86 @@
   // o: { k, b, punkte: Farbe der Flecken, kamm, bauchfl }
   function molch(o) {
     o = o || {};
-    const k = o.k || '#8a6d3b', b = o.b || k;
-    const punkte = o.punkte ? [[40, 62], [58, 54], [76, 50], [94, 52], [112, 50], [130, 54], [150, 58], [66, 64], [104, 62], [22, 70], [164, 54]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="${i % 2 ? 5.5 : 4}" ry="${i % 2 ? 3.4 : 3}" fill="${o.punkte}"/>`).join('') : '';
-    const kamm = o.kamm ? `<path d="M10 66 L16 54 L22 62 L30 48 L38 58 L48 42 L58 52 L68 38 L80 48 L92 36 L104 46 L116 36 L128 46 L138 40 L146 50 L146 60 L10 70Z" fill="${o.kamm}"/>` : '';
-    const bein = (x) => `<path d="M${x} 72 L${x - 6} 90 L${x - 14} 92 M${x - 6} 90 L${x - 4} 96 M${x - 6} 90 L${x + 2} 94" stroke="${k}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    return S('0 0 200 120', bg(o.wasser ? WASSER : LAND) + `<path d="M0 98 H200 V120 H0Z" fill="${o.wasser ? '#b7dcf2' : '#cfe0ae'}"/>` + kamm
-      + bein(70) + bein(128)
-      + `<path d="M4 72 C30 60 50 56 80 54 C110 50 140 50 160 52 C178 52 192 58 192 64 C192 72 180 76 164 76 C140 78 110 80 80 78 C50 78 30 78 4 72Z" fill="${k}"/>`
-      + `<path d="M40 76 C70 80 130 80 170 75 C150 82 110 84 80 82 C60 82 48 80 40 76Z" fill="${b}"/>`
-      + (o.bauchfl ? [[70, 80], [96, 82], [122, 81], [146, 79]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="${o.bauchfl}"/>`).join('') : '')
-      + punkte + auge(176, 60, 4.5, o.punkte ? '#1b1b1b' : '#f2c14e'), o.name || 'Schwanzlurch');
+    const k = o.k || '#8a6d3b', b = o.b || k, RAND = 'rgba(0,0,0,.3)';
+    // Rumpf mit Kopf (rechts) und seitlich abgeflachtem Schwanz (links)
+    const rumpf = 'M6 74 C24 66 44 60 70 56 C96 51 124 50 146 52 C156 50 168 50 178 54 C188 57 194 62 194 67 C194 73 186 78 174 78 C166 80 156 80 146 79 C122 82 96 83 72 81 C46 80 26 80 6 74Z';
+    const punkte = o.punkte ? [[30, 70, 5, 3], [50, 63, 6, 3.5], [70, 60, 5, 4], [90, 57, 7, 3.5], [112, 56, 5, 4], [132, 57, 6, 3.5], [152, 58, 5, 3], [62, 72, 5, 3], [100, 70, 6, 3], [136, 70, 5, 3], [170, 58, 5, 3], [182, 66, 3.5, 2.5]].map(([x, y, rx, ry], i) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${o.punkte}" transform="rotate(${i * 23 - 30} ${x} ${y})"/>`).join('') : '';
+    const kamm = o.kamm ? `<path d="M8 72 L14 60 L20 66 L28 52 L36 60 L46 44 L56 54 L66 40 L78 50 L90 38 L102 47 L114 37 L126 47 L136 40 L144 50 L146 56 L8 76Z" fill="${o.kamm}" stroke="${RAND}" stroke-width="1"/>` : '';
+    const saum = o.wasser && !o.kamm ? `<path d="M8 72 C30 58 60 50 100 46 C120 45 136 46 146 52 L146 56 L8 76Z" fill="${k}" opacity=".55"/>` : '';
+    const bein = (x, hinten) => { const d = hinten ? -1 : 1; return `<path d="M${x} 76 L${x + d * 4} 90 L${x + d * 14} 96" stroke="${RAND}" stroke-width="7.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x} 76 L${x + d * 4} 90 L${x + d * 14} 96" stroke="${k}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x + d * 14} 96 l${d * 8} -3 M${x + d * 14} 96 l${d * 9} 2 M${x + d * 14} 96 l${d * 5} 5 M${x + d * 14} 96 l${-d * 1} 6" stroke="${k}" stroke-width="2.4" stroke-linecap="round"/>`; };
+    const boden = o.wasser
+      ? bg(WASSER) + `<path d="M0 100 C40 94 80 104 120 98 C150 94 180 102 200 98 V120 H0Z" fill="#d9cba0"/><path d="M22 104 C24 80 16 60 24 34 M30 104 C34 86 30 70 36 52 M182 102 C178 82 186 66 180 44" stroke="#6aa84f" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="160" cy="22" r="3" fill="none" stroke="#fff" stroke-width="1.2"/><circle cx="168" cy="12" r="2" fill="none" stroke="#fff" stroke-width="1"/>`
+      : bg(LAND) + `<path d="M0 100 H200 V120 H0Z" fill="#cfe0ae"/><path d="M0 100 C30 94 50 98 70 100Z M130 100 C150 92 180 94 200 100Z" fill="#b9cf94"/><path d="M12 102 l3 -11 l3 11 M184 102 l3 -12 l3 12" stroke="#9dbb6c" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+    return S('0 0 200 120', boden + `<ellipse cx="100" cy="100" rx="78" ry="4.5" fill="rgba(0,0,0,.1)"/>` + kamm + saum
+      + bein(66, true) + bein(134, false)
+      + `<path d="${rumpf}" fill="${k}" stroke="${RAND}" stroke-width="1.2"/>`
+      + `<path d="M40 77 C70 78 120 78 150 76 C162 78 176 76 190 70 C188 76 178 78 174 78 C166 80 156 80 146 79 C122 82 96 83 72 81 C58 80.5 48 79.5 40 77Z" fill="${b}"/>`
+      + (o.bauchfl ? [[62, 79.5], [80, 80.5], [98, 80.5], [116, 80], [134, 79.5], [152, 78.5], [170, 77.5]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${1.6 + (i % 2) * 0.5}" fill="${o.bauchfl}"/>`).join('') : '')
+      + punkte
+      + `<path d="M56 62 C86 55 120 54 146 56" stroke="rgba(0,0,0,.13)" stroke-width="1.5" fill="none" stroke-linecap="round"/>`
+      + `<circle cx="178" cy="60" r="5.2" fill="${k}" stroke="${RAND}" stroke-width="1"/><circle cx="178.5" cy="60" r="3.6" fill="${o.punkte ? '#3a2a12' : '#e9b93a'}"/><circle cx="178.5" cy="60" r="2" fill="#1b1b1b"/><circle cx="177.5" cy="59" r=".8" fill="#fff"/>`
+      + `<circle cx="191" cy="63" r="1" fill="${TINTE}"/><path d="M194 68 C188 72 180 73 172 71" stroke="${TINTE}" stroke-width="1.2" fill="none" stroke-linecap="round"/>`, o.name || 'Schwanzlurch');
   }
   // ---------------------------------------------------- Entwicklung des Frosches: Stufen 0..5
   function stufe(i) {
-    const W = bg(WASSER) + `<path d="M0 104 H200 V120 H0Z" fill="#b7dcf2"/><path d="M20 120 C22 90 16 70 24 40 M180 120 C176 96 184 76 176 50" stroke="#6aa84f" stroke-width="4" fill="none"/>`;
-    const Q = '#3b3530';
-    if (i === 0) { // Laich
+    const W = bg(WASSER) + `<path d="M0 104 C40 98 80 108 120 102 C150 98 180 106 200 102 V120 H0Z" fill="#d9cba0"/><path d="M18 106 C22 84 12 64 22 34 M28 106 C32 90 26 76 34 56 M182 104 C176 84 186 66 178 40 M172 104 C170 92 176 82 172 70" stroke="#6aa84f" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M22 34 q10 2 8 12 q-10 0 -8 -12Z M178 40 q-10 2 -8 12 q10 0 8 -12Z" fill="#6aa84f"/>`;
+    const Q = '#3b3530', G = '#5d7a3a', RAND = 'rgba(0,0,0,.3)';
+    const augeK = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#e9b93a"/><circle cx="${x}" cy="${y}" r="${r * 0.55}" fill="#111"/><circle cx="${x - r * 0.3}" cy="${y - r * 0.3}" r="${r * 0.2}" fill="#fff"/>`;
+    // Ruderschwanz mit durchscheinendem Flossensaum; l = Länge
+    const schwanz = (x, f, l) => `<path d="M${x} 52 C${x + l * 0.4} 36 ${x + l * 0.8} 48 ${x + l} 62 C${x + l * 0.8} 76 ${x + l * 0.4} 88 ${x} 74Z" fill="${f}" opacity=".35"/><path d="M${x - 4} 58 C${x + l * 0.4} 56 ${x + l * 0.8} 60 ${x + l} 62 C${x + l * 0.8} 65 ${x + l * 0.4} 70 ${x - 4} 70Z" fill="${f}"/>`;
+    const bein = (d, f) => `<path d="${d}" stroke="${RAND}" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${f}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    if (i === 0) { // Laichballen: Eier in Gallerthüllen
       let s = '';
-      [[70, 50], [92, 44], [114, 50], [60, 68], [82, 64], [104, 66], [126, 68], [72, 84], [94, 86], [116, 84], [138, 56]].forEach(([x, y]) => { s += `<circle cx="${x}" cy="${y}" r="11" fill="#f4fbff" stroke="#a9c9de" stroke-width="1.2" opacity=".95"/><circle cx="${x}" cy="${y}" r="4" fill="${Q}"/>`; });
+      [[70, 46], [92, 40], [114, 46], [58, 64], [81, 61], [104, 62], [127, 64], [70, 82], [93, 84], [116, 82], [138, 50], [47, 80], [139, 80]].forEach(([x, y], n) => { s += `<circle cx="${x}" cy="${y}" r="12" fill="#f6fcff" stroke="#9fc3da" stroke-width="1.2" opacity=".92"/><path d="M${x - 7} ${y - 5} q4 -5 9 -3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="${x + (n % 3) - 1}" cy="${y + (n % 2)}" r="4.2" fill="${Q}"/>`; });
       return S('0 0 200 120', W + s, 'Laich');
     }
-    if (i === 1) return S('0 0 200 120', W + `<path d="M112 62 C140 56 168 60 186 62 C168 66 140 68 112 66Z" fill="${Q}"/><ellipse cx="96" cy="64" rx="24" ry="14" fill="${Q}"/><path d="M76 54 L62 44 M74 58 L58 54 M74 64 L60 66 M76 70 L64 78" stroke="#b5486b" stroke-width="3" stroke-linecap="round"/><circle cx="84" cy="60" r="2.5" fill="#fff"/>`, 'Kaulquappe mit Außenkiemen');
-    if (i === 2) return S('0 0 200 120', W + `<path d="M108 60 C140 46 170 54 190 62 C170 70 140 78 108 68Z" fill="${Q}" opacity=".8"/><ellipse cx="86" cy="64" rx="30" ry="19" fill="${Q}"/><circle cx="68" cy="58" r="3" fill="#fff"/>`, 'Kaulquappe ohne Beine');
-    if (i === 3) return S('0 0 200 120', W + `<path d="M108 60 C140 46 170 54 190 62 C170 70 140 78 108 68Z" fill="${Q}" opacity=".8"/><path d="M104 76 L118 90 L106 98 M106 98 L98 100" stroke="#5a6b3a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="86" cy="64" rx="30" ry="19" fill="#5a6b3a"/><circle cx="68" cy="58" r="3" fill="#fff"/>`, 'Kaulquappe mit Hinterbeinen');
-    if (i === 4) return S('0 0 200 120', W + `<path d="M108 60 C136 50 160 56 176 62 C160 68 136 74 108 68Z" fill="#5a6b3a" opacity=".85"/><path d="M104 76 L118 90 L106 98 M106 98 L98 100 M70 78 L64 94 L72 98" stroke="#5a8f3a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="86" cy="64" rx="30" ry="18" fill="#5a8f3a"/><circle cx="66" cy="54" r="5" fill="#5a8f3a"/><circle cx="66" cy="54" r="3" fill="#f2c14e"/><circle cx="66" cy="54" r="1.5" fill="#111"/>`, 'Kaulquappe mit vier Beinen');
+    if (i === 1) return S('0 0 200 120', W + schwanz(112, Q, 74) + `<ellipse cx="94" cy="64" rx="24" ry="14" fill="${Q}" stroke="${RAND}" stroke-width="1"/><path d="M74 56 q-10 -12 -18 -8 M72 60 q-12 -6 -20 0 M72 66 q-12 2 -18 10 M76 72 q-8 4 -10 12" stroke="#c0527a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M60 46 l-3 -3 M54 58 l-4 -1 M56 74 l-4 2" stroke="#c0527a" stroke-width="1.6" stroke-linecap="round"/>${augeK(82, 59, 3.2)}<path d="M72 68 q4 3 8 1" stroke="#8a8a8a" stroke-width="1.2" fill="none"/>`, 'Kaulquappe mit Außenkiemen');
+    if (i === 2) return S('0 0 200 120', W + schwanz(108, Q, 84) + `<ellipse cx="84" cy="64" rx="30" ry="19" fill="${Q}" stroke="${RAND}" stroke-width="1"/><ellipse cx="88" cy="72" rx="20" ry="9" fill="#5a524a" opacity=".7"/>${augeK(66, 57, 3.6)}<path d="M55 68 q4 3 9 1" stroke="#9a9a9a" stroke-width="1.3" fill="none"/>`, 'Kaulquappe ohne Beine');
+    if (i === 3) return S('0 0 200 120', W + schwanz(108, G, 84) + bein('M104 78 L120 86 L108 96 L98 98', G) + `<ellipse cx="84" cy="64" rx="30" ry="19" fill="${G}" stroke="${RAND}" stroke-width="1"/><ellipse cx="88" cy="73" rx="20" ry="8" fill="#e9e6c5" opacity=".75"/>${augeK(66, 57, 3.8)}<path d="M55 68 q4 3 9 1" stroke="${TINTE}" stroke-width="1.3" fill="none"/>`, 'Kaulquappe mit Hinterbeinen');
+    if (i === 4) return S('0 0 200 120', W + schwanz(110, '#5a8f3a', 62) + bein('M106 78 L122 86 L110 96 L98 98', '#5a8f3a') + bein('M72 78 L66 92 L76 97', '#5a8f3a') + `<path d="M54 66 C54 50 70 44 90 46 C106 48 116 56 116 66 C116 78 102 84 84 84 C66 84 54 78 54 66Z" fill="#5a8f3a" stroke="${RAND}" stroke-width="1"/><path d="M60 74 C74 70 96 70 112 72 C106 80 96 84 84 84 C72 84 64 80 60 74Z" fill="#e9e6c5"/><circle cx="68" cy="50" r="6.5" fill="#5a8f3a" stroke="${RAND}" stroke-width="1"/>${augeK(68, 50, 4.2)}<path d="M54 66 q6 4 14 3" stroke="${TINTE}" stroke-width="1.3" fill="none" stroke-linecap="round"/>`, 'Kaulquappe mit vier Beinen');
     return frosch({ k: '#6aa84f', name: 'Jungfrosch' });
   }
   // ---------------------------------------------------- Fisch
   // o: { k, b, form: 'karpfen'|'hecht'|'forelle'|'aal', marken: Nummern an die Teile }
   function fisch(o) {
     o = o || {};
-    const f = o.form || 'karpfen';
-    const W = bg(WASSER) + `<path d="M0 108 C40 100 80 112 120 104 C150 98 180 108 200 104 V120 H0Z" fill="#c9b98f"/>`;
-    if (f === 'aal') return S('0 0 200 120', W + `<path d="M12 70 C40 40 70 96 100 66 C124 44 150 78 176 58" stroke="#4a5a3a" stroke-width="13" fill="none" stroke-linecap="round"/><path d="M14 66 C40 34 70 90 100 60 C122 40 140 62 160 56" stroke="#3c4a30" stroke-width="3" fill="none"/>${auge(174, 56, 2.6)}<path d="M158 66 l8 8 l2 -8Z" fill="#3c4a30"/>`, 'Aal');
+    const f = o.form || 'karpfen', RAND = 'rgba(0,0,0,.32)';
+    const W = bg(WASSER) + `<path d="M0 108 C40 100 80 112 120 104 C150 98 180 108 200 104 V120 H0Z" fill="#d9cba0"/><path d="M14 108 C16 92 10 80 16 64 M22 108 C24 98 20 90 24 80 M188 106 C184 92 190 82 186 68" stroke="#6aa84f" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="186" cy="30" r="2.5" fill="none" stroke="#fff" stroke-width="1.1"/><circle cx="191" cy="20" r="1.6" fill="none" stroke="#fff" stroke-width="1"/>`;
+    const augeF = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#f1d27a" stroke="rgba(0,0,0,.45)" stroke-width=".8"/><circle cx="${x}" cy="${y}" r="${r * 0.52}" fill="#111"/><circle cx="${x - r * 0.3}" cy="${y - r * 0.3}" r="${r * 0.2}" fill="#fff"/>`;
+    if (f === 'aal') {
+      const weg = 'M12 72 C40 40 70 98 100 68 C124 44 150 80 178 58';
+      return S('0 0 200 120', W + `<path d="${weg}" stroke="${RAND}" stroke-width="15" fill="none" stroke-linecap="round"/><path d="${weg}" stroke="#4d5c3c" stroke-width="13" fill="none" stroke-linecap="round"/>`
+        + `<path d="M12 76 C40 46 70 104 100 74 C124 50 150 86 176 64" stroke="#d9d7a8" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".9"/>`
+        + `<path d="M12 66 C40 33 70 91 100 61 C122 39 142 64 160 58" stroke="#38452c" stroke-width="2.5" fill="none" stroke-linecap="round"/>`
+        + `<path d="M160 68 l7 9 l3 -9Z" fill="#38452c" stroke="${RAND}" stroke-width=".8"/>${augeF(176, 56, 2.6)}<path d="M184 60 l-7 2" stroke="${TINTE}" stroke-width="1.1" stroke-linecap="round"/>`, 'Aal');
+    }
     const P = {
-      karpfen: { k: '#b08a3c', b: '#e8d9a0', body: 'M26 62 C50 26 110 22 150 44 C166 52 176 58 178 62 C176 68 164 76 148 82 C108 98 50 94 26 62Z', rf: 'M70 34 C90 16 126 20 138 38 L130 40 C110 30 90 34 78 40Z', sf: 'M28 62 L4 40 C12 56 12 68 4 86Z', af: 'M70 88 L64 104 L88 92Z', bf: 'M100 90 L96 106 L116 92Z', brf: 'M136 72 L128 90 L148 78Z' },
-      hecht: { k: '#6b8a4a', b: '#dfe7c0', body: 'M24 62 C50 46 120 44 160 52 C176 56 190 60 194 62 C188 66 176 70 160 72 C120 80 50 78 24 62Z', rf: 'M52 48 C60 34 78 34 84 46 L76 48Z', sf: 'M26 62 L4 44 C10 58 10 66 4 82Z', af: 'M54 76 L52 90 L74 78Z', bf: 'M104 76 L100 90 L118 78Z', brf: 'M148 68 L142 82 L158 72Z' },
-      forelle: { k: '#8a9a6a', b: '#f0e6c8', body: 'M24 62 C50 38 110 34 150 46 C168 52 180 58 184 62 C180 66 168 72 150 78 C110 90 50 86 24 62Z', rf: 'M88 38 C96 24 112 24 120 38 L112 40Z', sf: 'M26 62 L4 42 C10 56 10 68 4 84Z', af: 'M64 82 L60 96 L80 86Z', bf: 'M100 84 L96 98 L114 86Z', brf: 'M140 72 L134 88 L152 76Z' },
+      karpfen: { k: '#b08a3c', b: '#ecdfa8', fl: '#9a7430', body: 'M26 62 C50 26 110 22 150 44 C166 52 176 58 178 62 C176 68 164 76 148 82 C108 98 50 94 26 62Z', rf: 'M70 34 C90 16 126 20 138 38 L130 40 C110 30 90 34 78 40Z', sf: 'M28 62 L4 40 C12 56 12 68 4 86Z', af: 'M70 88 L64 104 L88 92Z', bf: 'M100 90 L96 106 L116 92Z', brf: 'M136 72 L128 90 L148 78Z', kd: 'M146 48 C136 56 136 70 146 80 C156 78 164 72 170 66 C168 58 160 52 146 48Z', ax: 160, ay: 58, maul: 'M178 63 l-7 3' },
+      hecht: { k: '#6b8a4a', b: '#e3ebc6', fl: '#58733c', body: 'M24 62 C50 46 120 44 160 52 C176 56 190 60 194 62 C188 66 176 70 160 72 C120 80 50 78 24 62Z', rf: 'M52 48 C60 34 78 34 84 46 L76 48Z', sf: 'M26 62 L4 44 C10 58 10 66 4 82Z', af: 'M54 76 L52 90 L74 78Z', bf: 'M104 76 L100 90 L118 78Z', brf: 'M148 68 L142 82 L158 72Z', kd: 'M150 53 C144 58 144 67 150 72 C158 71 164 68 168 65 C166 59 160 55 150 53Z', ax: 170, ay: 58, maul: 'M194 62 C186 65 178 66 170 65' },
+      forelle: { k: '#8a9a6a', b: '#f2e9cc', fl: '#74845a', body: 'M24 62 C50 38 110 34 150 46 C168 52 180 58 184 62 C180 66 168 72 150 78 C110 90 50 86 24 62Z', rf: 'M88 38 C96 24 112 24 120 38 L112 40Z', sf: 'M26 62 L4 42 C10 56 10 68 4 84Z', af: 'M64 82 L60 96 L80 86Z', bf: 'M100 84 L96 98 L114 86Z', brf: 'M140 72 L134 88 L152 76Z', kd: 'M146 49 C138 56 138 68 146 76 C156 74 164 70 170 66 C168 58 160 52 146 49Z', ax: 162, ay: 58, maul: 'M184 62 C178 66 172 67 166 66' },
     }[f];
-    const k = o.k || P.k;
-    let extra = '';
-    if (f === 'karpfen') extra = `<path d="M174 68 q4 8 -2 12 M168 70 q2 8 -4 10" stroke="${k}" stroke-width="2" fill="none" stroke-linecap="round"/>` + [[60, 56], [76, 50], [92, 48], [108, 50], [70, 66], [86, 62], [102, 62], [118, 60], [80, 76], [96, 74], [112, 72]].map(([x, y]) => `<path d="M${x} ${y} q6 5 0 10" stroke="rgba(0,0,0,.25)" stroke-width="1.5" fill="none"/>`).join('');
-    if (f === 'forelle') extra = [[60, 58], [78, 52], [96, 50], [114, 52], [70, 66], [90, 62], [108, 62], [126, 58]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${i % 3 ? '#3b3530' : '#d0443a'}"/>`).join('') + `<path d="M50 46 C54 40 60 40 62 46Z" fill="${k}"/>`;
-    if (f === 'hecht') extra = [[50, 60], [70, 56], [90, 58], [110, 56], [130, 60], [60, 66], [100, 66]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="2.5" fill="#dfe7c0" opacity=".8"/>`).join('');
-    const kiemen = f === 'hecht' ? 'M150 54 C144 60 144 66 150 72' : 'M146 50 C138 58 138 68 146 78';
-    const ax = f === 'hecht' ? 170 : 160;
-    return S('0 0 200 120', W + `<path d="${P.sf}" fill="${k}"/><path d="${P.rf}" fill="${k}"/><path d="${P.af}" fill="${k}"/><path d="${P.bf}" fill="${k}"/>`
-      + `<path d="${P.body}" fill="${k}"/><path d="${P.body}" fill="${P.b}" clip-path="inset(55% 0 0 0)" opacity=".85"/>`
-      + extra + `<path d="${P.brf}" fill="${k}" stroke="rgba(0,0,0,.25)"/>`
-      + `<path d="${kiemen}" stroke="${TINTE}" stroke-width="1.8" fill="none"/>`
-      + (o.linie ? `<path d="M34 62 C70 58 110 58 140 62" stroke="${TINTE}" stroke-width="1.2" stroke-dasharray="3 3" fill="none"/>` : '')
-      + auge(ax, 58, 4) + (o.marken ? marken(o.marken) : ''), o.name || 'Fisch');
+    const k = o.k || P.k, id = 'fk-' + f;
+    const flosse = (d, strahlen) => `<path d="${d}" fill="${P.fl}" stroke="${RAND}" stroke-width="1"/><path d="${strahlen}" stroke="rgba(0,0,0,.22)" stroke-width=".9" fill="none"/>`;
+    const str = {
+      karpfen: { sf: 'M26 62 L8 46 M26 62 L8 54 M26 62 L9 62 M26 62 L8 70 M26 62 L8 80', rf: 'M82 38 L88 24 M92 34 L100 22 M104 32 L112 22 M116 33 L124 26 M126 36 L132 31', af: 'M72 90 L68 100 M76 91 L76 99 M80 91 L84 94', bf: 'M102 92 L100 102 M106 92 L108 98', brf: 'M136 74 L132 86 M138 75 L140 83' },
+      hecht: { sf: 'M26 62 L8 48 M26 62 L8 56 M26 62 L9 62 M26 62 L8 70 M26 62 L8 78', rf: 'M60 46 L62 38 M68 46 L70 36 M76 46 L78 40', af: 'M58 78 L56 86 M64 78 L66 84', bf: 'M106 78 L104 86 M110 78 L112 82', brf: 'M148 70 L146 79 M152 71 L153 76' },
+      forelle: { sf: 'M26 62 L8 46 M26 62 L8 54 M26 62 L9 62 M26 62 L8 70 M26 62 L8 80', rf: 'M96 38 L98 28 M104 37 L106 26 M112 38 L114 31', af: 'M66 84 L64 92 M72 85 L74 90', bf: 'M102 86 L100 94 M106 86 L108 91', brf: 'M140 74 L138 84 M144 75 L146 81' },
+    }[f];
+    let muster = '';
+    if (f === 'karpfen') { for (let r = 0; r < 7; r++) for (let c = 0; c < 11; c++) { const x = 36 + c * 10 + (r % 2) * 5, y = 34 + r * 9; muster += `M${x} ${y} q6 4.5 0 9 `; } muster = `<path d="${muster}" stroke="rgba(0,0,0,.2)" stroke-width="1.1" fill="none"/>`; }
+    if (f === 'forelle') muster = [[56, 58], [72, 50], [90, 46], [108, 46], [126, 50], [64, 66], [84, 60], [102, 58], [120, 60], [76, 72], [96, 70], [114, 68], [48, 62]].map(([x, y], i) => (i % 3 ? `<circle cx="${x}" cy="${y}" r="2.4" fill="#3b3530"/>` : `<circle cx="${x}" cy="${y}" r="3.4" fill="#d9e6f2"/><circle cx="${x}" cy="${y}" r="2.2" fill="#d0443a"/>`)).join('') + `<path d="M50 46 C54 40 60 40 62 46Z" fill="${P.fl}" stroke="${RAND}" stroke-width=".8"/>`;
+    if (f === 'hecht') muster = [[44, 60], [60, 56], [78, 54], [96, 55], [114, 54], [132, 57], [52, 66], [70, 63], [88, 64], [106, 63], [124, 64], [140, 62]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="${5 - (i % 2)}" ry="2.4" fill="#e3ebc6" opacity=".85"/>`).join('');
+    const barteln = f === 'karpfen' ? `<path d="M174 67 q5 7 0 12 M169 70 q3 7 -3 10" stroke="${P.fl}" stroke-width="2" fill="none" stroke-linecap="round"/>` : '';
+    return S('0 0 200 120', W + `<clipPath id="${id}"><path d="${P.body}"/></clipPath>`
+      + flosse(P.sf, str.sf) + flosse(P.rf, str.rf) + flosse(P.af, str.af) + flosse(P.bf, str.bf)
+      + `<path d="${P.body}" fill="${k}"/>`
+      + `<g clip-path="url(#${id})"><path d="M0 70 C60 78 130 76 200 62 V120 H0Z" fill="${P.b}" opacity=".9"/><path d="M0 20 H200 V40 C130 30 60 34 0 52Z" fill="rgba(0,0,0,.16)"/>${muster}<path d="${P.kd}" fill="rgba(0,0,0,.08)"/></g>`
+      + `<path d="${P.body}" fill="none" stroke="${RAND}" stroke-width="1.3"/>`
+      + barteln + flosse(P.brf, str.brf)
+      + `<path d="${P.kd.split(' C').slice(0, 2).join(' C')}" stroke="${TINTE}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`
+      + (o.linie ? `<path d="M34 62 C70 57 110 57 142 61" stroke="${TINTE}" stroke-width="1.6" stroke-dasharray="1.5 3.5" stroke-linecap="round" fill="none"/>` : `<path d="M34 62 C70 57 110 57 142 61" stroke="rgba(0,0,0,.2)" stroke-width="1" fill="none"/>`)
+      + augeF(P.ax, P.ay, 4.4) + `<path d="${P.maul}" stroke="${TINTE}" stroke-width="1.3" fill="none" stroke-linecap="round"/>`
+      + (o.marken ? marken(o.marken) : ''), o.name || 'Fisch');
   }
   // Fisch mit Nummern: 1 Rückenflosse, 2 Schwanzflosse, 3 Afterflosse, 4 Bauchflosse, 5 Brustflosse, 6 Kiemendeckel
   const FISCH_TEILE = ['Rückenflosse', 'Schwanzflosse', 'Afterflosse', 'Bauchflosse', 'Brustflosse', 'Kiemendeckel'];
@@ -136,24 +165,38 @@
   // ---------------------------------------------------- Kriechtiere
   function echse(o) {
     o = o || {};
-    const k = o.k || '#7a8f4a';
-    const bein = (x, d) => `<path d="M${x} 74 L${x + d * 8} 88 L${x + d * 18} 90" stroke="${k}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-    return S('0 0 200 120', bg(LAND) + `<path d="M0 96 H200 V120 H0Z" fill="#d8c9a0"/>` + bein(70, -1) + bein(120, 1)
-      + `<path d="M4 84 C30 70 50 66 80 62 C110 58 140 58 160 60 C178 60 194 66 194 70 C194 76 180 80 162 80 C140 82 110 82 82 80 C50 80 28 86 4 84Z" fill="${k}"/>`
-      + (o.muster ? [[50, 68], [66, 66], [82, 64], [98, 64], [114, 64], [130, 64], [146, 64]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" fill="${o.muster}"/><circle cx="${x}" cy="${y}" r="1.2" fill="#fff"/>`).join('') : '')
-      + (o.schuppen ? `<path d="M40 74 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0 q5 -5 10 0" stroke="rgba(0,0,0,.3)" fill="none"/>` : '')
-      + auge(178, 66, 3.5), o.name || 'Eidechse');
+    const k = o.k || '#7a8f4a', RAND = 'rgba(0,0,0,.32)';
+    // Körper: langer Schwanz (links), Rumpf, deutlich abgesetzter Kopf (rechts)
+    const rumpf = 'M4 88 C28 82 48 74 74 68 C98 62 124 60 144 62 C152 58 164 57 174 59 C186 61 195 66 195 71 C195 76 186 80 174 80 C164 82 154 82 146 81 C124 84 100 84 78 82 C52 82 30 90 4 88Z';
+    const bein = (x, hinten) => { const d = hinten ? -1 : 1; return `<path d="M${x} 78 L${x + d * 10} 86 L${x + d * 6} 96" stroke="${RAND}" stroke-width="7.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x} 78 L${x + d * 10} 86 L${x + d * 6} 96" stroke="${k}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M${x + d * 6} 96 l${d * 10} -2 M${x + d * 6} 96 l${d * 11} 2 M${x + d * 6} 96 l${d * 8} 5 M${x + d * 6} 96 l${d * 2} 6 M${x + d * 6} 96 l${-d * 4} 4" stroke="${k}" stroke-width="2" stroke-linecap="round"/>`; };
+    let schuppen = '';
+    if (o.schuppen) { for (let r = 0; r < 3; r++) for (let c = 0; c < 17; c++) { const x = 30 + c * 7 + (r % 2) * 3.5, y = 66 + r * 5 + Math.max(0, (70 - x) * 0.22); schuppen += `M${x} ${y} q3.5 -3.5 7 0 `; } schuppen = `<path d="${schuppen}" stroke="rgba(0,0,0,.22)" stroke-width=".9" fill="none"/>`; }
+    return S('0 0 200 120', bg(LAND) + `<path d="M0 98 H200 V120 H0Z" fill="#d8c9a0"/><path d="M118 100 C124 86 150 84 168 90 C180 94 186 98 190 100Z" fill="#b9b0a0" stroke="rgba(0,0,0,.2)" stroke-width="1"/><path d="M8 100 l3 -10 l3 10 M20 100 l2 -7 l3 7" stroke="#9dbb6c" stroke-width="2" fill="none" stroke-linecap="round"/>`
+      + `<ellipse cx="96" cy="99" rx="76" ry="4" fill="rgba(0,0,0,.1)"/>` + bein(74, true) + bein(136, false)
+      + `<clipPath id="ek"><path d="${rumpf}"/></clipPath><path d="${rumpf}" fill="${k}"/>`
+      + `<g clip-path="url(#ek)"><path d="M0 79 C60 77 130 78 200 74 V100 H0Z" fill="${o.b || '#dfe3b4'}" opacity=".9"/>${schuppen}`
+      + (o.muster ? `<path d="M10 85 C40 76 70 66 100 63 C124 61 140 62 150 63" stroke="#e9dfb4" stroke-width="2" fill="none" opacity=".8"/>` + [[44, 76], [58, 71], [72, 67], [86, 65], [100, 63.5], [114, 63], [128, 63], [142, 63.5]].map(([x, y]) => `<circle cx="${x}" cy="${y + 4}" r="3" fill="${o.muster}"/><circle cx="${x}" cy="${y + 4}" r="1.1" fill="#fff"/>`).join('') : '')
+      + `</g><path d="${rumpf}" fill="none" stroke="${RAND}" stroke-width="1.2"/>`
+      + `<circle cx="177" cy="66" r="3.6" fill="#e9b93a" stroke="rgba(0,0,0,.45)" stroke-width=".8"/><circle cx="177" cy="66" r="1.9" fill="#111"/><circle cx="176.2" cy="65.2" r=".7" fill="#fff"/>`
+      + `<ellipse cx="164" cy="69" rx="2.2" ry="3" fill="rgba(0,0,0,.25)"/><circle cx="191" cy="68" r=".9" fill="${TINTE}"/><path d="M195 72 C188 75 180 76 170 75" stroke="${TINTE}" stroke-width="1.2" fill="none" stroke-linecap="round"/>`, o.name || 'Eidechse');
   }
   // art: 'ringelnatter' | 'kreuzotter' | 'blindschleiche'
   function schlange(art) {
-    const k = { ringelnatter: '#6f7b7a', kreuzotter: '#b9a78a', blindschleiche: '#b08d57' }[art] || '#777';
-    const weg = 'M14 86 C40 50 70 100 100 70 C124 46 150 84 174 60';
-    let extra = '';
-    if (art === 'kreuzotter') extra = `<path d="M18 82 l8 -14 l8 14 l8 -18 l8 14 l8 -6 l8 16 l8 -4 l8 -16 l8 -6 l8 10 l8 -18 l8 16 l8 -2 l8 14 l8 -12 l8 -10 l8 2" stroke="#3b2f24" stroke-width="4" fill="none" stroke-linejoin="round"/>`;
-    const kopf = art === 'blindschleiche' ? `<circle cx="176" cy="59" r="8" fill="${k}"/>` : art === 'kreuzotter' ? `<path d="M168 50 L190 52 L186 68 L168 70Z" fill="${k}"/>` : `<ellipse cx="180" cy="58" rx="12" ry="8.5" fill="${k}"/>`;
-    const mond = art === 'ringelnatter' ? `<path d="M164 52 q6 8 0 18 q-7 -9 0 -18Z" fill="#f2d24e"/><path d="M158 54 q5 7 0 15" stroke="#1b1b1b" stroke-width="3" fill="none"/>` : '';
-    return S('0 0 200 120', bg(LAND) + `<path d="M0 98 H200 V120 H0Z" fill="#cfe0ae"/><path d="${weg}" stroke="${k}" stroke-width="${art === 'kreuzotter' ? 16 : 13}" fill="none" stroke-linecap="round"/>` + extra + kopf + mond
-      + auge(183, 56, 2.6, art === 'kreuzotter' ? '#c0392b' : '#f2c14e'), art);
+    const k = { ringelnatter: '#6f7b7a', kreuzotter: '#b9a78a', blindschleiche: '#b08d57' }[art] || '#777', RAND = 'rgba(0,0,0,.32)';
+    const weg = 'M14 88 C40 52 70 102 100 72 C124 48 150 86 172 62', breite = art === 'kreuzotter' ? 15 : art === 'blindschleiche' ? 11 : 12.5;
+    let extra = `<path d="M15 92 C41 56 71 106 101 76 C124 53 149 89 170 67" stroke="${art === 'blindschleiche' ? '#7a5f36' : '#e4e0c8'}" stroke-width="${art === 'blindschleiche' ? 2 : 3}" fill="none" stroke-linecap="round" opacity=".85"/>`;
+    if (art === 'kreuzotter') extra += `<path d="M18 84 l7 -13 l8 12 l8 -17 l8 14 l8 -5 l8 15 l8 -3 l8 -16 l8 -6 l8 10 l8 -17 l8 15 l8 -1 l8 13 l8 -11 l7 -9" stroke="#3b2f24" stroke-width="4.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if (art === 'ringelnatter') extra += [[30, 72], [46, 70], [60, 84], [76, 88], [92, 80], [106, 66], [122, 62], [138, 72], [154, 74]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.7" fill="#2b2f2e"/>`).join('');
+    if (art === 'blindschleiche') extra += `<path d="M14 85 C40 49 70 99 100 69 C124 45 150 83 172 59" stroke="#d8bb85" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>`;
+    const kopf = art === 'blindschleiche' ? `<path d="M166 54 C176 50 188 54 190 60 C188 66 176 70 166 68Z" fill="${k}" stroke="${RAND}" stroke-width="1.1"/>`
+      : art === 'kreuzotter' ? `<path d="M164 52 C172 46 186 48 194 56 C196 60 194 64 190 66 C182 70 170 70 164 68Z" fill="${k}" stroke="${RAND}" stroke-width="1.1"/><path d="M170 52 l8 5 l-8 5 M180 52 l-2 5" stroke="#3b2f24" stroke-width="2.4" fill="none" stroke-linejoin="round"/>`
+        : `<path d="M164 54 C172 48 188 50 195 58 C194 64 184 69 164 68Z" fill="${k}" stroke="${RAND}" stroke-width="1.1"/>`;
+    const mond = art === 'ringelnatter' ? `<path d="M163 53 q7 8 0 16 q-8 -8 0 -16Z" fill="#f2d24e" stroke="rgba(0,0,0,.3)" stroke-width=".6"/><path d="M157 55 q6 7 0 14" stroke="#1b1b1b" stroke-width="3" fill="none" stroke-linecap="round"/>` : '';
+    const pupille = art === 'kreuzotter' ? `<circle cx="182" cy="57" r="2.8" fill="#c0392b" stroke="rgba(0,0,0,.4)" stroke-width=".6"/><ellipse cx="182" cy="57" rx=".8" ry="2.3" fill="#111"/>` : `<circle cx="182" cy="57" r="2.8" fill="#e9b93a" stroke="rgba(0,0,0,.4)" stroke-width=".6"/><circle cx="182" cy="57" r="1.5" fill="#111"/>`;
+    const zunge = art === 'blindschleiche' ? '' : `<path d="M195 60 l6 0 l3 -3 M201 60 l3 3" stroke="#b03a48" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+    return S('0 0 200 120', bg(LAND) + `<path d="M0 98 H200 V120 H0Z" fill="#cfe0ae"/><path d="M6 100 l3 -11 l3 11 M186 100 l3 -10 l3 10 M120 106 l2 -6 l2 6" stroke="#9dbb6c" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="96" cy="97" rx="80" ry="4" fill="rgba(0,0,0,.1)"/>`
+      + `<path d="${weg}" stroke="${RAND}" stroke-width="${breite + 2}" fill="none" stroke-linecap="round"/><path d="${weg}" stroke="${k}" stroke-width="${breite}" fill="none" stroke-linecap="round"/>` + extra + zunge + kopf + mond + pupille
+      + `<path d="M194 61 C188 64 180 65 172 64" stroke="${TINTE}" stroke-width="1" fill="none" stroke-linecap="round"/>`, art);
   }
   // ---------------------------------------------------- Vögel
   // Singvogel auf einem Ast. o: { k: Körper, b: Brust/Bauch, kopf, wange, schnabel, ring }
