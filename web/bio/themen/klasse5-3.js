@@ -15,7 +15,7 @@
   const STAMM = [['Hund', 'Wolf'], ['Hausschwein', 'Wildschwein'], ['Hauskatze', 'Falbkatze'], ['Rind', 'Auerochse'], ['Hauskaninchen', 'Wildkaninchen'], ['Hausschaf', 'Mufflon']];
   const stammform = () => { const e = U.pick(STAMM), ch = U.shuffle([e[1], ...U.shuffle(STAMM.filter((x) => x !== e).map((x) => x[1])).slice(0, 3)]);
     return { prompt: `Von welchem Wildtier stammt dieses Haustier ab? <b>${e[0]}</b>`, choices: ch, correct: ch.indexOf(e[1]), hint: 'Jedes Haustier hat eine wilde Stammform. Oft steckt sie schon im Namen.',
-      solution: `<b>${e[1]}</b><br>${e[0]} und ${e[1]}: Der Mensch hat das Wildtier gezähmt und über viele Generationen gezüchtet.`, ex: { mode: 'karte', art: 'stammform', q: `Von welchem Wildtier stammt ab: ${e[0]}?`, opts: ch, ok: ch.indexOf(e[1]), svg: '', merk: `${e[0]} ← <b>${e[1]}</b>` } }; };
+      solution: `<b>${e[1]}</b><br>${e[0]} und ${e[1]}: Der Mensch hat das Wildtier gezähmt und über viele Generationen gezüchtet.`, ex: { mode: 'karte', nach: false, art: 'stammform', q: `Von welchem Wildtier stammt ab: ${e[0]}?`, opts: ch, ok: ch.indexOf(e[1]), svg: '', merk: `${e[0]} ← <b>${e[1]}</b>` } }; };
   G.saeugerVielfalt = baue('b5-saeuger-vielfalt', {
     h: WILD.h,
     S: WILD,

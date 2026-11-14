@@ -59,7 +59,7 @@
   function auswahl(art, e, hint) {
     const ch = shuffle([e.a, ...shuffle(e.x).slice(0, 3)]);
     const t = { prompt: e.f, choices: ch, correct: ch.indexOf(e.a), hint: e.h || hint, solution: `<b>${e.a}</b><br>${e.w}`,
-      ex: { mode: 'karte', art, q: nurText(e.f), opts: ch, ok: ch.indexOf(e.a), svg: e.svg || '', merk: `<b>${e.a}</b>: ${e.w}` } };
+      ex: { mode: 'karte', nach: false, art, q: nurText(e.f), opts: ch, ok: ch.indexOf(e.a), svg: e.svg || '', merk: `<b>${e.a}</b>: ${e.w}` } };
     if (e.svg) t.figure = BILDER[e.svg]();
     return t;
   }
@@ -68,7 +68,7 @@
     const [vor, nach] = e.f.split('___'), a = [].concat(e.a);
     const t = { prompt: e.p || 'Ergänze das fehlende Wort.', layout: 'satz', fields: [{ type: 'text', answer: a, prefix: vor.trim(), suffix: (nach || '').trim(), label: 'Lücke', ci: true }],
       hint: e.h || hint, solution: `${e.f.replace('___', `<b>${a[0]}</b>`)}<br>${e.w}`,
-      ex: { mode: 'karte', art, q: e.f.replace('___', '…'), opts: [a[0]], ok: 0, svg: e.svg || '', merk: `<b>${a[0]}</b>: ${e.w}` } };
+      ex: { mode: 'karte', nach: false, art, q: e.f.replace('___', '…'), opts: [a[0]], ok: 0, svg: e.svg || '', merk: `<b>${a[0]}</b>: ${e.w}` } };
     if (e.svg) t.figure = BILDER[e.svg]();
     return t;
   }
@@ -104,7 +104,7 @@
     const ok = falschGesucht ? pick(def.f) : pick(def.w), rest = shuffle(falschGesucht ? def.w : def.f).slice(0, 2), ch = shuffle([ok, ...rest]);
     return { prompt: falschGesucht ? 'Welche Aussage ist <b>falsch</b>?' : 'Welche Aussage <b>stimmt</b>?', choices: ch, correct: ch.indexOf(ok), hint,
       solution: falschGesucht ? `Falsch ist: <b>${ok}</b>` : `Richtig ist: <b>${ok}</b>`,
-      ex: { mode: 'karte', art, q: falschGesucht ? 'Welche Aussage ist falsch?' : 'Welche Aussage stimmt?', opts: ch, ok: ch.indexOf(ok), svg: '', merk: `${falschGesucht ? 'Falsch' : 'Richtig'}: <b>${ok}</b>` } };
+      ex: { mode: 'karte', nach: false, art, q: falschGesucht ? 'Welche Aussage ist falsch?' : 'Welche Aussage stimmt?', opts: ch, ok: ch.indexOf(ok), svg: '', merk: `${falschGesucht ? 'Falsch' : 'Richtig'}: <b>${ok}</b>` } };
   }
   // Ein Thema aus einer Sammlung bauen. b = { h: Tipp, F, T, O, S, A, extra: {art: fn} }, gw = Gewichte
   D.arten = {};
@@ -636,9 +636,9 @@
   function agGott() {
     const g = pick(GOETTER_AG), fragGott = Math.random() < 0.5, andere = shuffle(GOETTER_AG.filter((x) => x !== g)).slice(0, 3), ch = shuffle([g, ...andere]);
     if (fragGott) return { prompt: `Welcher Gott oder welche Göttin ist das? <b>${g[1]}</b>, dargestellt ${g[2]}.`, choices: ch.map((x) => x[0]), correct: ch.indexOf(g), hint: 'Viele Götter hatten einen Tierkopf. Das Tier verrät viel.', solution: `<b>${g[0]}</b>: ${g[1]}, ${g[2]}.`,
-      ex: { mode: 'karte', art: 'agGott', q: `${g[1]}, ${g[2]}`, opts: ch.map((x) => x[0]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}.` } };
+      ex: { mode: 'karte', nach: false, art: 'agGott', q: `${g[1]}, ${g[2]}`, opts: ch.map((x) => x[0]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}.` } };
     return { prompt: `Wofür war <b>${g[0]}</b> zuständig?`, choices: ch.map((x) => x[1]), correct: ch.indexOf(g), hint: 'Denk an das Tier, mit dem der Gott dargestellt wurde.', solution: `<b>${g[0]}</b> (${g[2]}): ${g[1]}.`,
-      ex: { mode: 'karte', art: 'agGott', q: `Wofür war ${g[0]} zuständig?`, opts: ch.map((x) => x[1]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}, ${g[2]}.` } };
+      ex: { mode: 'karte', nach: false, art: 'agGott', q: `Wofür war ${g[0]} zuständig?`, opts: ch.map((x) => x[1]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}, ${g[2]}.` } };
   }
   const religionAg = baue('g5-religion-ag', {
     h: 'Die Ägypter glaubten an viele Götter. Viele hatten einen Tierkopf: Anubis den Schakal, Horus den Falken, Thot den Ibis. Re war der Sonnengott, Osiris herrschte im Totenreich.',
@@ -767,9 +767,9 @@
     const g = pick(GOETTER_GR), andere = shuffle(GOETTER_GR.filter((x) => x !== g)).slice(0, 3), ch = shuffle([g, ...andere]), frag = Math.random() < 0.5;
     return frag
       ? { prompt: `Wer ist das: <b>${g[1]}</b>?`, choices: ch.map((x) => x[0]), correct: ch.indexOf(g), hint: 'Zeus: Blitz. Poseidon: Meer. Athene: Weisheit. Hermes: Bote.', solution: `<b>${g[0]}</b>: ${g[1]}.`,
-        ex: { mode: 'karte', art: 'grGott', q: g[1], opts: ch.map((x) => x[0]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}.` } }
+        ex: { mode: 'karte', nach: false, art: 'grGott', q: g[1], opts: ch.map((x) => x[0]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}.` } }
       : { prompt: `Wofür war <b>${g[0]}</b> zuständig?`, choices: ch.map((x) => x[1]), correct: ch.indexOf(g), hint: 'Zeus: Blitz. Poseidon: Meer. Athene: Weisheit. Hermes: Bote.', solution: `<b>${g[0]}</b>: ${g[1]}.`,
-        ex: { mode: 'karte', art: 'grGott', q: `Wofür war ${g[0]} zuständig?`, opts: ch.map((x) => x[1]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}.` } };
+        ex: { mode: 'karte', nach: false, art: 'grGott', q: `Wofür war ${g[0]} zuständig?`, opts: ch.map((x) => x[1]), ok: ch.indexOf(g), svg: '', merk: `<b>${g[0]}</b>: ${g[1]}.` } };
   }
   const religionGr = baue('g5-religion-gr', {
     h: 'Die Griechen glaubten an viele Götter, die wie Menschen aussahen und fühlten. Die wichtigsten wohnten auf dem Berg Olymp. Zeus war der Göttervater.',

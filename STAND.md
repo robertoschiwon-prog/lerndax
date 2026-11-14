@@ -21,6 +21,20 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-2. Erklärungen ohne Wiederholung (lerndax-v92, 14.11.2026)
+
+Roberto: Eine Erklärung, die nur die Frage wiederholt und falsche Antworten durchstreicht, bringt nichts. Dann lieber ein
+kurzer Text; Animation nur, wenn sie etwas zeigt, das nicht schon in der Frage steht. Umgesetzt in **Bio und Geschichte**:
+- Erklär-Art `karte` ist jetzt ein **Merkzettel**: Frage klein, Antwort groß, darunter kurz das Warum (mit Bild, wenn es eins gibt).
+  Keine Antwortmöglichkeiten mehr, kein Durchstreichen (`erklaerungen/klasse5.js` in `web/bio` und `web/geschichte`).
+- Nach der Aufgabe gibt es bei diesen Aufgaben **keinen Knopf „Lösung als Animation“** mehr, weil Antwort und Warum schon unter
+  „So geht’s“ stehen. Dafür: `ex.nach: false` in der Aufgabe; `fach.js` blendet den Knopf dann aus (gilt für alle Fächer).
+- „Welche Aussage stimmt?“ wird als Beispiel gar nicht mehr gezeigt (nichts zu erklären); stattdessen ein anderes Beispiel des Themas.
+- Geblieben sind die Animationen, die etwas zeigen: Reihenfolge mit Bildern, Sortieren in Fächer, Zeitstrahl, Pyramide.
+- Tests angepasst (`biodax.py`, `gedax.py`: kein Knopf ist bei `nach: false` richtig). Voller Lauf Bio (50 Themen) und
+  Geschichte (31 Themen) mit einer Runde ohne Meldung, dazu zwei Runden für je 6 Themen.
+- **Offen: Mathe.** Roberto meint, dort wiederholen manche Erklärungen auch nur, was schon zu sehen war. Noch nicht durchgesehen.
+
 ## 0-neu. Näher am Schulbuch (lerndax-v90, 14.11.2026)
 
 Roberto wollte die Bilder aus dem Buch verwenden (Wiedererkennung). Das geht nicht, weil App und Code öffentlich sind.

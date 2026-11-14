@@ -477,7 +477,7 @@
       if (t.tap) markTap();
       if (t.order) markOrd(true);
       const msg = c.attempt === 1 ? U.pick(['Richtig! 🎉', 'Stark! 💪', 'Genau so! ✨', 'Volltreffer! 🎯', 'Super gemacht! 🌟']) : 'Jetzt passt’s! 👍';
-      fb.innerHTML = `<div class="fb ok"><h3>${msg}</h3>${note ? `<div>${note}</div>` : ''}<div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${t.ex && EXP[exId(c.topic, t)] ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ Lösung als Animation</button>` : ''}</div>`;
+      fb.innerHTML = `<div class="fb ok"><h3>${msg}</h3>${note ? `<div>${note}</div>` : ''}<div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${t.ex && t.ex.nach !== false && EXP[exId(c.topic, t)] ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ Lösung als Animation</button>` : ''}</div>`;
     } else if (c.attempt === 1 && !fewChoices) {
       c.attempt = 2;
       if (t.tap) { /* Auswahl bleibt stehen und kann geändert werden */ }
@@ -492,7 +492,7 @@
       if (t.choices) markChoices(choiceIdx);
       if (t.tap) markTap();
       if (t.order) markOrd(false);
-      fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[exId(c.topic, t)] && !R.knobel ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
+      fb.innerHTML = `<div class="fb no"><h3>Leider falsch</h3>${note ? note + '<br>' : ''}Richtig ist: <b>${answerText(t)}</b><div class="sol"><b>So geht’s:</b><br>${t.solution}</div>${EXP[exId(c.topic, t)] && !R.knobel && !(t.ex && t.ex.nach === false) ? `<button class="btn exinline" data-explain="${exId(c.topic, t)}" data-when="post">▶ ${t.ex ? 'Lösung als Animation' : 'Als Animation erklärt'}</button>` : ''}</div>`;
     }
     document.getElementById('acts').innerHTML = `<button class="btn pri wide" id="nextB">${R.idx + 1 < R.seq.length ? 'Weiter →' : 'Fertig →'}</button>`;
     document.getElementById('nextB').focus();

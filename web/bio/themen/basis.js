@@ -278,7 +278,7 @@
   function auswahl(art, e, hint) {
     const ch = shuffle([e.a, ...shuffle(e.x).slice(0, 3)]);
     const t = { prompt: e.f, choices: ch, correct: ch.indexOf(e.a), hint: e.h || hint, solution: `<b>${e.a}</b><br>${e.w}`,
-      ex: { mode: 'karte', art, q: nurText(e.f), opts: ch, ok: ch.indexOf(e.a), svg: e.svg || '', merk: `<b>${e.a}</b>: ${e.w}` } };
+      ex: { mode: 'karte', nach: false, art, q: nurText(e.f), opts: ch, ok: ch.indexOf(e.a), svg: e.svg || '', merk: `<b>${e.a}</b>: ${e.w}` } };
     if (e.svg) t.figure = BILDER[e.svg]();
     return t;
   }
@@ -287,7 +287,7 @@
     const [vor, nach] = e.f.split('___'), a = [].concat(e.a);
     const t = { prompt: e.p || 'Ergänze das fehlende Wort.', layout: 'satz', fields: [{ type: 'text', answer: a, prefix: vor.trim(), suffix: (nach || '').trim(), label: 'Lücke', ci: true }],
       hint: e.h || hint, solution: `${e.f.replace('___', `<b>${a[0]}</b>`)}<br>${e.w}`,
-      ex: { mode: 'karte', art, q: e.f.replace('___', '…'), opts: [a[0]], ok: 0, svg: e.svg || '', merk: `<b>${a[0]}</b>: ${e.w}` } };
+      ex: { mode: 'karte', nach: false, art, q: e.f.replace('___', '…'), opts: [a[0]], ok: 0, svg: e.svg || '', merk: `<b>${a[0]}</b>: ${e.w}` } };
     if (e.svg) t.figure = BILDER[e.svg]();
     return t;
   }
@@ -321,7 +321,7 @@
     const ok = falschGesucht ? pick(def.f) : pick(def.w), rest = shuffle(falschGesucht ? def.w : def.f).slice(0, 2), ch = shuffle([ok, ...rest]);
     return { prompt: falschGesucht ? 'Welche Aussage ist <b>falsch</b>?' : 'Welche Aussage <b>stimmt</b>?', choices: ch, correct: ch.indexOf(ok), hint,
       solution: falschGesucht ? `Falsch ist: <b>${ok}</b>` : `Richtig ist: <b>${ok}</b>`,
-      ex: { mode: 'karte', art, q: falschGesucht ? 'Welche Aussage ist falsch?' : 'Welche Aussage stimmt?', opts: ch, ok: ch.indexOf(ok), svg: '', merk: `${falschGesucht ? 'Falsch' : 'Richtig'}: <b>${ok}</b>` } };
+      ex: { mode: 'karte', nach: false, art, q: falschGesucht ? 'Welche Aussage ist falsch?' : 'Welche Aussage stimmt?', opts: ch, ok: ch.indexOf(ok), svg: '', merk: `${falschGesucht ? 'Falsch' : 'Richtig'}: <b>${ok}</b>` } };
   }
   // Bild beschriften: Bild mit Nummern, gefragt ist der Name eines Teils. def = { svg: Bildname, teile: [...], was: { Teil: Aufgabe } }
   function beschriften(art, def, hint) {
@@ -330,14 +330,14 @@
     const w = (def.was && def.was[a]) || '';
     return { prompt: `Schau dir das Bild an. Wie heißt der Teil mit der <b>Nummer ${i + 1}</b>?`, figure: BILDER[def.svg](), choices: ch, correct: ch.indexOf(a), hint: def.h || hint,
       solution: `Nummer ${i + 1} ist: <b>${a}</b>${w ? '<br>' + w : ''}`,
-      ex: { mode: 'karte', art, q: `Wie heißt der Teil mit der Nummer ${i + 1}?`, opts: ch, ok: ch.indexOf(a), svg: def.svg, merk: `Nummer ${i + 1}: <b>${a}</b>${w ? '. ' + w : ''}` } };
+      ex: { mode: 'karte', nach: false, art, q: `Wie heißt der Teil mit der Nummer ${i + 1}?`, opts: ch, ok: ch.indexOf(a), svg: def.svg, merk: `Nummer ${i + 1}: <b>${a}</b>${w ? '. ' + w : ''}` } };
   }
   // Tier am Bild erkennen: def = { arten: [[Bildname, Name, Merkmal], ...], f?: Frage }
   function erkennen(art, def, hint) {
     const e = pick(def.arten), ch = shuffle([e[1], ...shuffle(def.arten.filter((x) => x[1] !== e[1]).map((x) => x[1])).slice(0, 3)]);
     return { prompt: def.f || 'Welches Tier ist das?', figure: BILDER[e[0]](), choices: ch, correct: ch.indexOf(e[1]), hint: def.h || hint,
       solution: `<b>${e[1]}</b><br>${e[2]}`,
-      ex: { mode: 'karte', art, q: nurText(def.f || 'Welches Tier ist das?'), opts: ch, ok: ch.indexOf(e[1]), svg: e[0], merk: `<b>${e[1]}</b>: ${e[2]}` } };
+      ex: { mode: 'karte', nach: false, art, q: nurText(def.f || 'Welches Tier ist das?'), opts: ch, ok: ch.indexOf(e[1]), svg: e[0], merk: `<b>${e[1]}</b>: ${e[2]}` } };
   }
   // Ein Thema aus einer Sammlung bauen. b = { h: Tipp, F, T, O, S, A, B (beschriften), E (erkennen), extra: {art: fn} }, gw = Gewichte
   D.arten = {};

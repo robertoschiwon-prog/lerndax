@@ -254,7 +254,7 @@
   const SCHNABEL = [['schnabelHaken', 'Hakenschnabel', 'Greifvogel: Fleisch zerreißen'], ['schnabelSeih', 'Seihschnabel', 'Ente: Nahrung aus dem Wasser seihen'], ['schnabelMeissel', 'Meißelschnabel', 'Specht: Holz aufhacken'], ['schnabelKegel', 'Kegelschnabel', 'Körnerfresser wie Sperling und Fink: Körner knacken'], ['schnabelPinzette', 'Pinzettenschnabel', 'Insektenfresser wie Rotkehlchen: Insekten aufpicken']];
   const schnabelWozu = () => { const e = U.pick(SCHNABEL), ch = U.shuffle([e[2], ...U.shuffle(SCHNABEL.filter((x) => x !== e).map((x) => x[2])).slice(0, 3)]);
     return { prompt: 'Zu welchem Vogel und welcher Nahrung passt dieser Schnabel?', figure: D.bilder[e[0]](), choices: ch, correct: ch.indexOf(e[2]), hint: 'Die Form des Schnabels verrät, was der Vogel frisst.',
-      solution: `<b>${e[1]}</b><br>${e[2]}`, ex: { mode: 'karte', art: 'schnabelWozu', q: 'Zu welchem Vogel und welcher Nahrung passt dieser Schnabel?', opts: ch, ok: ch.indexOf(e[2]), svg: e[0], merk: `<b>${e[1]}</b>: ${e[2]}` } }; };
+      solution: `<b>${e[1]}</b><br>${e[2]}`, ex: { mode: 'karte', nach: false, art: 'schnabelWozu', q: 'Zu welchem Vogel und welcher Nahrung passt dieser Schnabel?', opts: ch, ok: ch.indexOf(e[2]), svg: e[0], merk: `<b>${e[1]}</b>: ${e[2]}` } }; };
   G.vogelSchnabel = baue('b5-vogel-schnabel', {
     h: 'Schnabel und Füße passen zur Nahrung und zum Lebensraum: Haken zum Reißen, Sieb zum Seihen, Meißel zum Hacken, Kegel zum Knacken.',
     E: { f: 'Wie heißt diese Schnabelform?', arten: SCHNABEL.map((x) => [x[0], x[1], x[2]]) },

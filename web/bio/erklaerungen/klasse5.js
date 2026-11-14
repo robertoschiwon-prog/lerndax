@@ -4,7 +4,7 @@
  *   ctx: das ex-Objekt der Aufgabe plus pre:true (ähnliches Beispiel) oder post:true (genau die Aufgabe);
  *        leer, wenn die Erklärung ohne Aufgabe geöffnet wird (dann ein zufälliges Beispiel des Themas).
  * Bild-Modi (ex.mode):
- *   karte     Frage, Antwortmöglichkeiten, falsche werden durchgestrichen, die richtige leuchtet (optional mit Bild)
+ *   karte     Merkzettel: Frage klein, Antwort groß, darunter kurz das Warum (optional mit Bild); nach der Aufgabe kein Knopf (nach: false)
  *   reihe     Schritte nacheinander, nummeriert (optional mit kleinen Bildern; hell = gesuchter Schritt)
  *   faecher   Spalten (Kategorien); Kärtchen fliegen in ihr Fach, das gesuchte ist blau
  */
@@ -47,56 +47,42 @@
   const BILD = {
     // ---------------------------------------------------------------- Karte: Frage und Antworten
     async karte(api, x) {
+      // Merkzettel: kein Wiederholen der Antwortmöglichkeiten. Bild (wenn es eins gibt), Frage klein, Antwort groß, darunter kurz das Warum.
       const mitBild = !!x.svg && D.bilder && D.bilder[x.svg];
-      let y = 24;
+      let y = 30;
       if (mitBild) {
         const g = el('g', { opacity: 0 }, api.svg);
         const roh = D.bilder[x.svg]();
-        const vb = (roh.match(/viewBox="([^"]+)"/) || [0, '0 0 200 120'])[1].split(' ').map(Number), bw = 124, h = bw * vb[3] / vb[2];
-        g.innerHTML = roh.replace(/^<svg([^>]*)>/, (m, a) => `<svg${a.replace(/ (style|role|aria-label)="[^"]*"/g, '')} x="${180 - bw / 2}" y="4" width="${bw}" height="${h}">`);
-        el('rect', { x: 180 - bw / 2, y: 4, width: bw, height: h, rx: 6, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, api.svg);
+        const vb = (roh.match(/viewBox="([^"]+)"/) || [0, '0 0 200 120'])[1].split(' ').map(Number), bh = Math.min(104, 172 * vb[3] / vb[2]), bw = bh * vb[2] / vb[3];
+        g.innerHTML = roh.replace(/^<svg([^>]*)>/, (m, a) => `<svg${a.replace(/ (style|role|aria-label)="[^"]*"/g, '')} x="${180 - bw / 2}" y="4" width="${bw}" height="${bh}">`);
+        el('rect', { x: 180 - bw / 2, y: 4, width: bw, height: bh, rx: 6, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, g);
         await fade(api, g, 450);
-        y = 4 + h + 18;
+        y = 4 + bh + 20;
       }
-      const q = block(api.svg, 180, y, umbruch(x.q, 46).slice(0, 4), 13.5, 344);
-      api.say(x.opts.length > 1 ? 'Lies die Frage. Welche Antwort passt?' : 'Was gehört in die Lücke?');
-      await api.wait(1800);
-      y += q.h + 4;
-      // Antworten als Kästchen untereinander; Zeilenhöhe passt sich dem Platz an
-      const n = x.opts.length, rest = 236 - y, zeilen = x.opts.map((o) => umbruch(o, 52));
-      const alle = zeilen.reduce((s, z) => s + z.length, 0);
-      const lh = Math.max(9.5, Math.min(16, (rest - (n - 1) * 5 - n * 7) / alle)), fs = Math.min(12.5, lh - 2.5);
-      const boxen = [];
-      let yy = y;
-      for (let i = 0; i < n; i++) {
-        const hh = zeilen[i].length * lh + 7, g = el('g', { opacity: 0 }, api.svg);
-        const r = el('rect', { x: 12, y: yy, width: 336, height: hh, rx: 7, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 1.5 }, g);
-        const t = el('text', { x: 180, y: yy + 3.5 + lh * 0.78, 'text-anchor': 'middle', class: 'ex-b', style: `font-size:${fs}px` }, g);
-        (n === 1 ? ['…'] : zeilen[i]).forEach((z, k) => el('tspan', { x: 180, dy: k ? lh : 0, text: z }, t));
-        try { for (let f = fs; f >= 7 && t.getBBox().width > 326; f -= 0.5) t.setAttribute('style', `font-size:${f}px`); } catch (e) {}
-        boxen.push({ g, r, t, y: yy, h: hh });
-        yy += hh + 5;
-      }
-      for (const b of boxen) { await fade(api, b.g, 260); await api.wait(220); }
+      const antwort = nurText(x.opts[x.ok]);
+      const warum = nurText(String(x.merk || '').replace(/^[\s\S]*<\/b>[:.]?\s*/, ''));
+      const qz = umbruch(String(x.q).replace('…', '___'), 44).slice(0, 4), az = umbruch(antwort, 27).slice(0, 5), wz = warum && warum !== antwort ? umbruch(warum, 37).slice(0, 8) : [];
+      const hoehe = (k) => qz.length * (13 * k + 4) + 8 + az.length * (20 * k + 4) + (wz.length ? 12 + wz.length * (15 * k + 4) : 0);
+      let k = 1; while (k > 0.55 && hoehe(k) > 236 - y) k -= 0.03;
+      if (!mitBild) y = Math.max(26, (240 - hoehe(k)) / 2 + 10);
+      const q = block(api.svg, 180, y, qz, 13 * k, 340, { opacity: 0 });
+      q.ts.forEach((t) => { t.style.fill = '#6f6a7c'; t.style.fontWeight = '600'; });
+      api.say(x.pre ? 'Ein Beispiel aus diesem Thema:' : 'Kurz erklärt:');
+      await api.tw(350, (t) => q.ts.forEach((e) => e.setAttribute('opacity', t)));
       await api.wait(900);
-      if (n === 1) {
-        const t = boxen[0].t;
-        t.textContent = '';
-        zeilen[0].forEach((z, k) => el('tspan', { x: 180, dy: k ? lh : 0, text: z }, t));
-        try { for (let f = fs; f >= 7 && t.getBBox().width > 326; f -= 0.5) t.setAttribute('style', `font-size:${f}px`); } catch (e) {}
-        t.style.fill = GRUEN; t.setAttribute('opacity', 0);
-        await api.tw(500, (k) => t.setAttribute('opacity', k));
-      } else {
-        for (let i = 0; i < n; i++) {
-          if (i === x.ok) continue;
-          boxen[i].t.style.fill = GRAU; boxen[i].t.setAttribute('text-decoration', 'line-through');
-          boxen[i].r.setAttribute('stroke', GRAU);
-          await api.wait(420);
-        }
+      y += q.h + 8;
+      const a = block(api.svg, 180, y, az, 20 * k, 340, { opacity: 0 });
+      a.ts.forEach((t) => { t.style.fill = GRUEN; });
+      await api.tw(450, (t) => a.ts.forEach((e) => e.setAttribute('opacity', t)));
+      y += a.h + 12;
+      if (wz.length) {
+        await api.wait(500);
+        el('path', { d: `M 130 ${y - 14} H 230`, stroke: '#d9d2c3', 'stroke-width': 2, 'stroke-linecap': 'round' }, api.svg);
+        const w = block(api.svg, 180, y, wz, 15 * k, 344, { opacity: 0 });
+        w.ts.forEach((t) => { t.style.fontWeight = '600'; });
+        await api.tw(450, (t) => w.ts.forEach((e) => e.setAttribute('opacity', t)));
       }
-      const r = boxen[n === 1 ? 0 : x.ok].r;
-      r.setAttribute('stroke', GRUEN); r.setAttribute('stroke-width', 3); r.setAttribute('fill', '#e3f5ec');
-      api.say(x.merk);
+      api.say('');
     },
 
     // ---------------------------------------------------------------- Schritte nacheinander
@@ -173,8 +159,10 @@
       create(api, ctx) {
         ctx = ctx || {};
         const task = !!ctx.mode && (ctx.pre || ctx.post);
-        const arten = D.arten[id], zufall = () => arten[U.pick(Object.keys(arten))]().ex;
-        let x = task ? (ctx.post ? ctx : (arten[ctx.art] ? arten[ctx.art]().ex : zufall())) : zufall();
+        // 'Welche Aussage stimmt?' hat nichts zu erklären: solche Beispiele werden nicht gezeigt
+        const arten = D.arten[id], gut = (e) => !(e.mode === 'karte' && e.art === 'aussage');
+        const zufall = () => { let e; for (let i = 0; i < 40; i++) { e = arten[U.pick(Object.keys(arten))]().ex; if (gut(e)) break; } return e; };
+        let x = task ? (ctx.post ? ctx : (arten[ctx.art] && gut(ctx) ? arten[ctx.art]().ex : zufall())) : zufall();
         if (!task) api.chips([{ label: 'Anderes Beispiel', onClick() { x = zufall(); api.replay(); } }]);
         return {
           reset() { api.clear(); api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst'); },
