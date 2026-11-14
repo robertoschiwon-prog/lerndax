@@ -21,6 +21,15 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-9. Fotos für Fische, Kriechtiere, Vögel; Gelbbauchunke mit Bauch (lerndax-v99, 14.11.2026)
+
+Roberto: Lurch-Fotos „schon viel, viel besser“, nur bei der Gelbbauchunke fehlte der gelbe Bauch. Jetzt: Ausschnitt (linke Hälfte,
+`pos: 'xMinYMid'`) aus `BombinaBombina+Variegata.png` (Christian Fischer, CC BY-SA 3.0; beide Unken auf dem Rücken).
+Neu in `FOTOS` (16): Karpfen, Hecht, Bachforelle, Aal, Zauneidechse, Ringelnatter, Kreuzotter, Blindschleiche, Amsel, Kohlmeise,
+Rotkehlchen, Haussperling, Stockente, Schleiereule, Mäusebussard, Buntspecht (Fotografen und Lizenzen in `bildnachweis.html`).
+Zeichnungen bleiben nur noch für Schaubilder: Laich und Kaulquappen, Fisch mit Nummern, Seitenlinie, Feder, Ei, Skelett,
+Schnäbel, Gebisse, Gliedmaßen. Claude konnte die Fotos nicht ansehen (nach Beschreibung, Auszeichnung und Lizenz gewählt).
+
 ## 0-neu-8. Fotos für alle elf Lurche (lerndax-v98, 14.11.2026)
 
 Roberto: „Ein paar Bilder sind da. Mach mal weiter.“ Die Fotos laden also am Handy. Neu in `FOTOS`: Kreuzkröte (David Pérez,

@@ -450,7 +450,7 @@
     armMensch: () => gliedmasse('mensch'), armMaulwurf: () => gliedmasse('maulwurf'), armFledermaus: () => gliedmasse('fledermaus'), armWal: () => gliedmasse('wal'), armPferd: () => gliedmasse('pferd'),
     skelett,
   };
-  // ---------------------------------------------------- Fotos (seit v97; v98: alle 11 Lurche)
+  // ---------------------------------------------------- Fotos (seit v97; v98: Lurche; v99: Fische, Kriechtiere, Vögel)
   // Frei nutzbare Fotos von Wikimedia Commons, direkt von dort geladen. Fotograf und Lizenz stehen im Bild und in web/bio/bildnachweis.html.
   // Lädt das Foto nicht (kein Netz), bleibt die Zeichnung darunter sichtbar.
   const FOTOS = {
@@ -460,11 +460,31 @@
     erdkroete: { datei: 'Bufo bufo 2015 G3.jpg', von: 'George Chernilevsky', liz: 'gemeinfrei' },
     kreuzkroete: { datei: 'Epidalea calamita 02 by-dpc.jpg', von: 'David Pérez (DPC)', liz: 'CC BY 3.0' },
     rotbauchunke: { datei: 'Benny Trapp Bombina bombina Rotbauchunke.jpg', von: 'Benny Trapp', liz: 'CC BY-SA 3.0' },
-    gelbbauchunke: { datei: 'Gelbbauchunke-Bombina-variegata.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
+    // Vergleichsbild beider Unken auf dem Rücken; links die Gelbbauchunke, darum Ausschnitt links (pos)
+    gelbbauchunke: { datei: 'BombinaBombina+Variegata.png', von: 'Christian Fischer', liz: 'CC BY-SA 3.0', pos: 'xMinYMid' },
     feuersalamander: { datei: 'Salamandra salamandra 1.jpg', von: 'Joshua Lutz', liz: 'gemeinfrei' },
     teichmolch: { datei: 'Teichmolch-triturus-vulgaris.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
     bergmolch: { datei: 'Ichthyosaura alpestris Bergmolch.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
     kammmolch: { datei: 'TriturusCristatus.jpg', von: 'Christian Fischer', liz: 'CC BY-SA 3.0' },
+    // Fische
+    karpfen: { datei: 'Cyprinus carpio 2008 G1.jpg', von: 'George Chernilevsky', liz: 'CC BY-SA 3.0' },
+    hecht: { datei: 'Esox lucius Aquarium DG.jpg', von: 'Dirk Godlinski', liz: 'CC BY-SA 3.0' },
+    forelle: { datei: 'Salmo trutta fario Bachforelle.JPG', von: 'Böhringer Friedrich', liz: 'CC BY-SA 2.5' },
+    aal: { datei: 'Anguilla-anguilla 1.jpg', von: 'Dmitriy Konstantinov', liz: 'CC BY-SA 3.0' },
+    // Kriechtiere
+    zauneidechse: { datei: 'M Zauneidechse2.JPG', von: 'Böhringer Friedrich', liz: 'CC BY-SA 2.5' },
+    ringelnatter: { datei: 'Ringelnatter Natrix natrix.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
+    kreuzotter: { datei: 'Kreuzotter (Vipera berus), Großglockner-Hochalpenstraße, Nationalpark Hohe Tauern, Kärnten, Österreich (7567053890).jpg', von: 'Frank Vassen', liz: 'CC BY 2.0' },
+    blindschleiche: { datei: 'Blindschleiche Anguis fragilis.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
+    // Vögel
+    amsel: { datei: 'Blackbird (male).jpg', von: 'Tony Wills', liz: 'CC BY 2.5' },
+    kohlmeise: { datei: 'Kohlmeise (Parus major).jpg', von: 'Tobias Prell', liz: 'CC BY-SA 3.0' },
+    rotkehlchen: { datei: 'Rotkehlchen bird.jpg', von: 'Ting Chen', liz: 'CC BY 2.0' },
+    sperling: { datei: 'Passer domesticus aka House Sparrow in Sweden (male).jpg', von: 'Martin Olsson', liz: 'CC BY-SA 3.0' },
+    stockente: { datei: 'Anas platyrhynchos male.jpg', von: 'Andreas Trepte', liz: 'CC BY-SA 2.5' },
+    schleiereule: { datei: 'Tyto alba (Scopoli, 1769).jpg', von: 'Michael Gäbler', liz: 'CC BY 3.0' },
+    bussard: { datei: 'Buzzard.jpg', von: 'Andreas Trepte', liz: 'CC BY-SA 2.5' },
+    buntspecht: { datei: 'Great spotted woodpecker (Dendrocopos major) male Drenthe.jpg', von: 'Charles J. Sharp', liz: 'CC BY-SA 4.0' },
   };
   D.fotos = FOTOS;
   const fotoUrl = (datei, breite) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(datei.replace(/ /g, '_'))}?width=${breite || 640}`;
@@ -472,7 +492,7 @@
   Object.keys(FOTOS).forEach((name) => {
     const zeichnung = BILDER[name], f = FOTOS[name];
     // Der Bildnachweis erscheint erst, wenn das Foto wirklich geladen ist (sonst stünde er unter der Zeichnung)
-    BILDER[name] = () => zeichnung().replace(/<\/svg>$/, `<g class="foto"><image href="${fotoUrl(f.datei)}" x="0" y="0" width="200" height="120" preserveAspectRatio="xMidYMid slice" onload="this.nextSibling.setAttribute('visibility','visible')"/>`
+    BILDER[name] = () => zeichnung().replace(/<\/svg>$/, `<g class="foto"><image href="${fotoUrl(f.datei)}" x="0" y="0" width="200" height="120" preserveAspectRatio="${f.pos || 'xMidYMid'} slice" onload="this.nextSibling.setAttribute('visibility','visible')"/>`
       + `<g visibility="hidden"><rect x="0" y="111" width="200" height="9" fill="rgba(255,255,255,.78)"/><text x="3" y="117.6" style="font:600 5.6px Nunito,sans-serif;fill:#2b2540">Foto: ${f.von}, ${f.liz}, Wikimedia Commons</text></g></g></svg>`);
   });
   D.bilder = BILDER;
