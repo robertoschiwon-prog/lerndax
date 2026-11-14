@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 13.11.2026, Version `lerndax-v86`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 14.11.2026, Version `lerndax-v88`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,16 +21,25 @@ Weitere Dokumente:
 
 ---
 
-## 0. Übergabe vom 13.11.2026 abends: GeDax gebaut (`lerndax-v87`)
+## 0. Übergabe vom 14.11.2026: BioDax gebaut (`lerndax-v88`)
 
-- **BioDax begonnen (13.11. nachts, nur Doku, App unverändert v87):** Lehrplan Biologie Klasse 5 am Originaltext ausgewertet
-  (`faecher/bio/lehrplan/sachsen-gymnasium.md`, Startpunkt `faecher/bio/README.md`). Wichtig: Es gilt die **Fassung 2025**
-  (Klasse 5–10 seit 1.8.2025), das Buch LINDER 5 ist von 2020. Sieben Lernbereiche: Merkmale des Lebens, Fische, Lurche,
-  Kriechtiere, Vögel, Säugetiere (mit Fortpflanzung des Menschen), Systematisierung; drei Wahlbereiche.
-  **14.11. früh:** Fotos des ganzen Buchs liegen lokal in `notizen/schulbuch-bio/`. Abgleich fertig
-  (`faecher/bio/lehrplan/schulbuch-abgleich.md`: Buch = Lehrplan, sieben Kapitel), Themenplan vorgelegt
-  (`faecher/bio/themenplan.md`, 48 Themen). Im Unterricht: **Lurche**, dieser Bereich wird zuerst gebaut.
-  **Wartet auf Roberto:** Fortpflanzung des Menschen in die App ja/nein; Themenplan in Ordnung? Danach bauen.
+- **BioDax (Biologie) Klasse 5 ist gebaut und live** (Auftrag Roberto am 14.11.: „alles bauen, mit den Lurchen zuerst, ich schaue
+  später drüber“; Fortpflanzung des Menschen: ja). 49 Themen in 7 Bereichen = Kapitel von LINDER Biologie 5 (Merkmale des Lebens 2,
+  Fische 6, Lurche 8, Kriechtiere 6, Vögel 10, Säugetiere 13, Wirbeltiere im Vergleich 4), Entdecken (5: Zeitraffer vom Laich zum
+  Frosch, Axolotl, ein Bauplan für alle, Echo-Ortung der Fledermaus, Urvogel), Knobeln (161 Varianten). Auf der Startseite als
+  fertiges Fach (`faecher.js`: `themen: 49`, key `biodax.v1`, Ordner `web/bio/`).
+- Grundlagen: `faecher/bio/lehrplan/sachsen-gymnasium.md` (Lehrplan **Fassung 2025**, am Originaltext), `schulbuch-abgleich.md`
+  (das ganze Buch liegt als Fotos lokal in `notizen/schulbuch-bio/`), `themenplan.md`, `fakten.md` (Quellen), Bauweise in
+  `faecher/bio/README.md`. Neu gegenüber GeDax: Aufgabenformen „Bild beschriften“ und „Tier am Bild erkennen“, 52 selbst gezeichnete Bilder.
+- Tests: `tests/biodax.py 2` (49 Themen, 588 Antworten, 196 Lösungs-Animationen, alle freien Erklärungen und Entdeckungen, nichts ragt
+  aus dem Bild), `tests/biodax_knobel.py` (805 Knobel-Aufgaben), Generatoren ohne Browser (166.500 Aufgaben), `tests/hub.py`.
+  Mathe, Deutsch, Englisch, Geschichte nicht erneut getestet (`fach.js` unverändert, nur `faecher.js` und `sw.js` geändert).
+- **Wartet auf Roberto:** Durchsicht von BioDax (vor allem die gezeichneten Tiere); **Schutz vor sexuellem Missbrauch** (Lehrplan
+  LB 6, Buch S. 164–165) ist noch nicht drin, dazu fehlt seine Entscheidung; Rückmeldung von Bruno. Dazu weiter die offenen Punkte
+  zu GeDax (unten).
+- Als Nächstes: GeoDax (TERRA Geographie 5), dann TecDax.
+
+## 0-alt. Übergabe vom 13.11.2026 abends: GeDax gebaut (`lerndax-v87`)
 
 - **GeDax (Geschichte) Klasse 5 ist gebaut und live** (Auftrag Roberto: „Baue alles, frage wenig nach. Wir schauen später drüber.“).
   31 Themen in 5 Bereichen = Kapitel von ANNO 1 (Begegnungen mit Geschichte, Frühgeschichte, Ägypten, Griechische Polis,
@@ -1306,6 +1315,11 @@ Infos zur ersten Arbeit:
   `fach.css`, `faecher.js`, `web/englisch/`, `tests/endax.py`, `sw.js`. Geprüft: 18 000 erzeugte Aufgaben der drei Themen
   ohne Fehler, Sätze und Auswahl-Angebote durchgesehen (dabei „likees“ und eine doppelte Antwort bei „do“ behoben);
   `tests/endax.py` 3 Runden (15 Themen, 300 Antworten, 60 Animationen) ohne Fehler; Startseite zeigt drei Kacheln. Mathe und Deutsch danach ohne Fehler: `ui2` (576 Aufgaben), `dedax` (2 Runden), `eltern`, `hub`.
+- **v88: BioDax (Biologie) Klasse 5** (14.11.2026): neu `web/bio/` (`index.html`, `themen/basis.js`, `klasse5-1.js`, `klasse5-2.js`,
+  `klasse5-3.js`, `klasse5-knobel.js`, `erklaerungen/klasse5.js`, `entdecken.js`, `symbole.js`), `faecher/bio/` (Lehrplan, Buchabgleich,
+  Themenplan, Fakten, README), `tests/biodax.py`, `tests/biodax_knobel.py`; geändert `web/plattform/faecher.js` (BioDax fertig, 49 Themen),
+  `web/sw.js`, `README.md`, `faecher/README.md`, `tests/README.md`. Tests siehe Abschnitt 0.
+- **v87: GeDax (Geschichte) Klasse 5** (13.11.2026): siehe Abschnitt 0-alt.
 - **v86: Startpunkt für GeDax** (13.11.2026): neu `faecher/geschichte/README.md`; `STAND.md`, `faecher/README.md`, `web/sw.js`. App unverändert.
 - **v85: `e5-have` nach Unit 2 verschoben, „only child“** (13.11.2026): `web/englisch/themen/klasse5.js`, Aufnahmen, `sw.js`. Test `endax.py 1`.
 - **v84: EnDax Kurzantworten mit I/we/you, Uhrzeit mit Minuten, Entdeckung Greenwich** (13.11.2026): `web/englisch/themen/klasse5.js`,
