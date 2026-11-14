@@ -39,26 +39,39 @@
   // o: { k: Körperfarbe, b: Bauchfarbe, fl: Fleckenfarbe, haft, warzen, fleck (dunkler Fleck hinter dem Auge), streif, bauchfl: gefleckter Bauch, plump, blase }
   function frosch(o) {
     o = o || {};
-    const k = o.k || '#6aa84f', b = o.b || '#e9e6c5', fl = o.fl || 'none';
-    const zehe = (x, y) => (o.haft ? `<circle cx="${x}" cy="${y}" r="3.4" fill="${k}"/>` : '');
-    const flecken = fl === 'none' ? '' : [[78, 52], [98, 46], [116, 54], [92, 62], [128, 62], [60, 70]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="3.5" fill="${fl}"/>`).join('');
-    const warzen = o.warzen ? [[70, 50], [84, 44], [100, 50], [112, 44], [124, 52], [90, 58], [108, 60], [134, 60], [76, 62], [120, 66]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="rgba(0,0,0,.22)"/>`).join('') : '';
-    const bauchfl = o.bauchfl ? [[84, 80], [100, 84], [116, 82], [130, 78], [92, 88], [110, 90], [142, 70]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="5" ry="3.2" fill="${o.bauchfl}"/>`).join('') : '';
-    return S('0 0 200 120', bg(o.wasser ? WASSER : LAND) + `<path d="M0 100 H200 V120 H0Z" fill="${o.wasser ? '#b7dcf2' : '#cfe0ae'}"/>`
-      // Hinterbein (gefaltet)
-      + `<path d="M58 78 C40 60 30 84 48 96 L20 100 L18 104 L64 104 C74 100 76 88 58 78Z" fill="${k}"/>${zehe(20, 102)}`
-      // Körper
-      + `<path d="M40 82 C36 ${o.plump ? 40 : 50} 96 ${o.plump ? 26 : 34} 132 44 C160 50 172 62 170 72 C168 86 140 96 96 96 C66 96 42 94 40 82Z" fill="${k}"/>`
-      + `<path d="M56 90 C80 78 130 76 166 74 C160 88 138 96 96 96 C76 96 62 95 56 90Z" fill="${b}"/>${bauchfl}`
+    const k = o.k || '#6aa84f', b = o.b || '#e9e6c5', fl = o.fl || 'none', RAND = 'rgba(0,0,0,.3)', SCHATTEN = 'rgba(0,0,0,.16)';
+    const pl = o.plump ? 9 : 0; // Kröten und Unken: höherer, runderer Rücken
+    const koerper = `M36 86 C33 ${62 - pl} 58 ${42 - pl} 92 ${40 - pl} C112 ${38 - pl} 130 ${39 - pl * 0.5} 144 43 C160 47 173 55 174 62 C175 68 168 75 156 79 C150 87 132 96 100 97 C70 98 39 98 36 86Z`;
+    const haft = (x, y) => (o.haft ? `<circle cx="${x}" cy="${y}" r="3" fill="${k}" stroke="${RAND}" stroke-width=".8"/>` : '');
+    const flecken = fl === 'none' ? '' : [[70, 56, 6, 4], [90, 48, 7, 4], [110, 52, 5, 3.5], [100, 64, 6, 3.5], [124, 64, 4, 3], [58, 70, 4, 3], [80, 68, 4, 2.5], [46, 78, 5, 3], [40, 88, 4, 3], [56, 88, 4, 2.5]].map(([x, y, rx, ry], i) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${fl}" transform="rotate(${-20 + i * 9} ${x} ${y})"/>`).join('');
+    const warzen = o.warzen ? [[64, 50], [78, 42], [94, 46], [108, 40], [120, 50], [86, 56], [104, 58], [132, 60], [70, 64], [116, 66], [52, 62], [44, 76], [56, 82], [40, 88]].map(([x, y], i) => `<circle cx="${x}" cy="${y - pl * 0.6}" r="${2 + (i % 3) * 0.5}" fill="rgba(0,0,0,.2)"/><circle cx="${x - 0.7}" cy="${y - pl * 0.6 - 0.7}" r=".8" fill="rgba(255,255,255,.35)"/>`).join('') : '';
+    const bauchfl = o.bauchfl ? [[72, 90, 6, 3], [90, 86, 5, 3.5], [106, 90, 7, 3.5], [124, 85, 5, 3], [138, 82, 4, 2.5], [158, 74, 4, 2.5], [82, 94, 4, 2]].map(([x, y, rx, ry], i) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${o.bauchfl}" transform="rotate(${i * 17 - 30} ${x} ${y})"/>`).join('') : '';
+    const boden = o.wasser
+      ? bg(WASSER) + `<path d="M0 96 H200 V120 H0Z" fill="#b7dcf2"/><path d="M8 100 h22 M150 114 h30 M170 100 h18" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".8"/><ellipse cx="98" cy="106" rx="84" ry="11" fill="#5d9e4a"/><path d="M98 106 L172 100" stroke="#4a843a" stroke-width="1.2"/><ellipse cx="98" cy="104.5" rx="84" ry="10" fill="none" stroke="#4a843a" stroke-width="1"/>`
+      : bg(LAND) + `<path d="M0 102 H200 V120 H0Z" fill="#cfe0ae"/><path d="M10 104 l3 -12 l3 12 M20 104 l2 -8 l3 8 M178 104 l3 -13 l3 13 M166 104 l2 -7 l3 7 M96 112 l2 -6 l2 6" stroke="#9dbb6c" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+    return S('0 0 200 120', boden
+      + `<ellipse cx="100" cy="103" rx="70" ry="5" fill="rgba(0,0,0,.12)"/>`
+      // Hinterbein: Fuß mit Schwimmhaut, Unterschenkel, Oberschenkel (gefaltet zum Sprung)
+      + `<path d="M28 100 L60 102 L84 99 L82 103 L88 105 L82 107 L86 111 L60 110 L28 107Z" fill="${k}" stroke="${RAND}" stroke-width="1"/><path d="M62 103 L82 101 M62 106 L84 105 M62 108 L82 109" stroke="${SCHATTEN}" stroke-width="1"/>${haft(85, 100)}${haft(89, 105)}${haft(87, 111)}`
+      + `<path d="M76 84 C62 96 46 100 28 99 L28 106 C50 107 70 104 84 94Z" fill="${k}" stroke="${RAND}" stroke-width="1"/>`
+      + `<path d="${koerper}" fill="${k}" stroke="${RAND}" stroke-width="1.2"/>`
+      + `<path d="M50 92 C76 83 122 81 154 79 C148 88 130 96 100 97 C76 98 58 97 50 92Z" fill="${b}"/><path d="M152 79 C162 77 171 71 174 64 C173 72 166 78 156 80Z" fill="${b}"/>${bauchfl}`
+      + (o.blase ? `<circle cx="162" cy="82" r="11" fill="#eef3ff" stroke="#9fb0d8" stroke-width="1.5"/><path d="M156 76 q5 -3 9 1" stroke="#fff" stroke-width="2" fill="none"/>` : '')
       + flecken + warzen
-      + (o.streif ? `<path d="M48 70 C80 44 120 40 150 50" stroke="${o.streif}" stroke-width="4" fill="none" stroke-linecap="round"/>` : '')
-      + (o.fleck ? `<path d="M124 54 L146 58 L140 66 L124 64Z" fill="${o.fleck}"/>` : '')
-      // Vorderbein
-      + `<path d="M128 84 L132 102 L146 104 L148 100 L138 98 L138 84Z" fill="${k}"/>${zehe(146, 102)}`
-      // Auge (oben auf dem Kopf)
-      + `<circle cx="144" cy="46" r="9" fill="${k}"/>${auge(145, 46, 6)}`
-      + `<path d="M150 70 C160 70 168 68 170 66" stroke="${TINTE}" stroke-width="1.5" fill="none"/>`
-      + (o.blase ? `<circle cx="164" cy="80" r="11" fill="#eef3ff" stroke="#9fb0d8" stroke-width="1.5"/>` : ''), o.name || 'Froschlurch');
+      + (o.streif ? `<path d="M46 ${68 - pl * 0.7} C74 ${46 - pl} 114 ${40 - pl} 140 ${44 - pl * 0.4}" stroke="${o.streif}" stroke-width="${o.plump ? 3 : 4}" fill="none" stroke-linecap="round"/>` : `<path d="M50 ${66 - pl * 0.7} C78 ${48 - pl} 112 ${45 - pl} 134 ${47 - pl * 0.5}" stroke="${SCHATTEN}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`)
+      + `<path d="M62 70 C42 60 24 76 34 92 C42 102 66 100 76 88 C80 80 72 74 62 70Z" fill="${k}" stroke="${RAND}" stroke-width="1.2"/>`
+      + (fl === 'none' ? '' : `<path d="M40 74 l10 16 M52 68 l10 20 M64 72 l6 16" stroke="${fl}" stroke-width="3.5" stroke-linecap="round" opacity=".85"/>`)
+      + (o.warzen ? [[46, 80], [58, 76], [54, 90], [66, 84]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="rgba(0,0,0,.2)"/>`).join('') : '')
+      // Schläfenfleck (Grasfrosch), Ohrdrüse (Kröten), Trommelfell
+      + (o.fleck ? `<path d="M140 50 C130 48 118 54 114 64 C126 68 138 64 142 55Z" fill="${o.fleck}"/>` : '')
+      + (o.plump ? `<ellipse cx="122" cy="${46 - pl * 0.3}" rx="10" ry="4.5" fill="rgba(0,0,0,.18)" transform="rotate(-8 122 46)"/>` : '')
+      + `<circle cx="128" cy="59" r="5" fill="rgba(0,0,0,.14)" stroke="rgba(0,0,0,.28)" stroke-width="1"/>`
+      // Vorderbein mit Fingern
+      + `<path d="M132 82 L127 97 L142 106" stroke="${RAND}" stroke-width="9.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M132 82 L127 97 L142 106" stroke="${k}" stroke-width="7.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
+      + `<path d="M142 106 l10 -3 M142 106 l11 2 M142 106 l7 6 M142 106 l-1 6" stroke="${k}" stroke-width="3" stroke-linecap="round"/>${haft(153, 103)}${haft(154, 108)}${haft(150, 113)}`
+      // Kopf: Auge mit waagerechter Pupille, Nasenloch, Maulspalte
+      + `<circle cx="147" cy="43" r="10" fill="${k}" stroke="${RAND}" stroke-width="1.2"/><circle cx="148" cy="43" r="6.5" fill="${o.iris || '#e9b93a'}" stroke="rgba(0,0,0,.4)" stroke-width=".8"/><ellipse cx="148" cy="43" rx="3.8" ry="2.5" fill="#1b1b1b"/><circle cx="146" cy="41" r="1.2" fill="#fff"/>`
+      + `<circle cx="168" cy="57" r="1.3" fill="${TINTE}"/><path d="M174 63 C164 69 150 71 138 68" stroke="${TINTE}" stroke-width="1.4" fill="none" stroke-linecap="round"/>`, o.name || 'Froschlurch');
   }
   // ---------------------------------------------------- Molch und Salamander (von der Seite)
   // o: { k, b, punkte: Farbe der Flecken, kamm, bauchfl }

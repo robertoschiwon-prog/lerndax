@@ -21,6 +21,13 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-3. Frösche neu gezeichnet (lerndax-v93, 14.11.2026)
+
+- `frosch()` in `web/bio/themen/basis.js` neu: Umriss, gefaltetes Hinterbein mit Schwimmhaut, Vorderbein mit Fingern, Auge mit
+  waagerechter Pupille, Trommelfell, Ohrdrüse bei Kröten, Seerosenblatt oder Gras. Gilt für alle 7 Froschlurche, Jungfrosch, Frosch.
+  Eigene Zeichnung, nichts abgezeichnet. Molche, Fische, Kriechtiere, Vögel, Gebisse, Skelett sind noch die alten.
+- Zahlentasten statt Handy-Tastatur (Wunsch der Jungs): besprochen, Roberto macht das im **Mathe-Projekt/Tab**, nicht hier.
+
 ## 0-neu-2. Erklärungen ohne Wiederholung (lerndax-v92, 14.11.2026)
 
 Roberto: Eine Erklärung, die nur die Frage wiederholt und falsche Antworten durchstreicht, bringt nichts. Dann lieber ein
