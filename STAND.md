@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 14.11.2026, Version `lerndax-v89`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 14.11.2026, Version `lerndax-v101`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,21 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-10. Fotos auch für alle Schaubilder (lerndax-v100 und v101, 14.11.2026)
+
+Roberto: „Alles ersetzen und weitermachen.“ Neu: Claude sucht und **sieht** die Fotos jetzt im eingebauten Browser auf Robertos PC
+(Commons-API per `fetch(... &origin=*)`, Vorschau mit Gitternetz, Nummern daran ausgerichtet). Alle 27 Tierfotos geprüft: passen.
+Neu in `FOTOS` (23): Laich, 4 Kaulquappen-Stufen, Jungfrosch, Karpfen mit Nummern, Seitenlinie (rote Linie auf dem Karpfen),
+Feder mit Nummern (Großtrappe), Skelett mit Nummern (Skelettmodell, Bild hochkant 120×200), 5 Schnabel-Köpfe, 3 Schädel
+(Hund, Rind, Wildschwein), 5 Vordergliedmaßen (Arm des Menschen gedreht, Skelette von Maulwurf, Fledermaus, Pferd, Blauwalflosse).
+Technik (`basis.js`, `fotoBild`): `px` (Pixelgröße), `aus` (Ausschnitt), `ganz` (ganz zeigen, Rand in `bg`), `dreh` (90° drehen),
+`vb` (eigene Bildgröße), `nr` (Nummern auf dem Foto, mit weißem Rand), `extra` (eigene Zeichnung darüber). Rand, Nummern und
+Bildnachweis erscheinen erst, wenn das Foto geladen ist; ohne Netz bleibt die alte Zeichnung (mit eigenen Nummern) stehen.
+`D.zeichnungen` hält die Zeichnungen: „Ein Bauplan für alle“ (Entdecken) zeigt weiter die farbigen Knochen (rot, blau, gelb).
+Gliedmaßen-Aufgabe ohne Farbhinweis („Achte auf die Vordergliedmaße“). **Ausnahme: das Hühnerei** bleibt gezeichnet, weil es
+kein freies Foto gibt, das Kalkschale, Luftkammer, Hagelschnur und Keimscheibe zugleich zeigt. Kaulquappe mit Außenkiemen:
+kein scharfes freies Foto, darum frisch geschlüpfte Kaulquappen neben dem Laich.
 
 ## 0-neu-9. Fotos für Fische, Kriechtiere, Vögel; Gelbbauchunke mit Bauch (lerndax-v99, 14.11.2026)
 

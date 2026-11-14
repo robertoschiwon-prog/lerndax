@@ -491,7 +491,7 @@
     quappe2: { datei: 'Pelophylax perezi 03 by-dpc.jpg', von: 'David Pérez', liz: 'CC BY 3.0', px: [1577, 1055] },
     quappe3: { datei: 'Woodfrog tadpole.jpg', von: 'Brian Gratwicke', liz: 'CC BY 2.0', px: [3000, 2000] },
     quappe4: { datei: 'Rana Temporaria - Larva Final Stage.jpg', von: 'Viridiflavus', liz: 'CC BY-SA 3.0', px: [1443, 1168] },
-    jungfrosch: { datei: 'Rana temporaria juv 01.JPG', von: 'Nicolas Weghaupt', liz: 'CC0', px: [4488, 3033], aus: [0.12, 0.2, 0.58, 0.78] },
+    jungfrosch: { datei: 'Rana temporaria juv 01.JPG', von: 'Nicolas Weghaupt', liz: 'CC0', px: [4488, 3033], aus: [0.25, 0.3, 0.65, 0.8] },
     // Bilder zum Beschriften: Nummern liegen auf dem Foto
     fischNr: { datei: 'Cyprinus carpio 2008 G1.jpg', von: 'George Chernilevsky', liz: 'CC BY-SA 3.0', px: [3500, 1600], ganz: true, bg: '#f4f7fa',
       nr: [[80, 10, 96, 28], [12, 100, 20, 70], [45, 108, 59, 80], [100, 110, 104, 90], [150, 106, 138, 76], [172, 12, 160, 58]] },
@@ -551,11 +551,11 @@
       img = `<image href="${fotoUrl(f.datei, f.breite)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="${f.pos || 'xMidYMid'} slice" onload="LADEN"/>`;
     }
     img = img.replace('LADEN', "this.closest('.foto').querySelectorAll('.fz').forEach(function(e){e.setAttribute('visibility','visible')})");
-    const fs = Math.max(4.2, Math.min(5.6, W / 36));
+    const nachweis = `Foto: ${f.von}, ${f.liz}, Wikimedia Commons`, fs = Math.max(3.6, Math.min(5.6, W / 36, (W - 4) / (nachweis.length * 0.5)));
     return `<svg viewBox="0 0 ${W} ${H}"${(roh.match(/^<svg[^>]*?( role="img".*?)>/) || [0, ''])[1]}>${inhalt}<g class="foto">`
       + `<g class="fz" visibility="hidden"><rect width="${W}" height="${H}" fill="${f.bg || '#fff'}"/></g>${img}`
       + `<g class="fz" visibility="hidden">${f.extra || ''}${(f.nr || []).map((m, i) => nrF(i + 1, m[0], m[1], m[2], m[3])).join('')}`
-      + `<rect x="0" y="${H - fs * 1.6}" width="${W}" height="${fs * 1.6}" fill="rgba(255,255,255,.78)"/><text x="2" y="${r1(H - fs * 0.45)}" style="font:600 ${r1(fs)}px Nunito,sans-serif;fill:#2b2540">Foto: ${f.von}, ${f.liz}, Wikimedia Commons</text></g></g></svg>`;
+      + `<rect x="0" y="${H - fs * 1.6}" width="${W}" height="${fs * 1.6}" fill="rgba(255,255,255,.78)"/><text x="2" y="${r1(H - fs * 0.45)}" style="font:600 ${r1(fs)}px Nunito,sans-serif;fill:#2b2540">${nachweis}</text></g></g></svg>`;
   }
   Object.keys(FOTOS).forEach((name) => { const zeichnung = BILDER[name], f = FOTOS[name]; BILDER[name] = () => fotoBild(zeichnung, f); });
   D.bilder = BILDER;
