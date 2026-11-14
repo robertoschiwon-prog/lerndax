@@ -1,6 +1,8 @@
 # BioDax (Biologie) – Startpunkt
 
-Stand 13.11.2026: **Lehrplan ausgewertet** (`lehrplan/sachsen-gymnasium.md`). Noch nichts gebaut.
+Stand 14.11.2026: **Lehrplan ausgewertet** (`lehrplan/sachsen-gymnasium.md`), **mit dem Buch abgeglichen** (`lehrplan/schulbuch-abgleich.md`),
+**Themenplan liegt Roberto vor** (`themenplan.md`, 48 Themen in 7 Bereichen = Kapitel des Buchs). Noch nichts gebaut. Im Unterricht: Lurche.
+Fotos des ganzen Buchs liegen lokal in `notizen/schulbuch-bio/` (HEIC, Foto Nummer = Seite + 2).
 Vorher lesen: `STAND.md` (Abschnitt 0 und 6), `README.md`, `faecher/README.md`, `faecher/geschichte/README.md` (Vorbild für die Bauweise).
 
 ## Was feststeht
@@ -22,8 +24,8 @@ Lehrkraft oder Kind im öffentlichen Code; nichts aus dem Schulbuch abschreiben 
 ## Vorgehen
 
 1. ✅ Lehrplan am Originaltext auswerten.
-2. Mit dem Schulbuch abgleichen: Fotos vom Inhaltsverzeichnis, aktuelles Kapitel erfragen → `lehrplan/schulbuch-abgleich.md`.
-3. Themenplan mit Beispiel-Aufgaben vorlegen (`themenplan.md`), Fragen einzeln stellen.
+2. ✅ Mit dem Schulbuch abgleichen: Fotos vom Inhaltsverzeichnis, aktuelles Kapitel erfragen → `lehrplan/schulbuch-abgleich.md`.
+3. ✅ (wartet auf Antwort) Themenplan mit Beispiel-Aufgaben vorlegen (`themenplan.md`), Fragen einzeln stellen.
 4. Alles bauen (Bauweise wie GeDax: `baue(id, { F, T, O, S, A, extra })`), Entdecken, Knobeln, Tests.
 5. `faecher.js` auf `status: 'fertig'`, Version, GitHub, `STAND.md`, OneDrive, Übergabe.
 

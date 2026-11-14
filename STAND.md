@@ -27,7 +27,10 @@ Weitere Dokumente:
   (`faecher/bio/lehrplan/sachsen-gymnasium.md`, Startpunkt `faecher/bio/README.md`). Wichtig: Es gilt die **Fassung 2025**
   (Klasse 5–10 seit 1.8.2025), das Buch LINDER 5 ist von 2020. Sieben Lernbereiche: Merkmale des Lebens, Fische, Lurche,
   Kriechtiere, Vögel, Säugetiere (mit Fortpflanzung des Menschen), Systematisierung; drei Wahlbereiche.
-  **Wartet auf Roberto:** Fotos Inhaltsverzeichnis LINDER 5, aktuelles Kapitel. Danach Themenplan, dann bauen.
+  **14.11. früh:** Fotos des ganzen Buchs liegen lokal in `notizen/schulbuch-bio/`. Abgleich fertig
+  (`faecher/bio/lehrplan/schulbuch-abgleich.md`: Buch = Lehrplan, sieben Kapitel), Themenplan vorgelegt
+  (`faecher/bio/themenplan.md`, 48 Themen). Im Unterricht: **Lurche**, dieser Bereich wird zuerst gebaut.
+  **Wartet auf Roberto:** Fortpflanzung des Menschen in die App ja/nein; Themenplan in Ordnung? Danach bauen.
 
 - **GeDax (Geschichte) Klasse 5 ist gebaut und live** (Auftrag Roberto: „Baue alles, frage wenig nach. Wir schauen später drüber.“).
   31 Themen in 5 Bereichen = Kapitel von ANNO 1 (Begegnungen mit Geschichte, Frühgeschichte, Ägypten, Griechische Polis,
