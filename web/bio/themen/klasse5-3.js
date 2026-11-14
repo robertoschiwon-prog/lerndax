@@ -317,6 +317,38 @@
     ],
   }, { sortieren: 24, passtNicht: 0, ordnen: 14, frage: 48, tippen: 14 });
 
+  G.schutz = baue('b5-schutz', {
+    h: 'Dein Körper gehört dir. Du darfst Nein sagen, weggehen und dir Hilfe holen. Wenn jemand deine Grenzen verletzt, hast du niemals Schuld.',
+    S: { kats: ['gutes Geheimnis', 'schlechtes Geheimnis'], f: (x) => `Gutes oder schlechtes Geheimnis? <b>${x}</b>`, h: 'Ein gutes Geheimnis macht Freude und endet bald. Ein schlechtes Geheimnis macht Angst oder Bauchweh. Schlechte Geheimnisse darf man weitersagen.',
+      items: [['Ihr plant eine Überraschung zu Mamas Geburtstag.', 0], ['Du bastelst heimlich ein Geschenk für deinen Freund.', 0], ['Deine Freundin verrät dir, was sie ihrem Bruder schenkt.', 0], ['Die Klasse übt heimlich ein Lied für die Lehrerin.', 0],
+        ['Jemand fasst dich an und sagt: „Das darfst du niemandem erzählen.“', 1, 'Das darfst und sollst du weitersagen.'], ['Ein Geheimnis macht dir Angst oder Bauchweh.', 1, 'Solche Geheimnisse muss niemand für sich behalten.'], ['Jemand droht: „Wenn du etwas sagst, passiert etwas Schlimmes.“', 1, 'Wer so droht, weiß, dass er etwas Falsches tut.'], ['Ein Erwachsener schenkt dir etwas und verlangt, dass deine Eltern nichts davon erfahren.', 1], ['Jemand im Chat will, dass du eure Nachrichten vor deinen Eltern versteckst.', 1]] },
+    O: [
+      { t: 'Jemand kommt dir zu nah, und du willst das nicht. Was tust du? Bringe die Schritte in eine gute Reihenfolge.', items: ['Laut und deutlich „Nein, ich will das nicht!“ sagen', 'Weggehen, dorthin, wo andere Menschen sind', 'Einer Vertrauensperson davon erzählen'], w: 'Nein sagen, weggehen, erzählen. Und wenn das Neinsagen nicht klappt: Du hast trotzdem keine Schuld. Erzähl es auf jeden Fall.' },
+    ],
+    F: [
+      { f: 'Wer bestimmt, wer dich anfassen darf?', a: 'du selbst', x: ['jeder Erwachsene', 'wer älter ist als du', 'wer stärker ist als du'], w: 'Dein Körper gehört dir. Das gilt für alle Kinder, Mädchen und Jungen.' },
+      { f: 'Jemand berührt dich so, dass es sich für dich komisch oder unangenehm anfühlt. Was darfst du?', a: 'Nein sagen und weggehen, auch wenn es ein Erwachsener ist', x: ['nichts, Kinder müssen das aushalten', 'nur leise sein und abwarten', 'nur dann etwas sagen, wenn es ein Fremder ist'], w: 'Dein Nein gilt gegenüber allen: Fremden, Bekannten und auch Verwandten.' },
+      { f: 'Dein Gefühl sagt dir: „Hier stimmt etwas nicht.“ Was ist richtig?', a: 'dem Gefühl vertrauen und es ernst nehmen', x: ['das Gefühl wegschieben', 'sich schämen', 'denken, man bildet sich das ein'], w: 'Dein Gefühl ist ein guter Wegweiser. Ein komisches Gefühl ist Grund genug, Nein zu sagen oder wegzugehen.' },
+      { f: 'Die Tante will dir zur Begrüßung ein Küsschen geben. Du möchtest das nicht. Darfst du Nein sagen?', a: 'Ja. Das ist nicht unhöflich.', x: ['Nein, bei Verwandten muss man das.', 'Nur, wenn die Eltern es erlauben.', 'Nur, wenn man krank ist.'], w: 'Du kannst freundlich sagen: „Ich möchte das nicht. Ich gebe dir lieber die Hand.“' },
+      { f: 'Jemand sagt: „Das ist unser Geheimnis. Wenn du es erzählst, passiert etwas Schlimmes.“ Was ist richtig?', a: 'Es trotzdem einer Vertrauensperson erzählen.', x: ['Das Geheimnis für immer behalten.', 'Es nur dem Haustier erzählen.', 'Warten, bis man erwachsen ist.'], w: 'Das ist ein schlechtes Geheimnis. Wer so droht, will nur nicht erwischt werden.' },
+      { f: 'Ist es Petzen, wenn du dir bei so etwas Hilfe holst?', a: 'Nein. Hilfe holen ist mutig und richtig.', x: ['Ja, das ist Petzen.', 'Ja, und es ist verboten.', 'Nur, wenn man unter zehn Jahre alt ist.'], w: 'Petzen will jemandem schaden. Hilfe holen schützt dich oder andere.' },
+      { f: 'Ein Erwachsener hat die Grenzen eines Kindes verletzt. Wer hat Schuld?', a: 'immer der Erwachsene, niemals das Kind', x: ['das Kind, weil es nicht Nein gesagt hat', 'beide gleich', 'niemand'], w: 'Das gilt auch dann, wenn das Kind sich nicht gewehrt oder lange geschwiegen hat.' },
+      { f: 'Du erzählst einem Erwachsenen etwas, das dich bedrückt, und er glaubt dir nicht. Was tust du?', a: 'Ich erzähle es einer anderen Person, bis mir jemand hilft.', x: ['Ich sage nie wieder etwas.', 'Ich denke, dass ich selbst schuld bin.', 'Ich warte einfach ab.'], w: 'Manchmal braucht es mehrere Anläufe. Nicht aufgeben.' },
+      { f: 'Wer kann eine <b>Vertrauensperson</b> sein?', a: 'jemand, bei dem du dich sicher fühlst: Eltern, Großeltern, eine Lehrerin, ein Trainer', x: ['nur die Polizei', 'jeder, der nett schreibt', 'niemand'], w: 'Überlege dir schon jetzt, zu wem du gehen würdest.' },
+      { f: 'Unter welcher kostenlosen Nummer können Kinder und Jugendliche anrufen, wenn sie Sorgen haben?', a: '116 111 (Nummer gegen Kummer)', x: ['0190 12345', '11 88 0', '555 000'], w: 'Der Anruf kostet nichts, du musst deinen Namen nicht sagen, und er steht nicht auf der Telefonrechnung. Erreichbar montags bis samstags von 14 bis 20 Uhr.' },
+      { f: 'Jemand, den du nur aus dem Internet kennst, bittet dich um Fotos von dir und sagt: „Erzähl es nicht deinen Eltern.“ Was tust du?', a: 'nichts schicken und es den Eltern oder einer Vertrauensperson zeigen', x: ['schnell ein Foto schicken', 'weiterschreiben und es geheim halten', 'mich allein mit der Person treffen'], w: 'Im Internet kann sich jeder als jemand anderes ausgeben. Wer Heimlichkeit verlangt, meint es nicht gut.' },
+      { f: 'Was sagt das Gesetz in Deutschland?', a: 'Kinder stehen unter besonderem Schutz. Niemand darf sie zu sexuellen Handlungen bringen.', x: ['Erwachsene dürfen mit Kindern alles tun.', 'Kinder müssen Erwachsenen immer gehorchen.', 'Dazu gibt es kein Gesetz.'], w: 'Wer das Gesetz bricht, wird bestraft. Der besondere Schutz gilt für alle Kinder unter 14 Jahren.' },
+      { f: 'Eine Freundin erzählt dir, dass jemand sie gegen ihren Willen anfasst. Sie bittet dich, es niemandem zu sagen. Was hilft ihr am meisten?', a: 'Ihr sagen, dass sie keine Schuld hat, und mit ihr zu einem Erwachsenen gehen, dem ihr vertraut.', x: ['Es für mich behalten.', 'Es in der Klasse herumerzählen.', 'Sie auslachen.'], w: 'Das ist zu groß, um es allein zu tragen. Hilfe holen ist kein Verrat an deiner Freundin.' },
+    ],
+    T: [
+      { f: 'Dein Körper gehört ___.', a: 'dir', w: 'Du bestimmst, wer dir nahe kommen darf.' },
+      { f: 'Die Nummer gegen Kummer lautet 116 ___.', a: '111', w: 'Kostenlos und ohne Namen.' },
+      { f: 'Ein Erwachsener, dem du alles erzählen kannst, ist eine ___.', a: ['Vertrauensperson'], w: 'Zum Beispiel Eltern, Großeltern oder eine Lehrerin.' },
+    ],
+    A: { w: ['Du darfst Nein sagen, auch zu Erwachsenen.', 'Schlechte Geheimnisse darf man weitersagen.', 'Hilfe holen ist kein Petzen.', 'Das Kind hat niemals Schuld.'],
+      f: ['Kinder müssen sich von Erwachsenen immer anfassen lassen.', 'Ein Geheimnis muss man immer für sich behalten.', 'Wer sich Hilfe holt, ist eine Petze.', 'Wenn ein Kind nicht Nein gesagt hat, ist es selbst schuld.'] },
+  }, { sortieren: 22, passtNicht: 0, ordnen: 8, frage: 48, tippen: 10, aussage: 12 });
+
   // =====================================================
   // Bereich 7: Wirbeltiere im Vergleich
   // =====================================================
@@ -486,6 +518,7 @@
         { id: 'b5-tierhaltung', title: 'Artgerechte Tierhaltung', icon: '🐹', gen: G.tierhaltung },
         { id: 'b5-mensch-skelett', title: 'Der Mensch: Skelett und Bauplan', icon: '💀', gen: G.skelett },
         { id: 'b5-mensch-fortpfl', title: 'Pubertät und Fortpflanzung des Menschen', icon: '👶', gen: G.menschFortpfl },
+        { id: 'b5-schutz', title: 'Mein Körper gehört mir', icon: '✋', gen: G.schutz },
       ] },
       { id: 'b5-system', nr: 7, title: 'Wirbeltiere im Vergleich', topics: [
         { id: 'b5-vergleich', title: 'Die fünf Klassen im Vergleich', icon: '📊', gen: G.vergleich },

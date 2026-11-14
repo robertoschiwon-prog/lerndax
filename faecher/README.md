@@ -76,7 +76,7 @@ Das kann später neu entschieden werden.
 2. DeDax ✅ gebaut (37 Themen, Entdecken, Knobeln; mit dem Deutschbuch abgeglichen; Test mit dem Kind steht aus)
 3. EnDax ✅ gebaut (53 Themen nach den Units des Buchs, Entdecken, Knobeln; Startpunkt `faecher/englisch/README.md`; Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
 4. GeDax ✅ gebaut (31 Themen nach den Kapiteln von ANNO 1, Entdecken, Knobeln; `faecher/geschichte/README.md`); 
-5. BioDax ✅ gebaut (49 Themen nach den Kapiteln von LINDER Biologie 5, Entdecken, Knobeln; `faecher/bio/README.md`); **als Nächstes GeoDax (Terra 5)**
+5. BioDax ✅ gebaut (50 Themen nach den Kapiteln von LINDER Biologie 5, Entdecken, Knobeln; `faecher/bio/README.md`); **als Nächstes GeoDax (Terra 5)**
 6. TecDax (Technik/Computer)
 7. Vielleicht: MuDax, KuDax, EthDax
 

@@ -1,6 +1,6 @@
 # BioDax Klasse 5: Themenplan (Vorschlag)
 
-Stand 14.11.2026. **Von Roberto am 14.11.2026 bestätigt und so gebaut** (49 Themen, mit „Pubertät und Fortpflanzung des Menschen“). Grundlage: Lehrplan Sachsen (Fassung 2025) und die Kapitel des Schulbuchs
+Stand 14.11.2026. **Von Roberto am 14.11.2026 bestätigt und so gebaut** (50 Themen, mit „Pubertät und Fortpflanzung des Menschen“ und, nach Rückfrage, „Mein Körper gehört mir“). Grundlage: Lehrplan Sachsen (Fassung 2025) und die Kapitel des Schulbuchs
 LINDER Biologie 5. Die sieben Bereiche heißen wie die Kapitel des Buchs und stehen in derselben Reihenfolge.
 
 Die Beispiel-Aufgaben sind selbst geschrieben. Alle Zahlen, Namen und Tierarten werden vor dem Bauen nachgeschlagen und
@@ -17,9 +17,9 @@ mit Quelle in `fakten.md` festgehalten. Alle Bilder werden selbst gezeichnet.
 | 3 Lurche | 8 | S. 40–57 |
 | 4 Kriechtiere | 6 | S. 58–83 |
 | 5 Vögel | 10 | S. 84–115 |
-| 6 Säugetiere | 13 | S. 116–169 |
+| 6 Säugetiere | 14 | S. 116–169 |
 | 7 Wirbeltiere im Vergleich | 4 | S. 170–185 |
-| **zusammen** | **49** | |
+| **zusammen** | **50** | |
 
 Dazu wie in den anderen Fächern: „Entdecken“ (Staunen-Momente) und Knobel-Aufgaben zu jedem Thema.
 

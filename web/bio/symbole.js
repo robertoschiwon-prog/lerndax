@@ -63,6 +63,7 @@ window.BioDaxIcons = (function () {
     'b5-tierhaltung': `<path d="M3 21V11l9-7 9 7v10z"/><path d="M9.5 16.500l2.5 2.5 2.5-2.500a1.8 1.8 0 0 0-2.5-2.5 1.8 1.8 0 0 0-2.5 2.500z" ${F}/>`,
     'b5-mensch-skelett': `<circle cx="12" cy="5" r="3"/><path d="M12 8v8M7 10h10M8 13h8M12 16l-3 5M12 16l3 5M7 10l-2 5M17 10l2 5"/>`,
     'b5-mensch-fortpfl': `<circle cx="8" cy="6" r="2.5"/><path d="M4 21v-6c0-3 2-5 4-5s4 2 4 5v6"/><circle cx="17" cy="11" r="2"/><path d="M14 21v-4c0-2 1.5-3.5 3-3.500s3 1.5 3 3.500v4"/>`,
+    'b5-schutz': `<path d="M8 13V6a1.5 1.5 0 0 1 3 0v5M11 11V4.5a1.5 1.5 0 0 1 3 0V11M14 11V6a1.5 1.5 0 0 1 3 0v8c0 4-2 7-6 7-3 0-4.5-1.5-6-4l-2-3.5a1.4 1.4 0 0 1 2.4-1.4L8 15"/>`,
     // Wirbeltiere im Vergleich
     'b5-vergleich': `<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14.500h18M9 4v16M15 4v16"/>`,
     'b5-entwicklung': `<path d="M12 21V9M12 15l-5-4M12 12l5-4M12 9l-3-5M12 9l3-5"/><circle cx="7" cy="11" r="1.3" ${F}/><circle cx="17" cy="8" r="1.3" ${F}/><circle cx="9" cy="4" r="1.3" ${F}/><circle cx="15" cy="4" r="1.3" ${F}/>`,

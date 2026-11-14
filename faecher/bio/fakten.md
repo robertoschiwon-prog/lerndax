@@ -21,6 +21,8 @@ Wo sich Quellen leicht unterscheiden, nennt BioDax die vorsichtige Angabe („et
 | Lachs in Sachsen: Besatz seit 1995 im Lachsbach (Sächsische Schweiz), erste Rückkehrer im Herbst 1998 | Freistaat Sachsen: https://www.landwirtschaft.sachsen.de/download/Abschlussbericht_Lachswanderung.pdf und https://www.landwirtschaft.sachsen.de/download/Vortrag_Matthias_Pfeifer.pdf |
 | Gebiss: Hund 42 Zähne, Katze 30, Schwein 44, Wiederkäuer ohne obere Schneidezähne | https://www.bionity.com/de/lexikon/Zahnformel und Freie Universität Berlin, Veterinärmedizin: https://www.vetmed.fu-berlin.de/einrichtungen/zfg/we01/Studium_und_Lehre/anatomie/uebungen_II/Mundh__hle-II-WS05-06.pdf |
 
+| Nummer gegen Kummer (Kinder- und Jugendtelefon): 116 111, kostenlos, anonym, montags bis samstags 14 bis 20 Uhr, erscheint nicht auf der Telefonrechnung | Nummer gegen Kummer e. V.: https://www.nummergegenkummer.de/wp-content/uploads/2023/02/NgK_Klappkarte_Kinder-und-Jugendliche.pdf und Familienportal des Bundes: https://familienportal.de/familienportal/lebenslagen/krise-und-konflikt/hilfe-kinder-jugendliche-notlagen |
+
 ## Mit dem Schulbuch abgeglichen (LINDER Biologie 5)
 
 | Aussage in BioDax | Buch |
@@ -56,6 +58,8 @@ Wo sich Quellen leicht unterscheiden, nennt BioDax die vorsichtige Angabe („et
 - **Axolotl, Echo-Ortung (Schall etwa 340 Meter je Sekunde), Fund des Urvogels 1861:** nur in „Entdecken“, aus allgemeinem Fachwissen. Bei Gelegenheit noch einmal mit einer zweiten Quelle belegen.
 - **Bewusst weggelassen:** warum der Specht keine Kopfschmerzen bekommt (die Forschung ist sich nicht einig), genaue Zahlen zur Entstehungszeit der Tiergruppen (die Angaben schwanken).
 
-## Noch offen
+## Thema „Mein Körper gehört mir“ (seit v89)
 
-- Schutz vor sexuellem Missbrauch (Lehrplan LB 6, Buch S. 164–165) ist **nicht** in BioDax. Das hat Roberto noch nicht entschieden.
+- Inhalt nach Lehrplan LB 6 und Buch S. 164–165 (Grenzen setzen, „Dein Körper gehört dir“, Hilfe holen, Nummer gegen Kummer,
+  besonderer Schutz für Kinder unter 14 Jahren). Bewusst kindgerecht und ohne Schilderungen von Taten. Die Zahlen des Buchs zu
+  Strafverfahren stehen nicht in BioDax.

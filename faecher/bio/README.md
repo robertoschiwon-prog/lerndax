@@ -1,6 +1,6 @@
 # BioDax (Biologie) – Startpunkt
 
-Stand 14.11.2026 (`lerndax-v88`): **Klasse 5 gebaut und live** (49 Themen in 7 Bereichen = Kapitel von LINDER Biologie 5,
+Stand 14.11.2026 (`lerndax-v89`): **Klasse 5 gebaut und live** (50 Themen in 7 Bereichen = Kapitel von LINDER Biologie 5,
 Entdecken mit 5 Staunen-Momenten, Knobel-Aufgaben zu allen Themen). Lehrplan: `lehrplan/sachsen-gymnasium.md` (Fassung 2025),
 Buchabgleich: `lehrplan/schulbuch-abgleich.md`, Themenplan: `themenplan.md`, geprüfte Fakten mit Quellen: `fakten.md`.
 Tests: `tests/biodax.py`, `tests/biodax_knobel.py`. Im Unterricht am 13.11.2026: Lurche.
@@ -18,8 +18,9 @@ Schnelltest ohne Browser: alle Generatoren vielfach aufrufen (wie bei GeDax; 166
 **Fotos des Schulbuchs** liegen nur lokal in `notizen/schulbuch-bio/` (nicht auf GitHub). Foto Nummer = Buchseite + 2.
 
 **Offen (Roberto fragen):**
-1. **Schutz vor sexuellem Missbrauch** steht im Lehrplan (LB 6) und im Buch (S. 164–165), ist aber **nicht** in BioDax.
-   Roberto hat nur der Fortpflanzung des Menschen zugestimmt. Soll das Thema dazu?
+1. Erledigt (v89): Roberto hat am 14.11.2026 zugestimmt, das Thema **„Mein Körper gehört mir“** (`b5-schutz`, Schutz vor
+   Missbrauch: Nein sagen, weggehen, einer Vertrauensperson erzählen, Nummer gegen Kummer 116 111) steht bei den Säugetieren.
+   Roberto sollte dieses Thema und „Pubertät und Fortpflanzung“ selbst einmal durchspielen.
 2. Welche Arten behandelt die Schule genau (Hefter)? BioDax nimmt die Arten aus dem Buch.
 3. Durchsicht durch Roberto („ich schaue später drüber“), Rückmeldung von Bruno, besonders zu den gezeichneten Bildern.
 4. Gemeinsame Bausteine (`baue`, `auswahl` …) stehen jetzt in GeDax und BioDax doppelt. Bei Gelegenheit nach
@@ -55,5 +56,5 @@ Lehrkraft oder Kind im öffentlichen Code; nichts aus dem Schulbuch abschreiben 
 
 1. Fotos vom Inhaltsverzeichnis; welches Kapitel ist gerade dran, steht eine Arbeit an?
 2. Welche sechs Arten je Tiergruppe behandelt die Schule (Buch, Hefter)?
-3. Fortpflanzung des Menschen (Pubertät): **ja** (Roberto, 14.11.2026). Schutz vor Missbrauch: noch offen.
+3. Fortpflanzung des Menschen (Pubertät): **ja** (Roberto, 14.11.2026). Schutz vor Missbrauch: **ja, als kurzes Thema** (14.11.2026).
 4. Welcher Wahlbereich (Winter, Saurier, Tierhaltung)?
