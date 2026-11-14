@@ -1,7 +1,7 @@
 /* LernDax – Service Worker: App läuft auch offline.
  * Eigene Dateien: immer zuerst frisch vom Server, der Speicher ist nur der Offline-Ersatz.
  * So kommen Änderungen sofort an. Bei neuer Version VERSION erhöhen. */
-const VERSION = 'lerndax-v90';
+const VERSION = 'lerndax-v91';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js', './plattform/avatare.js', './plattform/trainings.js', './plattform/faecher.js', './plattform/symbole.js', './plattform/fach.js', './plattform/fach.css',
   './deutsch/', './deutsch/index.html', './deutsch/themen/klasse5.js', './deutsch/themen/klasse5-knobel.js', './deutsch/erklaerungen/klasse5.js', './deutsch/erklaerungen/entdecken.js', './deutsch/symbole.js',

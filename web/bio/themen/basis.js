@@ -176,7 +176,30 @@
   }
   // Feder mit Nummern: 1 Schaft, 2 Fahne, 3 Spule, 4 Federast (Wörter wie im Buch S. 94)
   const FEDER_TEILE = ['Schaft', 'Fahne', 'Spule', 'Federast'];
-  const feder = () => S('0 0 200 120', bg('#f6efe2') + `<path d="M20 100 L176 22" stroke="#7a6a54" stroke-width="3.5" stroke-linecap="round"/><path d="M52 84 C60 40 130 14 176 22 C170 60 110 96 52 84Z" fill="#8fb0d8" opacity=".9"/><path d="M52 84 L176 22" stroke="#5a6f94" stroke-width="2.5"/>` + [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `<path d="M${64 + i * 13} ${78 - i * 6.5} l-2 -22 M${64 + i * 13} ${78 - i * 6.5} l20 6" stroke="#5a6f94" stroke-width="1"/>`).join('') + `<path d="M142 39 l20 6" stroke="#22314f" stroke-width="2.2"/>` + marken([[150, 80, 120, 50], [84, 20, 100, 46], [18, 70, 32, 94], [186, 66, 156, 44]]), 'Feder');
+  const feder = () => {
+    // Schaft als Bogen; Fahne aus vielen einzelnen Federästen, außen schmaler als innen, mit zwei kleinen Lücken
+    const P = (t) => { const u = 1 - t; return [u * u * 20 + 2 * u * t * 92 + t * t * 186, u * u * 104 + 2 * u * t * 74 + t * t * 14]; };
+    const T = (t) => { const x = 2 * (1 - t) * 72 + 2 * t * 94, y = 2 * (1 - t) * -30 + 2 * t * -60, l = Math.hypot(x, y); return [x / l, y / l]; };
+    const T0 = 0.2, N = 46, oben = [], unten = []; let aeste = '';
+    for (let i = 0; i <= N; i++) {
+      const t = T0 + (1 - T0) * i / N, [x, y] = P(t), [tx, ty] = T(t), f = (t - T0) / (1 - T0);
+      const w = Math.pow(Math.sin(Math.PI * Math.pow(f, 0.62)), 0.75), luecke = (i === 17 || i === 31) ? 0.72 : 1;
+      const a = [x + (ty * 30 + tx * 13) * w * luecke, y + (-tx * 30 + ty * 13) * w * luecke], c = [x + (-ty * 17 + tx * 11) * w, y + (tx * 17 + ty * 11) * w];
+      oben.push(a); unten.push(c);
+      if (i % 1 === 0 && i < N) aeste += `M${x.toFixed(1)} ${y.toFixed(1)} Q${(x + ty * 12 * w).toFixed(1)} ${(y - tx * 12 * w).toFixed(1)} ${a[0].toFixed(1)} ${a[1].toFixed(1)} M${x.toFixed(1)} ${y.toFixed(1)} Q${(x - ty * 7 * w).toFixed(1)} ${(y + tx * 7 * w).toFixed(1)} ${c[0].toFixed(1)} ${c[1].toFixed(1)} `;
+    }
+    const rand = (l) => l.map((q) => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join(' L');
+    const [sx, sy] = P(T0), [ex, ey] = P(1);
+    const flaum = [0, 1, 2, 3].map((i) => { const [x, y] = P(T0 - 0.012 + i * 0.022); return `M${x} ${y} q-9 -${5 + i * 2} -${14 - i} -${12 + i * 3} M${x} ${y} q-2 ${8 + i} -${10 - i} ${13 + i}`; }).join(' ');
+    const [hx, hy] = P(T0 + 0.8 * 0.62), hi = oben[Math.round(N * 0.62)];
+    return S('0 0 200 120', bg('#f6efe2')
+      + `<path d="M${sx} ${sy} L${rand(oben)} L${ex} ${ey}Z" fill="#7f9cc4"/><path d="M${sx} ${sy} L${rand(unten)} L${ex} ${ey}Z" fill="#6884ad"/>`
+      + `<path d="${aeste}" stroke="#3f5680" stroke-width=".7" fill="none" opacity=".75"/>`
+      + `<path d="${flaum}" stroke="#a9b6c9" stroke-width="1.1" fill="none" stroke-linecap="round"/>`
+      + `<path d="M20 104 Q92 74 186 14" stroke="#efe6cf" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M20 104 Q92 74 186 14" stroke="#8a7a5c" stroke-width="1" fill="none" stroke-linecap="round" opacity=".7"/>`
+      + `<path d="M${hx.toFixed(1)} ${hy.toFixed(1)} L${hi[0].toFixed(1)} ${hi[1].toFixed(1)}" stroke="#16223d" stroke-width="2"/>`
+      + marken([[150, 96, P(0.55)[0], P(0.55)[1]], [176, 70, 150, 50], [16, 70, 34, 97], [84, 16, (hx + hi[0]) / 2, (hy + hi[1]) / 2]]), 'Feder');
+  };
   // Hühnerei im Schnitt: 1 Kalkschale, 2 Eiklar, 3 Dotter, 4 Keimscheibe, 5 Hagelschnur, 6 Luftkammer
   const EI_TEILE = ['Kalkschale', 'Eiklar', 'Dotter', 'Keimscheibe', 'Hagelschnur', 'Luftkammer'];
   const ei = () => S('0 0 200 120', bg('#f6efe2') + `<ellipse cx="100" cy="62" rx="74" ry="50" fill="#e8d2b0" stroke="#b08d57" stroke-width="4"/><ellipse cx="100" cy="62" rx="68" ry="44" fill="#fbfaf0"/><path d="M160 40 C172 52 172 72 160 84 C156 70 156 54 160 40Z" fill="#dfe9f2" stroke="#a9b9c9"/><path d="M36 62 q10 -8 18 0 q10 8 18 0 M124 62 q8 -8 16 0 q8 8 16 0" stroke="#c9c2a8" stroke-width="3" fill="none"/><circle cx="98" cy="62" r="26" fill="#f2b632"/><ellipse cx="98" cy="42" rx="7" ry="3.5" fill="#fff7d6" stroke="#c98a1e"/>` + marken([[20, 16, 44, 30], [56, 106, 70, 84], [100, 108, 100, 80], [100, 8, 98, 40], [186, 104, 140, 64], [184, 16, 164, 52]]), 'Hühnerei');

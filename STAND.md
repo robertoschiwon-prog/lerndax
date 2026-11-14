@@ -30,6 +30,8 @@ Stattdessen (seine Wahl „beides“):
 - **Wörter wie im Buch an den beschrifteten Bildern:** Feder mit **Federast** (S. 94), Skelett mit **Hüftknochen** statt Becken,
   dazu **Schlüsselbein** und **Kniescheibe** (S. 153). Fisch (S. 21) und Ei (S. 107) passten schon.
 - Die Zeichnungen bleiben eigene, schlichte Zeichnungen; nichts ist abgezeichnet.
+- **v91:** Feder neu gezeichnet (gebogener Schaft, viele einzelne Federäste, Lücken, Flaum an der Spule). Roberto fand die alte
+  „schrecklich“. Seinen Wunsch „Passwort einbauen und Buchbilder verwenden“ abgelehnt: Ein Passwort schützt die offenen Dateien nicht.
 - Tests: Generatoren (50 Themen, 0 Fehler), `biodax.py 2` für Feder, Skelett, Frosch, `hub.py`, `gedax.py 1` für ein Thema.
 
 ## 0. Übergabe vom 14.11.2026: BioDax gebaut (`lerndax-v89`)
