@@ -33,7 +33,7 @@ Technik (`basis.js`, `fotoBild`): `px` (Pixelgröße), `aus` (Ausschnitt), `ganz
 Bildnachweis erscheinen erst, wenn das Foto geladen ist; ohne Netz bleibt die alte Zeichnung (mit eigenen Nummern) stehen.
 `D.zeichnungen` hält die Zeichnungen: „Ein Bauplan für alle“ (Entdecken) zeigt weiter die farbigen Knochen (rot, blau, gelb).
 Gliedmaßen-Aufgabe ohne Farbhinweis („Achte auf die Vordergliedmaße“). **Ausnahme: das Hühnerei** bleibt gezeichnet, weil es
-kein freies Foto gibt, das Kalkschale, Luftkammer, Hagelschnur und Keimscheibe zugleich zeigt. Kaulquappe mit Außenkiemen:
+kein freies Foto gibt, das Kalkschale, Luftkammer, Hagelschnur und Keimscheibe zugleich zeigt. Roberto hat entschieden (14.11.): **Zeichnung behalten**, damit alle 6 Teile wie im Buch (S. 107) beschriftbar bleiben. Kaulquappe mit Außenkiemen:
 kein scharfes freies Foto, darum frisch geschlüpfte Kaulquappen neben dem Laich.
 
 ## 0-neu-9. Fotos für Fische, Kriechtiere, Vögel; Gelbbauchunke mit Bauch (lerndax-v99, 14.11.2026)
