@@ -123,7 +123,7 @@
     S: { kats: ['Mittelgebirge', 'Hochgebirge'], f: (b) => `<b>${b}</b>: Mittelgebirge oder Hochgebirge?`, h: 'Hochgebirge = Alpen. Fast alle anderen deutschen Gebirge sind Mittelgebirge.',
       items: [['Harz', 0], ['Erzgebirge', 0], ['Schwarzwald', 0], ['Thüringer Wald', 0], ['Alpen', 1], ['Gletscher', 1], ['spitze Felsgipfel', 1], ['rundliche Kuppen mit Wald', 0], ['Elbsandsteingebirge', 0]] },
     extra: {
-      berg: () => U.ortTippen('berg', { art: 'deutschland', ortArt: 'berg', orte: { Zugspitze: [10.98, 47.42], Feldberg: [8.0, 47.87], Brocken: [10.62, 51.8], Fichtelberg: [12.95, 50.43] }, frage: (b) => `Wo liegt der <b>${b}</b>?`, merk: (b) => ({ Zugspitze: '2962 m, Alpen', Feldberg: '1493 m, Schwarzwald', Brocken: '1141 m, Harz', Fichtelberg: '1215 m, Erzgebirge' })[b] }),
+      berg: () => U.ortTippen('berg', { art: 'deutschland', ortArt: 'berg', orte: { Zugspitze: [10.98, 47.42], Feldberg: [8.0, 47.87], Brocken: [10.62, 51.8], Fichtelberg: [12.95, 50.43] }, frage: (b) => `Wo liegt ${b === 'Zugspitze' ? 'die' : 'der'} <b>${b}</b>?`, merk: (b) => ({ Zugspitze: '2962 m, Alpen', Feldberg: '1493 m, Schwarzwald', Brocken: '1141 m, Harz', Fichtelberg: '1215 m, Erzgebirge' })[b] }),
     },
   }, { berg: 22 });
 
@@ -167,7 +167,7 @@
   // =====================================================
   const INSELN = { Sylt: [8.3, 54.88], Fehmarn: [11.15, 54.45], Rügen: [13.4, 54.42], Usedom: [14.0, 53.95], Borkum: [6.73, 53.6], Helgoland: [7.89, 54.18], Norderney: [7.2, 53.71], Poel: [11.44, 54.0] };
   const INSEL_MEER = { Sylt: 'Nordsee', Borkum: 'Nordsee', Helgoland: 'Nordsee', Föhr: 'Nordsee', Norderney: 'Nordsee', Fehmarn: 'Ostsee', Rügen: 'Ostsee', Usedom: 'Ostsee', Hiddensee: 'Ostsee', Poel: 'Ostsee' };
-  const KUESTE_AUS = { breite: 300 };
+  const KUESTE_AUS = { ausschnitt: [6.0, 14.6, 55.35, 52.9] };
   G.nordOstsee = baue('geo5-nord-ostsee', {
     h: 'Die Nordsee ist ein Randmeer des Atlantiks mit starken Gezeiten. Die Ostsee ist ein Binnenmeer, fast ganz von Land umgeben, mit kaum Ebbe und Flut und weniger Salz.',
     F: [
@@ -182,7 +182,7 @@
     S: { kats: ['Nordsee', 'Ostsee'], f: (b) => `<b>${b}</b>: Nordsee oder Ostsee?`, h: 'Die Nordsee liegt links (westlich) von Schleswig-Holstein, die Ostsee rechts (östlich).',
       items: [['Sylt', 0], ['Borkum', 0], ['Helgoland', 0], ['Norderney', 0], ['Wattenmeer', 0], ['Rügen', 1], ['Usedom', 1], ['Fehmarn', 1], ['Hiddensee', 1], ['Kieler Förde', 1]] },
     extra: {
-      insel: () => U.ortTippen('insel', { art: 'deutschland', ortArt: 'insel', orte: INSELN, namen: ['Sylt', 'Fehmarn', 'Rügen', 'Usedom', 'Borkum', 'Helgoland'], frage: (i) => `Wo liegt die Insel <b>${i}</b>?`, merk: (i) => `Insel in der ${INSEL_MEER[i]}.`, opts: KUESTE_AUS, versatz: { Sylt: [14, 8], Helgoland: [-12, 8], Rügen: [-14, -6], Usedom: [8, 10] } }),
+      insel: () => U.ortTippen('insel', { art: 'deutschland', ortArt: 'insel', orte: INSELN, namen: ['Sylt', 'Fehmarn', 'Rügen', 'Usedom', 'Borkum', 'Helgoland'], frage: (i) => `Wo liegt die Insel <b>${i}</b>?`, merk: (i) => `Insel in der ${INSEL_MEER[i]}.`, opts: KUESTE_AUS, abstand: 0.95 }),
     },
   }, { insel: 26, sortieren: 18 });
 
@@ -217,7 +217,7 @@
   function gezeitenUhr() {
     const h = R(0, 11), m = pick([0, 15, 30, 45]), hoch = R(0, 1) === 0;
     const plus = (std, min) => { let t = h * 60 + m + std * 60 + min; t = ((t % 1440) + 1440) % 1440; return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')} Uhr`; };
-    const ok = plus(6, 12), ch = shuffle([ok, plus(12, 25), plus(3, 0), plus(24, 0)]);
+    const ok = plus(6, 12), ch = shuffle([ok, plus(12, 25), plus(3, 0), plus(9, 20)]);
     return { prompt: `An der Nordsee ist um <b>${h}:${String(m).padStart(2, '0')} Uhr ${hoch ? 'Hochwasser' : 'Niedrigwasser'}</b>. Wann ist ungefähr das nächste <b>${hoch ? 'Niedrigwasser' : 'Hochwasser'}</b>?`, choices: ch, correct: ch.indexOf(ok), hint: 'Zwischen Hoch- und Niedrigwasser liegen etwa 6 Stunden und 12 Minuten.',
       solution: `Etwa 6 Stunden 12 Minuten später: <b>${ok}</b>.`, ex: { mode: 'gezeiten', art: 'uhr', start: h * 60 + m, hoch, merk: `<b>${ok}</b>: Hoch- und Niedrigwasser wechseln alle gut 6 Stunden.` } };
   }
@@ -294,7 +294,7 @@
     S: { kats: ['Marsch', 'Geest', 'Börde'], f: (b) => `<b>${b}</b>: Marsch, Geest oder Börde?`, h: 'Marsch = Schlick an der Küste. Geest = Sand aus der Eiszeit. Börde = Löss am Gebirgsrand.',
       items: [['Schlick vom Meer', 0], ['hinter dem Deich', 0], ['Weiden mit Kühen an der Küste', 0], ['sandiger Boden', 1], ['Heide und Kiefern', 1], ['etwas höher als die Marsch', 1], ['Löss', 2], ['Weizen und Zuckerrüben', 2], ['am Rand der Mittelgebirge', 2]] },
     extra: {
-      landschaft: () => U.ortTippen('landschaft', { art: 'deutschland', ortArt: 'gebiet', orte: TL_ORTE, frage: (l) => `Wo liegt die Landschaft <b>${l}</b>?`, opts: { fluesse: ['Elbe', 'Oder', 'Weser'] } }),
+      landschaft: () => U.ortTippen('landschaft', { art: 'deutschland', ortArt: 'gebiet', orte: TL_ORTE, frage: (l) => `Wo liegt die Landschaft <b>${l}</b>?`, opts: { fluesse: ['Elbe', 'Oder', 'Weser'], ausschnitt: [6.2, 15.2, 54.3, 50.7] }, abstand: 0.6 }),
     },
     E: { f: 'Welche Landschaft zeigt das Foto?', arten: [['heide', 'Heide', 'Lila blühendes Heidekraut, dazwischen Wacholder.'], ['boerde', 'Börde mit Ackerbau', 'Weite, fruchtbare Felder.']] },
   }, { landschaft: 24 });

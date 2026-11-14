@@ -364,10 +364,12 @@
     } else if (task.order) {
       // Wörter in die richtige Reihenfolge bringen: antippen legt ein Wort in die Satzzeile, nochmal antippen holt es zurück
       R.cur.ord = [];
-      inputs = `<div class="ordziel" id="ordZiel" aria-label="Dein Satz"><span class="ordleer">Tippe die Wörter in der richtigen Reihenfolge an.</span></div>
-        <div class="ordpool" id="ordPool">${task.order.words.map((w, i) => `<button class="tok" data-ord="${i}">${w}</button>`).join('')}</div>`;
+      // Satzteile (mit Leerzeichen oder lang) stehen gleich breit untereinander, einzelne Wörter nebeneinander
+      const saetze = task.order.words.some((w) => /\s/.test(String(w)) && String(w).length > 14) ? ' saetze' : '';
+      inputs = `<div class="ordziel${saetze}" id="ordZiel" aria-label="Dein Satz"><span class="ordleer">${saetze ? 'Tippe in der richtigen Reihenfolge an.' : 'Tippe die Wörter in der richtigen Reihenfolge an.'}</span></div>
+        <div class="ordpool${saetze}" id="ordPool">${task.order.words.map((w, i) => `<button class="tok" data-ord="${i}">${w}</button>`).join('')}</div>`;
     } else if (task.choices) {
-      inputs = `<div class="choices ${task.choices.length === 2 && task.choices.every((c) => String(c).replace(/<[^>]+>/g, '').length <= 22) ? 'two' : ''}">${task.choices.map((c, i) => `<button class="choice" data-choice="${i}">${c}</button>`).join('')}</div>`;
+      inputs = `<div class="choices ${task.choices.length === 2 && task.choices.every((c) => String(c).replace(/<[^>]+>/g, '').length <= 13) ? 'two' : ''}">${task.choices.map((c, i) => `<button class="choice" data-choice="${i}">${c}</button>`).join('')}</div>`;
     } else {
       const inp = (f, i) => 'fixed' in f
         ? `<span class="fx">${f.fixed}</span>`

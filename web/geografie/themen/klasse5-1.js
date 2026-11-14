@@ -150,7 +150,7 @@
     const oz = ['Pazifischer Ozean', 'Atlantischer Ozean', 'Indischer Ozean'], ziel = pick(oz), ch = shuffle([...oz, 'Nordpolarmeer']);
     const meere = {}; meere[ziel] = '?';
     return { prompt: 'Wie heißt der Ozean mit dem <b>Fragezeichen</b>?', figure: window.GeoKarte.welt({ meere, namen: true }), choices: ch, correct: ch.indexOf(ziel), hint: 'Der Atlantik liegt zwischen Amerika und Europa/Afrika, der Pazifik zwischen Amerika und Asien.',
-      solution: `Das ist der <b>${ziel}</b>.`, ex: { mode: 'karte', nach: false, art: 'ozean', q: 'Wie heißt der Ozean?', opts: [ziel], ok: 0, svg: D.karte('welt', { meere: true, namen: true }), merk: `<b>${ziel}</b>: Präge dir die Lage der drei großen Ozeane ein.` } };
+      solution: `Das ist der <b>${ziel}</b>.`, ex: { mode: 'karte', nach: false, art: 'ozean', q: 'Wie heißt der Ozean?', opts: [ziel], ok: 0, svg: D.karte('welt', { meere: { [ziel]: ziel } }), merk: `<b>${ziel}</b>: ${{ 'Pazifischer Ozean': 'zwischen Amerika im Osten und Asien und Australien im Westen. Er ist der größte Ozean.', 'Atlantischer Ozean': 'zwischen Amerika im Westen und Europa und Afrika im Osten.', 'Indischer Ozean': 'zwischen Afrika, Asien und Australien.' }[ziel]}` } };
   }
 
   G.windrose = baue('geo5-windrose', {
@@ -255,10 +255,10 @@
   });
 
   G.massstab = baue('geo5-massstab', {
-    h: 'Der Maßstab sagt, wie stark verkleinert ist. 1 : 100 000 heißt: 1 cm auf der Karte sind 100 000 cm = 1 km in Wirklichkeit.',
+    h: 'Der Maßstab sagt, wie stark verkleinert ist. 1 : 100 000 heißt: 1 cm auf der Karte sind 100 000 cm = 1 km in Wirklichkeit.',
     F: [
       { f: 'Was gibt der <b>Maßstab</b> einer Karte an?', a: 'wie stark die Wirklichkeit verkleinert ist', x: ['wie alt die Karte ist', 'wie viele Orte auf der Karte sind', 'wie hoch die Berge sind'], w: 'Mit dem Maßstab kann man Entfernungen berechnen.' },
-      { f: 'Welche Karte zeigt <b>mehr Einzelheiten</b>: 1 : 25 000 oder 1 : 1 000 000?', a: '1 : 25 000', x: ['1 : 1 000 000', 'beide gleich viel', 'man kann es nicht sagen'], w: 'Bei 1 : 25 000 wird weniger verkleinert. Man sieht sogar einzelne Häuser (großer Maßstab).' },
+      { f: 'Welche Karte zeigt <b>mehr Einzelheiten</b>: 1 : 25 000 oder 1 : 1 000 000?', a: '1 : 25 000', x: ['1 : 1 000 000', 'beide gleich viel', 'man kann es nicht sagen'], w: 'Bei 1 : 25 000 wird weniger verkleinert. Man sieht sogar einzelne Häuser (großer Maßstab).' },
       { f: 'Wofür ist eine <b>Maßstabsleiste</b> praktisch?', a: 'um Entfernungen direkt mit dem Lineal oder Papierstreifen abzulesen', x: ['um die Höhe zu messen', 'um Norden zu finden', 'um die Karte zu falten'], w: 'Man legt die Strecke an die Leiste und liest die km ab.' },
       { f: 'Wie misst man eine <b>kurvige</b> Strecke, zum Beispiel einen Fluss, auf der Karte?', a: 'mit einem Faden, der der Kurve folgt, und dann an der Maßstabsleiste', x: ['mit dem Lineal in gerader Linie', 'man kann sie nicht messen', 'mit einem Thermometer'], w: 'Die Luftlinie ist immer kürzer als der echte Weg.' },
       { f: 'Was ist die <b>Luftlinie</b>?', a: 'die gerade Entfernung zwischen zwei Orten', x: ['der Weg auf der Straße', 'die Strecke eines Flugzeugs mit Umwegen', 'eine Linie am Himmel'], w: 'Wege auf Straßen sind fast immer länger als die Luftlinie.' },
@@ -323,9 +323,17 @@
       { f: 'Wie ist das Wetter im Tropischen Regenwald?', a: 'das ganze Jahr heiß und feucht, fast täglich Regen', x: ['kalt und trocken', 'Sommer und Winter wie bei uns', 'heiß und fast nie Regen'], w: 'Jahreszeiten wie bei uns gibt es dort nicht.' },
       { f: 'Welcher große Fluss fließt durch den größten Regenwald der Erde?', a: 'der Amazonas', x: ['der Nil', 'die Elbe', 'der Rhein'], w: 'Der Amazonas fließt durch Südamerika.' },
       { f: 'Warum wird der Regenwald immer kleiner?', a: 'Er wird für Felder, Weiden, Holz und Bergbau abgeholzt.', x: ['Er wird von Wüsten überrollt.', 'Er friert im Winter ein.', 'Er wächst ins Meer.'], w: 'Mit dem Wald verschwinden viele Tier- und Pflanzenarten.' },
-      { f: 'Wie bauen manche Menschen im Regenwald ihre Häuser, damit sie bei Hochwasser trocken bleiben?', a: 'auf Stelzen', x: ['aus Eisblöcken', 'unter der Erde', 'aus Lehm ohne Dach'], w: 'Flüsse treten in der Regenzeit oft über die Ufer.' },
+      { f: 'Wie heißt ein Volk, das im Regenwald am Amazonas lebt (in Brasilien und Venezuela)?', a: 'Yanomami', x: ['Inuit', 'Hausa', 'Sorben'], w: 'Die Yanomami leben vom und im Wald: Sie jagen, sammeln und legen kleine Felder an.' },
+      { f: 'Wie wohnen die Yanomami in ihrem Dorf?', a: 'alle zusammen in einem großen runden Gemeinschaftshaus', x: ['jede Familie in einem Hochhaus', 'in Häusern aus Eisblöcken', 'in Lehmhäusern mit dicken Wänden'], w: 'In dem Rundhaus hat jede Familie ihre eigene Feuerstelle, geschlafen wird in Hängematten.' },
+      { f: 'Woher bekommen die Yanomami ihre Nahrung?', a: 'Sie jagen, fischen, sammeln Früchte und bauen auf kleinen Feldern Maniok an.', x: ['Sie kaufen alles im Supermarkt.', 'Sie halten große Rinderherden.', 'Sie fangen Robben.'], w: 'Maniok ist eine Pflanze mit dicken, stärkereichen Wurzeln, ähnlich wie Kartoffeln.' },
+      { f: 'Warum sind im Regenwald am Äquator Tag und Nacht fast <b>gleich lang</b>?', a: 'Am Äquator dauern Tag und Nacht das ganze Jahr etwa 12 Stunden.', x: ['Weil dort immer Sommerzeit gilt.', 'Weil die Bäume das Licht schlucken.', 'Weil die Sonne dort nie untergeht.'], w: 'Jahreszeiten wie bei uns gibt es dort nicht. Es ist immer warm.' },
+      { f: 'Wer bedroht das Leben der Menschen im Regenwald?', a: 'Holzfäller, Goldsucher und Straßenbauer, die den Wald roden', x: ['Eisbären', 'Sandstürme', 'zu viele Touristen am Strand'], w: 'Sie zerstören den Wald und schleppen Krankheiten ein.' },
       { f: 'Was gibt es im Regenwald besonders viel?', a: 'verschiedene Tier- und Pflanzenarten', x: ['Schnee und Eis', 'Sand', 'Ackerflächen'], w: 'Viele Tier- und Pflanzenarten gibt es nur dort. Wird der Wald abgeholzt, verschwinden sie.' },
     ],
+    S: { kats: ['passt zum Regenwald', 'passt nicht zum Regenwald'], f: (b) => `<b>${b}</b>: Passt das zum Tropischen Regenwald?`, h: 'Im Regenwald ist es immer heiß und feucht, und es wächst sehr viel.',
+      items: [['das ganze Jahr warm', 0], ['fast jeden Tag Regen', 0], ['Lianen und riesige Bäume', 0], ['sehr viele Tier- und Pflanzenarten', 0], ['Hängematten zum Schlafen', 0], ['Schnee im Winter', 1], ['monatelang kein Regen', 1], ['kaum Pflanzen', 1], ['Polarnacht', 1]] },
+    O: [{ t: 'Vom Wald auf den Teller: Wie kommen die Yanomami zu einer Mahlzeit aus Maniok? Ordne.', items: ['ein kleines Stück Wald wird gerodet', 'Maniok wird gepflanzt', 'die Wurzeln werden geerntet', 'die Wurzeln werden gerieben und gebacken'], w: 'Nach wenigen Jahren wird das Feld aufgegeben, und der Wald wächst nach.' }],
+    T: [{ f: 'Der größte Regenwald der Erde liegt am Fluss ___.', a: 'Amazonas', w: 'Er fließt durch Südamerika.' }],
     E: { f: 'Wo wurde dieses Foto aufgenommen?', arten: [['regenwald', 'im Tropischen Regenwald', 'Dichter, grüner Wald mit vielen Stockwerken.'], ['sahel', 'am Rand der Wüste', 'Trocken, wenig Pflanzen, sandiger Boden.'], ['polar', 'im Polargebiet', 'Eis und Schnee, keine Bäume.'], ['shanghai', 'in einer Riesenstadt', 'Hochhäuser dicht an dicht.']] },
   });
   G.wueste = baue('geo5-wueste', {
@@ -336,7 +344,18 @@
       { f: 'Warum sind viele Häuser am Wüstenrand aus <b>Lehm</b> mit dicken Wänden?', a: 'Lehm hält die Hitze draußen und ist vor Ort vorhanden.', x: ['Weil Lehm leuchtet.', 'Weil es dort sehr viel Holz gibt.', 'Weil Lehm Regen anzieht.'], w: 'Dicke Wände halten das Innere tagsüber kühl.' },
       { f: 'Wovon leben viele Familien am Wüstenrand?', a: 'von Viehhaltung (Ziegen, Rinder, Kamele) und etwas Ackerbau', x: ['vom Fischfang im Meer', 'vom Wintersport', 'vom Bergbau unter Eis'], w: 'Hirten ziehen mit ihren Tieren dorthin, wo es Wasser und Futter gibt.' },
       { f: 'Wie ist das Wetter am Rand der Wüste?', a: 'sehr heiß, lange Trockenzeit, kurze Regenzeit', x: ['das ganze Jahr Regen', 'kalt mit Schnee', 'wie in Deutschland'], w: 'Bleibt die Regenzeit aus, gibt es eine Dürre.' },
+      { f: 'Wie heißt die Hauptstadt des Landes <b>Niger</b>?', a: 'Niamey', x: ['Nairobi', 'Kairo', 'Shanghai'], w: 'Niamey liegt am Fluss Niger und hat über eine Million Einwohner.' },
+      { f: 'Auf welchem Kontinent liegt das Land <b>Niger</b>?', a: 'Afrika', x: ['Asien', 'Südamerika', 'Australien'], w: 'Niger liegt in Westafrika, am Südrand der Sahara.' },
+      { f: 'Woher holen viele Familien in Niamey ihr <b>Wasser</b>?', a: 'aus dem Brunnen oder vom Wasserhändler', x: ['aus dem Wasserhahn in jeder Wohnung', 'aus geschmolzenem Schnee', 'aus dem Meer'], w: 'Viele Häuser haben keinen Wasseranschluss und keinen Strom.' },
+      { f: 'Was ist ein <b>Nachteil</b> von Häusern aus Lehm?', a: 'Nach der Regenzeit müssen sie oft ausgebessert werden.', x: ['Sie sind im Sommer zu heiß.', 'Sie schmelzen in der Sonne.', 'Man kann keine Fenster einbauen.'], w: 'Regen weicht den Lehm auf. Dafür bleibt es innen angenehm kühl.' },
+      { f: 'Was essen viele Familien am Rand der Sahara häufig?', a: 'Brei aus Hirse', x: ['Robbenfleisch', 'Maniok aus dem Regenwald', 'Fischstäbchen'], w: 'Hirse ist ein Getreide, das mit wenig Wasser auskommt.' },
+      { f: 'Warum sprechen viele Menschen in Niger <b>mehrere Sprachen</b>?', a: 'Im Land leben viele Völker mit eigenen Sprachen, zum Beispiel Hausa und Zarma.', x: ['Weil es in der Schule Pflicht ist, zehn Sprachen zu lernen.', 'Weil dort viele Touristen leben.', 'Weil jede Straße eine eigene Sprache hat.'], w: 'In der Schule wird außerdem Französisch gelernt.' },
     ],
+    S: { kats: ['Vorteil von Lehmhäusern', 'Schwierigkeit im Alltag'], f: (b) => `<b>${b}</b>: Vorteil des Lehmhauses oder Schwierigkeit im Alltag am Wüstenrand?`, h: 'Lehm schützt vor Hitze. Schwierig ist vieles, was mit Wasser, Strom und Wegen zu tun hat.',
+      items: [['innen bleibt es kühl', 0], ['Baustoff gibt es vor Ort', 0], ['feste Wände', 0], ['kein Wasseranschluss', 1], ['kein Strom im Haus', 1], ['Trinkwasser ist teuer', 1], ['monatelang kein Regen', 1], ['wenige Busse', 1]] },
+    O: [{ t: 'Ein Jahr am Rand der Sahara: Ordne von der Regenzeit an.', items: ['im Sommer fällt Regen', 'Hirse wird gesät und wächst', 'die Ernte wird eingebracht', 'monatelang fällt kein Regen'], w: 'Bleibt der Regen aus, fällt die Ernte aus: eine Dürre.' }],
+    T: [{ f: 'Die größte Wüste Afrikas heißt ___.', a: 'Sahara', w: 'Niger liegt an ihrem Südrand.' }],
+    E: { f: 'Wo wurde dieses Foto aufgenommen?', arten: [['sahel', 'am Rand der Wüste', 'Trockener, sandiger Boden mit wenigen Bäumen.'], ['regenwald', 'im Tropischen Regenwald', 'Dichter, grüner Wald.'], ['polar', 'im Polargebiet', 'Eis und kaltes Meer.']] },
   });
   G.polar = baue('geo5-polar', {
     h: 'In den Polargebieten ist es sehr kalt. Im Sommer geht die Sonne wochenlang nicht unter (Polartag), im Winter nicht auf (Polarnacht).',
@@ -346,7 +365,18 @@
       { f: 'Wie heißen die Ureinwohner in der Arktis, zum Beispiel in Grönland und Kanada?', a: 'Inuit', x: ['Aborigines', 'Tuareg', 'Maya'], w: 'Früher jagten sie Robben und Wale, heute leben viele in modernen Siedlungen.' },
       { f: 'Welches Verkehrsmittel benutzen viele Menschen in der Arktis im Winter?', a: 'Schneemobil oder Hundeschlitten', x: ['Fahrrad', 'Straßenbahn', 'Kamel'], w: 'Straßen gibt es kaum, im Winter fährt man über Schnee und Eis.' },
       { f: 'Warum wachsen in den Polargebieten keine Bäume?', a: 'Es ist zu kalt und der Sommer ist zu kurz.', x: ['Es regnet zu viel.', 'Die Menschen haben alle gefällt.', 'Es ist zu heiß.'], w: 'Der Boden taut im Sommer nur oben etwas auf.' },
+      { f: 'Was bedeutet das Wort <b>Inuit</b>?', a: 'Menschen', x: ['Eisbären', 'Schneehaus', 'Jäger'], w: 'Ein einzelner Mensch heißt in ihrer Sprache „Inuk“.' },
+      { f: 'Warum stehen viele Häuser der Inuit auf <b>Stelzen</b>?', a: 'So kommt die Kälte nicht aus dem gefrorenen Boden ins Haus, und das Haus schneit nicht ein.', x: ['Wegen des Hochwassers im Sommer.', 'Damit man weiter sehen kann.', 'Damit keine Eisbären hineinkommen.'], w: 'Die Holzhäuser sind gut geheizt und gedämmt.' },
+      { f: 'Was ist ein <b>Iglu</b>?', a: 'ein Haus aus Schneeblöcken, das Jäger früher unterwegs bauten', x: ['ein Boot aus Robbenfell', 'ein Schlitten mit Motor', 'eine warme Jacke'], w: 'Heute wohnen die Inuit in festen Häusern.' },
+      { f: 'Wovon ernährten sich die Inuit früher fast nur?', a: 'von Fisch und Fleisch, zum Beispiel von Robben und Karibus', x: ['von Getreide und Obst', 'von Maniok', 'von Hirsebrei'], w: 'Ackerbau ist in der Kälte nicht möglich. Karibus sind die Rentiere Nordamerikas.' },
+      { f: 'Was hat den <b>Hundeschlitten</b> im Alltag der Inuit weitgehend ersetzt?', a: 'das Schneemobil (Motorschlitten)', x: ['das Fahrrad', 'die Straßenbahn', 'das Kamel'], w: 'Hundeschlitten sieht man heute vor allem bei Rennen und Touren für Gäste.' },
+      { f: 'Welche Kleidung schützt in der Arktis gegen Kälte und Wind?', a: 'ein Parka mit Kapuze aus Pelz und warme Stiefel', x: ['ein T-Shirt und Sandalen', 'ein dünner Regenmantel', 'ein Turban'], w: 'Die Kapuze schützt das Gesicht vor dem eisigen Wind.' },
     ],
+    S: { kats: ['früher', 'heute'], f: (b) => `<b>${b}</b>: Leben der Inuit früher oder heute?`, h: 'Früher: alles aus der Natur. Heute: feste Häuser, Motoren, Schule.',
+      items: [['Iglu auf der Jagd', 0], ['Hundeschlitten als wichtigstes Fahrzeug', 0], ['Kleidung nur aus Fell', 0], ['Schneemobil', 1], ['geheiztes Holzhaus auf Stelzen', 1], ['Schule mit Computern', 1], ['Smartphone', 1]] },
+    O: [{ t: 'Ein Jahr in der Arktis: Ordne vom Winter an.', items: ['Polarnacht: Die Sonne geht nicht auf', 'die Tage werden länger', 'Polartag: Die Sonne geht nicht unter', 'die Tage werden kürzer'], w: 'Schuld ist die schräge Erdachse, wie bei unseren Jahreszeiten.' }],
+    T: [{ f: 'Die Ureinwohner der Arktis in Kanada und Grönland heißen ___.', a: 'Inuit', w: 'Das Wort bedeutet „Menschen“.' }],
+    E: { f: 'Wo wurde dieses Foto aufgenommen?', arten: [['polar', 'im Polargebiet', 'Eis und kaltes Meer.'], ['sahel', 'am Rand der Wüste', 'Trockener, sandiger Boden.'], ['shanghai', 'in einer Riesenstadt', 'Hochhäuser dicht an dicht.']] },
   });
   G.shanghai = baue('geo5-shanghai', {
     h: 'Shanghai in China ist eine der größten Städte der Erde, mit rund 25 Millionen Einwohnern und dem größten Containerhafen der Welt.',
@@ -356,6 +386,17 @@
       { f: 'Wofür ist Shanghai weltweit bekannt?', a: 'für den größten Containerhafen der Welt und viele Hochhäuser', x: ['für den höchsten Berg der Erde', 'für den größten Regenwald', 'für ewiges Eis'], w: '2024 wurden dort über 51 Millionen Standardcontainer umgeschlagen.' },
       { f: 'Warum bauen Riesenstädte wie Shanghai viele <b>Hochhäuser</b>?', a: 'Auf wenig Fläche sollen sehr viele Menschen wohnen und arbeiten.', x: ['Weil es dort keinen Boden gibt.', 'Weil Hochhäuser billiger als Dörfer sind.', 'Damit man das Meer sieht.'], w: 'In die Höhe bauen spart Fläche.' },
       { f: 'Was ist ein Problem in Riesenstädten?', a: 'viel Verkehr und schlechte Luft', x: ['zu wenig Menschen', 'zu viele Wälder', 'keine Geschäfte'], w: 'Darum bauen viele Städte U-Bahnen und Elektrobusse.' },
+      { f: 'Wie heißt der Stadtteil von Shanghai mit den berühmten Hochhäusern?', a: 'Pudong', x: ['Manhattan', 'Altstadt', 'Niamey'], w: 'Um 1990 lagen dort noch Felder. Heute steht dort das Finanzviertel.' },
+      { f: 'Wie hoch ist das höchste Gebäude Chinas, der <b>Shanghai Tower</b>?', a: '632 m', x: ['63 m', '232 m', '2962 m'], w: 'Zum Vergleich: Der Berliner Fernsehturm ist 368 m hoch.' },
+      { f: 'Shanghai hat rund 25 Millionen Einwohner, Sachsen rund 4 Millionen. Was stimmt?', a: 'In Shanghai leben etwa sechsmal so viele Menschen wie in Sachsen.', x: ['In Sachsen leben mehr Menschen.', 'Es leben gleich viele Menschen dort.', 'In Shanghai leben hundertmal so viele.'], w: 'Dabei ist Shanghai nur etwa ein Drittel so groß wie Sachsen.' },
+      { f: 'Was macht in Shanghai die Luft schmutzig?', a: 'Abgase von Autos, Bussen und Fabriken (Feinstaub)', x: ['der Sand aus der Sahara', 'der Rauch von Lagerfeuern', 'der Nebel vom Meer'], w: 'Feinstaub kann krank machen, zum Beispiel Asthma auslösen.' },
+      { f: 'Was hilft in Shanghai gegen Stau und schlechte Luft?', a: 'U-Bahn fahren und Elektroroller benutzen', x: ['mehr Autos kaufen', 'breitere Hochhäuser bauen', 'die Fenster schließen'], w: 'Shanghai hat eines der längsten U-Bahn-Netze der Welt.' },
+      { f: 'Wie nennt man eine Stadt mit mehr als einer Million Einwohnern?', a: 'Millionenstadt', x: ['Kleinstadt', 'Dorf', 'Hauptstadt'], w: 'In Deutschland sind das Berlin, Hamburg, München und Köln.' },
     ],
+    S: { kats: ['Vorteil der Riesenstadt', 'Nachteil der Riesenstadt'], f: (b) => `<b>${b}</b>: Vorteil oder Nachteil der Riesenstadt?`, h: 'Was macht das Leben leichter, was schwerer?',
+      items: [['viele Arbeitsplätze', 0], ['viele Schulen und Geschäfte', 0], ['U-Bahn in alle Stadtteile', 0], ['Stau auf den Straßen', 1], ['Feinstaub in der Luft', 1], ['wenig Platz zum Wohnen', 1], ['Lärm', 1]] },
+    O: [{ t: 'Wie Pudong entstand: Ordne.', items: ['feuchtes Ackerland am Fluss', 'die ersten Hochhäuser werden gebaut', 'ein Finanzviertel mit Wolkenkratzern entsteht', 'der Shanghai Tower wird das höchste Gebäude Chinas'], w: 'In nur etwa 25 Jahren wurde aus Feldern eine Skyline.' }],
+    T: [{ f: 'Shanghai liegt im Land ___.', a: 'China', w: 'An der Ostküste, am Pazifischen Ozean.' }],
+    E: { f: 'Wo wurde dieses Foto aufgenommen?', arten: [['shanghai', 'in einer Riesenstadt', 'Hochhäuser dicht an dicht.'], ['polar', 'im Polargebiet', 'Eis und kaltes Meer.'], ['regenwald', 'im Tropischen Regenwald', 'Dichter, grüner Wald.']] },
   });
 })();

@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 14.11.2026, Version `lerndax-v104`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 14.11.2026, Version `lerndax-v105`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,28 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-14. GeoDax: Durchsicht in Handy-Größe, Darstellung korrigiert (lerndax-v105, 14.11.2026)
+
+Roberto: „Schau dir GeoDax nochmal abschließend genau an … Formatierungsfehler bezüglich der Größen der Boxen.“ Alle 55 Themen mit
+allen Aufgabenarten (223 Ansichten), die Erklärungen dazu und die Startseite bei 390 px Breite angesehen. Korrigiert:
+- **Gemeinsame App (`plattform/`, gilt für alle Fächer):** Zwei Antworten stehen nur noch nebeneinander, wenn beide kurz sind
+  (höchstens 13 Zeichen; vorher ragte „Kulturlandschaft“ aus der Karte). Beim Ordnen stehen ganze Satzteile gleich breit
+  untereinander (`.saetze`), einzelne Wörter wie bisher nebeneinander. Neunter Lernbereich hat eine Farbe (`.bg9`, `.bg10`;
+  vorher war das Themen-Schild bei „Exkursion“ weiß und leer). Merkzettel mit Bild: Bühne darf höher sein und das Bild breiter
+  (`LernDaxErklaer(D, { bild: { hoch, breit, schrift, H } })`), GeoDax nutzt das für Karten.
+- **Karten:** Schrift, Nummern und Zeichen größer (Faktor `Z` je Karte), Deutschlandkarte darf höher sein, Kartenausschnitt
+  (`ausschnitt`) für Küste und Tiefland, Nummern und Namen bleiben im Bild, zu dicht liegende Orte kommen nicht mehr zusammen
+  in eine Aufgabe, Nordpfeil mit N im Kreis. Diagramme: größere Schrift, Einheit in zweiter Zeile, lange Namen zweizeilig.
+- **Animationen:** Maßstab (Ergebniszeile fehlte, Leiste zu klein), Tag und Nacht (Beschriftung lag auf der Erde), Ebbe und Flut
+  (Beschriftung lag auf der Achse), Steigungsregen („Lee“ war abgeschnitten).
+- **Texte:** „2,5 km“ statt „2.5 km“; Maßstabszahlen brechen nicht mehr um; „die Zugspitze“, „das Thüringer Becken“;
+  Seitenangabe Braunkohle kürzer.
+- **Inhalt:** Regenwald, Wüstenrand, Polargebiete und Shanghai hatten nur 5 bis 6 Fragen (in einer Runde mit 8 Aufgaben kamen
+  Fragen doppelt). Jetzt je 11 bis 12 Fragen, dazu Zuordnen, Ordnen, Lückenwort und Foto; Begriffe wie auf S. 30–37
+  (Yanomami, Maniok, Niamey, Lehmhaus, Inuit, Iglu, Schneemobil, Pudong, Feinstaub). Fakten in `faecher/geo/fakten.md`.
+- Tests v105: `wissen_gen` GeoDax 9900, BioDax 4500, GeDax 2790 Aufgaben ohne Fehler; `geodax.py 2` (660 Antworten, 61 Animationen),
+  `gedax.py 1`, `biodax.py 1`, `dedax.py 1`, `endax.py 1`, `hub.py` ohne Meldung. Mathe-Tests nicht erneut gelaufen.
 
 ## 0-neu-13. GeoDax: fehlende Buchseiten, Thema „Die Welt entdecken“ (lerndax-v104, 14.11.2026)
 

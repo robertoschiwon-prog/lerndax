@@ -76,7 +76,14 @@
   }
   // Orte finden: vier Orte mit Nummern auf der Karte. def = { art, orte: { Name: [lon, lat] }, frage, opts, ortArt, merk }
   function ortTippen(art, def) {
-    const namen = Object.keys(def.orte), ziel = pick(def.namen || namen), andere = shuffle(namen.filter((n) => n !== ziel)).slice(0, 3), alle = shuffle([ziel, ...andere]);
+    const namen = Object.keys(def.orte), ziel = pick(def.namen || namen);
+    // die vier Orte sollen nicht zu dicht beieinander liegen (sonst überdecken sich die Nummern)
+    const min = def.abstand || { welt: 14, europa: 1.2, deutschland: 0.75, sachsen: 0.3 }[def.art] || 0.5;
+    const weit = (a, b) => Math.hypot((def.orte[a][0] - def.orte[b][0]) * 0.63, def.orte[a][1] - def.orte[b][1]) >= min;
+    let andere = [];
+    for (const n of shuffle(namen.filter((x) => x !== ziel))) { if (andere.length < 3 && weit(n, ziel) && andere.every((m) => weit(n, m))) andere.push(n); }
+    for (const n of shuffle(namen.filter((x) => x !== ziel && !andere.includes(x)))) { if (andere.length < 3) andere.push(n); }
+    const alle = shuffle([ziel, ...andere]);
     const orte = alle.map((n, i) => [n, ...def.orte[n], { nr: i + 1, art: def.ortArt || 'stadt', nrVersatz: def.versatz && def.versatz[n] }]);
     const k = alle.indexOf(ziel), merk = def.merk ? def.merk(ziel) : '';
     return { prompt: def.frage(ziel), figure: GK[def.art](Object.assign({}, def.opts || {}, { orte })), choices: ['1', '2', '3', '4'], correct: k, hint: def.h,
@@ -129,15 +136,15 @@
   // Maßstab: Karte ↔ Wirklichkeit
   // =====================================================
   const MASS = [10000, 20000, 25000, 50000, 100000, 200000, 250000, 500000, 1000000];
-  const tausend = (z) => String(z).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const tausend = (z) => String(z).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');   // geschütztes Leerzeichen: die Zahl bricht nicht um
   // Wie viel in Wirklichkeit ist 1 cm auf der Karte? (Text)
-  const cmText = (m) => (m >= 100000 ? `${m / 100000} km` : `${m / 100} m`);
+  const cmText = (m) => (m >= 100000 ? `${String(m / 100000).replace('.', ',')}\u00a0km` : `${m / 100}\u00a0m`);
   function massstabRechnen(art, schwer) {
     const m = pick(schwer ? MASS : MASS.filter((x) => [25000, 50000, 100000, 200000, 500000, 1000000].includes(x)));
     const cm = R(2, schwer ? 15 : 9), echtM = cm * m / 100, km = echtM >= 1000;
     const wert = km ? echtM / 1000 : echtM, einheit = km ? 'km' : 'm';
-    const t = { prompt: `Der Maßstab einer Karte ist <b>1 : ${tausend(m)}</b>. Auf der Karte misst du <b>${cm} cm</b>. Wie weit ist das in Wirklichkeit?`,
-      fields: [{ answer: wert, suffix: einheit, label: 'Wirklichkeit' }], hint: `1 : ${tausend(m)} heißt: 1 cm auf der Karte sind ${tausend(m)} cm in Wirklichkeit, also ${cmText(m)}.`,
+    const t = { prompt: `Der Maßstab einer Karte ist <b>1 : ${tausend(m)}</b>. Auf der Karte misst du <b>${cm} cm</b>. Wie weit ist das in Wirklichkeit?`,
+      fields: [{ answer: wert, suffix: einheit, label: 'Wirklichkeit' }], hint: `1 : ${tausend(m)} heißt: 1 cm auf der Karte sind ${tausend(m)} cm in Wirklichkeit, also ${cmText(m)}.`,
       solution: `1 cm ≙ ${cmText(m)}, also ${cm} · ${cmText(m)} = <b>${String(wert).replace('.', ',')} ${einheit}</b>.`,
       ex: { mode: 'massstab', art, m, cm, wert, einheit } };
     return t;
@@ -145,7 +152,7 @@
   // Rückwärts: Wie viele cm auf der Karte?
   function massstabRueck(art) {
     const m = pick([25000, 50000, 100000, 200000, 500000, 1000000]), cm = R(2, 10), echtM = cm * m / 100, km = echtM >= 1000, wert = km ? echtM / 1000 : echtM, einheit = km ? 'km' : 'm';
-    return { prompt: `Maßstab <b>1 : ${tausend(m)}</b>. Zwei Orte sind in Wirklichkeit <b>${String(wert).replace('.', ',')} ${einheit}</b> voneinander entfernt. Wie viele Zentimeter sind das auf der Karte?`,
+    return { prompt: `Maßstab <b>1 : ${tausend(m)}</b>. Zwei Orte sind in Wirklichkeit <b>${String(wert).replace('.', ',')} ${einheit}</b> voneinander entfernt. Wie viele Zentimeter sind das auf der Karte?`,
       fields: [{ answer: cm, suffix: 'cm', label: 'auf der Karte' }], hint: `1 cm auf der Karte sind ${cmText(m)} in Wirklichkeit. Wie oft passt ${cmText(m)} in ${String(wert).replace('.', ',')} ${einheit}?`,
       solution: `1 cm ≙ ${cmText(m)}. ${String(wert).replace('.', ',')} ${einheit} : ${cmText(m)} = <b>${cm} cm</b>.`,
       ex: { mode: 'massstab', art, m, cm, wert, einheit, rueck: true } };
@@ -155,7 +162,7 @@
     const m = pick([10000, 25000, 50000, 100000, 200000, 500000, 1000000]), ok = cmText(m);
     const falsch = shuffle(MASS.filter((x) => x !== m).map(cmText)).slice(0, 3);
     const ch = shuffle([ok, ...falsch]);
-    return { prompt: `Maßstab <b>1 : ${tausend(m)}</b>. Wie weit sind <b>1 cm</b> auf der Karte in Wirklichkeit?`, choices: ch, correct: ch.indexOf(ok), hint: '100 cm sind 1 m, 100 000 cm sind 1 km.',
+    return { prompt: `Maßstab <b>1 : ${tausend(m)}</b>. Wie weit sind <b>1 cm</b> auf der Karte in Wirklichkeit?`, choices: ch, correct: ch.indexOf(ok), hint: '100 cm sind 1 m, 100 000 cm sind 1 km.',
       solution: `1 cm ≙ ${tausend(m)} cm = <b>${ok}</b>.`, ex: { mode: 'massstab', art, m, cm: 1, wert: m >= 100000 ? m / 100000 : m / 100, einheit: m >= 100000 ? 'km' : 'm' } };
   }
   Object.assign(U, { massstabRechnen, massstabRueck, massstabBedeutung, tausend });
@@ -167,21 +174,23 @@
     { titel: 'Höchste Berge (in m)', einheit: 'm', daten: [['Zugspitze', 2962], ['Feldberg', 1493], ['Fichtelberg', 1215], ['Brocken', 1141]], schritt: 500 },
     { titel: 'Flüsse: Länge in Deutschland (in km)', einheit: 'km', daten: [['Rhein', 865], ['Elbe', 727], ['Donau', 647]], schritt: 200 },
     { titel: 'Einwohner sächsischer Großstädte 2023 (in Tausend)', einheit: 'Tausend', daten: [['Leipzig', 620], ['Dresden', 566], ['Chemnitz', 251]], schritt: 100 },
-    { titel: 'Nutzung der Fläche Deutschlands 2024 (in %)', einheit: '%', daten: [['Landwirtschaft', 50], ['Wald', 30], ['Siedlung und Verkehr', 15], ['Wasser', 2]], schritt: 10 },
-    { titel: 'Größe der Kontinente (in Mio. km²)', einheit: 'Mio. km²', daten: [['Asien', 44], ['Afrika', 30], ['Nordamerika', 25], ['Südamerika', 18], ['Europa', 10]], schritt: 10 },
+    { titel: 'Nutzung der Fläche Deutschlands 2024 (in %)', einheit: '%', daten: [['Landwirtschaft', 50, 'Landwirt-|schaft'], ['Wald', 30], ['Siedlung und Verkehr', 15, 'Siedlung|und Verkehr'], ['Wasser', 2]], schritt: 10 },
+    { titel: 'Größe der Kontinente (in Mio. km²)', einheit: 'Mio. km²', daten: [['Asien', 44], ['Afrika', 30], ['Nordamerika', 25, 'Nord-|amerika'], ['Südamerika', 18, 'Süd-|amerika'], ['Europa', 10]], schritt: 10 },
     { titel: 'Einwohner der größten Städte Deutschlands (in Mio.)', einheit: 'Mio.', daten: [['Berlin', 3.7], ['Hamburg', 1.9], ['München', 1.6]], schritt: 1 },
   ];
   function saeulen(d, hell) {
-    const n = d.daten.length, W = 300, H = 170, X0 = 40, Y0 = 140, top = 26, max = Math.ceil(Math.max(...d.daten.map((x) => x[1])) / d.schritt) * d.schritt;
-    const bw = Math.min(46, (W - X0 - 10) / n - 14);
-    let s = `<rect width="${W}" height="${H}" fill="#fff"/><text x="${W / 2}" y="15" text-anchor="middle" style="font:800 10px Nunito,sans-serif;fill:#2b2540">${d.titel}</text>`;
-    for (let v = 0; v <= max; v += d.schritt) { const y = Y0 - (v / max) * (Y0 - top); s += `<line x1="${X0}" y1="${y}" x2="${W - 8}" y2="${y}" stroke="#e3ddd0" stroke-width="1"/><text x="${X0 - 4}" y="${y + 3}" text-anchor="end" style="font:700 8px Nunito,sans-serif;fill:#6f6a7c">${String(v).replace('.', ',')}</text>`; }
-    d.daten.forEach(([name, v], i) => {
-      const x = X0 + 12 + i * ((W - X0 - 16) / n), h = (v / max) * (Y0 - top);
-      s += `<rect x="${x}" y="${Y0 - h}" width="${bw}" height="${h}" rx="2" fill="${name === hell ? '#1f55d6' : '#0e9fb5'}"/>`;
-      s += `<text x="${x + bw / 2}" y="${Y0 + 11}" text-anchor="middle" style="font:700 ${name.length > 12 ? 6.5 : 8}px Nunito,sans-serif;fill:#2b2540">${name.length > 16 ? name.split(' ')[0] + '…' : name}</text>`;
+    const n = d.daten.length, W = 300, H = 196, X0 = 44, Y0 = 150, top = 34, max = Math.ceil(Math.max(...d.daten.map((x) => x[1])) / d.schritt) * d.schritt;
+    const feld = (W - X0 - 10) / n, bw = Math.min(46, feld - 10), F = 'Nunito,sans-serif', T = '#2b2540';
+    let s = `<rect width="${W}" height="${H}" fill="#fff"/><text x="${W / 2}" y="14" text-anchor="middle" style="font:800 12px ${F};fill:${T}">${d.titel.split(' (')[0]}</text><text x="${W / 2}" y="27" text-anchor="middle" style="font:700 10px ${F};fill:#5d5870">${d.titel.includes(' (') ? d.titel.split(' (')[1].replace(')', '') : ''}</text>`;
+    for (let v = 0; v <= max; v += d.schritt) { const y = Y0 - (v / max) * (Y0 - top); s += `<line x1="${X0}" y1="${y}" x2="${W - 8}" y2="${y}" stroke="#e3ddd0" stroke-width="1"/><text x="${X0 - 5}" y="${y + 3.5}" text-anchor="end" style="font:700 10.5px ${F};fill:#5d5870">${String(v).replace('.', ',')}</text>`; }
+    d.daten.forEach(([name, v, zeilen], i) => {
+      const xm = X0 + 5 + feld * (i + 0.5), h = (v / max) * (Y0 - top);
+      s += `<rect x="${xm - bw / 2}" y="${Y0 - h}" width="${bw}" height="${h}" rx="2" fill="${name === hell ? '#1f55d6' : '#0e9fb5'}"/>`;
+      // lange Namen stehen in zwei Zeilen (in den Daten mit | getrennt), damit sich die Beschriftungen nicht überdecken
+      const teile = zeilen ? zeilen.split('|') : [name];
+      teile.slice(0, 2).forEach((t, k) => { s += `<text x="${xm}" y="${Y0 + 14 + k * 12}" text-anchor="middle" style="font:700 10.5px ${F};fill:${T}">${t}</text>`; });
     });
-    s += `<line x1="${X0}" y1="${Y0}" x2="${W - 8}" y2="${Y0}" stroke="#2b2540" stroke-width="1.2"/><line x1="${X0}" y1="${top - 6}" x2="${X0}" y2="${Y0}" stroke="#2b2540" stroke-width="1.2"/>`;
+    s += `<line x1="${X0}" y1="${Y0}" x2="${W - 8}" y2="${Y0}" stroke="${T}" stroke-width="1.2"/><line x1="${X0}" y1="${top - 6}" x2="${X0}" y2="${Y0}" stroke="${T}" stroke-width="1.2"/>`;
     return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Säulendiagramm" style="max-width:100%;height:auto">${s}</svg>`;
   }
   D.saeulen = saeulen; D.DIAGRAMME = DIAGRAMME;

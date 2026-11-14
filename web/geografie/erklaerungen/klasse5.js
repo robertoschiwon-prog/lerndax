@@ -11,7 +11,7 @@
  */
 (function () {
   const D = window.GeoDax;
-  const { el, lerp, block, fade, F } = LernDaxErklaer(D, { sand: '#e2f0f4', braun: '#0e7f91' });
+  const { el, lerp, block, fade, F } = LernDaxErklaer(D, { sand: '#e2f0f4', braun: '#0e7f91', bild: { hoch: 190, breit: 340, schrift: 1, H: 300 } });
   const { BLAU, ORANGE, GRUEN } = F;
   const T = 'var(--ink)';
   const txt = (p, x, y, t, fs, farbe, anker, extra) => el('text', Object.assign({ x, y, 'text-anchor': anker || 'middle', class: 'ex-b', text: t, style: `font-size:${fs || 13}px;fill:${farbe || T}` }, extra || {}), p);
@@ -23,47 +23,47 @@
     // ---------------------------------------------------------------- Maßstab
     async massstab(api, x) {
       const m = x.m, n = Math.min(x.cm, 12), proCm = m >= 100000 ? `${zahl(m / 100000)} km` : `${zahl(m / 100)} m`;
-      const W = Math.min(26, 300 / n), X0 = 180 - (n * W) / 2;
+      const W = Math.min(64, 240 / n), X0 = 100 + (240 - n * W) / 2;
       api.say(`Maßstab <b>1 : ${tausend(m)}</b>: Alles ist ${tausend(m)}-mal kleiner als in Wirklichkeit.`);
       txt(api.svg, 180, 30, `1 : ${tausend(m)}`, 22, BLAU);
       await api.wait(1600);
-      txt(api.svg, 20, 78, 'Karte', 12, '#6f6a7c', 'start');
-      txt(api.svg, 20, 158, 'Wirklichkeit', 12, '#6f6a7c', 'start');
-      const k1 = el('rect', { x: X0, y: 88, width: n * W, height: 10, fill: 'none', stroke: T, 'stroke-width': 1.5 }, api.svg); void k1;
+      txt(api.svg, 8, 98, 'Karte', 12, '#6f6a7c', 'start');
+      txt(api.svg, 8, 168, 'Wirklichkeit', 12, '#6f6a7c', 'start');
+      const k1 = el('rect', { x: X0, y: 88, width: n * W, height: 12, fill: 'none', stroke: T, 'stroke-width': 1.5 }, api.svg); void k1;
       for (let i = 0; i < n; i++) {
-        const seg = el('rect', { x: X0 + i * W, y: 88, width: W, height: 10, fill: i % 2 ? '#fff' : BLAU, opacity: 0 }, api.svg);
-        const pf = el('line', { x1: X0 + i * W + W / 2, y1: 102, x2: X0 + i * W + W / 2, y2: 102, stroke: '#c9c2b4', 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }, api.svg);
-        await api.tw(i === 0 ? 500 : 160, (t) => { seg.setAttribute('opacity', t); pf.setAttribute('y2', lerp(102, 162, t)); });
+        const seg = el('rect', { x: X0 + i * W, y: 88, width: W, height: 12, fill: i % 2 ? '#fff' : BLAU, opacity: 0 }, api.svg);
+        const pf = el('line', { x1: X0 + i * W + W / 2, y1: 104, x2: X0 + i * W + W / 2, y2: 104, stroke: '#c9c2b4', 'stroke-width': 1.5, 'stroke-dasharray': '3 3' }, api.svg);
+        await api.tw(i === 0 ? 500 : 160, (t) => { seg.setAttribute('opacity', t); pf.setAttribute('y2', lerp(104, 160, t)); });
         if (i === 0) {
-          txt(api.svg, X0 + W / 2, 84, '1 cm', 10, BLAU);
-          txt(api.svg, X0 + W / 2, 176, proCm, 10, GRUEN);
+          txt(api.svg, X0 + W / 2, 82, '1 cm', 13, BLAU);
+          txt(api.svg, X0 + W / 2, 182, proCm, 13, GRUEN);
           api.say(`1 cm auf der Karte sind ${tausend(m)} cm in Wirklichkeit, also <b>${proCm}</b>.`);
           await api.wait(2200);
         }
       }
-      el('line', { x1: X0, y1: 166, x2: X0 + n * W, y2: 166, stroke: GRUEN, 'stroke-width': 3, 'stroke-linecap': 'round' }, api.svg);
+      el('line', { x1: X0, y1: 164, x2: X0 + n * W, y2: 164, stroke: GRUEN, 'stroke-width': 4, 'stroke-linecap': 'round' }, api.svg);
       await api.wait(500);
-      const ergebnis = `${x.cm} cm  →  ${x.cm} · ${proCm} = ${zahl(x.wert)} ${x.einheit}`;
-      const e = block(api.svg, 180, 214, [x.rueck ? `${zahl(x.wert)} ${x.einheit} : ${proCm} = ${x.cm} cm` : ergebnis], 15, 340, { opacity: 0 });
-      e.ts.forEach((t) => { t.style.fill = GRUEN; });
-      await fade(api, e.g, 450);
+      const ergebnis = x.cm === 1 ? `1 cm ≙ ${proCm}` : `${x.cm} · ${proCm} = ${zahl(x.wert)} ${x.einheit}`;
+      const e = txt(api.svg, 180, 220, x.rueck ? `${zahl(x.wert)} ${x.einheit} : ${proCm} = ${x.cm} cm` : ergebnis, 17, GRUEN, 'middle', { opacity: 0 });
+      await fade(api, e, 450);
       api.say(x.rueck ? `Rückwärts: Wie oft passt ${proCm} in ${zahl(x.wert)} ${x.einheit}? <b>${x.cm}-mal</b>, also ${x.cm} cm.` : `Für jeden Zentimeter auf der Karte kommen ${proCm} dazu: <b>${zahl(x.wert)} ${x.einheit}</b>.`);
     },
 
     // ---------------------------------------------------------------- Tag und Nacht
     async tagnacht(api, x) {
-      const cx = 140, cy = 120, r = 70, NAMEN = ['Mitternacht', 'Sonnenaufgang', 'Mittag', 'Sonnenuntergang'], WINKEL = [180, 90, 0, 270];
+      const cx = 140, cy = 112, r = 64, NAMEN = ['Mitternacht', 'Sonnenaufgang', 'Mittag', 'Sonnenuntergang'], WINKEL = [180, 90, 0, 270];
       el('path', { d: `M${cx} ${cy - r} A${r} ${r} 0 0 1 ${cx} ${cy + r}Z`, fill: '#cfe6ff' }, api.svg);
       el('path', { d: `M${cx} ${cy - r} A${r} ${r} 0 0 0 ${cx} ${cy + r}Z`, fill: '#3a3f6e' }, api.svg);
       el('circle', { cx, cy, r, fill: 'none', stroke: T, 'stroke-width': 2 }, api.svg);
-      el('circle', { cx: 318, cy: 120, r: 20, fill: '#ffcf4a' }, api.svg);
-      for (let i = 0; i < 4; i++) el('line', { x1: 290, y1: 70 + i * 33, x2: 236, y2: 70 + i * 33, stroke: '#ffcf4a', 'stroke-width': 3 }, api.svg);
-      txt(api.svg, cx + 36, 30, 'Tag', 13, '#5a6e8a');
-      txt(api.svg, cx - 36, 30, 'Nacht', 13, '#3a3f6e');
+      el('circle', { cx: 318, cy: cy, r: 20, fill: '#ffcf4a' }, api.svg);
+      for (let i = 0; i < 4; i++) el('line', { x1: 290, y1: cy - 48 + i * 32, x2: 232, y2: cy - 48 + i * 32, stroke: '#ffcf4a', 'stroke-width': 3 }, api.svg);
+      txt(api.svg, 318, cy + 40, 'Sonne', 13, '#8a6d00');
+      txt(api.svg, cx + 36, 34, 'Tag', 15, '#5a6e8a');
+      txt(api.svg, cx - 36, 34, 'Nacht', 15, '#3a3f6e');
       api.say('Wir schauen von oben auf den Nordpol. Die Sonne beleuchtet immer nur die rechte Hälfte.');
       await api.wait(2400);
       const p = el('circle', { r: 7, fill: '#d0443a', stroke: '#fff', 'stroke-width': 2 }, api.svg);
-      const lab = txt(api.svg, cx, cy + 5, '', 13, '#d0443a');
+      const lab = txt(api.svg, cx, cy + r + 30, '', 17, '#d0443a');
       const setz = (w) => { const a = w * Math.PI / 180; p.setAttribute('cx', cx + Math.cos(a) * r * 0.8); p.setAttribute('cy', cy + Math.sin(a) * r * 0.8); };
       setz(180);
       api.say('Die Erde dreht sich in 24 Stunden einmal um sich selbst, von oben gesehen gegen den Uhrzeigersinn.');
@@ -77,7 +77,6 @@
       const w = WINKEL[x.k] - (WINKEL[x.k] > 180 ? 360 : 0);
       await api.tw(800, (t) => setz(lerp(180, w, t)));
       lab.textContent = NAMEN[x.k];
-      lab.style.fontSize = '15px';
       api.say(x.merk);
     },
 
@@ -103,7 +102,7 @@
       };
       setz(Math.PI);
       await api.wait(2000);
-      const links = txt(api.svg, 70, 196, 'Juni: Sommer', 12, ORANGE), rechts = txt(api.svg, 290, 196, 'Dezember: Winter', 12, BLAU);
+      const links = txt(api.svg, 70, 200, 'Juni: Sommer', 14, ORANGE), rechts = txt(api.svg, 285, 200, 'Dezember: Winter', 14, BLAU);
       links.setAttribute('opacity', 0); rechts.setAttribute('opacity', 0);
       api.say('Links: Der Nordpol ist zur Sonne geneigt. Die Strahlen treffen uns steil, die Tage sind lang: <b>Sommer</b>.');
       await fade(api, links, 400);
@@ -119,11 +118,11 @@
 
     // ---------------------------------------------------------------- Gezeiten
     async gezeiten(api, x) {
-      const X0 = 30, X1 = 340, Y = 120, A = 46, P = 745; // Minuten von Hochwasser zu Hochwasser
+      const X0 = 30, X1 = 340, Y = 100, A = 44, P = 745; // Minuten von Hochwasser zu Hochwasser
       const start = x.start, phase = x.hoch ? 0 : P / 2;
       const X = (min) => X0 + (min / 1440) * (X1 - X0), H = (min) => Y - A * Math.cos(((min - start + phase) / P) * 2 * Math.PI);
-      el('line', { x1: X0, y1: Y + A + 18, x2: X1, y2: Y + A + 18, stroke: T, 'stroke-width': 1.5 }, api.svg);
-      for (let h = 0; h <= 24; h += 6) { el('line', { x1: X(h * 60), y1: Y + A + 14, x2: X(h * 60), y2: Y + A + 22, stroke: T, 'stroke-width': 1.5 }, api.svg); txt(api.svg, X(h * 60), Y + A + 36, `${h} Uhr`, 10, '#6f6a7c'); }
+      el('line', { x1: X0, y1: Y + A + 44, x2: X1, y2: Y + A + 44, stroke: T, 'stroke-width': 1.5 }, api.svg);
+      for (let h = 0; h <= 24; h += 6) { el('line', { x1: X(h * 60), y1: Y + A + 40, x2: X(h * 60), y2: Y + A + 48, stroke: T, 'stroke-width': 1.5 }, api.svg); txt(api.svg, Math.max(22, Math.min(340, X(h * 60))), Y + A + 64, `${h} Uhr`, 12, '#6f6a7c'); }
       el('line', { x1: X0, y1: Y, x2: X1, y2: Y, stroke: '#d9d2c3', 'stroke-width': 1, 'stroke-dasharray': '4 4' }, api.svg);
       api.say('So steigt und fällt das Wasser an der Nordsee an einem Tag.');
       const linie = el('path', { fill: 'none', stroke: '#2a6fb0', 'stroke-width': 3 }, api.svg);
@@ -131,7 +130,7 @@
       // Hoch- und Niedrigwasser beschriften
       for (let m = 0; m <= 1440; m += 5) {
         const a = H(m - 5), b = H(m), c = H(m + 5);
-        if ((b < a && b <= c) || (b > a && b >= c)) txt(api.svg, Math.max(62, Math.min(308, X(m))), b < Y ? b - 8 : b + 16, b < Y ? 'Hochwasser' : 'Niedrigwasser', 9.5, b < Y ? '#2a6fb0' : '#6f6a7c');
+        if ((b < a && b <= c) || (b > a && b >= c)) txt(api.svg, Math.max(46, Math.min(314, X(m))), b < Y ? b - 9 : b + 20, b < Y ? 'Hochwasser' : 'Niedrigwasser', 12, b < Y ? '#2a6fb0' : '#6f6a7c');
       }
       await api.wait(1200);
       api.say('Steigt das Wasser, ist <b>Flut</b>. Fällt es, ist <b>Ebbe</b>. Von Hochwasser zu Niedrigwasser vergehen gut 6 Stunden.');
@@ -148,9 +147,9 @@
       const sk = 1.2, g = el('g', { transform: `translate(0,40) scale(${sk},${sk * 0.95})` }, api.svg);
       el('path', { d: 'M0 128 L60 128 L60 140 L0 140Z', fill: '#9cc8f0' }, g);
       el('path', { d: D.bergPfad, fill: '#b9a27a', stroke: '#2b2540', 'stroke-width': 1.2 }, g);
-      txt(api.svg, 36, 200, 'Meer', 12, '#2a6fb0');
-      txt(api.svg, 70, 30, 'Luv (zum Wind)', 12, BLAU);
-      txt(api.svg, 300, 30, 'Lee (vom Wind weg)', 12, ORANGE);
+      txt(api.svg, 36, 186, 'Meer', 13, '#2a6fb0');
+      txt(api.svg, 8, 28, 'Luv (zum Wind)', 14, BLAU, 'start');
+      txt(api.svg, 352, 28, 'Lee (vom Wind weg)', 14, ORANGE, 'end');
       api.say('Der Wind bringt feuchte Luft vom Meer.');
       const luft = el('circle', { r: 9, fill: '#bfe3ff', stroke: '#2a6fb0', 'stroke-width': 1.5 }, api.svg);
       // Weg der Luft (Bildkoordinaten)

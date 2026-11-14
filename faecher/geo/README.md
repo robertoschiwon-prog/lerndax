@@ -1,6 +1,6 @@
 # GeoDax (Geografie) – Startpunkt
 
-Stand 14.11.2026: **Klasse 5 gebaut** (`lerndax-v104`): 55 Themen in 9 Bereichen, Entdecken (5), Knobeln zu allen Themen.
+Stand 14.11.2026: **Klasse 5 gebaut** (`lerndax-v105`): 55 Themen in 9 Bereichen, Entdecken (5), Knobeln zu allen Themen.
 **Aktuell im Unterricht: S. 26–27 „Die Welt entdecken“** (Thema `geo5-welt`).
 
 ## Was feststeht
@@ -40,6 +40,10 @@ Foto-Nummer × 2 − 12 = linke Seite der Doppelseite. S. 4–5 und S. 18–19 f
   sonst Merkzettel. `erklaerungen/entdecken.js`: Jahreszeiten, Grönland schrumpft, Erde als Fußball, zwei Flutberge,
   ein Fluss gräbt ein Tal.
 - `bildnachweis.html`: alle Fotos mit Fotograf, Lizenz und Link; Hinweis auf Natural Earth.
+
+**Größen auf dem Handy:** In `karten/karten.js` legt der Faktor `Z` je Karte fest, wie groß Schrift, Nummern und Zeichen sind;
+`ausschnitt: [West, Ost, Nord, Süd]` zeigt nur einen Teil Deutschlands. Der Merkzettel zeigt Karten groß (`bild: { hoch, breit,
+schrift, H }` in `erklaerungen/klasse5.js`). Nach Änderungen alle Aufgabenarten bei 390 px Breite ansehen.
 
 **Fotos aussuchen:** im eingebauten Browser auf commons.wikimedia.org, Suche über die Commons-API (`fetch` mit
 `origin=*`), bevorzugt „Quality images“, Vorschaubilder als Bildtafel angesehen. Neue Fotos in `themen/fotos.js`

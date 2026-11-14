@@ -70,7 +70,7 @@
       { f: 'Was ist typisch für ein Ballungsgebiet?', a: 'dichte Bebauung, viel Verkehr, viele Arbeitsplätze', x: ['viele Bauernhöfe und Wälder', 'kaum Straßen', 'sehr wenige Menschen'], w: 'Die Städte gehen ineinander über.' },
     ],
     extra: {
-      ballung: () => U.ortTippen('ballung', { art: 'deutschland', ortArt: 'gebiet', orte: { Ruhrgebiet: [7.2, 51.5], 'Rhein-Main': [8.7, 50.05], 'Raum München': [11.6, 48.15], 'Raum Berlin': [13.4, 52.5], 'Raum Leipzig–Halle': [12.2, 51.4], 'Raum Hamburg': [10.0, 53.55], 'Raum Stuttgart': [9.2, 48.8] }, frage: (b) => `Wo liegt das Ballungsgebiet <b>${b}</b>?` }),
+      ballung: () => U.ortTippen('ballung', { art: 'deutschland', ortArt: 'gebiet', orte: { Ruhrgebiet: [7.2, 51.5], 'Rhein-Main': [8.7, 50.05], 'Raum München': [11.6, 48.15], 'Raum Berlin': [13.4, 52.5], 'Raum Leipzig–Halle': [12.2, 51.4], 'Raum Hamburg': [10.0, 53.55], 'Raum Stuttgart': [9.2, 48.8] }, frage: (b) => `Wo liegt das Ballungsgebiet <b>${b}</b>?`, abstand: 1.15 }),
     },
   }, { ballung: 30 });
 
@@ -116,6 +116,7 @@
   // Bereich 8: Im Mittelgebirgsland
   // =====================================================
   const MG = { Harz: [10.6, 51.75], 'Schwäbische Alb': [9.4, 48.45], 'Thüringer Becken': [11.0, 51.1], 'Oberrheinische Tiefebene': [8.15, 49.0], Erzgebirge: [12.9, 50.6], Schwarzwald: [8.15, 48.2], 'Thüringer Wald': [10.8, 50.65], Elbsandsteingebirge: [14.15, 50.9] };
+  const MG_ART = { Harz: 'der', 'Schwäbische Alb': 'die', 'Thüringer Becken': 'das', 'Oberrheinische Tiefebene': 'die', Erzgebirge: 'das', Schwarzwald: 'der', 'Thüringer Wald': 'der', Elbsandsteingebirge: 'das' };
   G.mittelgebirge = baue('geo5-mittelgebirge', {
     h: 'Zum Mittelgebirgsland gehören Gebirge (Harz, Erzgebirge, Schwarzwald, Schwäbische Alb), aber auch Becken (Thüringer Becken) und Tiefebenen (Oberrheinische Tiefebene).',
     F: [
@@ -126,7 +127,7 @@
       { f: 'Wovon lebten die Menschen im <b>Erzgebirge</b> früher vor allem?', a: 'vom Bergbau auf Silber, Zinn und andere Erze', x: ['vom Fischfang', 'vom Weinbau', 'vom Containerhafen'], w: 'Später kamen Holzspielzeug und Schnitzkunst dazu.' },
     ],
     extra: {
-      mgTippen: () => U.ortTippen('mgTippen', { art: 'deutschland', ortArt: 'gebiet', orte: MG, frage: (m) => `Wo liegt <b>${m === 'Harz' || m === 'Schwarzwald' || m === 'Thüringer Wald' || m === 'Erzgebirge' || m === 'Elbsandsteingebirge' ? 'das Gebirge ' : ''}${m}</b>?`, opts: { fluesse: ['Rhein', 'Elbe', 'Donau', 'Main'] } }),
+      mgTippen: () => U.ortTippen('mgTippen', { art: 'deutschland', ortArt: 'gebiet', orte: MG, frage: (m) => `Wo liegt ${MG_ART[m]} <b>${m}</b>?`, abstand: 1.15, opts: { fluesse: ['Rhein', 'Elbe', 'Donau', 'Main'] } }),
       mgNennen: () => U.ortNennen('mgNennen', { art: 'deutschland', ortArt: 'gebiet', orte: MG, frage: () => 'Welche Landschaft ist <b>blau</b> eingekreist?', opts: { fluesse: ['Rhein', 'Elbe', 'Donau', 'Main'] } }),
     },
     E: { f: 'Was zeigt das Foto?', arten: [['mittelgebirge', 'ein Mittelgebirge', 'Rundliche Berge, fast ganz bewaldet.'], ['alpen', 'ein Hochgebirge', 'Spitze Felsgipfel mit Schnee.'], ['boerde', 'ein Tiefland mit Feldern', 'Flach und weit, Ackerbau.']] },
@@ -298,7 +299,7 @@
         { id: 'geo5-kanaele', buch: 'S. 96–97', title: 'Flüsse, Kanäle, Schleusen', icon: '⛴', gen: G.kanaele },
         { id: 'geo5-landwirtschaft', buch: 'S. 98–103', title: 'Landwirtschaft im Tiefland', icon: '🚜', gen: G.landwirtschaft },
         { id: 'geo5-kohle-entstehung', buch: 'S. 106–107', title: 'Wie aus Pflanzen Braunkohle wird', icon: '🌿', gen: G.braunkohleEntstehung },
-        { id: 'geo5-braunkohle', buch: 'S. 104–105, 108–109', title: 'Braunkohle in Sachsen', icon: '⛏', gen: G.braunkohle },
+        { id: 'geo5-braunkohle', buch: 'S. 104–109', title: 'Braunkohle in Sachsen', icon: '⛏', gen: G.braunkohle },
         { id: 'geo5-rekultivierung', buch: 'S. 110–111', title: 'Vom Tagebau zum See', icon: '🏊', gen: G.rekultivierung },
       ] },
       { id: 'geo5-stadtdorf', nr: 6, title: 'Leben in der Stadt, Leben im Dorf', topics: [

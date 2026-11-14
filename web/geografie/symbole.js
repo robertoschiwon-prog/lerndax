@@ -11,7 +11,7 @@ window.GeoDaxIcons = (function () {
     'geo5-landschaft': `${BERG}<path d="M2 20h20"/><path d="M15 20v-3h4v3"/>`,
     'geo5-weltall': `<circle cx="12" cy="12" r="3.5" ${F}/><ellipse cx="12" cy="12" rx="10" ry="4"/><circle cx="20" cy="9.5" r="1.4" ${F}/>`,
     'geo5-tagnacht': `${KUGEL}<path d="M12 3a9 9 0 0 0 0 18z" ${F}/>`,
-    'geo5-jahreszeiten': `<circle cx="12" cy="12" r="3" ${F}/><ellipse cx="12" cy="12" rx="10" ry="5"/><circle cx="2.5" cy="12" r="1.6"/><circle cx="21.5" cy="12" r="1.6"/>`,
+    'geo5-jahreszeiten': `<circle cx="12" cy="12" r="4" ${F}/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>`,
     'geo5-abbildungen': `${KUGEL}<path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>`,
     'geo5-kontinente': `<path d="M3 6c3-2 6 0 6 2s-3 3-2 6-3 3-4 0 0-6 0-8z"/><path d="M13 5c3 0 6 1 8 3-1 2-3 2-3 5s-2 6-4 6-1-5-2-7-2-5 1-7z"/>`,
     'geo5-windrose': `<path d="M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/><path d="M12 2l2.5 7.5L12 12z" ${F}/>`,

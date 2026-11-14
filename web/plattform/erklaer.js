@@ -8,7 +8,7 @@
  *   reihe     Schritte nacheinander, nummeriert (optional mit kleinen Bildern; hell = gesuchter Schritt)
  *   faecher   Spalten (Kategorien); Kärtchen fliegen in ihr Fach, das gesuchte ist blau
  *   bild      nur ein Bild mit Text
- * Ein Fach ruft LernDaxErklaer(D, { sand, braun }) auf, kann in D.bild eigene Modi ergänzen (GeDax: strahl, pyramide)
+ * Ein Fach ruft LernDaxErklaer(D, { sand, braun, bild: { hoch, breit, schrift } }) auf, kann in D.bild eigene Modi ergänzen (GeDax: strahl, pyramide)
  * und meldet zum Schluss mit D.erklaereThemen() alle Themen aus D.grades an.
  */
 (function () {
@@ -18,6 +18,7 @@
     const EX = (D.explainers = D.explainers || {});
     const NS = 'http://www.w3.org/2000/svg';
     const lerp = (a, b, t) => a + (b - a) * t;
+    const MZ = opt.bild || {};   // Bild im Merkzettel: { hoch, breit, schrift, H } (Geografie: Karten brauchen mehr Platz; H = Höhe der Bühne mit Bild)
     const BLAU = '#1f55d6', ORANGE = '#c2410c', GRUEN = '#0a7d57', GRAU = '#9a94a8', HELLBLAU = '#dfe9ff', SAND = opt.sand || '#f3e6cc', BRAUN = opt.braun || '#a0522d';
     function el(tag, a, parent) {
       const e = document.createElementNS(NS, tag);
@@ -56,18 +57,21 @@
         const warum = nurText(String(x.merk || '').replace(/^[\s\S]*<\/b>[:.]?\s*/, ''));
         const qz = umbruch(String(x.q).replace('…', '___'), 44).slice(0, 4), az = umbruch(antwort, 27).slice(0, 5), wz = warum && warum !== antwort ? umbruch(warum, 37).slice(0, 8) : [];
         const hoehe = (k) => qz.length * (13 * k + 4) + 8 + az.length * (20 * k + 4) + (wz.length ? 12 + wz.length * (15 * k + 4) : 0);
+        // Mit Bild darf die Bühne höher sein (MZ.H, zum Beispiel für Karten), sonst bleibt sie 240 hoch
+        const H = mitBild && MZ.H ? MZ.H : 240;
+        api.svg.setAttribute('viewBox', `0 0 360 ${H}`);
         let y = 30;
         if (mitBild) {
           const g = el('g', { opacity: 0 }, api.svg);
           const roh = D.bilder[x.svg]();
           // Bild höchstens so hoch, dass der Text darunter noch Platz hat (seit v103)
-          const vb = (roh.match(/viewBox="([^"]+)"/) || [0, '0 0 200 120'])[1].split(' ').map(Number), bh = Math.max(46, Math.min(x.bildHoch || 104, 172 * vb[3] / vb[2], 212 - hoehe(0.62))), bw = bh * vb[2] / vb[3];
+          const vb = (roh.match(/viewBox="([^"]+)"/) || [0, '0 0 200 120'])[1].split(' ').map(Number), bh = Math.max(46, Math.min(x.bildHoch || MZ.hoch || 104, (MZ.breit || 172) * vb[3] / vb[2], H - 28 - hoehe(MZ.schrift || 0.62))), bw = bh * vb[2] / vb[3];
           g.innerHTML = roh.replace(/^<svg([^>]*)>/, (m, a) => `<svg${a.replace(/ (style|role|aria-label)="[^"]*"/g, '')} x="${180 - bw / 2}" y="4" width="${bw}" height="${bh}">`);
           el('rect', { x: 180 - bw / 2, y: 4, width: bw, height: bh, rx: 6, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, g);
           await fade(api, g, 450);
           y = 4 + bh + 20;
         }
-        let k = 1; while (k > 0.55 && hoehe(k) > 236 - y) k -= 0.03;
+        let k = 1; while (k > 0.55 && hoehe(k) > H - 4 - y) k -= 0.03;
         if (!mitBild) y = Math.max(26, (240 - hoehe(k)) / 2 + 10);
         const q = block(api.svg, 180, y, qz, 13 * k, 340, { opacity: 0 });
         q.ts.forEach((t) => { t.style.fill = '#6f6a7c'; t.style.fontWeight = '600'; });
@@ -169,7 +173,7 @@
           let x = task ? (ctx.post ? ctx : (arten[ctx.art] && gut(ctx) ? arten[ctx.art]().ex : zufall())) : zufall();
           if (!task) api.chips([{ label: 'Anderes Beispiel', onClick() { x = zufall(); api.replay(); } }]);
           return {
-            reset() { api.clear(); api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst'); },
+            reset() { api.svg.setAttribute('viewBox', '0 0 360 240'); api.clear(); api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst'); },
             play() { return D.bild[x.mode](api, x); },
           };
         },

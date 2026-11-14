@@ -96,6 +96,11 @@ wird nichts. Wo Quellen leicht voneinander abweichen, nennt GeoDax eine gerundet
 | Gezeiten | Hochwasser zu Hochwasser ≈ 12 h 25 min, Hoch- zu Niedrigwasser ≈ 6 h 12 min; Flut jeden Tag etwa 50 min später | wie Abschnitt Küste |
 | terra (Latein) | „Erde, Land“ | duden.de „Terra“; etymonline.com „terra“ |
 | Atlas (Kartensammlung) | Mercators Kartensammlung „Atlas sive Cosmographicae Meditationes …“ erschien 1595 in Duisburg, ein Jahr nach seinem Tod (Sohn Rumold); erste Kartensammlung mit dem Namen Atlas, benannt nach dem sagenhaften König Atlas | Universität Utrecht, Special Collections „The Atlas by Mercator and Hondius“; crouchrarebooks.com; raremaps.com |
+| Shanghai: Hochhäuser | Shanghai Tower 632 m (höchstes Gebäude Chinas, Stadtteil Pudong); Oriental Pearl Tower 468 m; Pudong war um 1990 noch Ackerland | structurae.net „Shanghai Tower“; skydb.net; shanghaiatlas |
+| Berliner Fernsehturm | 368 m | allgemein bekannt (berlin.de) |
+| Yanomami | Volk im Regenwald im Grenzgebiet Brasilien/Venezuela, rund 35 000 Menschen; rundes Gemeinschaftshaus (Shabono) mit einer Feuerstelle je Familie; Jagd, Sammeln, kleine Felder mit Maniok und Bananen; bedroht durch Goldsucher | Klett-Infoblatt Yanomami (yanomami-hilfe.de); friedrich-verlag.de; Survival International (über sensesatlas.com) |
+| Inuit | Wort bedeutet „Menschen“ (Einzahl Inuk); leben in Kanada, Grönland, Alaska; heute feste Häuser statt Iglus; Schneemobile haben Hundeschlitten ersetzt; Sprache Inuktitut | thecanadianencyclopedia.ca „Inuit“; studyflix.de „Inuit“ |
+| Niger | Hauptstadt Niamey (über 1 Mio. Einwohner, am Fluss Niger); Völker und Sprachen u. a. Hausa und Zarma; Französisch in Schule und Verwaltung | bpb.de Kosmos Weltalmanach „Niger“; britannica.com „Niamey“ |
 | Karten | Natural Earth (gemeinfrei), Maßstab 1:10 Mio. (Länder, Bundesländer, Flüsse, Seen) | naturalearthdata.com |
 | Fotos | 49 freie Fotos von Wikimedia Commons, Fotograf und Lizenz in `web/geografie/bildnachweis.html` | Wikimedia Commons |
 

@@ -16,9 +16,12 @@
   const TINTE = '#2b2540', LAND = '#efe8d6', LAND2 = '#e2dac4', WASSER = '#cfe6f6', RAND = '#8f8571', HELL = '#ffcf4a', HELLRAND = '#b8860b', BLAU = '#1f55d6', FLUSS = '#4a90d9';
   const r1 = (v) => Math.round(v * 10) / 10;
   const liste = (x) => (x === undefined || x === null ? [] : [].concat(x));
-  const S = (w, h, inhalt, label) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${label || 'Karte'}" style="max-width:100%;height:auto">${inhalt}</svg>`;
-  const txt = (x, y, t, o) => { o = o || {}; const fs = o.fs || 9; return `<text x="${r1(x)}" y="${r1(y)}" text-anchor="${o.anker || 'middle'}" style="font:${o.w || 800} ${fs}px Nunito,sans-serif;fill:${o.farbe || TINTE};paint-order:stroke;stroke:${o.halo || 'rgba(255,255,255,.85)'};stroke-width:${o.halob || 2.6}px;stroke-linejoin:round">${t}</text>`; };
-  const marke = (x, y, n, o) => { o = o || {}; const r = o.r || 7.5; return `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r}" fill="${o.fill || '#fff'}" stroke="${o.stroke || TINTE}" stroke-width="1.5"/><text x="${r1(x)}" y="${r1(y + r * 0.45)}" text-anchor="middle" style="font:800 ${r * 1.3}px Nunito,sans-serif;fill:${o.farbe || TINTE}">${n}</text>`; };
+  // hoch: größte Höhe auf dem Handy (hohe Karten wie Deutschland dürfen höher sein als andere Bilder)
+  const S = (w, h, inhalt, label, hoch) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${label || 'Karte'}" style="max-width:100%;height:auto${hoch ? `;max-height:${hoch}px` : ''}">${inhalt}</svg>`;
+  // Z: Größe von Schrift, Nummern und Zeichen je Karte, damit sie auf dem Handy gut lesbar sind
+  let Z = 1, BW = 9999, BH = 9999;   // BW, BH: Breite und Höhe der Karte, damit Nummern nicht über den Rand ragen
+  const txt = (x, y, t, o) => { o = o || {}; const fs = (o.fs || 9) * Z; return `<text x="${r1(x)}" y="${r1(y)}" text-anchor="${o.anker || 'middle'}" style="font:${o.w || 800} ${fs}px Nunito,sans-serif;fill:${o.farbe || TINTE};paint-order:stroke;stroke:${o.halo || 'rgba(255,255,255,.85)'};stroke-width:${r1((o.halob || 2.6) * Z)}px;stroke-linejoin:round">${t}</text>`; };
+  const marke = (x, y, n, o) => { o = o || {}; const r = r1((o.r || 7.5) * Z); return `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r}" fill="${o.fill || '#fff'}" stroke="${o.stroke || TINTE}" stroke-width="1.5"/><text x="${r1(x)}" y="${r1(y + r * 0.45)}" text-anchor="middle" style="font:800 ${r1(r * 1.3)}px Nunito,sans-serif;fill:${o.farbe || TINTE}">${n}</text>`; };
 
   // ---------------------------------------------------------------- Projektionen
   // Robinson (Tabelle nach Robinson 1974), Ergebnis in Einheiten, x −1…1 ungefähr
@@ -84,13 +87,13 @@
     for (const [name, lon, lat, o0] of orte || []) {
       const o = o0 || {}, [x, y] = f(lon, lat), art = o.art || 'stadt';
       const farbe = o.hell ? BLAU : TINTE;
-      if (art === 'berg') s += `<path d="M${r1(x - 5)} ${r1(y + 3.5)} L${r1(x)} ${r1(y - 4.5)} L${r1(x + 5)} ${r1(y + 3.5)}Z" fill="${o.hell ? BLAU : '#7a5a3a'}" stroke="#fff" stroke-width="1"/>`;
-      else if (art === 'gebiet') s += `<circle cx="${r1(x)}" cy="${r1(y)}" r="${o.r || 9}" fill="${o.hell ? 'rgba(31,85,214,.25)' : 'rgba(43,37,64,.12)'}" stroke="${farbe}" stroke-width="1.2" stroke-dasharray="2.5 2"/>`;
-      else if (art === 'insel') s += `<circle cx="${r1(x)}" cy="${r1(y)}" r="5.5" fill="none" stroke="${farbe}" stroke-width="1.6"/>`;
-      else if (art === 'hauptstadt') s += `<rect x="${r1(x - 3)}" y="${r1(y - 3)}" width="6" height="6" fill="${o.hell ? BLAU : '#d0443a'}" stroke="#fff" stroke-width="1"/>`;
-      else s += `<circle cx="${r1(x)}" cy="${r1(y)}" r="${o.hell ? 3.6 : 2.8}" fill="${o.hell ? BLAU : TINTE}" stroke="#fff" stroke-width="1"/>`;
-      if (o.nr !== undefined) { const [dx, dy] = o.nrVersatz || [10, -9]; s += `<line x1="${r1(x)}" y1="${r1(y)}" x2="${r1(x + dx)}" y2="${r1(y + dy)}" stroke="${TINTE}" stroke-width=".9"/>` + marke(x + dx, y + dy, o.nr, { r: 7 }); }
-      else if (!o.ohneName) { const [dx, dy, anker] = o.lage || [6, 3, 'start']; s += txt(x + dx, y + dy, name, { fs: o.fs || 8, anker, farbe, w: art === 'gebiet' ? 700 : 800 }); }
+      if (art === 'berg') s += `<path d="M${r1(x - 5 * Z)} ${r1(y + 3.5 * Z)} L${r1(x)} ${r1(y - 4.5 * Z)} L${r1(x + 5 * Z)} ${r1(y + 3.5 * Z)}Z" fill="${o.hell ? BLAU : '#7a5a3a'}" stroke="#fff" stroke-width="1"/>`;
+      else if (art === 'gebiet') s += `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1((o.r || 9) * Z)}" fill="${o.hell ? 'rgba(31,85,214,.25)' : 'rgba(43,37,64,.12)'}" stroke="${farbe}" stroke-width="1.2" stroke-dasharray="2.5 2"/>`;
+      else if (art === 'insel') s += `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1(5.5 * Z)}" fill="none" stroke="${farbe}" stroke-width="1.6"/>`;
+      else if (art === 'hauptstadt') s += `<rect x="${r1(x - 3 * Z)}" y="${r1(y - 3 * Z)}" width="${r1(6 * Z)}" height="${r1(6 * Z)}" fill="${o.hell ? BLAU : '#d0443a'}" stroke="#fff" stroke-width="1"/>`;
+      else s += `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1((o.hell ? 3.6 : 2.8) * Z)}" fill="${o.hell ? BLAU : TINTE}" stroke="#fff" stroke-width="1"/>`;
+      if (o.nr !== undefined) { let [dx, dy] = (o.nrVersatz || [10, -9]).map((v) => v * Z); const rr = 7 * Z + 1; if (x + dx + rr > BW) dx = -dx; if (x + dx - rr < 0) dx = -dx; if (y + dy - rr < 0) dy = -dy; if (y + dy + rr > BH) dy = -dy; s += `<line x1="${r1(x)}" y1="${r1(y)}" x2="${r1(x + dx)}" y2="${r1(y + dy)}" stroke="${TINTE}" stroke-width=".9"/>` + marke(x + dx, y + dy, o.nr, { r: 7 }); }
+      else if (!o.ohneName) { let [dx, dy, anker] = o.lage || [6, 3, 'start']; const breit = name.length * (o.fs || 8) * Z * 0.58; if (anker === 'start' && x + dx * Z + breit > BW - 2) { dx = -dx; anker = 'end'; } else if (anker === 'end' && x + dx * Z - breit < 2) { dx = -dx; anker = 'start'; } s += txt(x + dx * Z, y + dy * Z, name, { fs: o.fs || 8, anker, farbe, w: art === 'gebiet' ? 700 : 800 }); }
     }
     return s;
   }
@@ -113,8 +116,8 @@
   const MEERE = { 'Pazifischer Ozean': [[-128, -14], [150, 24]], 'Atlantischer Ozean': [[-35, 15]], 'Indischer Ozean': [[78, -22]], 'Nordpolarmeer': [[30, 80]], 'Südpolarmeer': [[60, -58]] };
   const KONT_MITTE = { Nordamerika: [-102, 46], Südamerika: [-60, -12], Europa: [17, 52], Afrika: [20, 6], Asien: [92, 46], Australien: [134, -24], Antarktis: [20, -80] };
   function welt(o) {
-    o = o || {};
-    const W = 360, H = 183, sx = W / 2 / (0.8487 * Math.PI) * 0.985, f = (lon, lat) => { const [x, y] = robinson(lon, lat); return [W / 2 + x * sx, H / 2 - y * sx * 1.0]; };
+    o = o || {}; Z = 1.5;
+    const W = 360, H = 183; BW = W; BH = H; const sx = W / 2 / (0.8487 * Math.PI) * 0.985, f = (lon, lat) => { const [x, y] = robinson(lon, lat); return [W / 2 + x * sx, H / 2 - y * sx * 1.0]; };
     let s = `<rect width="${W}" height="${H}" fill="#fff"/>`;
     // Umriss der Erde (Hintergrund Wasser)
     const um = []; for (let la = -90; la <= 90; la += 5) um.push(f(-180, la)); for (let la = 90; la >= -90; la -= 5) um.push(f(180, la));
@@ -137,7 +140,12 @@
       for (const [m, punkte] of Object.entries(MEERE)) {
         const n = o.meere === true ? null : o.meere[m];
         if (o.meere !== true && n === undefined) continue;
-        punkte.forEach(([lo, la]) => { const [x, y] = f(lo, la); s += n !== undefined && n !== null ? marke(x, y, n, { stroke: BLAU, farbe: BLAU }) : txt(x, y, m, { fs: 7.5, farbe: '#2b5c8a', w: 700 }); });
+        punkte.forEach(([lo, la]) => {
+          const [x, y] = f(lo, la), name = typeof n === 'string' && n.length > 2 ? n : n === undefined || n === null ? m : null;
+          if (name === null) { s += marke(x, y, n, { stroke: BLAU, farbe: BLAU }); return; }
+          const halb = name.length * 7.5 * Z * 0.29 + 3;   // Namen nicht über den Kartenrand
+          s += txt(Math.max(halb, Math.min(W - halb, x)), y, name, { fs: 7.5, farbe: '#2b5c8a', w: 700 });
+        });
       }
     }
     if (o.gradnetz && o.gradnetz.namen) {
@@ -145,15 +153,15 @@
       s += txt(x1 + 2, y1 - 3, 'Äquator', { fs: 7, anker: 'start', farbe: '#d0443a' }) + txt(x2 + 3, y2 + 2, 'Nullmeridian', { fs: 7, anker: 'start', farbe: '#0a7d57' });
     }
     s += orteZeichnen(o.orte, f);
-    if (o.nord) s += kompass(W - 18, 20);
+    if (o.nord) s += kompass(W - 20, 22);
     return S(W, H, s, o.label || 'Weltkarte');
   }
 
   // ---------------------------------------------------------------- Mitteleuropa: Deutschland und Nachbarn
   const EU_VERSATZ = { Luxemburg: { nr: [3.2, 48.6], name: [3.6, 49.2] }, Liechtenstein: {}, Belgien: { name: [4.6, 50.6] }, Niederlande: { name: [5.6, 52.4] }, Dänemark: { ziel: [9.3, 56.0] }, Schweiz: { ziel: [8.1, 46.8] }, Österreich: { ziel: [14.3, 47.6] }, Tschechien: { ziel: [15.4, 49.8] }, Polen: { ziel: [18.0, 52.6] }, Frankreich: { ziel: [4.0, 47.0] }, Deutschland: { ziel: [10.3, 51.0] }, Italien: { ziel: [10.6, 45.6] }, Schweden: { ziel: [14.0, 56.8] } };
   function europa(o) {
-    o = o || {};
-    const lon0 = 11, c = Math.cos(51 * Math.PI / 180), X0 = 1.6, X1 = 20.6, Y0 = 57.2, Y1 = 45.2, W = 340, sx = W / ((X1 - X0) * c), H = Math.round((Y0 - Y1) * sx);
+    o = o || {}; Z = 1.4;
+    const lon0 = 11, c = Math.cos(51 * Math.PI / 180), X0 = 1.6, X1 = 20.6, Y0 = 57.2, Y1 = 45.2, W = 340, sx = W / ((X1 - X0) * c), H = Math.round((Y0 - Y1) * sx); BW = W; BH = H;
     const f = (lon, lat) => [(lon - X0) * c * sx, (Y0 - lat) * sx];
     let s = `<rect width="${W}" height="${H}" fill="${WASSER}"/>`;
     const nachbarn = ['Deutschland', 'Dänemark', 'Niederlande', 'Belgien', 'Luxemburg', 'Frankreich', 'Schweiz', 'Österreich', 'Tschechien', 'Polen'];
@@ -162,8 +170,8 @@
     s += beschriftung(K.europa, f, fl.namen.filter((n) => nachbarn.includes(n) || o.namen !== true), fl.nr, EU_VERSATZ, 8.5);
     if (o.meere !== false) { s += txt(...f(5.2, 55.6), 'Nordsee', { fs: 8, farbe: '#2b5c8a', w: 700 }) + txt(...f(17.2, 55.3), 'Ostsee', { fs: 8, farbe: '#2b5c8a', w: 700 }); }
     s += orteZeichnen(o.orte, f);
-    if (o.nord) s += kompass(W - 18, 20);
-    return S(W, H, s, o.label || 'Deutschland und seine Nachbarn');
+    if (o.nord) s += kompass(W - 22, 24);
+    return S(W, H, s, o.label || 'Deutschland und seine Nachbarn', 300);
   }
 
   // ---------------------------------------------------------------- Deutschland: Bundesländer
@@ -173,13 +181,15 @@
     'Sachsen-Anhalt': { ziel: [11.65, 51.95] }, 'Rheinland-Pfalz': { ziel: [7.4, 49.95] }, 'Nordrhein-Westfalen': { ziel: [7.6, 51.5] },
   };
   const DE = { X0: 5.6, X1: 15.3, Y0: 55.15, Y1: 47.15 };
+  // ausschnitt: [West, Ost, Nord, Süd] in Grad zeigt nur einen Teil (zum Beispiel die Küste), dann in voller Breite
   function deBox(o) {
-    const c = Math.cos(51.2 * Math.PI / 180), W = o.breite || 250, sx = W / ((DE.X1 - DE.X0) * c), H = Math.round((DE.Y0 - DE.Y1) * sx);
-    return { W, H, f: (lon, lat) => [(lon - DE.X0) * c * sx, (DE.Y0 - lat) * sx] };
+    const A = o.ausschnitt ? { X0: o.ausschnitt[0], X1: o.ausschnitt[1], Y0: o.ausschnitt[2], Y1: o.ausschnitt[3] } : DE;
+    const c = Math.cos(51.2 * Math.PI / 180), W = o.ausschnitt ? 340 : 250, sx = W / ((A.X1 - A.X0) * c), H = Math.round((A.Y0 - A.Y1) * sx);
+    return { W, H, f: (lon, lat) => [(lon - A.X0) * c * sx, (A.Y0 - lat) * sx] };
   }
   function deutschland(o) {
-    o = o || {};
-    const { W, H, f } = deBox(o);
+    o = o || {}; Z = o.ausschnitt ? 1.45 : 1.3;
+    const { W, H, f } = deBox(o); BW = W; BH = H;
     let s = `<rect width="${W}" height="${H}" fill="${o.ohneMeer ? '#fff' : WASSER}"/>`;
     // Nachbarn grau im Hintergrund
     for (const [n, ringe] of Object.entries(K.europa)) if (n !== 'Deutschland') s += `<path d="${ringe.map((r) => pfad(r, f)).join('')}" fill="${LAND2}" stroke="#c9bfa8" stroke-width=".6"/>`;
@@ -189,36 +199,36 @@
     s += fluesseZeichnen(o, f);
     s += beschriftung(K.laender, f, fl.namen, fl.nr, DE_VERSATZ, o.fs || 6.8);
     s += orteZeichnen(o.orte, f);
-    if (o.nord) s += kompass(W - 16, 18);
+    if (o.nord) s += kompass(W - 19, 22);
     if (o.massstab) s += massstabsleiste(f, 51, 8, 100, H - 12);
-    return S(W, H, s, o.label || 'Deutschland');
+    return S(W, H, s, o.label || 'Deutschland', 330);
   }
 
   // ---------------------------------------------------------------- Sachsen mit Nachbarn
   const SN_VERSATZ = { Sachsen: { ziel: [13.35, 51.2] }, Polen: { ziel: [14.95, 51.62] }, Tschechien: { ziel: [13.6, 50.25] }, Bayern: { ziel: [11.75, 50.15] }, Thüringen: { ziel: [11.7, 50.85] }, 'Sachsen-Anhalt': { ziel: [11.75, 51.75] }, Brandenburg: { ziel: [13.6, 51.75] } };
   function sachsen(o) {
-    o = o || {};
-    const X0 = 11.3, X1 = 15.35, Y0 = 51.9, Y1 = 50.05, c = Math.cos(51 * Math.PI / 180), W = 340, sx = W / ((X1 - X0) * c), H = Math.round((Y0 - Y1) * sx);
+    o = o || {}; Z = 1.45;
+    const X0 = 11.3, X1 = 15.35, Y0 = 51.9, Y1 = 50.05, c = Math.cos(51 * Math.PI / 180), W = 340, sx = W / ((X1 - X0) * c), H = Math.round((Y0 - Y1) * sx); BW = W; BH = H;
     const f = (lon, lat) => [(lon - X0) * c * sx, (Y0 - lat) * sx];
     let s = `<rect width="${W}" height="${H}" fill="${LAND2}"/>`;
     const fl = flaechen(K.sachsen, f, Object.assign({}, o), { grau: (n) => n !== 'Sachsen' });
     s += fl.s + fluesseZeichnen(o, f);
     s += beschriftung(K.sachsen, f, fl.namen, fl.nr, SN_VERSATZ, 8.5);
     s += orteZeichnen(o.orte, f);
-    if (o.nord) s += kompass(W - 16, 18);
+    if (o.nord) s += kompass(W - 22, 26);
     if (o.massstab) s += massstabsleiste(f, 51, 12, 50, H - 10);
     return S(W, H, s, o.label || 'Sachsen');
   }
 
   // ---------------------------------------------------------------- Kleinteile
   function kompass(x, y) {
-    return `<g transform="translate(${x} ${y})"><circle r="11" fill="rgba(255,255,255,.85)" stroke="${TINTE}" stroke-width="1"/><path d="M0 -9 L3 0 L0 2 L-3 0Z" fill="#d0443a"/><path d="M0 9 L3 0 L0 -2 L-3 0Z" fill="${TINTE}"/><text y="-12.5" text-anchor="middle" style="font:800 7px Nunito,sans-serif;fill:${TINTE}">N</text></g>`;
+    return `<g transform="translate(${x} ${y}) scale(${Z})"><circle r="13" fill="rgba(255,255,255,.9)" stroke="${TINTE}" stroke-width="1"/><path d="M0 -2.5 L3 5 L0 6.5 L-3 5Z" fill="#d0443a"/><path d="M0 11 L3 5 L0 3.5 L-3 5Z" fill="${TINTE}"/><text y="-4" text-anchor="middle" style="font:800 8.5px Nunito,sans-serif;fill:#d0443a">N</text></g>`;
   }
   // Maßstabsleiste: km Länge an der Breite lat, links bei Länge lon0
   function massstabsleiste(f, lat, lon0, km, y) {
     const dlon = km / (111.32 * Math.cos(lat * Math.PI / 180)), [xa] = f(lon0, lat), [xb] = f(lon0 + dlon, lat), w = xb - xa;
     return `<g><rect x="${r1(xa)}" y="${r1(y)}" width="${r1(w / 2)}" height="3.5" fill="${TINTE}"/><rect x="${r1(xa + w / 2)}" y="${r1(y)}" width="${r1(w / 2)}" height="3.5" fill="#fff" stroke="${TINTE}" stroke-width=".8"/>`
-      + txt(xa, y - 2, '0', { fs: 6.5, w: 700 }) + txt(xa + w, y - 2, `${km} km`, { fs: 6.5, w: 700 }) + '</g>';
+      + txt(xa, y - 3, '0', { fs: 7.5, w: 700 }) + txt(xa + w, y - 3, `${km} km`, { fs: 7.5, w: 700 }) + '</g>';
   }
 
   window.GeoKarte = { welt, europa, deutschland, sachsen, robinson, mercator, pfad, mitte, marke, txt, kompass, daten: K, farben: { TINTE, LAND, LAND2, WASSER, RAND, HELL, BLAU, FLUSS } };
