@@ -1,12 +1,12 @@
 /* LernDax – Service Worker: App läuft auch offline.
  * Eigene Dateien: immer zuerst frisch vom Server, der Speicher ist nur der Offline-Ersatz.
  * So kommen Änderungen sofort an. Bei neuer Version VERSION erhöhen. */
-const VERSION = 'lerndax-v96';
+const VERSION = 'lerndax-v97';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js', './plattform/avatare.js', './plattform/trainings.js', './plattform/faecher.js', './plattform/symbole.js', './plattform/fach.js', './plattform/fach.css',
   './deutsch/', './deutsch/index.html', './deutsch/themen/klasse5.js', './deutsch/themen/klasse5-knobel.js', './deutsch/erklaerungen/klasse5.js', './deutsch/erklaerungen/entdecken.js', './deutsch/symbole.js',
   './englisch/', './englisch/index.html', './englisch/themen/klasse5.js', './englisch/themen/klasse5-knobel.js', './englisch/erklaerungen/klasse5.js', './englisch/erklaerungen/entdecken.js', './englisch/symbole.js', './englisch/audio/us/index.json', './englisch/audio/gb/index.json', // Sammeldateien der Aufnahmen (englisch/audio/*/<thema>.bin) werden beim ersten Öffnen eines Themas gespeichert
-  './bio/', './bio/index.html', './bio/themen/basis.js', './bio/themen/klasse5-1.js', './bio/themen/klasse5-2.js', './bio/themen/klasse5-3.js', './bio/themen/klasse5-knobel.js', './bio/erklaerungen/klasse5.js', './bio/erklaerungen/entdecken.js', './bio/symbole.js',
+  './bio/', './bio/index.html', './bio/bildnachweis.html', './bio/themen/basis.js', './bio/themen/klasse5-1.js', './bio/themen/klasse5-2.js', './bio/themen/klasse5-3.js', './bio/themen/klasse5-knobel.js', './bio/erklaerungen/klasse5.js', './bio/erklaerungen/entdecken.js', './bio/symbole.js',
   './geschichte/', './geschichte/index.html', './geschichte/themen/klasse5.js', './geschichte/themen/klasse5-knobel.js', './geschichte/erklaerungen/klasse5.js', './geschichte/erklaerungen/entdecken.js', './geschichte/symbole.js',
   './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js', './mathe/generatoren/klasse5-luecken.js', './mathe/generatoren/klasse5-buch.js', './mathe/generatoren/klasse5-knobel.js', './mathe/symbole.js',
   './mathe/erklaerungen/klasse5.js', './mathe/erklaerungen/klasse5-luecken.js', './mathe/erklaerungen/klasse5-buch.js', './mathe/erklaerungen/entdecken.js',
@@ -28,7 +28,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   const own = url.origin === location.origin;
-  const cdn = /fonts\.(googleapis|gstatic)\.com$|cdn\.jsdelivr\.net$/.test(url.hostname);
+  const cdn = /fonts\.(googleapis|gstatic)\.com$|cdn\.jsdelivr\.net$|^(commons|upload)\.wikimedia\.org$/.test(url.hostname); // auch die Fotos in BioDax
   if (!own && !cdn) return; // Datenbank-Anfragen nie zwischenspeichern
   if (own) {
     // Netz zuerst (ohne veralteten Browser-Cache), offline aus dem Speicher

@@ -21,6 +21,17 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-7. Test: echte Fotos statt Zeichnungen (lerndax-v97, 14.11.2026)
+
+Roberto gefallen die gezeichneten Bilder „überhaupt nicht“ (auch die neuen). Test mit freien Fotos von Wikimedia Commons für vier
+Lurche: Wasserfrosch (Holger Krisp, CC BY 3.0), Grasfrosch (Richard Bartz, CC BY-SA 2.5), Laubfrosch (THAWonderland, CC BY-SA 4.0),
+Erdkröte (George Chernilevsky, gemeinfrei). Technik: `FOTOS` in `web/bio/themen/basis.js`; das Foto wird direkt von Wikimedia
+geladen (`Special:FilePath/<Datei>?width=640`) und liegt über der Zeichnung; ohne Netz bleibt die Zeichnung sichtbar. Fotograf und
+Lizenz stehen im Bild (nur wenn das Foto geladen ist) und in `web/bio/bildnachweis.html`. `sw.js` speichert die Fotos für offline.
+**Nicht geprüft:** Von der Arbeitsumgebung aus ist Wikimedia nicht erreichbar; ob die Fotos laden und gut aussehen, muss Roberto
+am Handy ansehen. Lizenzen stammen aus den Suchergebnissen zu den Dateiseiten (Erdkröte: über die Liste gemeinfreier Bilder des
+Fotografen, nicht direkt auf der Dateiseite gesehen). Die übrigen 7 Lurche und alle anderen Tiere sind noch Zeichnungen.
+
 ## 0-neu-6. Fleischfresser-Gebiss und Gliedmaßen überarbeitet (lerndax-v96, 14.11.2026)
 
 `gebiss('fleisch')`: Zähne klar getrennt (Schneidezähne, Fangzähne, Vorbackenzähne, Reißzähne, Backenzähne).

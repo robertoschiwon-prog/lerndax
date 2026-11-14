@@ -450,6 +450,24 @@
     armMensch: () => gliedmasse('mensch'), armMaulwurf: () => gliedmasse('maulwurf'), armFledermaus: () => gliedmasse('fledermaus'), armWal: () => gliedmasse('wal'), armPferd: () => gliedmasse('pferd'),
     skelett,
   };
+  // ---------------------------------------------------- Fotos (Test seit v97)
+  // Frei nutzbare Fotos von Wikimedia Commons, direkt von dort geladen. Fotograf und Lizenz stehen im Bild und in web/bio/bildnachweis.html.
+  // Lädt das Foto nicht (kein Netz), bleibt die Zeichnung darunter sichtbar.
+  const FOTOS = {
+    wasserfrosch: { datei: 'Pelophylax esculentus teichfrosch.jpg', von: 'Holger Krisp', liz: 'CC BY 3.0' },
+    grasfrosch: { datei: 'Rana temporaria.jpg', von: 'Richard Bartz', liz: 'CC BY-SA 2.5' },
+    laubfrosch: { datei: 'Laubfrosch (Hyla arborea).jpg', von: 'THAWonderland', liz: 'CC BY-SA 4.0' },
+    erdkroete: { datei: 'Bufo bufo 2015 G3.jpg', von: 'George Chernilevsky', liz: 'gemeinfrei' },
+  };
+  D.fotos = FOTOS;
+  const fotoUrl = (datei, breite) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(datei.replace(/ /g, '_'))}?width=${breite || 640}`;
+  D.fotoUrl = fotoUrl;
+  Object.keys(FOTOS).forEach((name) => {
+    const zeichnung = BILDER[name], f = FOTOS[name];
+    // Der Bildnachweis erscheint erst, wenn das Foto wirklich geladen ist (sonst stünde er unter der Zeichnung)
+    BILDER[name] = () => zeichnung().replace(/<\/svg>$/, `<g class="foto"><image href="${fotoUrl(f.datei)}" x="0" y="0" width="200" height="120" preserveAspectRatio="xMidYMid slice" onload="this.nextSibling.setAttribute('visibility','visible')"/>`
+      + `<g visibility="hidden"><rect x="0" y="111" width="200" height="9" fill="rgba(255,255,255,.78)"/><text x="3" y="117.6" style="font:600 5.6px Nunito,sans-serif;fill:#2b2540">Foto: ${f.von}, ${f.liz}, Wikimedia Commons</text></g></g></svg>`);
+  });
   D.bilder = BILDER;
   D.teile = { fischNr: FISCH_TEILE, feder: FEDER_TEILE, ei: EI_TEILE, skelett: SKELETT_TEILE };
 
