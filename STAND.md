@@ -21,6 +21,15 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-5. Alle Bio-Bilder neu gezeichnet (lerndax-v95, 14.11.2026)
+
+Jetzt auch neu in `web/bio/themen/basis.js`: `vogel()` (Amsel, Kohlmeise mit Bauchstreif und Flügelbinde, Rotkehlchen, Haussperling
+mit Latz), `ente`, `eule`, `bussard`, `specht`, `schnabel()` (5 Köpfe in den Farben passender Vögel), `ei`, `gebiss()` (3 Schädel),
+`gliedmasse()` (Knochen mit Rand), `skelett` (Wirbel, Rippen, Becken, Elle und Speiche, Schienbein und Wadenbein). Nachgebessert:
+Aal (Kopf), Kreuzotter (Zickzackband folgt dem Körper). Damit sind alle 52 Bilder im neuen Stil; nichts ist abgezeichnet.
+Die Nummern an Ei und Skelett zeigen auf dieselben Teile wie vorher (am Bild geprüft).
+Test: Generatoren, voller Lauf `biodax.py 1` (50 Themen) ohne Meldung.
+
 ## 0-neu-4. Molche, Kaulquappen, Fische, Kriechtiere neu gezeichnet (lerndax-v94, 14.11.2026)
 
 Roberto: Der Stil der neuen Frösche passt, die übrigen Bilder genauso. In `web/bio/themen/basis.js` neu: `molch()` (4 Schwanzlurche),

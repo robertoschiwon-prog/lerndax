@@ -124,11 +124,14 @@
     const W = bg(WASSER) + `<path d="M0 108 C40 100 80 112 120 104 C150 98 180 108 200 104 V120 H0Z" fill="#d9cba0"/><path d="M14 108 C16 92 10 80 16 64 M22 108 C24 98 20 90 24 80 M188 106 C184 92 190 82 186 68" stroke="#6aa84f" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="186" cy="30" r="2.5" fill="none" stroke="#fff" stroke-width="1.1"/><circle cx="191" cy="20" r="1.6" fill="none" stroke="#fff" stroke-width="1"/>`;
     const augeF = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#f1d27a" stroke="rgba(0,0,0,.45)" stroke-width=".8"/><circle cx="${x}" cy="${y}" r="${r * 0.52}" fill="#111"/><circle cx="${x - r * 0.3}" cy="${y - r * 0.3}" r="${r * 0.2}" fill="#fff"/>`;
     if (f === 'aal') {
-      const weg = 'M12 72 C40 40 70 98 100 68 C124 44 150 80 178 58';
-      return S('0 0 200 120', W + `<path d="${weg}" stroke="${RAND}" stroke-width="15" fill="none" stroke-linecap="round"/><path d="${weg}" stroke="#4d5c3c" stroke-width="13" fill="none" stroke-linecap="round"/>`
-        + `<path d="M12 76 C40 46 70 104 100 74 C124 50 150 86 176 64" stroke="#d9d7a8" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".9"/>`
-        + `<path d="M12 66 C40 33 70 91 100 61 C122 39 142 64 160 58" stroke="#38452c" stroke-width="2.5" fill="none" stroke-linecap="round"/>`
-        + `<path d="M160 68 l7 9 l3 -9Z" fill="#38452c" stroke="${RAND}" stroke-width=".8"/>${augeF(176, 56, 2.6)}<path d="M184 60 l-7 2" stroke="${TINTE}" stroke-width="1.1" stroke-linecap="round"/>`, 'Aal');
+      const weg = 'M12 74 C38 42 68 98 98 68 C118 48 136 66 156 62';
+      return S('0 0 200 120', W + `<path d="M12 66 C38 34 68 90 98 60 C116 42 132 54 148 55 L150 62 C132 62 118 52 98 72 C68 102 38 46 12 78Z" fill="#38452c" opacity=".55"/>`
+        + `<path d="${weg}" stroke="${RAND}" stroke-width="14.5" fill="none" stroke-linecap="round"/><path d="${weg}" stroke="#4d5c3c" stroke-width="12.5" fill="none" stroke-linecap="round"/>`
+        + `<path d="M13 78 C39 47 69 103 99 73 C118 54 135 71 154 67" stroke="#d9d7a8" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".9"/>`
+        // Kopf: spitz zulaufend, Maulspalte, kleine Brustflosse dahinter
+        + `<path d="M150 55 C162 52 178 54 190 60 C192 62 192 64 190 65 C178 70 162 70 150 69Z" fill="#4d5c3c" stroke="${RAND}" stroke-width="1.1"/><path d="M152 66 C164 69 178 68 190 64 C180 70 164 71 150 69Z" fill="#d9d7a8"/>`
+        + `<path d="M144 68 C148 74 150 80 148 84 C142 80 140 74 140 70Z" fill="#38452c" stroke="${RAND}" stroke-width=".9"/>`
+        + augeF(176, 59, 2.6) + `<path d="M191 63 C185 65 178 65.5 172 65" stroke="${TINTE}" stroke-width="1.1" fill="none" stroke-linecap="round"/><circle cx="187" cy="60.5" r=".7" fill="${TINTE}"/>`, 'Aal');
     }
     const P = {
       karpfen: { k: '#b08a3c', b: '#ecdfa8', fl: '#9a7430', body: 'M26 62 C50 26 110 22 150 44 C166 52 176 58 178 62 C176 68 164 76 148 82 C108 98 50 94 26 62Z', rf: 'M70 34 C90 16 126 20 138 38 L130 40 C110 30 90 34 78 40Z', sf: 'M28 62 L4 40 C12 56 12 68 4 86Z', af: 'M70 88 L64 104 L88 92Z', bf: 'M100 90 L96 106 L116 92Z', brf: 'M136 72 L128 90 L148 78Z', kd: 'M146 48 C136 56 136 70 146 80 C156 78 164 72 170 66 C168 58 160 52 146 48Z', ax: 160, ay: 58, maul: 'M178 63 l-7 3' },
@@ -185,7 +188,14 @@
     const k = { ringelnatter: '#6f7b7a', kreuzotter: '#b9a78a', blindschleiche: '#b08d57' }[art] || '#777', RAND = 'rgba(0,0,0,.32)';
     const weg = 'M14 88 C40 52 70 102 100 72 C124 48 150 86 172 62', breite = art === 'kreuzotter' ? 15 : art === 'blindschleiche' ? 11 : 12.5;
     let extra = `<path d="M15 92 C41 56 71 106 101 76 C124 53 149 89 170 67" stroke="${art === 'blindschleiche' ? '#7a5f36' : '#e4e0c8'}" stroke-width="${art === 'blindschleiche' ? 2 : 3}" fill="none" stroke-linecap="round" opacity=".85"/>`;
-    if (art === 'kreuzotter') extra += `<path d="M18 84 l7 -13 l8 12 l8 -17 l8 14 l8 -5 l8 15 l8 -3 l8 -16 l8 -6 l8 10 l8 -17 l8 15 l8 -1 l8 13 l8 -11 l7 -9" stroke="#3b2f24" stroke-width="4.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if (art === 'kreuzotter') {
+      // Punkte auf der Körperlinie berechnen und abwechselnd nach links und rechts versetzen
+      const B = (t, p) => { const u = 1 - t; return u * u * u * p[0] + 3 * u * u * t * p[1] + 3 * u * t * t * p[2] + t * t * t * p[3]; };
+      const segs = [[[14, 40, 70, 100], [88, 52, 102, 72]], [[100, 124, 150, 172], [72, 48, 86, 62]]];
+      const pts = [];
+      segs.forEach(([xs, ys], si) => { for (let i = si ? 1 : 0; i <= 11; i++) { const t = i / 11, x = B(t, xs), y = B(t, ys), x2 = B(Math.min(1, t + 0.02), xs) - B(Math.max(0, t - 0.02), xs), y2 = B(Math.min(1, t + 0.02), ys) - B(Math.max(0, t - 0.02), ys), l = Math.hypot(x2, y2) || 1, v = (pts.length % 2 ? 1 : -1) * 4.2; pts.push(`${(x - y2 / l * v).toFixed(1)} ${(y + x2 / l * v).toFixed(1)}`); } });
+      extra += `<path d="M${pts.join(' L')}" stroke="#3b2f24" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>`;
+    }
     if (art === 'ringelnatter') extra += [[30, 72], [46, 70], [60, 84], [76, 88], [92, 80], [106, 66], [122, 62], [138, 72], [154, 74]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.7" fill="#2b2f2e"/>`).join('');
     if (art === 'blindschleiche') extra += `<path d="M14 85 C40 49 70 99 100 69 C124 45 150 83 172 59" stroke="#d8bb85" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>`;
     const kopf = art === 'blindschleiche' ? `<path d="M166 54 C176 50 188 54 190 60 C188 66 176 70 166 68Z" fill="${k}" stroke="${RAND}" stroke-width="1.1"/>`
@@ -202,33 +212,96 @@
   // Singvogel auf einem Ast. o: { k: Körper, b: Brust/Bauch, kopf, wange, schnabel, ring }
   function vogel(o) {
     o = o || {};
-    const k = o.k || '#555', b = o.b || k, kopf = o.kopf || k;
-    return S('0 0 200 120', bg('#e6f1fb') + `<path d="M0 96 C60 90 140 100 200 92" stroke="#8a6a44" stroke-width="7" fill="none" stroke-linecap="round"/>`
-      + `<path d="M40 70 L8 62 L10 76 L44 82Z" fill="${k}"/>`
-      + `<ellipse cx="92" cy="66" rx="52" ry="26" fill="${k}" transform="rotate(-8 92 66)"/>`
-      + `<path d="M70 76 C90 96 130 90 142 62 C120 74 96 78 70 76Z" fill="${b}"/>`
-      + `<circle cx="140" cy="46" r="20" fill="${kopf}"/>`
-      + (o.wange ? `<ellipse cx="138" cy="52" rx="10" ry="7" fill="${o.wange}"/>` : '')
-      + (o.brust ? `<path d="M124 56 C132 74 148 70 152 56 C144 62 132 62 124 56Z" fill="${o.brust}"/>` : '')
-      + `<path d="M158 42 L180 48 L158 52Z" fill="${o.schnabel || '#555'}"/>`
-      + (o.ring ? `<circle cx="146" cy="42" r="5" fill="${o.ring}"/>` : '') + `<circle cx="146" cy="42" r="3" fill="#111"/>`
-      + `<path d="M92 90 L90 98 M108 90 L110 98" stroke="#7a6a54" stroke-width="2.5"/>`, o.name || 'Vogel');
+    const k = o.k || '#555', b = o.b || k, kopf = o.kopf || k, RAND = 'rgba(0,0,0,.34)', id = 'vk-' + (o.name || 'v').replace(/[^a-z]/gi, '');
+    const koerper = 'M52 72 C54 52 84 42 114 44 C122 34 134 28 146 30 C158 32 164 42 162 52 C160 60 152 66 146 70 C142 86 122 96 98 96 C76 96 56 90 52 72Z';
+    const dunkler = 'rgba(0,0,0,.22)';
+    return S('0 0 200 120', bg('#e6f1fb') + `<circle cx="26" cy="24" r="12" fill="#fff" opacity=".7"/><circle cx="40" cy="26" r="9" fill="#fff" opacity=".7"/><path d="M0 100 C60 94 140 104 200 96" stroke="#6b4f33" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M0 100 C60 94 140 104 200 96" stroke="#8a6a44" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="M168 98 q10 -14 22 -12 q-4 12 -22 12Z M30 99 q-6 -12 -18 -12 q2 10 18 12Z" fill="#6aa84f" stroke="rgba(0,0,0,.25)" stroke-width=".8"/>`
+      // Beine und Zehen um den Ast
+      + `<path d="M92 94 L90 102 M110 94 L112 101" stroke="#6b5a48" stroke-width="2.6" stroke-linecap="round"/><path d="M84 103 h12 M106 102 h12 M90 102 l-3 4 M112 101 l3 4" stroke="#6b5a48" stroke-width="2" stroke-linecap="round"/>`
+      // Schwanz
+      + `<path d="M62 74 L12 82 L10 88 L14 94 L66 88Z" fill="${k}" stroke="${RAND}" stroke-width="1.2"/><path d="M60 80 L13 87 M62 84 L16 91" stroke="${dunkler}" stroke-width="1"/>`
+      + `<clipPath id="${id}"><path d="${koerper}"/></clipPath><path d="${koerper}" fill="${k}"/>`
+      + `<g clip-path="url(#${id})">`
+      + `<path d="M62 78 C86 88 126 84 148 62 L170 70 L150 100 L60 100Z" fill="${b}"/>`
+      + (o.brust ? `<path d="M132 44 C140 38 156 40 160 50 C160 62 150 68 146 72 C140 84 124 88 112 84 C120 72 126 56 132 44Z" fill="${o.brust}"/>` : '')
+      + (kopf !== k ? `<path d="M112 46 C120 30 136 24 150 28 C164 32 168 44 160 54 C150 46 130 44 112 46Z" fill="${kopf}"/>` : '')
+      + (o.wange ? `<path d="M132 46 C140 42 152 44 156 50 C154 58 144 62 134 58 C130 54 130 50 132 46Z" fill="${o.wange}"/>` : '')
+      + (o.latz ? `<path d="M148 56 C154 56 160 54 162 52 C160 62 152 68 146 72 C140 76 134 72 136 66 C140 62 144 58 148 56Z" fill="${o.latz}"/>` : '')
+      + (o.streif ? `<path d="M140 66 C132 78 118 90 100 98 L112 98 C128 90 140 80 148 68Z" fill="${o.streif}"/>` : '')
+      + `</g><path d="${koerper}" fill="none" stroke="${RAND}" stroke-width="1.3"/>`
+      // Flügel mit Schwungfedern
+      + `<path d="M66 64 C84 52 112 54 126 66 C116 80 92 88 64 84 C58 78 60 70 66 64Z" fill="${k}" stroke="${RAND}" stroke-width="1.2"/><path d="M66 64 C84 52 112 54 126 66 C116 80 92 88 64 84 C58 78 60 70 66 64Z" fill="${o.fluegel || 'rgba(0,0,0,.14)'}"/>`
+      + `<path d="M70 68 C88 62 106 62 120 68 M66 74 C84 70 102 70 116 74 M64 80 C80 78 96 78 108 80" stroke="${dunkler}" stroke-width="1.1" fill="none" stroke-linecap="round"/>`
+      + (o.binde ? `<path d="M78 62 C90 58 104 58 114 62" stroke="${o.binde}" stroke-width="2.5" fill="none" stroke-linecap="round"/>` : '')
+      // Schnabel und Auge
+      + `<path d="M160 42 L181 48 L160 53Z" fill="${o.schnabel || '#555'}" stroke="${RAND}" stroke-width="1" stroke-linejoin="round"/><path d="M161 47.5 L178 48" stroke="rgba(0,0,0,.4)" stroke-width=".9"/>`
+      + (o.ring ? `<circle cx="150" cy="42" r="5" fill="${o.ring}"/>` : '') + `<circle cx="150" cy="42" r="3.4" fill="#151515"/><circle cx="149" cy="41" r="1" fill="#fff"/>`, o.name || 'Vogel');
   }
-  const ente = () => S('0 0 200 120', bg(WASSER) + `<path d="M24 78 C30 52 90 50 124 60 C132 40 150 34 160 46 C172 44 184 50 186 52 C178 56 168 58 162 58 C158 72 150 84 130 90 C90 96 40 96 24 78Z" fill="#b9a58c"/><path d="M24 78 L8 70 L22 66Z" fill="#3b3530"/><circle cx="150" cy="46" r="15" fill="#1f7a4d"/><path d="M134 58 C142 62 156 62 164 58" stroke="#fff" stroke-width="3" fill="none"/><path d="M162 44 L188 50 L164 54Z" fill="#e3c21e"/><path d="M70 66 C90 60 110 64 118 72 C100 78 82 76 70 66Z" fill="#5f6fb0"/><circle cx="154" cy="42" r="2.5" fill="#111"/><path d="M0 92 C40 86 80 98 120 90 C150 86 180 96 200 90 V120 H0Z" fill="#b7dcf2"/>`, 'Stockente');
-  const eule = () => S('0 0 200 120', bg('#1f2240') + `<path d="M0 104 H200" stroke="#8a6a44" stroke-width="8"/><path d="M70 100 C60 60 70 30 100 26 C130 30 140 60 130 100Z" fill="#d9b77a"/><path d="M78 100 C74 76 82 66 100 66 C118 66 126 76 122 100Z" fill="#f6efe2"/><path d="M100 30 C72 22 66 48 80 62 C90 70 96 66 100 58 C104 66 110 70 120 62 C134 48 128 22 100 30Z" fill="#f6efe2" stroke="#b08d57" stroke-width="2"/><circle cx="88" cy="46" r="5" fill="#111"/><circle cx="112" cy="46" r="5" fill="#111"/><path d="M100 52 L96 62 L104 62Z" fill="#c9a24a"/><circle cx="170" cy="22" r="10" fill="#f2e6a0"/>`, 'Schleiereule');
-  const bussard = () => S('0 0 200 120', bg('#e6f1fb') + `<path d="M100 62 C70 40 40 34 6 40 C30 50 44 60 60 72 C76 78 90 74 100 70 C110 74 124 78 140 72 C156 60 170 50 194 40 C160 34 130 40 100 62Z" fill="#7a5a3a"/><path d="M92 66 C92 50 108 50 108 66 L112 96 L88 96Z" fill="#8a6a44"/><path d="M88 96 L84 110 L116 110 L112 96Z" fill="#6b4f33"/><circle cx="100" cy="52" r="9" fill="#8a6a44"/><path d="M96 56 L100 66 L104 56Z" fill="#e3c21e"/><path d="M30 46 l10 8 M50 50 l8 10 M150 50 l-8 10 M170 46 l-10 8" stroke="#e8d9b8" stroke-width="3"/>`, 'Mäusebussard');
-  const specht = () => S('0 0 200 120', bg('#e6f1fb') + `<rect x="120" y="0" width="46" height="120" fill="#8a6a44"/><path d="M130 10 v100 M146 0 v120 M156 20 v80" stroke="#6b4f33" stroke-width="2"/><path d="M118 40 C96 36 80 50 82 74 C84 88 96 96 116 100 L120 86 C108 80 104 70 108 58Z" fill="#1b1b1b"/><path d="M92 60 C96 54 104 54 108 60 L104 76 L92 72Z" fill="#fff"/><path d="M110 96 L118 112 L124 96Z" fill="#1b1b1b"/><path d="M98 90 C104 98 112 100 118 98 L116 88Z" fill="#d0443a"/><circle cx="108" cy="36" r="13" fill="#1b1b1b"/><path d="M100 36 C104 30 114 30 118 36 C114 42 104 42 100 36Z" fill="#fff"/><path d="M98 26 C104 22 112 22 116 26 L112 30 L102 30Z" fill="#d0443a"/><path d="M118 34 L134 38 L118 42Z" fill="#555"/><circle cx="112" cy="35" r="2" fill="#111"/><path d="M112 76 L122 72 M112 82 L122 84" stroke="#555" stroke-width="2.5"/>`, 'Buntspecht');
+  const ente = () => { const R = 'rgba(0,0,0,.34)'; return S('0 0 200 120', bg(WASSER)
+    + `<path d="M150 24 C154 12 148 6 152 0 M160 26 C166 14 162 8 166 2" stroke="#6aa84f" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    + `<path d="M22 76 C28 54 80 50 118 58 C122 50 128 44 136 42 C134 32 142 22 154 22 C166 22 172 30 172 38 L190 44 C190 48 180 50 170 49 C166 56 160 60 156 62 C158 74 150 86 130 90 C90 96 36 94 22 76Z" fill="#b4a690" stroke="${R}" stroke-width="1.3"/>`
+    + `<path d="M118 58 C122 50 128 44 136 42 C144 48 152 56 156 62 C158 72 152 82 140 88 C124 84 114 72 118 58Z" fill="#7a4a34"/>`
+    + `<path d="M136 42 C134 32 142 22 154 22 C166 22 172 30 172 38 C172 44 168 52 162 57 C152 54 142 48 136 42Z" fill="#1f7a4d" stroke="${R}" stroke-width="1"/><path d="M134 44 C142 50 152 55 162 57" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    + `<path d="M172 36 L191 43 C191 47 182 50 170 49 C170 44 171 40 172 36Z" fill="#e3c21e" stroke="${R}" stroke-width="1"/><path d="M172 44 L188 45" stroke="rgba(0,0,0,.35)" stroke-width=".9"/><circle cx="177" cy="40" r=".9" fill="#5a4a10"/>`
+    + `<path d="M46 62 C70 52 100 54 118 64 C108 76 76 80 44 74 C40 70 42 66 46 62Z" fill="#9c8f7c" stroke="${R}" stroke-width="1"/><path d="M50 66 C70 60 92 60 110 66 M48 71 C66 68 86 68 102 72" stroke="rgba(0,0,0,.2)" stroke-width="1" fill="none"/>`
+    + `<path d="M78 70 C88 66 100 67 108 72 C100 78 88 78 78 70Z" fill="#3f55b0" stroke="#fff" stroke-width="1.4"/>`
+    + `<path d="M24 76 L6 66 L10 60 L28 66 C34 60 32 56 30 54 C38 56 40 64 34 70Z" fill="#2b2622" stroke="${R}" stroke-width="1"/>`
+    + `<circle cx="158" cy="33" r="3" fill="#151515"/><circle cx="157.2" cy="32.2" r=".9" fill="#fff"/>`
+    + `<path d="M0 90 C40 84 80 96 120 88 C150 84 180 94 200 88 V120 H0Z" fill="#b7dcf2"/><path d="M10 100 h24 M60 108 h30 M130 100 h26 M164 110 h22" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`, 'Stockente'); };
+  const eule = () => { const R = 'rgba(0,0,0,.38)'; return S('0 0 200 120', bg('#1f2240')
+    + `<circle cx="168" cy="22" r="11" fill="#f2e6a0"/><circle cx="164" cy="20" r="2.5" fill="#e0d48c"/><circle cx="24" cy="18" r="1.2" fill="#fff"/><circle cx="52" cy="34" r="1" fill="#fff"/><circle cx="134" cy="14" r="1" fill="#fff"/><circle cx="184" cy="60" r="1.1" fill="#fff"/><circle cx="16" cy="62" r="1" fill="#fff"/>`
+    + `<path d="M0 106 H200" stroke="#5a4028" stroke-width="10" stroke-linecap="round"/><path d="M0 104 H200" stroke="#8a6a44" stroke-width="5" stroke-linecap="round"/>`
+    + `<path d="M68 100 C56 64 68 30 100 26 C132 30 144 64 132 100Z" fill="#d6b06e" stroke="${R}" stroke-width="1.3"/>`
+    + `<path d="M78 100 C74 76 82 64 100 64 C118 64 126 76 122 100Z" fill="#fbf5e8"/>` + [[90, 74], [100, 72], [110, 74], [86, 84], [96, 82], [106, 84], [114, 86], [92, 92], [102, 92], [110, 94]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1" fill="#8a6a44"/>`).join('')
+    + `<path d="M68 96 C60 76 62 56 72 44 C74 62 76 80 82 96Z M132 96 C140 76 138 56 128 44 C126 62 124 80 118 96Z" fill="#b98f52" stroke="${R}" stroke-width="1"/><path d="M70 60 l6 4 M68 72 l8 4 M70 84 l8 3 M130 60 l-6 4 M132 72 l-8 4 M130 84 l-8 3" stroke="rgba(0,0,0,.3)" stroke-width="1.2"/>`
+    // herzförmiger Gesichtsschleier
+    + `<path d="M100 32 C74 20 62 46 76 62 C86 72 96 68 100 60 C104 68 114 72 124 62 C138 46 126 20 100 32Z" fill="#fbf5e8" stroke="#b08d57" stroke-width="2"/>`
+    + `<circle cx="88" cy="46" r="5.5" fill="#151515"/><circle cx="112" cy="46" r="5.5" fill="#151515"/><circle cx="86.5" cy="44.5" r="1.5" fill="#fff"/><circle cx="110.5" cy="44.5" r="1.5" fill="#fff"/>`
+    + `<path d="M100 50 L96.5 62 L103.5 62Z" fill="#d9b25a" stroke="${R}" stroke-width=".8"/>`
+    + `<path d="M88 100 v6 M92 100 v6 M96 100 v6 M104 100 v6 M108 100 v6 M112 100 v6" stroke="#c9a24a" stroke-width="2.4" stroke-linecap="round"/>`, 'Schleiereule'); };
+  const bussard = () => { const R = 'rgba(0,0,0,.36)', F = '#7a5a3a'; return S('0 0 200 120', bg('#e6f1fb')
+    + `<circle cx="30" cy="96" r="12" fill="#fff" opacity=".7"/><circle cx="46" cy="98" r="9" fill="#fff" opacity=".7"/><circle cx="168" cy="100" r="10" fill="#fff" opacity=".7"/>`
+    // breite Flügel mit gefingerten Handschwingen
+    + `<path d="M100 60 C76 40 44 32 12 34 L4 40 L14 42 L4 48 L16 50 L8 56 L22 56 L16 63 L32 62 C50 66 76 74 100 72Z" fill="${F}" stroke="${R}" stroke-width="1.2" stroke-linejoin="round"/>`
+    + `<path d="M100 60 C124 40 156 32 188 34 L196 40 L186 42 L196 48 L184 50 L192 56 L178 56 L184 63 L168 62 C150 66 124 74 100 72Z" fill="${F}" stroke="${R}" stroke-width="1.2" stroke-linejoin="round"/>`
+    + `<path d="M26 50 C50 52 76 60 96 68 M174 50 C150 52 124 60 104 68" stroke="#e8d9b8" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9"/>`
+    + `<path d="M30 42 l4 14 M44 42 l4 16 M58 44 l4 17 M72 48 l3 17 M170 42 l-4 14 M156 42 l-4 16 M142 44 l-4 17 M128 48 l-3 17" stroke="rgba(0,0,0,.25)" stroke-width="1"/>`
+    // Rumpf, gefächerter Schwanz, Kopf
+    + `<path d="M88 92 L80 112 L90 110 L100 114 L110 110 L120 112 L112 92Z" fill="#6b4f33" stroke="${R}" stroke-width="1.2" stroke-linejoin="round"/><path d="M84 104 L116 104" stroke="#e8d9b8" stroke-width="2.5"/><path d="M94 94 L90 110 M100 94 L100 113 M106 94 L110 110" stroke="rgba(0,0,0,.25)" stroke-width="1"/>`
+    + `<path d="M90 64 C90 50 110 50 110 64 L113 94 L87 94Z" fill="#8a6a44" stroke="${R}" stroke-width="1.2"/><path d="M92 74 C96 78 104 78 108 74" stroke="#e8d9b8" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
+    + `<circle cx="100" cy="50" r="9.5" fill="#8a6a44" stroke="${R}" stroke-width="1.2"/><circle cx="96" cy="48" r="1.6" fill="#151515"/><circle cx="104" cy="48" r="1.6" fill="#151515"/><path d="M97 52 C97 49 103 49 103 52 L100 60Z" fill="#e3c21e" stroke="${R}" stroke-width=".8"/><path d="M99 57 L100 60 L101 57" fill="#3b3530"/>`, 'Mäusebussard'); };
+  const specht = () => { const R = 'rgba(0,0,0,.36)'; return S('0 0 200 120', bg('#e6f1fb')
+    + `<rect x="118" y="0" width="50" height="120" fill="#8a6a44"/><path d="M118 0 V120 M168 0 V120" stroke="${R}" stroke-width="1.2"/><path d="M128 6 q4 30 -1 54 q-4 30 2 56 M142 0 q-4 40 2 70 q3 30 -2 50 M156 4 q3 34 -1 60 q-3 30 2 52" stroke="#6b4f33" stroke-width="1.6" fill="none"/><ellipse cx="148" cy="30" rx="6" ry="8" fill="#3b2a18" stroke="#6b4f33" stroke-width="1.5"/>`
+    + `<path d="M0 28 q30 -8 50 2 M10 96 q20 -6 44 2" stroke="#8a6a44" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 27 q8 -12 20 -8 q-6 10 -20 8Z M36 96 q8 -12 20 -8 q-6 10 -20 8Z" fill="#6aa84f"/>`
+    // Stützschwanz
+    + `<path d="M92 92 L112 118 L118 116 L118 98 L104 86Z" fill="#1b1b1b" stroke="${R}" stroke-width="1"/>`
+    // Körper: schwarzer Rücken, heller Bauch, roter Unterschwanz
+    + `<path d="M116 40 C98 38 84 50 82 68 C80 84 92 96 110 98 L118 96 L118 82 C112 74 110 60 116 50Z" fill="#f4efe2" stroke="${R}" stroke-width="1.2"/>`
+    + `<path d="M104 40 C90 44 80 56 82 72 C84 86 94 96 108 98 C98 84 94 60 104 40Z" fill="#1b1b1b"/><path d="M90 58 C94 54 100 54 104 58 L102 72 L92 70Z" fill="#fff" stroke="rgba(0,0,0,.3)" stroke-width=".8"/><path d="M86 76 l8 2 M88 82 l8 2 M92 88 l6 1" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>`
+    + `<path d="M104 88 C108 96 114 98 118 97 L118 86Z" fill="#d0443a"/>`
+    // Kopf
+    + `<path d="M96 36 C96 24 108 18 118 22 C124 26 124 36 122 42 C114 46 102 44 96 36Z" fill="#1b1b1b" stroke="${R}" stroke-width="1"/><path d="M102 36 C106 30 116 30 120 34 C118 40 108 42 102 36Z" fill="#fff"/><path d="M98 28 C100 24 104 22 108 22 L108 27 L100 31Z" fill="#d0443a"/>`
+    + `<path d="M121 32 L140 37 L121 41Z" fill="#555" stroke="${R}" stroke-width=".9" stroke-linejoin="round"/><circle cx="113" cy="33" r="2.1" fill="#151515"/><circle cx="112.4" cy="32.4" r=".7" fill="#fff"/>`
+    + `<path d="M110 78 L119 74 M119 74 l4 -4 M119 74 l5 0 M110 84 L119 86 M119 86 l5 -1 M119 86 l4 4" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/>`, 'Buntspecht'); };
   // Schnabel: 'haken' | 'seih' | 'meissel' | 'kegel' | 'pinzette'
   function schnabel(art) {
-    const kopf = `<circle cx="70" cy="60" r="34" fill="#9a8f7e"/><circle cx="82" cy="50" r="5" fill="#111"/>`;
-    const s = {
-      haken: `<path d="M100 44 C130 40 150 52 148 78 C140 66 124 64 100 72Z" fill="#e3c21e"/><path d="M148 78 L142 70" stroke="#3b3530" stroke-width="3"/>`,
-      seih: `<path d="M100 48 C130 44 176 52 184 62 C176 72 130 74 100 72Z" fill="#e3c21e"/><path d="M104 62 H180" stroke="#8a6a1e" stroke-width="1.5"/><path d="M110 62 v5 M120 62 v5 M130 62 v5 M140 62 v5 M150 62 v5 M160 62 v5 M170 62 v5" stroke="#8a6a1e" stroke-width="1.5"/>`,
-      meissel: `<path d="M100 50 L186 60 L100 70Z" fill="#555"/><path d="M100 60 H180" stroke="#222" stroke-width="1.5"/>`,
-      kegel: `<path d="M100 42 L140 62 L100 80Z" fill="#c98a3a"/><path d="M100 62 H136" stroke="#7a4f1a" stroke-width="1.5"/>`,
-      pinzette: `<path d="M102 54 L160 60 L102 66Z" fill="#555"/><path d="M102 60 H156" stroke="#222" stroke-width="1"/>`,
+    const R = 'rgba(0,0,0,.36)';
+    // Kopf in den Farben eines passenden Vogels; der Schnabel ist das Wichtige
+    const f = { haken: ['#8a6a44', '#e8d9b8'], seih: ['#1f7a4d', '#1f7a4d'], meissel: ['#1b1b1b', '#fff'], kegel: ['#7a7f86', '#e6e0d4'], pinzette: ['#8a7a5a', '#e2702c'] }[art];
+    const kopf = `<path d="M30 120 C24 96 26 60 46 42 C62 28 88 28 102 44 C110 54 112 66 108 78 C104 96 96 110 92 120Z" fill="${f[0]}" stroke="${R}" stroke-width="1.4"/>`
+      + `<path d="M70 62 C82 58 100 62 108 74 C104 92 98 108 92 120 L60 120 C58 100 60 78 70 62Z" fill="${f[1]}" opacity="${art === 'seih' ? 0 : 0.95}"/>`
+      + (art === 'meissel' ? `<path d="M40 46 C48 34 64 30 76 32 L74 42 L48 52Z" fill="#d0443a"/>` : '')
+      + (art === 'seih' ? `<path d="M34 104 C54 110 78 110 98 102" stroke="#fff" stroke-width="5" fill="none"/>` : '')
+      + `<path d="M30 120 C24 96 26 60 46 42 C62 28 88 28 102 44 C110 54 112 66 108 78 C104 96 96 110 92 120" fill="none" stroke="${R}" stroke-width="1.4"/>`
+      + `<circle cx="84" cy="52" r="${art === 'haken' ? 7 : 6}" fill="${art === 'haken' ? '#e9b93a' : '#151515'}" stroke="rgba(0,0,0,.5)" stroke-width="1"/>${art === 'haken' ? '<circle cx="84" cy="52" r="3.6" fill="#151515"/><path d="M74 44 L96 46" stroke="rgba(0,0,0,.5)" stroke-width="2.5" stroke-linecap="round"/>' : ''}<circle cx="82" cy="50" r="1.6" fill="#fff"/>`;
+    const sch = {
+      haken: `<path d="M102 46 C124 40 146 48 150 66 C152 76 148 84 144 88 C144 78 138 72 128 70 C120 70 110 72 106 74Z" fill="#4a4540" stroke="${R}" stroke-width="1.2"/><path d="M102 46 C112 44 122 46 126 54 C122 60 112 62 106 62Z" fill="#e3c21e" stroke="${R}" stroke-width="1"/><circle cx="118" cy="52" r="1.6" fill="#5a4a10"/><path d="M106 74 C116 72 126 72 132 76 C126 82 114 82 106 80Z" fill="#5a544e" stroke="${R}" stroke-width="1"/>`,
+      seih: `<path d="M104 50 C130 46 172 52 188 62 C190 68 186 72 180 73 C150 76 122 76 106 74Z" fill="#e3c21e" stroke="${R}" stroke-width="1.2"/><path d="M108 64 C134 66 162 66 186 64" stroke="#8a6a1e" stroke-width="1.4" fill="none"/><path d="M112 65 v6 M120 65.5 v6 M128 66 v6 M136 66 v6 M144 66 v6 M152 66 v6 M160 66 v6 M168 65.5 v6 M176 65 v6" stroke="#8a6a1e" stroke-width="1.3"/><ellipse cx="124" cy="56" rx="3" ry="1.4" fill="#8a6a1e"/><path d="M180 60 q6 2 7 6" stroke="#3b3530" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
+      meissel: `<path d="M104 50 L190 61 L104 72Z" fill="#5c5c5c" stroke="${R}" stroke-width="1.2" stroke-linejoin="round"/><path d="M104 61 L186 61" stroke="#222" stroke-width="1.4"/><path d="M186 57 L191 61 L186 65" fill="#333"/><ellipse cx="116" cy="56" rx="3" ry="1.3" fill="#222"/>`,
+      kegel: `<path d="M104 44 C120 46 136 54 142 62 C134 68 120 76 104 80Z" fill="#c98a3a" stroke="${R}" stroke-width="1.2" stroke-linejoin="round"/><path d="M104 63 C116 62 130 62 140 62" stroke="#7a4f1a" stroke-width="1.5" fill="none"/><ellipse cx="112" cy="54" rx="2.4" ry="1.2" fill="#7a4f1a"/>`,
+      pinzette: `<path d="M106 54 L164 60.5 L106 67Z" fill="#4c4c4c" stroke="${R}" stroke-width="1.1" stroke-linejoin="round"/><path d="M106 60.5 L160 60.5" stroke="#1d1d1d" stroke-width="1.1"/><ellipse cx="114" cy="57.5" rx="2.2" ry="1" fill="#222"/>`,
     }[art];
-    return S('0 0 200 120', bg('#e6f1fb') + s + kopf, 'Schnabel');
+    return S('0 0 200 120', bg('#e6f1fb') + sch + kopf, 'Schnabel');
   }
   // Feder mit Nummern: 1 Schaft, 2 Fahne, 3 Spule, 4 Federast (Wörter wie im Buch S. 94)
   const FEDER_TEILE = ['Schaft', 'Fahne', 'Spule', 'Federast'];
@@ -258,22 +331,44 @@
   };
   // Hühnerei im Schnitt: 1 Kalkschale, 2 Eiklar, 3 Dotter, 4 Keimscheibe, 5 Hagelschnur, 6 Luftkammer
   const EI_TEILE = ['Kalkschale', 'Eiklar', 'Dotter', 'Keimscheibe', 'Hagelschnur', 'Luftkammer'];
-  const ei = () => S('0 0 200 120', bg('#f6efe2') + `<ellipse cx="100" cy="62" rx="74" ry="50" fill="#e8d2b0" stroke="#b08d57" stroke-width="4"/><ellipse cx="100" cy="62" rx="68" ry="44" fill="#fbfaf0"/><path d="M160 40 C172 52 172 72 160 84 C156 70 156 54 160 40Z" fill="#dfe9f2" stroke="#a9b9c9"/><path d="M36 62 q10 -8 18 0 q10 8 18 0 M124 62 q8 -8 16 0 q8 8 16 0" stroke="#c9c2a8" stroke-width="3" fill="none"/><circle cx="98" cy="62" r="26" fill="#f2b632"/><ellipse cx="98" cy="42" rx="7" ry="3.5" fill="#fff7d6" stroke="#c98a1e"/>` + marken([[20, 16, 44, 30], [56, 106, 70, 84], [100, 108, 100, 80], [100, 8, 98, 40], [186, 104, 140, 64], [184, 16, 164, 52]]), 'Hühnerei');
+  const ei = () => S('0 0 200 120', bg('#f6efe2')
+    + `<path d="M26 62 C26 30 62 12 106 12 C150 12 174 36 174 62 C174 88 150 112 106 112 C62 112 26 94 26 62Z" fill="#e9d3b0" stroke="#a9834c" stroke-width="2"/>`
+    + `<path d="M32 62 C32 34 66 18 106 18 C146 18 168 40 168 62 C168 84 146 106 106 106 C66 106 32 90 32 62Z" fill="#fdfcf2" stroke="#cdbf9f" stroke-width="1.2"/>`
+    + `<path d="M158 38 C164 46 168 54 168 62 C168 70 164 78 158 86 C152 74 152 50 158 38Z" fill="#dfe9f2" stroke="#9fb0c4" stroke-width="1.1"/>`
+    + `<path d="M36 62 q5 -7 10 0 q5 7 10 0 q5 -7 10 0 q4 6 8 0 M124 62 q4 -7 9 0 q5 7 10 0 q5 -7 10 0" stroke="#cfc8ac" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
+    + `<circle cx="98" cy="62" r="27" fill="#f2b632" stroke="#d99a1e" stroke-width="1.5"/><path d="M80 50 q8 -10 22 -10" stroke="#f9d674" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="98" cy="62" r="17" fill="none" stroke="#e5a628" stroke-width="1"/>`
+    + `<ellipse cx="98" cy="41" rx="7.5" ry="3.6" fill="#fff7d6" stroke="#c98a1e" stroke-width="1.1"/><ellipse cx="98" cy="41" rx="2.6" ry="1.3" fill="#e9c87a"/>`
+    + marken([[20, 16, 44, 28], [56, 106, 70, 86], [100, 108, 100, 80], [100, 8, 98, 40], [186, 104, 140, 63], [184, 16, 162, 52]]), 'Hühnerei');
   // ---------------------------------------------------- Säugetiere
   // Gebiss (Schädel von der Seite, schematisch): 'fleisch' | 'pflanze' | 'alles'
   function gebiss(art) {
-    const sch = `<path d="M20 50 C40 20 120 16 170 40 L182 58 L40 60Z" fill="#efe4c8" stroke="#b5a57a" stroke-width="2"/><path d="M36 70 L176 68 L168 86 C120 100 60 98 30 84Z" fill="#efe4c8" stroke="#b5a57a" stroke-width="2"/><circle cx="70" cy="40" r="9" fill="#cfc3a0"/>`;
-    const z = (pts, f) => `<path d="${pts}" fill="${f || '#fff'}" stroke="#8a7d5a" stroke-width="1.2"/>`;
+    const K = '#f1e7cc', L = '#8a7d5a';
+    // Oberschädel mit Augenhöhle und Hirnschädel, darunter der Unterkiefer mit Gelenkast
+    const lang = art === 'pflanze' ? 0 : art === 'alles' ? 4 : 8;
+    const sch = `<path d="M18 ${44 + lang} C22 22 52 12 80 16 C104 18 128 28 150 36 C166 40 180 46 186 54 L184 60 L44 62 C30 60 20 56 18 ${44 + lang}Z" fill="${K}" stroke="${L}" stroke-width="1.8" stroke-linejoin="round"/>`
+      + `<path d="M24 76 C24 66 34 62 44 66 L60 70 L182 68 C182 76 176 84 164 88 C120 100 70 98 44 92 C34 90 24 86 24 76Z" fill="${K}" stroke="${L}" stroke-width="1.8" stroke-linejoin="round"/>`
+      + `<path d="M28 78 C26 60 30 46 40 38" stroke="${L}" stroke-width="1.4" fill="none" opacity=".6"/>`
+      + `<ellipse cx="74" cy="38" rx="11" ry="9.5" fill="#d8ccab" stroke="${L}" stroke-width="1.6"/><ellipse cx="168" cy="50" rx="5" ry="3" fill="#d8ccab" stroke="${L}" stroke-width="1"/><path d="M96 26 C120 30 144 38 164 46" stroke="${L}" stroke-width="1" fill="none" opacity=".5"/>`;
+    const z = (pts, f) => `<path d="${pts}" fill="${f || '#fffdf6'}" stroke="#7a6d4a" stroke-width="1.1" stroke-linejoin="round"/>`;
     let zz = '';
-    if (art === 'fleisch') zz = z('M142 58 l6 26 l7 -26Z') + z('M150 70 l5 -22 l6 22Z') + z('M168 58 l3 9 l4 -9Z') + z('M160 58 l3 8 l3 -8Z') + z('M152 58 l3 8 l3 -8Z') + z('M96 60 l6 12 l5 -10 l6 12 l6 -14Z') + z('M96 70 l6 -10 l6 8 l6 -10 l6 12Z') + z('M70 60 h18 v7 h-18Z') + z('M68 70 h18 v-6 h-18Z') ;
-    if (art === 'pflanze') zz = `<path d="M150 58 h26 v5 h-26Z" fill="#c9a24a" stroke="#8a7d5a"/>` + z('M152 70 h6 v-9 h-6Z') + z('M160 70 h6 v-9 h-6Z') + z('M168 70 h6 v-8 h-6Z') + [50, 64, 78, 92, 106].map((x) => z(`M${x} 60 h12 v8 h-12Z`) + z(`M${x} 70 h12 v-7 h-12Z`) + `<path d="M${x + 3} 68 v-5 M${x + 8} 68 v-5" stroke="#8a7d5a" stroke-width=".8"/>`).join('');
-    if (art === 'alles') zz = z('M160 58 h6 v8 h-6Z') + z('M168 58 h6 v8 h-6Z') + z('M160 70 h6 v-8 h-6Z') + z('M168 70 h6 v-8 h-6Z') + z('M146 58 l4 14 l4 -14Z') + z('M146 72 l-4 -4 l10 -10Z') + [56, 72, 88, 104].map((x) => z(`M${x} 60 h13 v7 q-3 3 -6 0 q-3 3 -7 0Z`) + z(`M${x} 70 h13 v-6 q-3 -3 -6 0 q-3 -3 -7 0Z`)).join('') + z('M124 60 l4 7 l4 -7Z') + z('M134 60 l4 7 l4 -7Z');
+    if (art === 'fleisch') zz = z('M150 59 C150 70 152 80 155 86 C158 80 160 70 160 59Z') + z('M142 70 C142 62 144 54 147 48 C150 54 152 62 152 70Z')
+      + z('M164 59 l2.5 8 l2.5 -8Z') + z('M170 59 l2.5 8 l2.5 -8Z') + z('M176 59 l2.5 7 l2.5 -7Z') + z('M164 70 l2.5 -7 l2.5 7Z') + z('M170 70 l2.5 -7 l2.5 7Z') + z('M176 70 l2.5 -6 l2.5 6Z')
+      + z('M94 60 l5 13 l5 -9 l6 13 l6 -9 l5 10 l5 -18Z') + z('M96 72 l6 -9 l6 7 l6 -9 l6 7 l5 -6 l3 10Z')
+      + z('M124 60 l3 8 l4 -8Z') + z('M132 60 l3 7 l4 -7Z') + z('M126 70 l3 -7 l4 7Z')
+      + z('M66 60 h11 v7 q-5.5 3 -11 0Z') + z('M79 60 h11 v8 q-5.5 3 -11 0Z') + z('M64 72 h12 v-6 q-6 -3 -12 0Z') + z('M78 72 h12 v-6 q-6 -3 -12 0Z');
+    if (art === 'pflanze') zz = `<path d="M150 59 h32 v5 q-16 3 -32 0Z" fill="#c9a24a" stroke="#7a6d4a" stroke-width="1.1"/>`
+      + z('M154 70 h6 v-10 q-3 -2 -6 0Z') + z('M161 70 h6 v-10 q-3 -2 -6 0Z') + z('M168 70 h6 v-9 q-3 -2 -6 0Z') + z('M175 70 h5 v-7 q-2.5 -2 -5 0Z')
+      + [46, 60, 74, 88, 102].map((x) => z(`M${x} 60 h13 v9 h-13Z`) + z(`M${x} 72 h13 v-8 h-13Z`) + `<path d="M${x + 3} 69 v-6 M${x + 6.5} 69 v-6 M${x + 10} 69 v-6 M${x + 3} 72 v-5 M${x + 6.5} 72 v-5 M${x + 10} 72 v-5" stroke="#7a6d4a" stroke-width=".8"/>`).join('');
+    if (art === 'alles') zz = z('M160 59 h6 v8 q-3 2 -6 0Z') + z('M167 59 h6 v8 q-3 2 -6 0Z') + z('M174 59 h5 v7 q-2.5 2 -5 0Z') + z('M160 70 h6 v-7 q-3 -2 -6 0Z') + z('M167 70 h6 v-7 q-3 -2 -6 0Z') + z('M174 70 h5 v-6 q-2.5 -2 -5 0Z')
+      + z('M146 59 C146 66 148 72 150 76 C152 72 154 66 154 59Z') + z('M140 70 C140 64 142 58 144 54 C146 58 148 64 148 70Z')
+      + [52, 68, 84, 100].map((x) => z(`M${x} 60 h14 v6 q-3.5 4 -7 0 q-3.5 4 -7 0Z`) + z(`M${x} 72 h14 v-5 q-3.5 -4 -7 0 q-3.5 -4 -7 0Z`)).join('')
+      + z('M118 60 l3.5 8 l3.5 -8Z') + z('M127 60 l3.5 8 l3.5 -8Z') + z('M120 70 l3.5 -7 l3.5 7Z') + z('M129 70 l3 -6 l3 6Z');
     return S('0 0 200 120', bg('#f6efe2') + sch + zz, 'Gebiss');
   }
   // Vordergliedmaße mit gleichen Farben für gleiche Knochen: Oberarm rot, Unterarm blau, Hand gelb. art: 'mensch'|'maulwurf'|'fledermaus'|'wal'|'pferd'
   function gliedmasse(art) {
     const ROT = '#d0443a', BLAU = '#3d7bff', GELB = '#e3a81e';
-    const k = (d, f, w) => `<path d="${d}" stroke="${f}" stroke-width="${w || 8}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const k = (d, f, w) => `<path d="${d}" stroke="rgba(0,0,0,.45)" stroke-width="${(w || 8) + 2}" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${f}" stroke-width="${w || 8}" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="rgba(255,255,255,.35)" stroke-width="${Math.max(1, (w || 8) * 0.25)}" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.8,-0.8)"/>`;
     const g = {
       mensch: k('M40 24 L84 54', ROT, 9) + k('M84 54 L132 70 M84 58 L132 78', BLAU, 5) + k('M136 72 L150 70 M136 74 L160 78 M136 76 L160 84 M136 78 L156 90 M134 80 L148 94', GELB, 4),
       maulwurf: k('M60 40 L84 58', ROT, 13) + k('M84 58 L108 62', BLAU, 12) + `<path d="M108 44 C140 40 156 56 150 80 C140 84 118 82 106 76Z" fill="${GELB}"/>` + k('M140 44 L158 34 M148 52 L170 48 M152 62 L174 64 M150 72 L170 80 M142 80 L156 94', '#8a6a1e', 4),
@@ -285,10 +380,30 @@
   }
   // Skelett des Menschen mit Nummern (Wörter wie im Buch S. 153): 1 Schädel, 2 Wirbelsäule, 3 Brustkorb, 4 Hüftknochen, 5 Oberarmknochen, 6 Oberschenkelknochen, 7 Schlüsselbein, 8 Kniescheibe
   const SKELETT_TEILE = ['Schädel', 'Wirbelsäule', 'Brustkorb', 'Hüftknochen', 'Oberarmknochen', 'Oberschenkelknochen', 'Schlüsselbein', 'Kniescheibe'];
-  const skelett = () => { const K = '#fbf6e6', L = '#8a7d5a'; const b = (d, w) => `<path d="${d}" stroke="${L}" stroke-width="${(w || 5) + 2}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${K}" stroke-width="${w || 5}" fill="none" stroke-linecap="round"/>`;
-    return S('0 0 200 170', bg('#e9eef6', 200, 170) + b('M100 34 V96', 5) + `<ellipse cx="100" cy="20" rx="13" ry="15" fill="${K}" stroke="${L}" stroke-width="2"/><circle cx="95" cy="19" r="3" fill="${L}"/><circle cx="105" cy="19" r="3" fill="${L}"/>` + [44, 52, 60, 68].map((y) => `<path d="M100 ${y} C84 ${y - 4} 78 ${y + 4} 82 ${y + 8} M100 ${y} C116 ${y - 4} 122 ${y + 4} 118 ${y + 8}" stroke="${L}" stroke-width="2.5" fill="none"/>`).join('') + `<path d="M82 96 C86 88 114 88 118 96 C116 108 84 108 82 96Z" fill="${K}" stroke="${L}" stroke-width="2"/>` + b('M80 40 H120', 4) + b('M80 40 L70 72') + b('M70 72 L66 100', 4) + b('M120 40 L130 72') + b('M130 72 L134 100', 4) + b('M90 104 L86 136', 6) + b('M86 136 L84 164', 5) + b('M110 104 L114 136', 6) + b('M114 136 L116 164', 5)
-      + `<circle cx="86" cy="136" r="4.5" fill="${K}" stroke="${L}" stroke-width="1.5"/><circle cx="114" cy="136" r="4.5" fill="${K}" stroke="${L}" stroke-width="1.5"/>`
-      + marken([[150, 12, 112, 18], [36, 86, 100, 84], [162, 62, 120, 60], [158, 106, 114, 100], [40, 50, 74, 56], [44, 126, 88, 120], [166, 36, 112, 40], [156, 142, 118, 137]]), 'Skelett des Menschen'); };
+  const skelett = () => { const K = '#fbf6e6', L = '#8a7d5a';
+    // Röhrenknochen mit verdickten Enden
+    const kn = (x1, y1, x2, y2, w) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${L}" stroke-width="${w + 2}" stroke-linecap="round"/><path d="M${x1} ${y1} L${x2} ${y2}" stroke="${K}" stroke-width="${w}" stroke-linecap="round"/><circle cx="${x1}" cy="${y1}" r="${w * 0.72}" fill="${K}" stroke="${L}" stroke-width="1"/><circle cx="${x2}" cy="${y2}" r="${w * 0.72}" fill="${K}" stroke="${L}" stroke-width="1"/>`;
+    const wirbel = Array.from({ length: 13 }, (_, i) => `<rect x="${97 + Math.sin(i / 2.2) * 1.2}" y="${34 + i * 4.8}" width="6" height="3.6" rx="1.2" fill="${K}" stroke="${L}" stroke-width=".9"/>`).join('');
+    const rippen = [0, 1, 2, 3, 4, 5].map((i) => { const y = 44 + i * 5.2, w = 15 + i * 1.6 - (i > 4 ? 3 : 0); return `<path d="M100 ${y} C${100 - w * 0.6} ${y - 4} ${100 - w} ${y + 2} ${100 - w + 3} ${y + 9} M100 ${y} C${100 + w * 0.6} ${y - 4} ${100 + w} ${y + 2} ${100 + w - 3} ${y + 9}" stroke="${L}" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M100 ${y} C${100 - w * 0.6} ${y - 4} ${100 - w} ${y + 2} ${100 - w + 3} ${y + 9} M100 ${y} C${100 + w * 0.6} ${y - 4} ${100 + w} ${y + 2} ${100 + w - 3} ${y + 9}" stroke="${K}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`; }).join('');
+    const hand = (x, y, d) => `<path d="M${x} ${y} l${d * -2} 8 M${x} ${y} l${d * 1} 9 M${x} ${y} l${d * 4} 8 M${x} ${y} l${d * -5} 5" stroke="${L}" stroke-width="2" stroke-linecap="round"/>`;
+    const fuss = (x, y, d) => `<path d="M${x} ${y} l${d * 12} 3 l0 3 l${d * -14} 0Z" fill="${K}" stroke="${L}" stroke-width="1.2" stroke-linejoin="round"/>`;
+    return S('0 0 200 170', bg('#e9eef6', 200, 170)
+      + wirbel
+      // Schädel mit Augenhöhlen, Nasenöffnung, Unterkiefer und Zähnen
+      + `<path d="M87 18 C87 6 113 6 113 18 C113 24 110 27 108 29 L108 34 C104 37 96 37 92 34 L92 29 C90 27 87 24 87 18Z" fill="${K}" stroke="${L}" stroke-width="1.6" stroke-linejoin="round"/><ellipse cx="95" cy="19" rx="3.6" ry="3.2" fill="${L}"/><ellipse cx="105" cy="19" rx="3.6" ry="3.2" fill="${L}"/><path d="M100 23 l-1.6 4 h3.2Z" fill="${L}"/><path d="M94 31 h12 M96 29.5 v3 M98.5 29.5 v3 M101.5 29.5 v3 M104 29.5 v3" stroke="${L}" stroke-width=".8"/>`
+      + rippen + `<path d="M98 42 h4 v26 l-2 4 l-2 -4Z" fill="${K}" stroke="${L}" stroke-width="1"/>`
+      // Schlüsselbeine und Schultern
+      + `<path d="M100 41 C92 38 86 39 80 41 M100 41 C108 38 114 39 120 41" stroke="${L}" stroke-width="4.5" fill="none" stroke-linecap="round"/><path d="M100 41 C92 38 86 39 80 41 M100 41 C108 38 114 39 120 41" stroke="${K}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`
+      // Becken
+      + `<path d="M82 92 C80 86 90 84 97 90 L100 96 L103 90 C110 84 120 86 118 92 C120 100 114 106 108 106 C104 104 102 100 100 100 C98 100 96 104 92 106 C86 106 80 100 82 92Z" fill="${K}" stroke="${L}" stroke-width="1.6" stroke-linejoin="round"/><ellipse cx="91" cy="100" rx="2.6" ry="2" fill="#e9eef6" stroke="${L}" stroke-width=".8"/><ellipse cx="109" cy="100" rx="2.6" ry="2" fill="#e9eef6" stroke="${L}" stroke-width=".8"/>`
+      // Arme: Oberarmknochen, Elle und Speiche, Hand
+      + kn(79, 43, 71, 72, 4.2) + kn(70, 74, 65, 100, 2.2) + kn(73, 74, 69, 100, 2.2) + hand(67, 102, -1)
+      + kn(121, 43, 129, 72, 4.2) + kn(130, 74, 135, 100, 2.2) + kn(127, 74, 131, 100, 2.2) + hand(133, 102, 1)
+      // Beine: Oberschenkelknochen, Kniescheibe, Schienbein und Wadenbein, Fuß
+      + kn(90, 106, 86, 134, 5) + kn(87, 140, 85, 162, 3.6) + kn(82.5, 141, 81.5, 161, 1.6) + fuss(84, 162, -1)
+      + kn(110, 106, 114, 134, 5) + kn(113, 140, 115, 162, 3.6) + kn(117.5, 141, 118.5, 161, 1.6) + fuss(116, 162, 1)
+      + `<ellipse cx="86" cy="137" rx="3.6" ry="3" fill="${K}" stroke="${L}" stroke-width="1.3"/><ellipse cx="114" cy="137" rx="3.6" ry="3" fill="${K}" stroke="${L}" stroke-width="1.3"/>`
+      + marken([[150, 12, 111, 16], [36, 86, 99, 82], [164, 62, 119, 60], [160, 108, 116, 98], [38, 50, 75, 58], [44, 126, 88, 120], [166, 36, 112, 39.5], [158, 144, 117, 137.5]]), 'Skelett des Menschen'); };
 
   const BILDER = {
     // Lurche
@@ -313,9 +428,9 @@
     ringelnatter: () => schlange('ringelnatter'), kreuzotter: () => schlange('kreuzotter'), blindschleiche: () => schlange('blindschleiche'),
     // Vögel
     amsel: () => vogel({ k: '#1b1b1b', schnabel: '#f0a81e', ring: '#f0a81e', name: 'Amsel (Männchen)' }),
-    kohlmeise: () => vogel({ k: '#6f8a5a', b: '#f2d83a', kopf: '#1b1b1b', wange: '#fff', schnabel: '#333', name: 'Kohlmeise' }),
+    kohlmeise: () => vogel({ k: '#6f8a5a', b: '#f2d83a', kopf: '#1b1b1b', wange: '#fff', streif: '#1b1b1b', fluegel: 'rgba(60,80,110,.55)', binde: '#fff', schnabel: '#333', name: 'Kohlmeise' }),
     rotkehlchen: () => vogel({ k: '#8a7a5a', b: '#efe9dc', brust: '#e2702c', schnabel: '#333', name: 'Rotkehlchen' }),
-    sperling: () => vogel({ k: '#8a623a', b: '#cfc6b6', kopf: '#7a7f86', wange: '#e6e0d4', schnabel: '#3b3530', name: 'Haussperling' }),
+    sperling: () => vogel({ k: '#8a623a', b: '#cfc6b6', kopf: '#7a7f86', wange: '#e6e0d4', latz: '#1b1b1b', binde: '#fff', schnabel: '#3b3530', name: 'Haussperling' }),
     stockente: ente, schleiereule: eule, bussard, buntspecht: specht,
     schnabelHaken: () => schnabel('haken'), schnabelSeih: () => schnabel('seih'), schnabelMeissel: () => schnabel('meissel'), schnabelKegel: () => schnabel('kegel'), schnabelPinzette: () => schnabel('pinzette'),
     feder, ei,
