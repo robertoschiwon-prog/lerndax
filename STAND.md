@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 14.11.2026, Version `lerndax-v101`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 14.11.2026, Version `lerndax-v102`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,21 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-11. GeoDax: Planung begonnen (lerndax-v102, 14.11.2026)
+
+Auftrag Roberto: GeoDax bauen (TERRA Geographie 5 Sachsen), Vorgehen wie GeDax/BioDax. Bisher nur Unterlagen, noch kein Code.
+- **Buchfotos geprüft** (`notizen/schulbuch-geo/`, 108 Fotos, 2 doppelte Dateien): vollständig bis auf **S. 4–5** (Auftakt
+  Kapitel 1) und **S. 18–19** („Die Welt im Atlas“). Ab Foto 16: Foto-Nummer × 2 − 12 = linke Seite.
+- **Lehrplan:** Für Geographie gibt es **keine Fassung 2025**. Die Landeslisten 2025/26 und 2026/27 nennen „2004/2009/2011/2019“.
+  Ausgewertet wurde also die Fassung 2019 am Originaltext (`faecher/geo/lehrplan/sachsen-gymnasium.md`). Das Buch passt genau
+  dazu: Kapitel 2–9 = Lernbereiche 1–6 und Wahlbereiche (`schulbuch-abgleich.md`).
+- **Themenplan:** 54 Themen in 9 Bereichen (= Kapitel), Entdecken (5 Ideen), Aufgabenformen neu: Karte antippen, Karte
+  beschriften, Foto erkennen, Maßstab rechnen, Diagramme lesen (`faecher/geo/themenplan.md`).
+- **Fakten mit Quellen:** `faecher/geo/fakten.md` (Erde, Kontinente, Deutschland, Sachsen, Küste, Tiefland, Ballungsgebiete,
+  Mittelgebirge).
+- **Wartet auf Roberto:** Themenplan ok? Karten als freie Kartenbilder, Kartendaten oder beides? Fotos S. 4–5 und 18–19?
+  Aktuelles Kapitel, Wahlbereich?
 
 ## 0-neu-10. Fotos auch für alle Schaubilder (lerndax-v100 und v101, 14.11.2026)
 
