@@ -351,11 +351,14 @@
       + `<ellipse cx="74" cy="38" rx="11" ry="9.5" fill="#d8ccab" stroke="${L}" stroke-width="1.6"/><ellipse cx="168" cy="50" rx="5" ry="3" fill="#d8ccab" stroke="${L}" stroke-width="1"/><path d="M96 26 C120 30 144 38 164 46" stroke="${L}" stroke-width="1" fill="none" opacity=".5"/>`;
     const z = (pts, f) => `<path d="${pts}" fill="${f || '#fffdf6'}" stroke="#7a6d4a" stroke-width="1.1" stroke-linejoin="round"/>`;
     let zz = '';
-    if (art === 'fleisch') zz = z('M150 59 C150 70 152 80 155 86 C158 80 160 70 160 59Z') + z('M142 70 C142 62 144 54 147 48 C150 54 152 62 152 70Z')
-      + z('M164 59 l2.5 8 l2.5 -8Z') + z('M170 59 l2.5 8 l2.5 -8Z') + z('M176 59 l2.5 7 l2.5 -7Z') + z('M164 70 l2.5 -7 l2.5 7Z') + z('M170 70 l2.5 -7 l2.5 7Z') + z('M176 70 l2.5 -6 l2.5 6Z')
-      + z('M94 60 l5 13 l5 -9 l6 13 l6 -9 l5 10 l5 -18Z') + z('M96 72 l6 -9 l6 7 l6 -9 l6 7 l5 -6 l3 10Z')
-      + z('M124 60 l3 8 l4 -8Z') + z('M132 60 l3 7 l4 -7Z') + z('M126 70 l3 -7 l4 7Z')
-      + z('M66 60 h11 v7 q-5.5 3 -11 0Z') + z('M79 60 h11 v8 q-5.5 3 -11 0Z') + z('M64 72 h12 v-6 q-6 -3 -12 0Z') + z('M78 72 h12 v-6 q-6 -3 -12 0Z');
+    // Fleischfresser: kleine Schneidezähne, lange Fangzähne, spitze Vorbackenzähne, große Reißzähne (greifen wie eine Schere), dahinter Backenzähne
+    if (art === 'fleisch') zz = z('M166 59.5 h4 v5 q-2 2 -4 0Z') + z('M171 59.5 h4 v5 q-2 2 -4 0Z') + z('M176 59.5 h4 v4.5 q-2 2 -4 0Z')
+      + z('M168 71 h4 v-4.5 q-2 -2 -4 0Z') + z('M173 71 h4 v-4 q-2 -2 -4 0Z')
+      + z('M159 71 C159 63 161 57 163 53 C165 57 167 63 167 71Z')
+      + z('M150 59.5 C150 68 152 76 155 81 C157 76 158.5 68 158.5 59.5Z')
+      + z('M136 59.5 L140 67 L144 59.5Z') + z('M126 59.5 L130 68 L134 59.5Z') + z('M141 71 L145 64.5 L149 71Z') + z('M131 71 L135 64 L139 71Z')
+      + z('M108 71 L112 62.5 L116 67 L121 61.5 L126 71Z', '#f4efdd') + z('M106 59.5 L109 69.5 L113 64.5 L118 70.5 L124 59.5Z')
+      + z('M92 59.5 h12 v5 q-3 3 -6 0 q-3 3 -6 0Z') + z('M80 59.5 h10 v4.5 q-5 3 -10 0Z') + z('M94 71 h12 v-4.5 q-3 -3 -6 0 q-3 -3 -6 0Z') + z('M82 71 h10 v-4 q-5 -3 -10 0Z');
     if (art === 'pflanze') zz = `<path d="M150 59 h32 v5 q-16 3 -32 0Z" fill="#c9a24a" stroke="#7a6d4a" stroke-width="1.1"/>`
       + z('M154 70 h6 v-10 q-3 -2 -6 0Z') + z('M161 70 h6 v-10 q-3 -2 -6 0Z') + z('M168 70 h6 v-9 q-3 -2 -6 0Z') + z('M175 70 h5 v-7 q-2.5 -2 -5 0Z')
       + [46, 60, 74, 88, 102].map((x) => z(`M${x} 60 h13 v9 h-13Z`) + z(`M${x} 72 h13 v-8 h-13Z`) + `<path d="M${x + 3} 69 v-6 M${x + 6.5} 69 v-6 M${x + 10} 69 v-6 M${x + 3} 72 v-5 M${x + 6.5} 72 v-5 M${x + 10} 72 v-5" stroke="#7a6d4a" stroke-width=".8"/>`).join('');
@@ -376,7 +379,15 @@
       wal: `<path d="M40 34 C80 20 150 40 170 80 C140 96 80 90 50 66Z" fill="#9fb6c9" opacity=".8"/>` + k('M52 42 L74 52', ROT, 11) + k('M74 50 L100 56 M74 56 L98 64', BLAU, 6) + k('M102 58 L150 74 M102 60 L146 80 M102 62 L136 84 M100 64 L124 84', GELB, 3.5),
       pferd: k('M70 14 L96 38', ROT, 10) + k('M96 38 L96 70', BLAU, 8) + k('M96 72 L96 100', GELB, 6) + `<path d="M86 100 h20 l4 12 h-28Z" fill="#3b3530"/>`,
     }[art];
-    return S('0 0 200 120', bg('#f6efe2') + g, 'Vordergliedmaße');
+    // heller Umriss des Körperteils, damit man sieht, wo die Knochen stecken
+    const um = (d, f, w) => `<path d="${d}" stroke="rgba(0,0,0,.25)" stroke-width="${w + 2}" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" stroke="${f}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const umriss = {
+      mensch: um('M40 24 L84 54 L134 74', '#f0d2b4', 24) + `<path d="M130 62 C144 58 160 62 168 76 C166 88 156 98 142 98 C132 96 126 86 126 76Z" fill="#f0d2b4" stroke="rgba(0,0,0,.25)" stroke-width="1"/>`,
+      maulwurf: um('M52 34 L84 58 L108 62', '#6b625a', 28) + `<path d="M100 40 C140 30 166 50 160 84 C144 92 116 88 100 80Z" fill="#e8b9a8" stroke="rgba(0,0,0,.25)" stroke-width="1"/>`,
+      fledermaus: '', wal: '',
+      pferd: um('M66 10 L96 38 L96 98', '#b8895a', 22),
+    }[art];
+    return S('0 0 200 120', bg('#f6efe2') + umriss + g, 'Vordergliedmaße');
   }
   // Skelett des Menschen mit Nummern (Wörter wie im Buch S. 153): 1 Schädel, 2 Wirbelsäule, 3 Brustkorb, 4 Hüftknochen, 5 Oberarmknochen, 6 Oberschenkelknochen, 7 Schlüsselbein, 8 Kniescheibe
   const SKELETT_TEILE = ['Schädel', 'Wirbelsäule', 'Brustkorb', 'Hüftknochen', 'Oberarmknochen', 'Oberschenkelknochen', 'Schlüsselbein', 'Kniescheibe'];

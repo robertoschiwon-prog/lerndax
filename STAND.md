@@ -21,6 +21,12 @@ Weitere Dokumente:
 
 ---
 
+## 0-neu-6. Fleischfresser-Gebiss und Gliedmaßen überarbeitet (lerndax-v96, 14.11.2026)
+
+`gebiss('fleisch')`: Zähne klar getrennt (Schneidezähne, Fangzähne, Vorbackenzähne, Reißzähne, Backenzähne).
+`gliedmasse()`: heller Umriss von Arm, Grabhand und Pferdebein hinter den farbigen Knochen.
+Test: Generatoren, `biodax.py 1` für vier Säugetier-Themen ohne Meldung.
+
 ## 0-neu-5. Alle Bio-Bilder neu gezeichnet (lerndax-v95, 14.11.2026)
 
 Jetzt auch neu in `web/bio/themen/basis.js`: `vogel()` (Amsel, Kohlmeise mit Bauchstreif und Flügelbinde, Rotkehlchen, Haussperling
