@@ -58,7 +58,8 @@ LernDax
  ├─ MaDax    Mathe      ✅ Klasse 5
  ├─ DeDax    Deutsch    Phase 1
  ├─ EnDax    Englisch   Phase 1
- ├─ BioDax · GeDax · GeoDax · TecDax   Phase 1 (Klasse 5)
+ ├─ GeDax · BioDax   ✅ Klasse 5
+ ├─ GeoDax · TecDax   Phase 1 (Klasse 5)
  └─ PhDax · ChDax · GrwDax · 2. Fremdsprache · SuDax   ab Phase 2
 ```
 
@@ -134,5 +135,7 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] DeDax (Deutsch) Klasse 5: 30 Themen in 5 Bereichen, „Entdecken“ (6), Knobel-Aufgaben zu allen Themen; auf der Startseite
 - [ ] DeDax: Abgleich mit dem Schulbuch (ISBN und Inhaltsverzeichnis fehlen), Test mit Bruno
 - [ ] EnDax (Englisch)
-- [ ] BioDax, GeoDax, GeDax
+- [x] GeDax (Geschichte) Klasse 5: 31 Themen
+- [x] BioDax (Biologie) Klasse 5: 49 Themen in 7 Bereichen, „Entdecken“ (5), Knobel-Aufgaben; `web/bio/`
+- [ ] GeoDax
 - [ ] TecDax (Technik/Computer)

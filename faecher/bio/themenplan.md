@@ -1,6 +1,6 @@
 # BioDax Klasse 5: Themenplan (Vorschlag)
 
-Stand 14.11.2026, zur Durchsicht für Roberto. Grundlage: Lehrplan Sachsen (Fassung 2025) und die Kapitel des Schulbuchs
+Stand 14.11.2026. **Von Roberto am 14.11.2026 bestätigt und so gebaut** (49 Themen, mit „Pubertät und Fortpflanzung des Menschen“). Grundlage: Lehrplan Sachsen (Fassung 2025) und die Kapitel des Schulbuchs
 LINDER Biologie 5. Die sieben Bereiche heißen wie die Kapitel des Buchs und stehen in derselben Reihenfolge.
 
 Die Beispiel-Aufgaben sind selbst geschrieben. Alle Zahlen, Namen und Tierarten werden vor dem Bauen nachgeschlagen und
@@ -17,9 +17,9 @@ mit Quelle in `fakten.md` festgehalten. Alle Bilder werden selbst gezeichnet.
 | 3 Lurche | 8 | S. 40–57 |
 | 4 Kriechtiere | 6 | S. 58–83 |
 | 5 Vögel | 10 | S. 84–115 |
-| 6 Säugetiere | 12 (+1 offen) | S. 116–169 |
+| 6 Säugetiere | 13 | S. 116–169 |
 | 7 Wirbeltiere im Vergleich | 4 | S. 170–185 |
-| **zusammen** | **48 (+1)** | |
+| **zusammen** | **49** | |
 
 Dazu wie in den anderen Fächern: „Entdecken“ (Staunen-Momente) und Knobel-Aufgaben zu jedem Thema.
 
@@ -108,7 +108,7 @@ Wahlbereich „Reptilien vergangener Zeiten“ (Saurier, Fossilien, Urvogel) kom
 | Säugetiere schützen | Gefahren, Schutz, Jagd, Beispiele aus Sachsen | Hilft es oder schadet es? |
 | Artgerechte Tierhaltung (Wahl) | Was braucht ein Tier? | „Ist das artgerecht? Meerschweinchen allein im kleinen Käfig“ |
 | Skelett des Menschen | Körpergliederung, Skelett von Mensch und Säugetier vergleichen | Skelett beschriften · gleiche Knochen bei Mensch und Hund finden |
-| **offen:** Fortpflanzung des Menschen | Pubertät, Geschlechtsorgane, Entwicklung des Kindes | **Roberto entscheidet**, ob das in die App kommt |
+| Pubertät und Fortpflanzung des Menschen | Pubertät, Eizelle und Spermienzelle, Schwangerschaft, Geburt | Bei wem verändert sich das? (sortieren) · Schritte ordnen · sachlich und knapp |
 
 ## 7 Wirbeltiere im Vergleich
 
@@ -130,5 +130,9 @@ Wahlbereich „Reptilien vergangener Zeiten“ (Saurier, Fossilien, Urvogel) kom
 
 ## Fragen an Roberto (einzeln)
 
-1. Fortpflanzung des Menschen (Pubertät): in die App, ja oder nein?
-2. Passt der Plan so, oder soll etwas weg oder dazu?
+1. Fortpflanzung des Menschen (Pubertät): **ja**.
+2. Plan: **passt, alles bauen**.
+
+Gebaut wurde leicht anders geschnitten als oben (zum Beispiel „Federn“ und „Schnabel und Füße“ als eigene Themen, die vier
+Vögel in einem Thema, „Lunge“ und „Tiere verständigen sich“ als eigene Themen). Die genaue Liste steht in
+`web/bio/themen/klasse5-3.js` am Ende (`D.grades[5]`).

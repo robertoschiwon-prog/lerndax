@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6ee">
+<title>BioDax · LernDax</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/favicon-v4.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon-v4.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LernDax">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../plattform/fach.css">
+</head>
+<body>
+<div id="app"></div>
+
+<script>window.LERNDAX_SUBJECT = 'bio';</script>
+<script src="../plattform/symbole.js"></script>
+<script src="../plattform/avatare.js"></script>
+<script src="../plattform/config.js"></script>
+<script src="../plattform/trainings.js"></script>
+<script src="../plattform/sync.js"></script>
+<script src="themen/basis.js"></script>
+<script src="themen/klasse5-1.js"></script>
+<script src="themen/klasse5-2.js"></script>
+<script src="themen/klasse5-3.js"></script>
+<script src="themen/klasse5-knobel.js"></script>
+<script src="symbole.js"></script>
+<script src="erklaerungen/klasse5.js"></script>
+<script src="erklaerungen/entdecken.js"></script>
+<script>
+/* BioDax: Das Fach beschreibt sich, die App selbst steckt in ../plattform/fach.js (gemeinsam für alle Fächer). */
+window.LERNDAX_FACH = {
+  id: 'bio', name: 'BioDax', fach: 'Biologie', key: 'biodax.v1',
+  app: window.BioDax, icons: window.BioDaxIcons,
+  dachs: '../icons/biodax.svg',
+  entdecken: ['bio-zeitraffer', 'bio-axolotl', 'bio-knochen', 'bio-echo', 'bio-urvogel'],
+  entdeckenText: 'Biologie zum Staunen: vom Laich zum Frosch im Zeitraffer, der Lurch, der nie erwachsen wird, ein Bauplan für alle Säugetiere, die Fledermaus und der Urvogel.', entdeckenKurz: 'Biologie zum Staunen',
+  andereKlassen: {},
+};
+</script>
+<script src="../plattform/fach.js"></script>
+</body>
+</html>

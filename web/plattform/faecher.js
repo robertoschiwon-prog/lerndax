@@ -30,7 +30,7 @@ window.LERNDAX_FAECHER = [
 
   // Sachfächer
   { id: 'sachunterricht', kuerzel: 'Su',  name: 'SuDax',  fach: 'Sachunterricht', icon: 'Su',  farbe: '#e9a800', klassen: [1, 4],  gruppe: 'sach', status: 'geplant', fertig: [] },
-  { id: 'bio', dachs: 'icons/biodax.svg',            kuerzel: 'Bio', name: 'BioDax', fach: 'Biologie',       icon: 'Bio', farbe: '#4caf50', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
+  { id: 'bio', dachs: 'icons/biodax.svg',            kuerzel: 'Bio', name: 'BioDax', fach: 'Biologie',       icon: 'Bio', farbe: '#4caf50', klassen: [5, 10], gruppe: 'sach', status: 'fertig', fertig: [5], href: 'bio/', key: 'biodax.v1', themen: 49, entdecken: 'Biologie zum Staunen: vom Laich zum Frosch, der Axolotl, die Fledermaus, der Urvogel' },
   { id: 'geschichte', dachs: 'icons/gedax.svg',     kuerzel: 'Ge',  name: 'GeDax',  fach: 'Geschichte',     icon: 'Ge',  farbe: '#a0522d', klassen: [5, 10], gruppe: 'sach', status: 'fertig', fertig: [5], href: 'geschichte/', key: 'gedax.v1', themen: 31, entdecken: 'Geschichte zum Staunen: die Erdgeschichte als ein Tag, Steinzeit-Brunnen in Sachsen, Alexander der Große' },
   { id: 'geografie', dachs: 'icons/geodax.svg',      kuerzel: 'Geo', name: 'GeoDax', fach: 'Geografie',      icon: 'Geo', farbe: '#0e9fb5', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
   { id: 'technik', dachs: 'icons/tecdax.svg',        kuerzel: 'TC',  name: 'TecDax', fach: 'Technik/Computer', fachAb: { 7: 'Informatik' }, icon: 'Tc', farbe: '#5b6378', klassen: [5, 10], gruppe: 'sach', status: 'geplant', fertig: [] },
