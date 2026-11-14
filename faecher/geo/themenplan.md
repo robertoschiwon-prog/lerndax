@@ -12,7 +12,7 @@ Bilder: freie Fotos und Karten (Wikimedia Commons, mit Fotograf und Lizenz), kei
 | Bereich (= Kapitel im Buch) | Themen | Buch | Lehrplan |
 |---|---|---|---|
 | 1 Geographie – dein neues Fach | 1 | S. 4–7 | Einstieg |
-| 2 Unser Planet Erde | 15 | S. 8–43 | LB 1 |
+| 2 Unser Planet Erde | 16 | S. 8–43 | LB 1 |
 | 3 Deutschland im Überblick | 8 | S. 44–61 | LB 2 |
 | 4 An Nordseeküste und Ostseeküste | 7 | S. 62–91 | LB 3 |
 | 5 Im Tiefland | 6 | S. 92–117 | LB 4 |
@@ -20,7 +20,7 @@ Bilder: freie Fotos und Karten (Wikimedia Commons, mit Fotograf und Lizenz), kei
 | 7 Wo viele Menschen leben und arbeiten | 5 | S. 130–145 | LB 5 |
 | 8 Im Mittelgebirgsland | 6 | S. 146–165 | LB 6 |
 | 9 Exkursion im Heimatraum | 3 | S. 166–175 | Wahlbereiche |
-| **zusammen** | **54** | | |
+| **zusammen** | **55** | | |
 
 Dazu „Entdecken“ (5 Staunen-Momente) und Knobel-Aufgaben zu jedem Thema.
 
@@ -57,6 +57,7 @@ Erklärungen nach Robertos Grundsatz: Merkzettel (kurz das Warum), Animation nur
 | Mit dem Atlas arbeiten (S. 18–21) | Inhaltsverzeichnis, Register, Planquadrat, Legende | „Im Register steht: Dresden 34 C3. Was bedeutet 34, was C3?“ · Planquadrat auf einem Gitter finden |
 | Vom Luftbild zur Karte (S. 22–23) | Schrägluftbild, Senkrechtluftbild, Karte; Karte vereinfacht, Legende | Luftbild und Karte vergleichen · „Was fehlt auf der Karte?“ |
 | Maßstab und Entfernungen (S. 24–25) | 1 : 100 000 heißt 1 cm = 1 km; Maßstabsleiste | Rechnen mit Maßstab (Generator) · Strecke auf Karte mit der Maßstabsleiste messen |
+| Die Welt entdecken (S. 26–27) | Vier Lebensräume (Polargebiet, Regenwald, Wüstenrand, Riesenstadt); Hilfsmittel Bild, Karte, Text, Zahl | „Wofür ist ein Foto gut?“ · Lebensraum auf der Weltkarte antippen · Merkmal einem Lebensraum zuordnen (ergänzt am 14.11.2026) |
 | Bilder und Texte auswerten (S. 28–29) | Vordergrund, Mittelgrund, Hintergrund; Schritte beim Beschreiben | Reihenfolge der Schritte · „Was liegt im Vordergrund?“ |
 | Leben im Tropischen Regenwald (S. 30–31) | heiß und feucht, Wald, Lebensweise | Foto zuordnen · „Was passt nicht in den Regenwald?“ |
 | Leben am Rand der Wüste (S. 32–33) | trocken, wenig Wasser, Lebensweise | „Warum sind die Häuser hier aus Lehm?“ |
@@ -150,3 +151,4 @@ Erklärungen nach Robertos Grundsatz: Merkzettel (kurz das Warum), Animation nur
 2. Fotos S. 4–5 und S. 18–19: **reicht Roberto nach.**
 3. Aktuelles Kapitel und Wahlbereich: **reicht Roberto nach** (gebaut wird in der Reihenfolge des Buchs).
 4. Umfang 54 Themen: **ja, so bauen.**
+5. Fotos S. 4–5 und 18–19 nachgereicht (14.11.2026, abends). **Aktuell im Unterricht: S. 26–27** („Die Welt entdecken“). Dafür kam ein eigenes Thema dazu (jetzt 55).

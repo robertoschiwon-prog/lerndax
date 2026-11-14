@@ -13,9 +13,11 @@ Begriffen und Seitenzahlen. Nichts wird abgeschrieben, kein Bild übernommen.
 - Ab Foto 8 meist eine Doppelseite je Foto, Seitenzahlen unten gelesen und mit dem Inhaltsverzeichnis verglichen:
   Foto 8 = S. 6, Foto 9 = S. 7, Foto 10 = S. 8, Foto 11 = S. 9, Foto 12–15 = S. 10–17,
   **ab Foto 16: Foto Nummer × 2 − 12 = linke Seite** (Foto 16 = S. 20/21 … Foto 107 = S. 202/203), Foto 108 = Rückseite.
-- **Es fehlen zwei Doppelseiten:**
-  - **S. 4–5:** Auftakt Kapitel 1 „Geographie – dein neues Fach“
-  - **S. 18–19:** „Die Welt im Atlas“ (Lehrplan LB 1, Schulatlas)
+- **Zwei Doppelseiten fehlten** und wurden am 14.11.2026 abends nachgereicht (im Chat, nicht im Ordner):
+  - **S. 4–5:** Auftakt Kapitel 1 „Geographie – dein neues Fach“: TERRA heißt „Erde“; Fotos von Erdbeben, Großstadt, Flughafen,
+    Basteibrücke, Bohrinsel, ländlichem Raum (die Erde hat viele Gesichter). → Thema „Naturlandschaft und Kulturlandschaft“ (S. 4–7).
+  - **S. 18–19:** „Die Welt im Atlas“: physische und thematische Karten, Höhenschichten, Meerestiefen, Hinweise zum Kartenlesen
+    (erst Überschrift, dann Legende), Bevölkerungsdichte in Einw./km², Mercators Atlas von 1595. → Thema „Mit dem Atlas arbeiten“ (S. 18–21).
 - Alles andere ist da und lesbar (S. 6–17, 20–203, der ganze Anhang mit Karten S. 190–199).
 
 ## Kapitel des Buchs und Lernbereiche
@@ -37,7 +39,7 @@ Begriffen und Seitenzahlen. Nichts wird abgeschrieben, kein Bild übernommen.
 
 **Kapitel 2 Unser Planet Erde:** Unsere Erde im Weltall (10–13: Planeten, Tag und Nacht, Jahreszeiten, Schaltjahr) ·
 Abbildungen der Erde (14–15: Weltraumbild, Globus, Weltkarte) · Sich auf der Erde orientieren (16–17: Kontinente, Ozeane,
-Windrose, Gradnetz) · Die Welt im Atlas (18–19, Foto fehlt) · Methode: Mit dem Atlas arbeiten (20–21: Register,
+Windrose, Gradnetz) · Die Welt im Atlas (18–19) · Methode: Mit dem Atlas arbeiten (20–21: Register,
 Planquadrat, Kartenübersicht) · Vom Luftbild zur Karte (22–23) · Methode: Entfernungen bestimmen (24–25: Maßstab) ·
 Die Welt entdecken (26–27) · Methode: Bilder und Texte auswerten (28–29) · Leben im Tropischen Regenwald (30–31),
 am Rand der Wüste (32–33), in den Polargebieten (34–35), in großen Städten: Shanghai (36–37) · Extra: Google Earth,

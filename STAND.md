@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 14.11.2026, Version `lerndax-v103`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 14.11.2026, Version `lerndax-v104`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,15 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-13. GeoDax: fehlende Buchseiten, Thema „Die Welt entdecken“ (lerndax-v104, 14.11.2026)
+
+Roberto hat S. 4–5 und S. 18–19 als Fotos im Chat geschickt. **Aktuell im Unterricht: S. 26–27 „Die Welt entdecken“.**
+- Neues Thema `geo5-welt` „Die Welt entdecken“ (S. 26–27): Hilfsmittel Bild, Karte, Text, Zahl (wofür welches); vier Lebensräume
+  (Polargebiet, Regenwald, Wüstenrand, Riesenstadt) auf der Weltkarte antippen, am Foto erkennen, Merkmale zuordnen. GeoDax hat jetzt 55 Themen.
+- „Mit dem Atlas arbeiten“ ergänzt (S. 18–19): erst die Überschrift lesen, Meerestiefen, Name „Atlas“ (Mercator 1595), Schritte beim Kartenlesen.
+- „Naturlandschaft und Kulturlandschaft“: Seitenhinweis jetzt S. 4–7, Frage zu „terra = Erde“.
+- Tests: `wissen_gen` GeoDax 13 200 Aufgaben ohne Fehler; `geodax.py 4` für die drei geänderten Themen ohne Meldung.
 
 ## 0-neu-12. GeoDax gebaut, gemeinsame Bausteine in plattform/ (lerndax-v103, 14.11.2026)
 

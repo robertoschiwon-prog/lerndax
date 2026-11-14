@@ -94,6 +94,8 @@ wird nichts. Wo Quellen leicht voneinander abweichen, nennt GeoDax eine gerundet
 | Erde als Fußball (22 cm) | Mond 6 cm in 6,6 m Abstand, Sonne 24 m groß in 2,6 km Abstand (eigene Rechnung aus den Werten oben) | Rechnung |
 | Mittagshöhe der Sonne in Dresden (51° N) | Juni ≈ 62,5°, März/September ≈ 39°, Dezember ≈ 15,5° (90° − 51° ± 23,4°); Tageslänge Juni rund 16 ½ h, Dezember knapp 8 h | Rechnung; Sonnenauf- und -untergangszeiten Dresden |
 | Gezeiten | Hochwasser zu Hochwasser ≈ 12 h 25 min, Hoch- zu Niedrigwasser ≈ 6 h 12 min; Flut jeden Tag etwa 50 min später | wie Abschnitt Küste |
+| terra (Latein) | „Erde, Land“ | duden.de „Terra“; etymonline.com „terra“ |
+| Atlas (Kartensammlung) | Mercators Kartensammlung „Atlas sive Cosmographicae Meditationes …“ erschien 1595 in Duisburg, ein Jahr nach seinem Tod (Sohn Rumold); erste Kartensammlung mit dem Namen Atlas, benannt nach dem sagenhaften König Atlas | Universität Utrecht, Special Collections „The Atlas by Mercator and Hondius“; crouchrarebooks.com; raremaps.com |
 | Karten | Natural Earth (gemeinfrei), Maßstab 1:10 Mio. (Länder, Bundesländer, Flüsse, Seen) | naturalearthdata.com |
 | Fotos | 49 freie Fotos von Wikimedia Commons, Fotograf und Lizenz in `web/geografie/bildnachweis.html` | Wikimedia Commons |
 

@@ -1,6 +1,7 @@
 # GeoDax (Geografie) – Startpunkt
 
-Stand 14.11.2026: **Klasse 5 gebaut** (`lerndax-v103`): 54 Themen in 9 Bereichen, Entdecken (5), Knobeln zu allen Themen.
+Stand 14.11.2026: **Klasse 5 gebaut** (`lerndax-v104`): 55 Themen in 9 Bereichen, Entdecken (5), Knobeln zu allen Themen.
+**Aktuell im Unterricht: S. 26–27 „Die Welt entdecken“** (Thema `geo5-welt`).
 
 ## Was feststeht
 
@@ -17,11 +18,11 @@ Stand 14.11.2026: **Klasse 5 gebaut** (`lerndax-v103`): 54 Themen in 9 Bereichen
 
 - `lehrplan/sachsen-gymnasium.md`: Lehrplan Klasse 5 am Originaltext, mit eigenen Worten
 - `lehrplan/schulbuch-abgleich.md`: Kapitel des Buchs ↔ Lernbereiche, Prüfung der Buchfotos
-- `themenplan.md`: 54 Themen in 9 Bereichen (= Kapitel des Buchs) mit Beispiel-Aufgaben (von Roberto bestätigt)
+- `themenplan.md`: 55 Themen in 9 Bereichen (= Kapitel des Buchs) mit Beispiel-Aufgaben (von Roberto bestätigt)
 - `fakten.md`: alle Zahlen und Namen mit Quelle
 
 **Fotos des Schulbuchs** liegen nur lokal in `notizen/schulbuch-geo/` (nicht auf GitHub). Ab Foto 16 gilt:
-Foto-Nummer × 2 − 12 = linke Seite der Doppelseite. Es fehlen S. 4–5 und S. 18–19 (Roberto reicht sie nach).
+Foto-Nummer × 2 − 12 = linke Seite der Doppelseite. S. 4–5 und S. 18–19 fehlen im Ordner; Roberto hat sie im Chat geschickt (Inhalt in `lehrplan/schulbuch-abgleich.md`).
 
 ## Bauweise (`web/geografie/`)
 
@@ -57,6 +58,5 @@ eintragen und in `bildnachweis.html` ergänzen.
 
 ## Offen
 
-- Fotos S. 4–5 und S. 18–19 des Buchs (Roberto reicht nach), dann Seitenhinweise prüfen.
-- Welches Kapitel gerade dran ist und welcher Wahlbereich (Stadt, Dorf oder Natur) gewählt wird.
+- Welcher Wahlbereich (Stadt, Dorf oder Natur) gewählt wird.
 - Für „Sohlental“ und „Marsch“ gab es kein gutes freies Foto; diese beiden werden mit Zeichnung bzw. Text geübt.

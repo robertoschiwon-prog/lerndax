@@ -254,7 +254,7 @@
   D.grades[5] = {
     lbs: [
       { id: 'geo5-fach', nr: 1, title: 'Geografie – dein neues Fach', topics: [
-        { id: 'geo5-landschaft', buch: 'S. 6–7', title: 'Naturlandschaft und Kulturlandschaft', icon: '🏞', gen: G.landschaft },
+        { id: 'geo5-landschaft', buch: 'S. 4–7', title: 'Naturlandschaft und Kulturlandschaft', icon: '🏞', gen: G.landschaft },
       ] },
       { id: 'geo5-erde', nr: 2, title: 'Unser Planet Erde', topics: [
         { id: 'geo5-weltall', buch: 'S. 10–11', title: 'Die Erde im Sonnensystem', icon: '🪐', gen: G.weltall },
@@ -267,6 +267,7 @@
         { id: 'geo5-atlas', buch: 'S. 18–21', title: 'Mit dem Atlas arbeiten', icon: '📕', gen: G.atlas },
         { id: 'geo5-luftbild', buch: 'S. 22–23', title: 'Vom Luftbild zur Karte', icon: '🛩', gen: G.luftbild },
         { id: 'geo5-massstab', buch: 'S. 24–25', title: 'Maßstab und Entfernungen', icon: '📏', gen: G.massstab },
+        { id: 'geo5-welt', buch: 'S. 26–27', title: 'Die Welt entdecken', icon: '🔭', gen: G.weltEntdecken },
         { id: 'geo5-bilder', buch: 'S. 28–29', title: 'Bilder und Texte auswerten', icon: '🖼', gen: G.bilderTexte },
         { id: 'geo5-regenwald', buch: 'S. 30–31', title: 'Leben im Tropischen Regenwald', icon: '🌴', gen: G.regenwald },
         { id: 'geo5-wueste', buch: 'S. 32–33', title: 'Leben am Rand der Wüste', icon: '🐪', gen: G.wueste },

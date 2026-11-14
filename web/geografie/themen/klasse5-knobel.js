@@ -48,6 +48,7 @@
     'geo5-gradnetz': [['Wie heißt der Breitenkreis mit 0°?', ['Äquator', 'der Äquator', 'Aequator'], 'Er teilt die Erde in Nord- und Südhalbkugel.'], ['Durch welchen Ort in London verläuft der Nullmeridian?', ['Greenwich'], 'Dort steht eine Sternwarte.']],
     'geo5-atlas': [['Wie heißt das Verzeichnis aller Namen hinten im Atlas?', ['Register', 'Namensregister', 'das Register'], 'Dort stehen Seite und Planquadrat.']],
     'geo5-luftbild': [['Wie heißt die Erklärung der Zeichen und Farben einer Karte?', ['Legende', 'die Legende', 'Zeichenerklärung'], 'Ohne Legende kann man eine Karte nicht lesen.']],
+    'geo5-welt': [['Auf welchem Kontinent liegt der Amazonas-Regenwald?', ['Südamerika'], 'Der größte Regenwald der Erde.'], ['Wie heißt der trockene Streifen am Südrand der Sahara?', ['Sahel', 'Sahelzone', 'die Sahelzone'], 'Dort liegt zum Beispiel Niger.']],
     'geo5-bilder': [['Wie heißt der Teil eines Bildes, der dem Betrachter am nächsten ist?', ['Vordergrund', 'der Vordergrund'], 'Dann folgen Mittelgrund und Hintergrund.']],
     'geo5-regenwald': [['Wie heißt der Fluss mit dem größten Regenwald der Erde?', ['Amazonas', 'der Amazonas'], 'Er fließt durch Südamerika.']],
     'geo5-wueste': [['Wie heißt der trockene Streifen südlich der Sahara?', ['Sahel', 'die Sahelzone', 'Sahelzone'], 'Dort wird es immer trockener.']],

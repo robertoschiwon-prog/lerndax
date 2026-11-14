@@ -19,6 +19,7 @@ window.GeoDaxIcons = (function () {
     'geo5-atlas': `<path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17a3 3 0 0 1 3-3h12"/>`,
     'geo5-luftbild': `<path d="M3 9h18v11H3z"/><path d="M6 13h4v4H6zM13 12h5M13 16h5"/><path d="M8 3l4 4 4-4"/>`,
     'geo5-massstab': `<path d="M2 15h20v4H2z"/><path d="M6 15v2M10 15v3M14 15v2M18 15v3"/><path d="M5 10l4-5 4 4 3-3 4 4"/>`,
+    'geo5-welt': `${KUGEL}<path d="M3 12h18"/><circle cx="16" cy="8" r="4"/><path d="M19 11l3 3"/>`,
     'geo5-bilder': `<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/>`,
     'geo5-regenwald': `<path d="M12 21V10"/><path d="M12 10c-3-4-7-3-9-1 3 0 6 0 9 1zM12 10c3-4 7-3 9-1-3 0-6 0-9 1zM12 10c-1-4 1-7 3-8-1 3-2 5-3 8z"/>`,
     'geo5-wueste': `<path d="M2 19c4-4 8-4 12 0 2-2 5-3 8-1"/><circle cx="17" cy="6" r="3"/>`,

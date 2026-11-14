@@ -137,5 +137,5 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [ ] EnDax (Englisch)
 - [x] GeDax (Geschichte) Klasse 5: 31 Themen
 - [x] BioDax (Biologie) Klasse 5: 50 Themen in 7 Bereichen, „Entdecken“ (5), Knobel-Aufgaben; `web/bio/`
-- [x] GeoDax (Geografie) Klasse 5: 54 Themen in 9 Bereichen, Karten zum Antippen, freie Fotos, „Entdecken“ (5), Knobel-Aufgaben; `web/geografie/`
+- [x] GeoDax (Geografie) Klasse 5: 55 Themen in 9 Bereichen, Karten zum Antippen, freie Fotos, „Entdecken“ (5), Knobel-Aufgaben; `web/geografie/`
 - [ ] TecDax (Technik/Computer)

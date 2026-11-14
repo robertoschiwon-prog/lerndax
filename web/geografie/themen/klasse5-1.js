@@ -12,6 +12,7 @@
     h: 'Eine Naturlandschaft hat der Mensch nicht verändert. In einer Kulturlandschaft sieht man Felder, Straßen, Häuser oder Kanäle.',
     F: [
       { f: 'Womit beschäftigt sich die <b>Geografie</b>?', a: 'mit der Erde, ihren Landschaften und wie Menschen dort leben', x: ['nur mit Pflanzen und Tieren', 'nur mit der Vergangenheit der Menschen', 'mit Zahlen und Formen'], w: '„Geografie“ heißt übersetzt „Erdbeschreibung“. Sie fragt: Wo liegt etwas? Wie sieht es dort aus? Warum leben Menschen so?' },
+      { f: 'Was bedeutet das lateinische Wort <b>terra</b>?', a: 'Erde', x: ['Land und Leute', 'Wasser', 'Himmel'], w: 'Daher kommen auch Wörter wie Terrasse oder Territorium.' },
       { f: 'Was ist eine <b>Naturlandschaft</b>?', a: 'eine Landschaft, die der Mensch nicht verändert hat', x: ['eine Landschaft mit vielen Feldern', 'ein Park in der Stadt', 'eine Landschaft mit Bauernhöfen'], w: 'Naturlandschaften gibt es heute vor allem im Hochgebirge, in Urwäldern, Wüsten und an den Polen.' },
       { f: 'Was ist eine <b>Kulturlandschaft</b>?', a: 'eine Landschaft, die der Mensch verändert und gestaltet hat', x: ['eine Landschaft ganz ohne Menschen', 'ein Gebirge mit Gletschern', 'eine Landschaft mit Theatern'], w: 'Felder, Dörfer, Straßen, Kanäle und Städte machen aus der Naturlandschaft eine Kulturlandschaft.' },
       { f: 'Woran erkennst du auf einem Foto sofort eine <b>Kulturlandschaft</b>?', a: 'an Feldern in geraden Formen, Straßen und Häusern', x: ['an Wolken am Himmel', 'an einem Fluss', 'an Bergen im Hintergrund'], w: 'Gerade Linien und Flächen gibt es in der Natur kaum. Sie zeigen: Hier hat der Mensch gearbeitet.' },
@@ -213,9 +214,13 @@
       { f: 'Was erklärt die <b>Legende</b> einer Karte?', a: 'was die Farben und Zeichen bedeuten', x: ['wer die Karte gezeichnet hat', 'eine alte Sage', 'wie alt die Karte ist'], w: 'Ohne Legende versteht man eine Karte nicht.' },
       { f: 'Was zeigt eine <b>physische Karte</b>?', a: 'Höhen (Tiefland und Gebirge), Gewässer und Orte', x: ['nur Ländergrenzen in bunten Farben', 'nur das Wetter', 'nur Straßen'], w: 'Grün heißt tief gelegen, Gelb und Braun heißt höher.' },
       { f: 'Was zeigt eine <b>thematische Karte</b>?', a: 'ein bestimmtes Thema, zum Beispiel Landwirtschaft oder Bevölkerung', x: ['immer nur Höhen', 'nur das Gradnetz', 'nichts, sie ist leer'], w: 'Das Thema steht im Titel der Karte.' },
+      { f: 'Was liest du bei einer Karte <b>zuerst</b>?', a: 'die Überschrift: Sie nennt das Thema und das Gebiet', x: ['den kleinsten Ortsnamen', 'die Seitenzahl', 'das Planquadrat'], w: 'Danach in der Legende die Zeichen und Farben suchen.' },
+      { f: 'Auf einer physischen Karte ist das Meer <b>dunkelblau</b>. Was bedeutet das meist?', a: 'Das Meer ist dort sehr tief.', x: ['Das Wasser ist dort besonders sauber.', 'Dort ist es sehr kalt.', 'Dort fahren viele Schiffe.'], w: 'Flaches Meer ist hell, tiefes Meer dunkelblau.' },
+      { f: 'Woher hat der <b>Atlas</b> seinen Namen?', a: 'von Atlas, einem König aus einer alten Sage: Nach ihm wurde 1595 die Kartensammlung von Gerhard Mercator benannt', x: ['von einem Gebirge in Sachsen', 'von einem Schiff', 'von einer Abkürzung für „alle Karten“'], w: 'Mercator war ein berühmter Kartenzeichner. Sein „Atlas“ erschien kurz nach seinem Tod.' },
       { f: 'Auf einer physischen Karte ist ein Gebiet <b>dunkelbraun</b>. Was bedeutet das meist?', a: 'Es liegt sehr hoch, zum Beispiel ein Hochgebirge.', x: ['Dort ist eine Wüste.', 'Dort wird Kaffee angebaut.', 'Das Gebiet liegt unter dem Meeresspiegel.'], w: 'Höhenschichten: Grün (tief), Gelb, Hellbraun, Dunkelbraun (hoch), oft Weiß für Gletscher.' },
     ],
-    O: [{ t: 'Du suchst „Freiberg“ im Atlas. Ordne die Schritte.', items: ['im Register den Namen suchen', 'die Seite aufschlagen', 'am Kartenrand Buchstabe und Zahl suchen', 'im Planquadrat den Ort finden'], w: 'Register → Seite → Planquadrat → Ort.' }],
+    O: [{ t: 'Du suchst „Freiberg“ im Atlas. Ordne die Schritte.', items: ['im Register den Namen suchen', 'die Seite aufschlagen', 'am Kartenrand Buchstabe und Zahl suchen', 'im Planquadrat den Ort finden'], w: 'Register → Seite → Planquadrat → Ort.' },
+      { t: 'So liest du eine Karte. Ordne.', items: ['die Überschrift lesen (Thema und Gebiet)', 'in der Legende die Zeichen und Farben suchen', 'die Zeichen in der Karte finden', 'beschreiben, wo etwas liegt und wie es verteilt ist'], w: 'Erst das Thema, dann die Legende, dann die Karte selbst.' }],
     S: { kats: ['physische Karte', 'thematische Karte'], f: (b) => `<b>${b}</b>: Welche Kartenart?`, h: 'Physisch = Gelände (Höhen, Gewässer). Thematisch = ein bestimmtes Thema.',
       items: [['Höhen in Grün, Gelb und Braun', 0], ['Gebirge und Flüsse', 0], ['Bevölkerungsdichte in Deutschland', 1], ['Wo wird Weizen angebaut?', 1], ['Ferienorte an der Ostsee', 1], ['Tiefland und Hochgebirge', 0]] },
     T: [{ f: 'Das Namensverzeichnis im Atlas heißt ___.', a: 'Register', w: 'Es steht hinten im Atlas und ist alphabetisch geordnet.' }],
@@ -260,6 +265,34 @@
     ],
     extra: { rechnen: () => U.massstabRechnen('rechnen'), rueck: () => U.massstabRueck('rueck'), bedeutung: () => U.massstabBedeutung('bedeutung') },
   }, { rechnen: 34, rueck: 18, bedeutung: 22, frage: 20 });
+
+  // Die Welt entdecken: vier Lebensräume und vier Hilfsmittel (Bild, Karte, Text, Zahl)
+  const LR = { 'Arktis an der Baffin Bay': [-68, 72, 'Nordamerika, nahe dem Nordpol'], 'Regenwald am Amazonas': [-62, -4, 'Südamerika, am Äquator'], 'Niger am Rand der Sahara': [8, 15, 'Afrika, im Sahel südlich der Sahara'], Shanghai: [121.5, 31.2, 'Asien (China), am Pazifischen Ozean'] };
+  const LR_ORTE = Object.fromEntries(Object.entries(LR).map(([k, v]) => [k, [v[0], v[1]]]));
+  const HILFSMITTEL = { kats: ['Bild', 'Karte', 'Text', 'Zahl'], f: (b) => `<b>${b}</b>: Welches Hilfsmittel hilft hier am besten?`, h: 'Bild = wie es aussieht. Karte = wo es liegt. Text = warum es so ist. Zahl = wie groß, wie viele.',
+    items: [['Wie sehen die Häuser am Amazonas aus?', 0], ['Welche Kleidung tragen die Menschen in der Arktis?', 0], ['Wie sieht eine Schule in Niger aus?', 0], ['Wo liegen die Regenwälder der Erde?', 1], ['Welche Flüsse und Städte liegen in der Nähe?', 1], ['An welchem Ozean liegt Shanghai?', 1], ['Warum regnet es im Regenwald fast jeden Tag?', 2], ['Wie leben die Menschen mit der Trockenheit?', 2], ['Wie groß ist der Regenwald in km²?', 3], ['Wie viele Menschen leben in Shanghai?', 3], ['Wie viel Regen fällt in einem Jahr?', 3]] };
+  G.weltEntdecken = baue('geo5-welt', {
+    h: 'Gebiete, die man nicht selbst besuchen kann, lernt man mit Bildern, Karten, Texten und Zahlen kennen. Vier sehr verschiedene Lebensräume: Polargebiet, Tropischer Regenwald, Wüstenrand und Riesenstadt.',
+    F: [
+      { f: 'Womit kannst du Gebiete kennenlernen, die du nicht selbst besuchen kannst?', a: 'mit Bildern, Karten, Texten und Zahlen', x: ['nur mit dem Wetterbericht', 'gar nicht', 'nur mit Postkarten von Freunden'], w: 'Jedes Hilfsmittel zeigt etwas anderes. Zusammen ergeben sie ein gutes Bild.' },
+      { f: 'Was zeigt ein <b>Foto</b> besonders gut?', a: 'wie es dort aussieht, zum Beispiel Häuser, Kleidung und Landschaft', x: ['wie viele Menschen in einem Land leben', 'warum es dort so heiß ist', 'wie weit es bis dorthin ist'], w: 'Ein Bild kann man in Ruhe anschauen, ein Film zeigt dafür Bewegung.' },
+      { f: 'Warum zeigt ein Foto nie die <b>ganze</b> Wirklichkeit?', a: 'Es ist nur ein Ausschnitt, und der Fotograf wählt aus, was er zeigen will.', x: ['Weil Fotos immer unscharf sind.', 'Weil Fotos nur schwarz-weiß sind.', 'Weil Fotos immer gefälscht sind.'], w: 'Darum fragt man: Was ist außerhalb des Bildes? Was wollte der Fotograf zeigen?' },
+      { f: 'Wofür ist eine <b>Karte</b> besonders gut?', a: 'um die Lage zu zeigen: wo etwas liegt und was in der Nähe ist', x: ['um zu zeigen, wie die Menschen aussehen', 'um Gefühle zu beschreiben', 'um Musik zu hören'], w: 'Karten zeigen zum Beispiel Verkehrswege, Städte oder wo Pflanzen wachsen.' },
+      { f: 'Wofür ist ein <b>Text</b> besonders gut?', a: 'um Hintergründe und Zusammenhänge zu erklären', x: ['um die genaue Lage zu zeigen', 'um Farben zu zeigen', 'um Entfernungen zu messen'], w: 'Ein Text kann erklären, warum etwas so ist.' },
+      { f: 'Wofür sind <b>Zahlen</b> besonders gut?', a: 'um Größen zu vergleichen und Veränderungen zu zeigen', x: ['um zu zeigen, wie es riecht', 'um die Landschaft zu zeigen', 'um eine Geschichte zu erzählen'], w: 'Zum Beispiel Fläche, Einwohner oder Regenmenge.' },
+      { f: 'Auf welchem Kontinent liegt der Regenwald am <b>Amazonas</b>?', a: 'Südamerika', x: ['Afrika', 'Asien', 'Australien'], w: 'Der Amazonas-Regenwald ist der größte Regenwald der Erde.' },
+      { f: 'Am Rand welcher Wüste liegt das Land <b>Niger</b>?', a: 'der Sahara', x: ['der Gobi', 'der Atacama', 'der Namib'], w: 'Niger liegt in Afrika. Der trockene Streifen südlich der Sahara heißt Sahel.' },
+      { f: 'Auf welchem Kontinent liegt die Riesenstadt <b>Shanghai</b>?', a: 'Asien', x: ['Europa', 'Nordamerika', 'Afrika'], w: 'Shanghai liegt in China am Pazifischen Ozean.' },
+      { f: 'In welchem Lebensraum ist es viele Monate sehr <b>kalt</b> und lange dunkel?', a: 'im Polargebiet', x: ['im Tropischen Regenwald', 'am Rand der Sahara', 'in Shanghai'], w: 'Im Winter geht dort die Sonne wochenlang nicht auf (Polarnacht).' },
+    ],
+    S: { kats: ['Polargebiet', 'Tropischer Regenwald', 'Wüstenrand', 'Riesenstadt'], f: (b) => `<b>${b}</b>: Zu welchem Lebensraum passt das?`, h: 'Kalt, nass und heiß, trocken oder voller Menschen?',
+      items: [['Polarnacht im Winter', 0], ['Eis und Schnee fast das ganze Jahr', 0], ['Dauerfrostboden', 0], ['fast jeden Tag ein Regenguss', 1], ['riesige Bäume in mehreren Stockwerken', 1], ['schwülheiß das ganze Jahr', 1], ['lange Trockenzeit', 2], ['Wasser aus dem Brunnen holen', 2], ['Dürre und Sandstürme', 2], ['Hochhäuser und U-Bahn', 3], ['Millionen Menschen auf engem Raum', 3], ['Stau und Smog', 3]] },
+    E: { f: 'Welchen Lebensraum zeigt das Foto?', arten: [['polar', 'ein Polargebiet', 'Eis und kaltes Meer.'], ['regenwald', 'einen Tropischen Regenwald', 'Dichter, nebliger Wald, heiß und feucht.'], ['sahel', 'den Rand einer Wüste (Sahel)', 'Trockener Boden, wenige Büsche und Bäume.'], ['shanghai', 'eine Riesenstadt', 'Hochhäuser, so weit man sieht.']] },
+    extra: {
+      hilfsmittel: () => U.sortiere('hilfsmittel', HILFSMITTEL),
+      lage: () => U.ortTippen('lage', { art: 'welt', ortArt: 'gebiet', orte: LR_ORTE, frage: (n) => `Wo liegt der Lebensraum <b>${n}</b>?`, merk: (n) => LR[n][2] + '.', h: 'Denk an die Kontinente und den Äquator.', opts: { gradnetz: { hell: ['aequator'] } } }),
+    },
+  }, { hilfsmittel: 24, lage: 22, frage: 24, sortieren: 18, erkennen: 14 });
 
   G.bilderTexte = baue('geo5-bilder', {
     h: 'Ein Bild beschreibt man von vorn nach hinten: Vordergrund, Mittelgrund, Hintergrund. Erst beschreiben, was man sieht, dann erklären, dann bewerten.',
