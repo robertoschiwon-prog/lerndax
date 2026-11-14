@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 14.11.2026, Version `lerndax-v102`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 14.11.2026, Version `lerndax-v103`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,28 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-12. GeoDax gebaut, gemeinsame Bausteine in plattform/ (lerndax-v103, 14.11.2026)
+
+Roberto: Karten „beides“, Umfang „ja, so bauen“, fehlende Buchfotos (S. 4–5, 18–19) und aktuelles Kapitel reicht er nach.
+- **GeoDax Klasse 5 fertig** (`web/geografie/`, Fach-ID `geografie`, Lernstand `geodax.v1`): 54 Themen in 9 Bereichen
+  (= Kapitel von TERRA Geographie 5 Sachsen) mit „📖 Buch S. …“, Entdecken (Jahreszeiten, Grönland schrumpft, Erde als
+  Fußball, zwei Flutberge, ein Fluss gräbt ein Tal), Knobel-Aufgaben zu allen Themen. Auf der Startseite (`faecher.js`:
+  `status: 'fertig'`). Startpunkt und Bauweise: `faecher/geo/README.md`.
+- **Karten aus Kartendaten** (Natural Earth, gemeinfrei; `karten/daten.js` erzeugt mit `tests/geo_karten.py`): Welt,
+  Europa, Deutschland mit Bundesländern, Sachsen mit Nachbarn, Flüsse, Gradnetz, Ozeane, Maßstabsleiste. Neue Aufgabenart:
+  **auf die Karte tippen** (`data-wahl` in `plattform/fach.js`: ein Tipp auf eine Fläche oder Nummer wählt die Antwort).
+- **49 freie Fotos** von Wikimedia Commons, im eingebauten Browser über die Commons-API gesucht und als Bildtafel angesehen
+  (`themen/fotos.js`, `bildnachweis.html`). Für „Sohlental“ und „Marsch“ gab es kein gutes Foto; dort Zeichnung bzw. Text.
+- **Eigene Animationen:** Maßstab, Tag und Nacht, Jahreszeiten, Ebbe und Flut, Steigungsregen, Talformen; sonst Merkzettel.
+- **Gemeinsam statt kopiert:** `plattform/bausteine.js` (auswahl, tippen, ordnen, sortiere, passtNicht, aussage,
+  beschriften, erkennen, baue, fotoBild) und `plattform/erklaer.js` (Merkzettel, Schritte, Fächer, Bild; Themen anmelden).
+  BioDax und GeDax nutzen sie jetzt auch (ihre Kopien sind entfernt). Merkzettel: Bild wird kleiner, wenn viel Text kommt.
+- **Tests:** neu `tests/wissen_gen.js` (Schnelltest ohne Browser für Bio, Ge, Geo) und `tests/geodax.py`.
+  Ergebnis v103: `wissen_gen` GeoDax 9720, BioDax 6500, GeDax 4030 Aufgaben ohne Fehler; `geodax.py 2` (648 Antworten,
+  64 Lösungs-Animationen, freie Erklärungen, 5 Entdeckungen) nach einer Korrektur ohne Meldung; `gedax.py 1`, `biodax.py 1`
+  und `hub.py` ohne Meldung.
+- **Offen:** Buchfotos S. 4–5 und 18–19, aktuelles Kapitel und Wahlbereich (Roberto), Test mit dem Kind.
 
 ## 0-neu-11. GeoDax: Planung begonnen (lerndax-v102, 14.11.2026)
 

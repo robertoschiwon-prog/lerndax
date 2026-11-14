@@ -1,6 +1,6 @@
-# GeoDax Klasse 5: Themenplan (Vorschlag)
+# GeoDax Klasse 5: Themenplan
 
-Stand 14.11.2026, **noch nicht bestätigt**. Grundlage: Lehrplan Geographie Sachsen, Fassung 2019 (eine Fassung 2025 gibt es
+Stand 14.11.2026, **von Roberto bestätigt** („Ja, so bauen“), gebaut in `lerndax-v103`. Grundlage: Lehrplan Geographie Sachsen, Fassung 2019 (eine Fassung 2025 gibt es
 für Geographie nicht, siehe `lehrplan/sachsen-gymnasium.md`), und die Kapitel des Schulbuchs TERRA Geographie 5 Sachsen.
 Die Bereiche heißen wie die Kapitel des Buchs und stehen in derselben Reihenfolge. Jedes Thema bekommt „📖 Buch S. …“.
 
@@ -144,9 +144,9 @@ Erklärungen nach Robertos Grundsatz: Merkzettel (kurz das Warum), Animation nur
 4. **Zwei Flutberge:** Warum gibt es zweimal am Tag Flut, wenn der Mond doch nur einmal vorbeikommt?
 5. **Ein Fluss gräbt ein Tal:** Zeitraffer vom Bach im Gebirge bis zum breiten Tal.
 
-## Offene Fragen an Roberto (einzeln stellen)
+## Antworten von Roberto (14.11.2026)
 
-1. Wie zeigen wir Karten? (freie Kartenbilder, Kartendaten oder beides)
-2. Fotos von S. 4–5 und S. 18–19 nachreichen? (fehlen)
-3. Welches Kapitel ist gerade dran? Welcher Wahlbereich (Stadt, Dorf oder Natur)?
-4. Passt der Umfang (54 Themen)?
+1. Karten: **beides**. Kartendaten (Natural Earth) zum Antippen und Beschriften, dazu freie Fotos und Karten von Wikimedia zum Anschauen.
+2. Fotos S. 4–5 und S. 18–19: **reicht Roberto nach.**
+3. Aktuelles Kapitel und Wahlbereich: **reicht Roberto nach** (gebaut wird in der Reihenfolge des Buchs).
+4. Umfang 54 Themen: **ja, so bauen.**

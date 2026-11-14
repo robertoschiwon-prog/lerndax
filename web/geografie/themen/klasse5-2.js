@@ -165,7 +165,7 @@
   // =====================================================
   // Bereich 4: An Nordseeküste und Ostseeküste
   // =====================================================
-  const INSELN = { Sylt: [8.3, 54.88], Fehmarn: [11.15, 54.45], Rügen: [13.4, 54.42], Usedom: [14.0, 53.95], Borkum: [6.73, 53.6], Helgoland: [7.89, 54.18], Föhr: [8.53, 54.72], Norderney: [7.2, 53.71], Hiddensee: [13.1, 54.55], Poel: [11.44, 54.0] };
+  const INSELN = { Sylt: [8.3, 54.88], Fehmarn: [11.15, 54.45], Rügen: [13.4, 54.42], Usedom: [14.0, 53.95], Borkum: [6.73, 53.6], Helgoland: [7.89, 54.18], Norderney: [7.2, 53.71], Poel: [11.44, 54.0] };
   const INSEL_MEER = { Sylt: 'Nordsee', Borkum: 'Nordsee', Helgoland: 'Nordsee', Föhr: 'Nordsee', Norderney: 'Nordsee', Fehmarn: 'Ostsee', Rügen: 'Ostsee', Usedom: 'Ostsee', Hiddensee: 'Ostsee', Poel: 'Ostsee' };
   const KUESTE_AUS = { breite: 300 };
   G.nordOstsee = baue('geo5-nord-ostsee', {
@@ -182,7 +182,7 @@
     S: { kats: ['Nordsee', 'Ostsee'], f: (b) => `<b>${b}</b>: Nordsee oder Ostsee?`, h: 'Die Nordsee liegt links (westlich) von Schleswig-Holstein, die Ostsee rechts (östlich).',
       items: [['Sylt', 0], ['Borkum', 0], ['Helgoland', 0], ['Norderney', 0], ['Wattenmeer', 0], ['Rügen', 1], ['Usedom', 1], ['Fehmarn', 1], ['Hiddensee', 1], ['Kieler Förde', 1]] },
     extra: {
-      insel: () => U.ortTippen('insel', { art: 'deutschland', ortArt: 'insel', orte: INSELN, namen: ['Sylt', 'Fehmarn', 'Rügen', 'Usedom', 'Borkum', 'Helgoland'], frage: (i) => `Wo liegt die Insel <b>${i}</b>?`, merk: (i) => `Insel in der ${INSEL_MEER[i]}.`, opts: KUESTE_AUS }),
+      insel: () => U.ortTippen('insel', { art: 'deutschland', ortArt: 'insel', orte: INSELN, namen: ['Sylt', 'Fehmarn', 'Rügen', 'Usedom', 'Borkum', 'Helgoland'], frage: (i) => `Wo liegt die Insel <b>${i}</b>?`, merk: (i) => `Insel in der ${INSEL_MEER[i]}.`, opts: KUESTE_AUS, versatz: { Sylt: [14, 8], Helgoland: [-12, 8], Rügen: [-14, -6], Usedom: [8, 10] } }),
     },
   }, { insel: 26, sortieren: 18 });
 
@@ -296,7 +296,7 @@
     extra: {
       landschaft: () => U.ortTippen('landschaft', { art: 'deutschland', ortArt: 'gebiet', orte: TL_ORTE, frage: (l) => `Wo liegt die Landschaft <b>${l}</b>?`, opts: { fluesse: ['Elbe', 'Oder', 'Weser'] } }),
     },
-    E: { f: 'Welche Landschaft zeigt das Foto?', arten: [['heide', 'Heide', 'Lila blühendes Heidekraut, dazwischen Wacholder.'], ['boerde', 'Börde mit Ackerbau', 'Weite, fruchtbare Felder.'], ['marsch', 'Marsch hinter dem Deich', 'Flaches Grünland mit Gräben, oft mit Kühen.']] },
+    E: { f: 'Welche Landschaft zeigt das Foto?', arten: [['heide', 'Heide', 'Lila blühendes Heidekraut, dazwischen Wacholder.'], ['boerde', 'Börde mit Ackerbau', 'Weite, fruchtbare Felder.']] },
   }, { landschaft: 24 });
 
   G.kanaele = baue('geo5-kanaele', {

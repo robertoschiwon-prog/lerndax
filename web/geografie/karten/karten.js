@@ -110,7 +110,7 @@
   }
 
   // ---------------------------------------------------------------- Weltkarte
-  const MEERE = { 'Pazifischer Ozean': [[-150, 5], [165, 10]], 'Atlantischer Ozean': [[-35, 15]], 'Indischer Ozean': [[78, -22]], 'Nordpolarmeer': [[30, 80]], 'Südpolarmeer': [[60, -58]] };
+  const MEERE = { 'Pazifischer Ozean': [[-128, -14], [150, 24]], 'Atlantischer Ozean': [[-35, 15]], 'Indischer Ozean': [[78, -22]], 'Nordpolarmeer': [[30, 80]], 'Südpolarmeer': [[60, -58]] };
   const KONT_MITTE = { Nordamerika: [-102, 46], Südamerika: [-60, -12], Europa: [17, 52], Afrika: [20, 6], Asien: [92, 46], Australien: [134, -24], Antarktis: [20, -80] };
   function welt(o) {
     o = o || {};
@@ -141,7 +141,7 @@
       }
     }
     if (o.gradnetz && o.gradnetz.namen) {
-      const [x1, y1] = f(-178, 0), [x2, y2] = f(0, -86);
+      const [x1, y1] = f(-112, 0), [x2, y2] = f(0, -86);
       s += txt(x1 + 2, y1 - 3, 'Äquator', { fs: 7, anker: 'start', farbe: '#d0443a' }) + txt(x2 + 3, y2 + 2, 'Nullmeridian', { fs: 7, anker: 'start', farbe: '#0a7d57' });
     }
     s += orteZeichnen(o.orte, f);
@@ -195,7 +195,7 @@
   }
 
   // ---------------------------------------------------------------- Sachsen mit Nachbarn
-  const SN_VERSATZ = { Sachsen: { ziel: [13.35, 51.2] }, Polen: { ziel: [15.25, 51.5] }, Tschechien: { ziel: [13.6, 50.25] }, Bayern: { ziel: [11.75, 50.15] }, Thüringen: { ziel: [11.7, 50.85] }, 'Sachsen-Anhalt': { ziel: [11.75, 51.75] }, Brandenburg: { ziel: [13.6, 51.75] } };
+  const SN_VERSATZ = { Sachsen: { ziel: [13.35, 51.2] }, Polen: { ziel: [14.95, 51.62] }, Tschechien: { ziel: [13.6, 50.25] }, Bayern: { ziel: [11.75, 50.15] }, Thüringen: { ziel: [11.7, 50.85] }, 'Sachsen-Anhalt': { ziel: [11.75, 51.75] }, Brandenburg: { ziel: [13.6, 51.75] } };
   function sachsen(o) {
     o = o || {};
     const X0 = 11.3, X1 = 15.35, Y0 = 51.9, Y1 = 50.05, c = Math.cos(51 * Math.PI / 180), W = 340, sx = W / ((X1 - X0) * c), H = Math.round((Y0 - Y1) * sx);

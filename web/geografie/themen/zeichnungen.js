@@ -19,7 +19,7 @@
     const px = cx + Math.cos(w) * r * 0.82, py = cy + Math.sin(w) * r * 0.82;
     let s = `<path d="M${cx} ${cy - r} A${r} ${r} 0 0 1 ${cx} ${cy + r}Z" fill="${TAG}"/><path d="M${cx} ${cy - r} A${r} ${r} 0 0 0 ${cx} ${cy + r}Z" fill="${NACHT}"/>`;
     s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${T}" stroke-width="1.6"/><circle cx="${cx}" cy="${cy}" r="3" fill="${T}"/>`;
-    s += tx(cx + 22, cy + 3, 'Nordpol', 7, T, 'middle', 700);
+    s += tx(cx + 20, cy - 6, 'Nordpol', 7, T, 'middle', 700);
     // Drehrichtung: gegen den Uhrzeigersinn (von oben gesehen)
     const R2 = r + 10, a0 = 200 * Math.PI / 180, a1 = 250 * Math.PI / 180;
     s += `<path d="M${(cx + Math.cos(a0) * R2).toFixed(1)} ${(cy - Math.sin(a0) * R2).toFixed(1)} A${R2} ${R2} 0 0 0 ${(cx + Math.cos(a1) * R2).toFixed(1)} ${(cy - Math.sin(a1) * R2).toFixed(1)}" fill="none" stroke="${T}" stroke-width="1.6"/>`;

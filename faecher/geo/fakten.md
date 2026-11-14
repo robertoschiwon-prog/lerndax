@@ -81,7 +81,23 @@ wird nichts. Wo Quellen leicht voneinander abweichen, nennt GeoDax eine gerundet
 | Talsperren: Sachsen hat 23 Trinkwassertalsperren; die größte ist die Talsperre Eibenstock (Zwickauer Mulde, rund 64 Mio. m³ Trinkwasser, in Betrieb seit 1982); etwa 40 % des Trinkwassers in Sachsen kommt aus Talsperren | Landestalsperrenverwaltung über Medienservice Sachsen: https://medienservice.sachsen.de/medien/news/194540/download_pdf und https://medienservice.sachsen.de/medien/news/253418/download_pdf; Volksstimme: https://www.volksstimme.de/panorama/generationenaufgabe-wasser-reicht-der-vorrat-noch-4299026 |
 | Nachhaltigkeit: Hans Carl von Carlowitz, Oberberghauptmann in Freiberg, schrieb 1713 in „Sylvicultura oeconomica“ erstmals, dass man nur so viel Holz schlagen soll, wie nachwächst | Freistaat Sachsen, Waldstrategie 2050: https://publikationen.sachsen.de/bdb/artikel/11309/documents/37097 |
 
-## Noch nachzuschlagen (beim Bauen)
+## Ergänzt beim Bauen (14.11.2026)
+
+| Fakt | Wert | Quelle |
+|---|---|---|
+| Letzte Steinkohlenzeche Deutschlands | Prosper-Haniel in Bottrop, Förderende 21.12.2018 | wissen.de „Abschied von der Steinkohle“; RAG-Sonderausgabe Prosper-Haniel |
+| Bodenfläche Deutschland 2024 | Landwirtschaft 50,2 %, Wald 29,9 %, Siedlung und Verkehr 14,6 %, Wasser 2,3 % | Umweltbundesamt, Abb. Flächennutzung (Destatis 2025) |
+| Erwerbstätige im Dienstleistungsbereich | gut drei Viertel (2024 rund 75,5 %), Landwirtschaft rund 1,2 % | Statista nach Destatis; ibisworld Dienstleistungsgrad |
+| Entstehung Elbsandstein | Sand vor rund 100 Mio. Jahren (Kreidezeit) in einem Meeresarm abgelagert | saechsische-schweiz.de; Bergwaldprojekt-Dossier NP Sächsische Schweiz |
+| Grönland / Afrika | 2,16 Mio. km² / 30,3 Mio. km², Afrika rund 14-mal so groß | laenderdaten.info; mylifeelsewhere.com |
+| Erde, Mond, Sonne | Erde ≈ 12 742 km (mittlerer Radius 6371 km), Mond ≈ 3475 km, Abstand Erde–Mond 384 400 km, Sonne ≈ 1 392 000 km, Abstand Erde–Sonne ≈ 149,6 Mio. km | NASA Moon Fact Sheet (nssdc.gsfc.nasa.gov); hyperphysics.gsu.edu |
+| Erde als Fußball (22 cm) | Mond 6 cm in 6,6 m Abstand, Sonne 24 m groß in 2,6 km Abstand (eigene Rechnung aus den Werten oben) | Rechnung |
+| Mittagshöhe der Sonne in Dresden (51° N) | Juni ≈ 62,5°, März/September ≈ 39°, Dezember ≈ 15,5° (90° − 51° ± 23,4°); Tageslänge Juni rund 16 ½ h, Dezember knapp 8 h | Rechnung; Sonnenauf- und -untergangszeiten Dresden |
+| Gezeiten | Hochwasser zu Hochwasser ≈ 12 h 25 min, Hoch- zu Niedrigwasser ≈ 6 h 12 min; Flut jeden Tag etwa 50 min später | wie Abschnitt Küste |
+| Karten | Natural Earth (gemeinfrei), Maßstab 1:10 Mio. (Länder, Bundesländer, Flüsse, Seen) | naturalearthdata.com |
+| Fotos | 49 freie Fotos von Wikimedia Commons, Fotograf und Lizenz in `web/geografie/bildnachweis.html` | Wikimedia Commons |
+
+## Noch nachzuschlagen (später)
 
 - Einzelne Höhen in Sachsen für Aufgaben (z. B. Lilienstein, Bastei), Längen von Mulde und Spree
 - Zahlen zu Seen der Tagebaue (Cospudener See, Senftenberger See, Bärwalder See)

@@ -1,12 +1,13 @@
 /* LernDax – Service Worker: App läuft auch offline.
  * Eigene Dateien: immer zuerst frisch vom Server, der Speicher ist nur der Offline-Ersatz.
  * So kommen Änderungen sofort an. Bei neuer Version VERSION erhöhen. */
-const VERSION = 'lerndax-v102';
+const VERSION = 'lerndax-v103';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js', './plattform/avatare.js', './plattform/trainings.js', './plattform/faecher.js', './plattform/symbole.js', './plattform/fach.js', './plattform/fach.css', './plattform/bausteine.js', './plattform/erklaer.js',
   './deutsch/', './deutsch/index.html', './deutsch/themen/klasse5.js', './deutsch/themen/klasse5-knobel.js', './deutsch/erklaerungen/klasse5.js', './deutsch/erklaerungen/entdecken.js', './deutsch/symbole.js',
   './englisch/', './englisch/index.html', './englisch/themen/klasse5.js', './englisch/themen/klasse5-knobel.js', './englisch/erklaerungen/klasse5.js', './englisch/erklaerungen/entdecken.js', './englisch/symbole.js', './englisch/audio/us/index.json', './englisch/audio/gb/index.json', // Sammeldateien der Aufnahmen (englisch/audio/*/<thema>.bin) werden beim ersten Öffnen eines Themas gespeichert
   './bio/', './bio/index.html', './bio/bildnachweis.html', './bio/themen/basis.js', './bio/themen/klasse5-1.js', './bio/themen/klasse5-2.js', './bio/themen/klasse5-3.js', './bio/themen/klasse5-knobel.js', './bio/erklaerungen/klasse5.js', './bio/erklaerungen/entdecken.js', './bio/symbole.js',
+  './geografie/', './geografie/index.html', './geografie/bildnachweis.html', './geografie/karten/daten.js', './geografie/karten/karten.js', './geografie/themen/basis.js', './geografie/themen/zeichnungen.js', './geografie/themen/klasse5-1.js', './geografie/themen/klasse5-2.js', './geografie/themen/klasse5-3.js', './geografie/themen/fotos.js', './geografie/themen/klasse5-knobel.js', './geografie/erklaerungen/klasse5.js', './geografie/erklaerungen/entdecken.js', './geografie/symbole.js',
   './geschichte/', './geschichte/index.html', './geschichte/themen/klasse5.js', './geschichte/themen/klasse5-knobel.js', './geschichte/erklaerungen/klasse5.js', './geschichte/erklaerungen/entdecken.js', './geschichte/symbole.js',
   './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js', './mathe/generatoren/klasse5-luecken.js', './mathe/generatoren/klasse5-buch.js', './mathe/generatoren/klasse5-knobel.js', './mathe/symbole.js',
   './mathe/erklaerungen/klasse5.js', './mathe/erklaerungen/klasse5-luecken.js', './mathe/erklaerungen/klasse5-buch.js', './mathe/erklaerungen/entdecken.js',

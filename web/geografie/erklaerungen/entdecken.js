@@ -132,7 +132,7 @@
           txt(g, 300, 145, 'Mond', 12, '#cfcfd6');
           await api.wait(4000);
           api.say('Die Sonne wäre eine Kugel von <b>24 Metern</b>, so hoch wie ein Haus mit acht Stockwerken.');
-          const sonne = el('circle', { cx: 900, cy: 120, r: 760, fill: GELB, opacity: 0 }, g);
+          const sonne = el('circle', { cx: 1110, cy: 120, r: 760, fill: GELB, opacity: 0 }, g);
           await zeig(api, sonne, 900);
           await api.wait(3800);
           api.say('Und sie wäre <b>2,6 Kilometer</b> entfernt. Zwischen Fußball und Sonne: fast nur leerer Raum. Das Licht braucht für den echten Weg trotzdem nur gut 8 Minuten.');

@@ -8,7 +8,7 @@
   // =====================================================
   // Bereich 6: Leben in der Stadt, Leben im Dorf
   // =====================================================
-  const GB = ['wohnen', 'arbeiten', 'sich versorgen', 'sich bilden', 'sich erholen', 'am Verkehr teilnehmen', 'in Gemeinschaft leben'];
+  const GB = ['wohnen', 'arbeiten', 'versorgen', 'bilden', 'erholen', 'Verkehr', 'Gemeinschaft'];
   G.stadt = baue('geo5-stadt', {
     h: 'Menschen haben Grundbedürfnisse: wohnen, arbeiten, sich versorgen, sich bilden, sich erholen, am Verkehr teilnehmen, in Gemeinschaft leben. Eine Stadt bietet für alle etwas.',
     F: [
@@ -160,7 +160,7 @@
     ],
     S: { kats: Object.keys(TAL), f: (b) => `<b>${b}</b>: Welche Talform?`, h: 'Klamm = eng; Kerbtal = V; Sohlental = flacher Boden; Muldental = breit und sanft.',
       items: [['senkrechte Felswände', 0], ['so eng, dass kaum Licht hineinfällt', 0], ['V-Form', 1], ['Fluss füllt den Talboden ganz aus', 1], ['flache Talsohle mit Wiesen', 2], ['Hänge steil, Boden flach', 2], ['sanfte, flache Hänge', 3], ['breite Mulde', 3]] },
-    E: { f: 'Welche Talform zeigt das Foto?', arten: [['klamm', 'Klamm', TAL.Klamm + '.'], ['kerbtal', 'Kerbtal', TAL.Kerbtal + '.'], ['sohlental', 'Sohlental', TAL.Sohlental + '.']] },
+    E: { f: 'Welche Talform zeigt das Foto?', arten: [['klamm', 'Klamm', TAL.Klamm + '.'], ['kerbtal', 'Kerbtal', TAL.Kerbtal + '.']] },
     extra: { talQuer: () => { const n = Object.keys(TAL), k = R(0, 3), ch = shuffle(n.slice()); return { prompt: 'Der Querschnitt zeigt ein Tal. Welche <b>Talform</b> ist das?', figure: D.talBild(k), choices: ch, correct: ch.indexOf(n[k]), hint: 'Schau auf die Hänge und den Talboden.', solution: `<b>${n[k]}</b>: ${TAL[n[k]]}.`, ex: { mode: 'tal', art: 'talQuer', k, merk: `<b>${n[k]}</b>: ${TAL[n[k]]}.` } }; } },
   }, { talQuer: 26, erkennen: 16 });
 
@@ -191,7 +191,7 @@
       { f: 'Wie heißt die berühmte Felsformation mit Brücke über dem Elbtal bei Rathen?', a: 'die Bastei', x: ['die Zugspitze', 'das Rote Kliff', 'der Brocken'], w: 'Die Basteibrücke ist eines der bekanntesten Ausflugsziele Sachsens.' },
     ],
     O: [{ t: 'Wie entstand das Elbsandsteingebirge? Ordne.', items: ['Flüsse bringen Sand in ein Meer', 'der Sand wird zu Sandstein gepresst', 'das Meer zieht sich zurück', 'das Gestein bekommt Risse (Klüfte)', 'Elbe und Bäche schneiden tiefe Täler hinein', 'Tafelberge und Felsnadeln bleiben stehen'], n: 5, w: 'Ablagerung im Meer, dann Abtragung durch Wasser: So entstand die Felslandschaft.' }],
-    E: { f: 'Was zeigt das Foto?', arten: [['bastei', 'die Bastei im Elbsandsteingebirge', 'Sandsteinfelsen über dem Elbtal.'], ['sandstein', 'Sandstein aus der Nähe', 'Man sieht die einzelnen Sandkörner.'], ['alpen', 'die Alpen', 'Hochgebirge mit Schnee.']] },
+    E: { f: 'Was zeigt das Foto?', arten: [['bastei', 'die Bastei im Elbsandsteingebirge', 'Sandsteinfelsen über dem Elbtal.'], ['kreide', 'die Kreidefelsen auf Rügen', 'Weiße Kreide an der Ostseeküste, kein Sandstein.'], ['alpen', 'die Alpen', 'Hochgebirge mit Schnee.']] },
   });
 
   G.wald = baue('geo5-wald', {

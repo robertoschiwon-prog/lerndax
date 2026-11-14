@@ -103,7 +103,7 @@
       };
       setz(Math.PI);
       await api.wait(2000);
-      const links = txt(api.svg, 50, 196, 'Juni: Sommer bei uns', 12, ORANGE), rechts = txt(api.svg, 310, 196, 'Dezember: Winter bei uns', 12, BLAU);
+      const links = txt(api.svg, 70, 196, 'Juni: Sommer', 12, ORANGE), rechts = txt(api.svg, 290, 196, 'Dezember: Winter', 12, BLAU);
       links.setAttribute('opacity', 0); rechts.setAttribute('opacity', 0);
       api.say('Links: Der Nordpol ist zur Sonne geneigt. Die Strahlen treffen uns steil, die Tage sind lang: <b>Sommer</b>.');
       await fade(api, links, 400);
@@ -131,7 +131,7 @@
       // Hoch- und Niedrigwasser beschriften
       for (let m = 0; m <= 1440; m += 5) {
         const a = H(m - 5), b = H(m), c = H(m + 5);
-        if ((b < a && b <= c) || (b > a && b >= c)) txt(api.svg, X(m), b < Y ? b - 8 : b + 16, b < Y ? 'Hochwasser' : 'Niedrigwasser', 9.5, b < Y ? '#2a6fb0' : '#6f6a7c');
+        if ((b < a && b <= c) || (b > a && b >= c)) txt(api.svg, Math.max(62, Math.min(308, X(m))), b < Y ? b - 8 : b + 16, b < Y ? 'Hochwasser' : 'Niedrigwasser', 9.5, b < Y ? '#2a6fb0' : '#6f6a7c');
       }
       await api.wait(1200);
       api.say('Steigt das Wasser, ist <b>Flut</b>. Fällt es, ist <b>Ebbe</b>. Von Hochwasser zu Niedrigwasser vergehen gut 6 Stunden.');
