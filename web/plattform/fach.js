@@ -994,6 +994,9 @@
 
   // ---------- Ereignisse ----------
   document.addEventListener('click', (e) => {
+    // Karte antippen (GeoDax): Flächen im Bild mit data-wahl="i" wirken wie der Knopf data-choice="i"
+    const w = e.target.closest && e.target.closest('.fig [data-wahl]');
+    if (w) { const k = document.querySelector(`[data-choice="${w.getAttribute('data-wahl')}"]:not([disabled])`); if (k) k.click(); return; }
     const b = e.target.closest('button');
     if (!b) return;
     const d = b.dataset;

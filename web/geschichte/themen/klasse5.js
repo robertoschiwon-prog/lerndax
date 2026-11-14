@@ -13,20 +13,18 @@
  */
 (function () {
   const D = (window.GeDax = window.GeDax || {});
-  const U = (D.util = D.util || {});
-  const R = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
-  const pick = (arr) => arr[R(0, arr.length - 1)];
-  const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = R(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-  Object.assign(U, { R, pick, shuffle, fmt: (x) => String(x) });
-  U.wahl = (liste) => { let r = Math.random() * liste.reduce((s, x) => s + x[0], 0); for (const [w, f] of liste) { r -= w; if (r <= 0) return f(); } return liste[0][1](); };
-  // Liste gemischt der Reihe nach durchgehen (Wiederholungen kommen spät)
-  const reihum = (liste) => { let s = []; return () => { if (!s.length) s = shuffle(liste); return s.pop(); }; };
-  const nurText = (s) => String(s).replace(/<[^>]+>/g, '');
   // Jahr als Text: negativ = v. Chr.; kleine Jahre n. Chr. mit Zusatz
   const J = (j, um) => (um ? 'um ' : '') + (j < 0 ? `${-j} v. Chr.` : j < 1000 ? `${j} n. Chr.` : String(j));
-  // Mischen, aber nie in der richtigen Reihenfolge lassen
-  const mische = (teile) => { let w = teile.slice(); for (let k = 0; k < 30 && w.join('|') === teile.join('|'); k++) w = shuffle(teile); return w; };
-  Object.assign(U, { reihum, nurText, J, mische });
+  // Gemeinsame Bausteine aus plattform/bausteine.js; Reihenfolgen mit Jahren (e.j) zeigen den Zeitstrahl
+  const umV = (e, i) => (Array.isArray(e.um) ? !!e.um[i] : !!e.um);
+  const U = LernDaxBausteine(D, {
+    passtNicht: 'Drei Begriffe gehören zusammen. Welcher <b>passt nicht</b> dazu?',
+    gw: { tippen: 16 },
+    ordnenZusatz: (e, i) => (e.j ? ` (${J(e.j[i], umV(e, i))})` : ''),
+    ordnenEx: (art, e, idx) => (e.j ? { mode: 'strahl', art, punkte: idx.map((i) => ({ j: e.j[i], t: e.kurz ? e.kurz[i] : e.items[i], um: umV(e, i) })), s1: e.s1 || 'Wir legen alles auf den Zeitstrahl: links das Älteste, rechts das Jüngste.', merk: e.w || 'Von links nach rechts: vom Ältesten zum Jüngsten.' } : null),
+  });
+  U.J = J;
+  const { R, pick, shuffle, reihum, nurText, mische, baue } = U;
 
   // =====================================================
   // Bilder (selbst gezeichnet, flach). Jede Funktion liefert ein <svg>.
@@ -51,78 +49,6 @@
     nilkarte: () => S('0 0 200 140', `<rect width="200" height="140" fill="${WUESTE}"/><rect width="200" height="22" fill="#7fb8e6"/><text x="100" y="15" text-anchor="middle" style="font:700 10px Nunito,sans-serif;fill:#1f4f7a">Mittelmeer</text><path d="M70 22 L100 46 L130 22 Z" fill="${FRUCHT}"/><path d="M92 46 C88 70 104 92 98 140 L112 140 C116 92 100 70 108 46 Z" fill="${FRUCHT}"/><path d="M100 46 C96 70 110 92 104 140" stroke="${NIL}" stroke-width="4" fill="none"/><path d="M100 46 L80 22 M100 46 L100 22 M100 46 L120 22" stroke="${NIL}" stroke-width="2.5"/><text x="150" y="40" text-anchor="middle" style="font:700 9px Nunito,sans-serif;fill:#5a4a1a">Unterägypten</text><text x="160" y="118" text-anchor="middle" style="font:700 9px Nunito,sans-serif;fill:#5a4a1a">Oberägypten</text><text x="40" y="96" text-anchor="middle" style="font:700 9px Nunito,sans-serif;fill:#8a6a2a">Wüste</text><path d="M120 128 l6 -10 l6 10" stroke="#5a4a1a" stroke-width="2" fill="none"/><text x="126" y="136" text-anchor="middle" style="font:700 7px Nunito,sans-serif;fill:#5a4a1a">Süden</text>`, 'Karte: der Nil fließt von Süden nach Norden ins Mittelmeer'),
   };
   D.bilder = BILDER;
-
-  // =====================================================
-  // Bausteine für Wissensaufgaben
-  // =====================================================
-  // Auswahl: { f: Frage, a: richtig, x: [falsche …], w: warum, svg?: Bildname, h?: Tipp }
-  function auswahl(art, e, hint) {
-    const ch = shuffle([e.a, ...shuffle(e.x).slice(0, 3)]);
-    const t = { prompt: e.f, choices: ch, correct: ch.indexOf(e.a), hint: e.h || hint, solution: `<b>${e.a}</b><br>${e.w}`,
-      ex: { mode: 'karte', nach: false, art, q: nurText(e.f), opts: ch, ok: ch.indexOf(e.a), svg: e.svg || '', merk: `<b>${e.a}</b>: ${e.w}` } };
-    if (e.svg) t.figure = BILDER[e.svg]();
-    return t;
-  }
-  // Lücke tippen: { f: 'Satz mit ___', a: 'Wort' oder ['Wort', 'andere Schreibweise'], w }
-  function tippen(art, e, hint) {
-    const [vor, nach] = e.f.split('___'), a = [].concat(e.a);
-    const t = { prompt: e.p || 'Ergänze das fehlende Wort.', layout: 'satz', fields: [{ type: 'text', answer: a, prefix: vor.trim(), suffix: (nach || '').trim(), label: 'Lücke', ci: true }],
-      hint: e.h || hint, solution: `${e.f.replace('___', `<b>${a[0]}</b>`)}<br>${e.w}`,
-      ex: { mode: 'karte', nach: false, art, q: e.f.replace('___', '…'), opts: [a[0]], ok: 0, svg: e.svg || '', merk: `<b>${a[0]}</b>: ${e.w}` } };
-    if (e.svg) t.figure = BILDER[e.svg]();
-    return t;
-  }
-  // Reihenfolge: { t: Aufgabe, items: [in richtiger Reihenfolge], j?: [Jahre], w: Merksatz }, n = wie viele Teile
-  function ordnen(art, e, hint, n) {
-    let idx = e.items.map((_, i) => i);
-    if (n && n < idx.length) idx = shuffle(idx).slice(0, n).sort((a, b) => a - b);
-    const teile = idx.map((i) => e.items[i]);
-    const um = (i) => (Array.isArray(e.um) ? !!e.um[i] : !!e.um);
-    const loes = teile.map((x, k) => `${k + 1}. ${x}${e.j ? ` (${J(e.j[idx[k]], um(idx[k]))})` : ''}`).join('<br>');
-    return { prompt: e.t, order: { words: mische(teile), answer: teile.join(' '), end: '' }, hint: e.h || hint, solution: `${loes}${e.w ? '<br>' + e.w : ''}`,
-      ex: e.j ? { mode: 'strahl', art, punkte: idx.map((i) => ({ j: e.j[i], t: e.kurz ? e.kurz[i] : e.items[i], um: um(i) })), s1: e.s1 || 'Wir legen alles auf den Zeitstrahl: links das Älteste, rechts das Jüngste.', merk: e.w || 'Von links nach rechts: vom Ältesten zum Jüngsten.' }
-        : { mode: 'reihe', art, items: teile, s1: e.s1 || 'Schritt für Schritt:', merk: e.w || `Die richtige Reihenfolge: ${teile.join(' → ')}` } };
-  }
-  // Sortieren: def = { kats: [...], items: [[Begriff, Kategorie, warum?], ...], f: (Begriff) => Frage, h }
-  function sortiere(art, def) {
-    const it = pick(def.items), andere = shuffle(def.items.filter((x) => x !== it && x[0] !== it[0])).slice(0, 3);
-    return { prompt: def.f(it[0]), choices: def.kats.slice(), correct: it[1], hint: def.h,
-      solution: `<b>${it[0]}</b> → <b>${def.kats[it[1]]}</b>${it[2] ? '<br>' + it[2] : ''}`,
-      ex: { mode: 'faecher', art, kats: def.kats, items: [[it[0], it[1]], ...andere.map((x) => [x[0], x[1]])], merk: `${it[0]} → <b>${def.kats[it[1]]}</b>${it[2] ? '. ' + it[2] : ''}` } };
-  }
-  // Was passt nicht? Drei aus einer Gruppe, einer aus einer anderen
-  function passtNicht(art, def) {
-    const gr = def.kats.map((_, k) => k).filter((k) => def.items.filter((x) => x[1] === k).length >= 3), k = pick(gr);
-    const drin = shuffle(def.items.filter((x) => x[1] === k)).slice(0, 3), raus = pick(def.items.filter((x) => x[1] !== k));
-    const ch = shuffle([...drin, raus].map((x) => x[0]));
-    return { prompt: def.nicht || 'Drei Begriffe gehören zusammen. Welcher <b>passt nicht</b> dazu?', choices: ch, correct: ch.indexOf(raus[0]), hint: def.h,
-      solution: `<b>${raus[0]}</b> gehört zu „${def.kats[raus[1]]}“. Die anderen gehören zu „${def.kats[k]}“.`,
-      ex: { mode: 'faecher', art, kats: def.kats, items: [[raus[0], raus[1]], ...drin.map((x) => [x[0], x[1]])], merk: `<b>${raus[0]}</b> passt nicht: ${def.kats[raus[1]]}. Die anderen: ${def.kats[k]}.` } };
-  }
-  // Aussagen: { w: [wahre], f: [falsche] } → „Welche Aussage stimmt?“ oder „Welche Aussage ist falsch?“
-  function aussage(art, def, hint, falschGesucht) {
-    const ok = falschGesucht ? pick(def.f) : pick(def.w), rest = shuffle(falschGesucht ? def.w : def.f).slice(0, 2), ch = shuffle([ok, ...rest]);
-    return { prompt: falschGesucht ? 'Welche Aussage ist <b>falsch</b>?' : 'Welche Aussage <b>stimmt</b>?', choices: ch, correct: ch.indexOf(ok), hint,
-      solution: falschGesucht ? `Falsch ist: <b>${ok}</b>` : `Richtig ist: <b>${ok}</b>`,
-      ex: { mode: 'karte', nach: false, art, q: falschGesucht ? 'Welche Aussage ist falsch?' : 'Welche Aussage stimmt?', opts: ch, ok: ch.indexOf(ok), svg: '', merk: `${falschGesucht ? 'Falsch' : 'Richtig'}: <b>${ok}</b>` } };
-  }
-  // Ein Thema aus einer Sammlung bauen. b = { h: Tipp, F, T, O, S, A, extra: {art: fn} }, gw = Gewichte
-  D.arten = {};
-  function baue(id, b, gw) {
-    const a = {};
-    if (b.F) { const r = reihum(b.F); a.frage = () => auswahl('frage', r(), b.h); }
-    if (b.T) { const r = reihum(b.T); a.tippen = () => tippen('tippen', r(), b.h); }
-    if (b.O) { const r = reihum(b.O); a.ordnen = () => { const e = r(); return ordnen('ordnen', e, b.h, e.n); }; }
-    if (b.S) { a.sortieren = () => sortiere('sortieren', b.S); a.passtNicht = () => passtNicht('passtNicht', b.S); }
-    if (b.A) a.aussage = () => aussage('aussage', b.A, b.h);
-    Object.assign(a, b.extra || {});
-    D.arten[id] = a;
-    gw = Object.assign({ frage: 34, tippen: 16, ordnen: 14, sortieren: 16, passtNicht: 8, aussage: 12 }, gw || {});
-    const liste = Object.keys(a).map((k) => [gw[k] ?? 15, a[k]]).filter((x) => x[0] > 0);
-    D.banken = D.banken || {}; D.banken[id] = b;
-    return () => U.wahl(liste);
-  }
-  Object.assign(U, { auswahl, tippen, ordnen, sortiere, passtNicht, aussage, baue });
 
   // =====================================================
   // Bereich 0: Begegnungen mit Geschichte (ANNO 1, S. 6–11; Lehrplan LB 1)

@@ -3,7 +3,7 @@
  * So kommen Änderungen sofort an. Bei neuer Version VERSION erhöhen. */
 const VERSION = 'lerndax-v102';
 const SHELL = [
-  './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js', './plattform/avatare.js', './plattform/trainings.js', './plattform/faecher.js', './plattform/symbole.js', './plattform/fach.js', './plattform/fach.css',
+  './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js', './plattform/avatare.js', './plattform/trainings.js', './plattform/faecher.js', './plattform/symbole.js', './plattform/fach.js', './plattform/fach.css', './plattform/bausteine.js', './plattform/erklaer.js',
   './deutsch/', './deutsch/index.html', './deutsch/themen/klasse5.js', './deutsch/themen/klasse5-knobel.js', './deutsch/erklaerungen/klasse5.js', './deutsch/erklaerungen/entdecken.js', './deutsch/symbole.js',
   './englisch/', './englisch/index.html', './englisch/themen/klasse5.js', './englisch/themen/klasse5-knobel.js', './englisch/erklaerungen/klasse5.js', './englisch/erklaerungen/entdecken.js', './englisch/symbole.js', './englisch/audio/us/index.json', './englisch/audio/gb/index.json', // Sammeldateien der Aufnahmen (englisch/audio/*/<thema>.bin) werden beim ersten Öffnen eines Themas gespeichert
   './bio/', './bio/index.html', './bio/bildnachweis.html', './bio/themen/basis.js', './bio/themen/klasse5-1.js', './bio/themen/klasse5-2.js', './bio/themen/klasse5-3.js', './bio/themen/klasse5-knobel.js', './bio/erklaerungen/klasse5.js', './bio/erklaerungen/entdecken.js', './bio/symbole.js',

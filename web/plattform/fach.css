@@ -132,6 +132,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .q b{font-weight:800}
 .fig{margin:4px 0 14px;background:#fffdf9;border:2px solid var(--tint);border-radius:12px;padding:6px}
 .fig svg{width:100%;height:auto;max-height:260px;display:block}
+.fig [data-wahl]{cursor:pointer}
 .answer{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:6px 0 16px;font-size:22px;font-weight:800}
 .fld{display:flex;flex-direction:column;gap:4px}
 .fld label{font-size:13px;color:var(--soft);font-weight:800}
