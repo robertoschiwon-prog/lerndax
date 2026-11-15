@@ -196,18 +196,22 @@
     // ---------------------------------------------------------------- Planeten
     async planeten(api, x) {
       const PL = D.planeten, Y = 112, HELL = '#fff', LEISE = '#b9bfe6', WORT = ['Mein', 'Vater', 'erklärt', 'mir', 'jeden', 'Sonntag', 'unseren', 'Nachthimmel'];
-      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10, fill: '#0d0e22' }, api.svg);
+      // alles im dunklen Rahmen halten (die große Sonne ragt sonst heraus)
+      const ID = 'plst' + Date.now(), cp = el('clipPath', { id: ID }, api.svg);
+      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10 }, cp);
+      const S = el('g', { 'clip-path': `url(#${ID})` }, api.svg);
+      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10, fill: '#0d0e22' }, S);
       // Fotos in Einheitsgröße (Radius 1 um 0,0), bewegt und vergrößert mit transform
-      const foto = (p, name, farbe) => { const g = el('g', {}, p); g.innerHTML = D.planetFoto(name, 0, 0, 1, `<circle r="1" fill="${farbe}"/>`); return g; };
-      const sonne = foto(api.svg, 'Sonne', '#ffcf4a');
+      const foto = (p, name, farbe, ring) => { const g = el('g', {}, p); g.innerHTML = D.planetFoto(name, 0, 0, 1, (ring ? '<ellipse rx="1.9" ry=".42" fill="none" stroke="#cdb98a" stroke-width=".22"/>' : '') + `<circle r="1" fill="${farbe}"/>`); return g; };
+      const sonne = foto(S, 'Sonne', '#ffcf4a');
       const setzS = (cx, r) => sonne.setAttribute('transform', `translate(${cx} ${Y}) scale(${r})`);
       setzS(-40, 72);
-      const linie = el('line', { x1: 20, y1: Y, x2: 354, y2: Y, stroke: LEISE, 'stroke-width': 1, opacity: 0 }, api.svg);
-      const satz = txt(api.svg, 180, 26, '', 10.5, '#ffcf4a');
-      txt(api.svg, 354, 234, 'Fotos: NASA', 9, LEISE, 'end');
+      const linie = el('line', { x1: 20, y1: Y, x2: 354, y2: Y, stroke: LEISE, 'stroke-width': 1, opacity: 0 }, S);
+      const satz = txt(S, 180, 26, '', 10.5, '#ffcf4a');
+      txt(S, 354, 234, 'Fotos: NASA', 9, LEISE, 'end');
       const k = PL.map((p, i) => {
-        const g = el('g', { opacity: 0 }, api.svg), z = { p, g, x: 58 + i * 38, r: (3.5 + 2.6 * Math.sqrt(p.d / 12756)) * (p.ring ? 0.7 : 1), ty: i % 2 ? Y + 38 : Y - 28 };
-        z.k = foto(g, p.n, p.f);
+        const g = el('g', { opacity: 0 }, S), z = { p, g, x: 58 + i * 38, r: (3.5 + 2.6 * Math.sqrt(p.d / 12756)) * (p.ring ? 0.7 : 1), ty: i % 2 ? Y + 38 : Y - 28 };
+        z.k = foto(g, p.n, p.f, p.ring);
         z.t = txt(g, z.x, z.ty, p.n, 12, HELL);
         return z;
       });
@@ -226,7 +230,7 @@
       }
       api.say('Die Anfangsbuchstaben im Merksatz sind die Anfangsbuchstaben der Planeten.');
       await api.wait(2200);
-      const zeig = (i) => { if (i == null) return; const z = k[i]; el('circle', { cx: z.cx, cy: Y, r: z.rr + 5, fill: 'none', stroke: '#ff6b5e', 'stroke-width': 2.5 }, api.svg); };
+      const zeig = (i) => { if (i == null) return; const z = k[i]; el('circle', { cx: z.cx, cy: Y, r: z.rr + 5, fill: 'none', stroke: '#ff6b5e', 'stroke-width': 2.5 }, S); };
       if (x.teil === 'reihe') { zeig(x.k); api.say(x.merk); return; }
       satz.textContent = '';
       if (x.teil === 'groesse') {
@@ -242,7 +246,7 @@
         await api.wait(900);
         api.say('Merkur, Venus, Erde und Mars sind winzig. Von der Sonne passt nur noch der Rand ins Bild.');
         await api.wait(3000);
-        const rE = 12756 * M / 2, g = el('g', { opacity: 0 }, api.svg);
+        const rE = 12756 * M / 2, g = el('g', { opacity: 0 }, S);
         for (let i = 0; i < 11; i++) el('circle', { cx: 130 - 30 + rE + i * (60 - 2 * rE) / 10, cy: Y, r: rE, fill: '#3f7fd9', stroke: HELL, 'stroke-width': 0.6 }, g);
         await fade(api, g, 500);
         api.say('Quer durch den Jupiter passen etwa <b>11 Erdkugeln</b> nebeneinander, durch die Sonne sogar 109.');
@@ -263,7 +267,7 @@
       api.say('Merkur, Venus, Erde und Mars drängen sich dicht an der Sonne. Die anderen liegen immer weiter auseinander.');
       await api.wait(3200);
       // Maßband: so weit wie Sonne–Erde, 30-mal bis zum Neptun
-      const g = el('g', { opacity: 0 }, api.svg), sx = 149.6 * M;
+      const g = el('g', { opacity: 0 }, S), sx = 149.6 * M;
       for (let i = 0; i <= 30; i++) el('line', { x1: 24 + i * sx, y1: Y + 22, x2: 24 + i * sx, y2: Y + (i % 5 ? 30 : 36), stroke: i % 5 ? LEISE : HELL, 'stroke-width': 1 }, g);
       el('line', { x1: 24, y1: Y + 22, x2: 24 + 30 * sx, y2: Y + 22, stroke: LEISE, 'stroke-width': 1 }, g);
       [5, 10, 20, 30].forEach((i) => txt(g, 24 + i * sx, Y + 52, i, 12, HELL, i === 30 ? 'end' : 'middle'));
