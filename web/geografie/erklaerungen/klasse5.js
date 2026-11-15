@@ -202,9 +202,9 @@
       el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10, fill: '#0d0e22' }, S);
       txt(S, 354, 234, 'Fotos: NASA', 9, LEISE, 'end');
       const rE = 30, rM = rE * 3475 / 12756, rS = rE * 109;      // Durchmesser: Erde 12 756 km, Mond 3 475 km, Sonne 109-mal die Erde
-      const teil = (name, cx, r, farbe, nr, wort, tx) => {
+      const teil = (name, cx, r, farbe, nr, wort, tx, zoom) => {
         const g = el('g', { opacity: 0 }, S);
-        g.innerHTML = D.planetFoto(name, cx, Y, r, `<circle cx="${cx}" cy="${Y}" r="${r}" fill="${farbe}"/>`);
+        g.innerHTML = D.planetFoto(name, cx, Y, r, `<circle cx="${cx}" cy="${Y}" r="${r}" fill="${farbe}"/>`, '', zoom);
         el('circle', { cx: tx - 22, cy: 30, r: 12, fill: '#0e7f91' }, g);
         txt(g, tx - 22, 35, nr, 13, '#fff');
         txt(g, tx - 5, 35, wort, 14, '#fff', 'start');
@@ -212,7 +212,7 @@
       };
       api.say('Sonne, Erde und Mond, alle im <b>selben Maßstab</b>:');
       await api.wait(1000);
-      const sonne = teil('Sonne', 62 - rS, rS, '#ffcf4a', 1, 'Sonne', 34);
+      const sonne = teil('Sonne', 62 - rS, rS, '#ffcf4a', 1, 'Sonne', 34, 1.25);
       await fade(api, sonne, 500);
       api.say('Die Sonne ist so riesig, dass nur ein kleines Stück von ihrem Rand ins Bild passt.');
       await api.wait(2600);
@@ -315,7 +315,8 @@
       const erden = el('g', {}, S), zahl = txt(S, 180, YL + 52, '', 15, '#ffcf4a');
       for (let i = 1; i <= 30; i++) {
         const e = el('g', { opacity: 0 }, erden);
-        e.innerHTML = D.planetFoto('Erde', 24 + i * sx, YE, 4.3, `<circle cx="${24 + i * sx}" cy="${YE}" r="4.3" fill="#3f7fd9"/>`);
+        e.innerHTML = D.planetFoto('Erde', 24 + i * sx, YE, 4.8, `<circle cx="${24 + i * sx}" cy="${YE}" r="4.8" fill="#3f7fd9"/>`)
+          + `<circle cx="${24 + i * sx}" cy="${YE}" r="4.9" fill="none" stroke="#5b9cff" stroke-width=".7"/>`;
         zahl.textContent = i === 1 ? '1 Erde' : `${i} Erden`;
         await api.tw(i === 1 ? 500 : i < 6 ? 220 : 70, (t) => e.setAttribute('opacity', t));
         if (i === 1) { api.say('<b>1</b> Schritt: so weit wie von der Sonne zur Erde.'); await api.wait(1600); }

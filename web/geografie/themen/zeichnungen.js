@@ -107,10 +107,12 @@
   let clipNr = 0;
   const urlVon = (f) => (window.LernDaxBausteine && LernDaxBausteine.fotoUrl ? LernDaxBausteine.fotoUrl(f.datei, f.b || 320) : '');
   // Foto als Kugel (beim Saturn mit Ringen). ersatz: Zeichnung, die verschwindet, sobald das Foto geladen ist.
-  D.planetFoto = function (name, x, y, r, ersatz, extra) {
+  // zoom > 1: Foto größer als die Kugel (nur die Mitte zu sehen), z. B. für einen winzigen Rand der riesigen Sonne,
+  // der sonst nur aus dem dunklen Sonnenrand bestünde.
+  D.planetFoto = function (name, x, y, r, ersatz, extra, zoom) {
     const f = FOTO[name], url = f && urlVon(f);
     if (!url) return `<g${extra || ''}>${ersatz}</g>`;
-    const w = r / f.f[2], h = w * f.q, id = 'gpl' + (++clipNr);
+    const w = r / f.f[2] * (zoom || 1), h = w * f.q, id = 'gpl' + (++clipNr);
     const bild = `<image href="${url}" x="${r1(x - f.f[0] * w)}" y="${r1(y - f.f[1] * h)}" width="${r1(w)}" height="${r1(h)}" preserveAspectRatio="none"`
       + (f.ring ? ' style="mix-blend-mode:screen"' : ` clip-path="url(#${id})"`) + ` onload="this.parentNode.firstChild.setAttribute('visibility','hidden')"/>`;
     return `<g${extra || ''}><g>${ersatz}</g>${f.ring ? '' : `<clipPath id="${id}"><circle cx="${x}" cy="${y}" r="${r1(r * 0.985)}"/></clipPath>`}${bild}</g>`;
