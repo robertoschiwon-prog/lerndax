@@ -944,6 +944,10 @@ Aussehen `design_audit.py`. (`gen-test.js` braucht den Pfad einer Generator-Date
    Chat- oder Sozialfunktionen.
 8. **Eng ans Schulbuch halten** (Roberto, 14.11.2026): Themen, Reihenfolge, Fachwörter und Erklärungen kommen aus dem Buch (Fotos in `notizen/`), in eigenen Worten und ohne Bilder aus dem Buch. Im Netz wird nur noch nachgeschlagen, was veralten kann (Einwohner, Mengen, Jahreszahlen der Gegenwart) oder im Buch nicht steht; das weiter mit Quelle festhalten.
    Gilt für alle Fächer mit Schulbuch.
+9. **Buchinhalte nie veröffentlichen** (Roberto, 15.11.2026): Buchfotos und Zusammenfassungen der Bücher („Nachschlagen …“,
+   Lernübersichten in `notizen/lernuebersichten/`) sind nur privat zum Nachschlagen und bleiben in `notizen/` (steht in `.gitignore`).
+   Nie auf GitHub, nie als Artifact oder Link teilen, nie in den öffentlichen Code. Keine vollständigen Kopien der Bücher (auch keine
+   PDF aus den Fotos); Zusammenfassungen nur in eigenen Worten.
 
 ## 7. Verbindung zum Familienkalender
 
