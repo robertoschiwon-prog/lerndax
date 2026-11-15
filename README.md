@@ -135,7 +135,7 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] DeDax (Deutsch) Klasse 5: 30 Themen in 5 Bereichen, „Entdecken“ (6), Knobel-Aufgaben zu allen Themen; auf der Startseite
 - [ ] DeDax: Abgleich mit dem Schulbuch (ISBN und Inhaltsverzeichnis fehlen), Test mit Bruno
 - [ ] EnDax (Englisch)
-- [x] GeDax (Geschichte) Klasse 5: 31 Themen
+- [x] GeDax (Geschichte) Klasse 5: 42 Themen (mit Seitenhinweisen ANNO 1)
 - [x] BioDax (Biologie) Klasse 5: 50 Themen in 7 Bereichen, „Entdecken“ (5), Knobel-Aufgaben; `web/bio/`
 - [x] GeoDax (Geografie) Klasse 5: 55 Themen in 9 Bereichen, Karten zum Antippen, freie Fotos, „Entdecken“ (5), Knobel-Aufgaben; `web/geografie/`
 - [ ] TecDax (Technik/Computer)

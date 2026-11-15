@@ -27,3 +27,64 @@ Am Bildschirm übbar: Karte lesen, schriftliche Quelle, Vasenbild, Schaubild les
 Lascaux, Altamira, Ocker, Pigment, Felsbild, Archäologe).
 
 **Beim Bau (v87):** Für Sparta nutzt GeDax „Periöken“ (wie die meisten Bücher), „Metöken“ nur für Athen. Quellenarten heißen Sachquelle, Bildquelle, Textquelle, mündliche Quelle; „gegenständliche Quelle“ wird beim Tippen auch angenommen.
+
+## Abgleich mit den Buchseiten (15.11.2026, `lerndax-v109`)
+
+Roberto hat das ganze Buch fotografiert (`notizen/schulbuch-geschichte/`, nur lokal; es fehlen S. 12–13, 48–49, 88–89).
+Jedes Thema hat jetzt einen Seitenhinweis „📖 Buch S. …“. Inhalte, Fachwörter und Zahlen folgen dem Buch, in eigenen Worten.
+
+| Thema in GeDax | Buch |
+|---|---|
+| Quellen | S. 6–8 |
+| **neu:** Von der kleinen zur großen Geschichte | S. 9 |
+| **neu:** Zeit messen und Kalender; Zeitstrahl; Jahrhunderte; Rechnen | S. 10–11 |
+| Zeitabschnitte (Vorgeschichte, Antike) | Fachbegriffe S. 138–141 |
+| Entwicklung zum Menschen | S. 14–17 |
+| Altsteinzeit | S. 18–21 |
+| Höhlenmalerei | kein Buchkapitel (Arbeitsblatt im Unterricht) |
+| Jungsteinzeit, Alt- oder Jungsteinzeit | S. 20–25 |
+| **neu:** Felsbilder in der Sahara | S. 26–29 |
+| Ötzi | S. 30–31 |
+| **neu:** Handel in der Bronzezeit: Abu-Ballas-Weg | S. 32–35 |
+| Metalle; **neu:** Die Kelten | S. 36–37 |
+| Himmelsscheibe von Nebra | S. 38–39 |
+| Nil | S. 46–49 |
+| **neu:** Klimawandel: Die Sahara wird zur Wüste | S. 50–51 |
+| Staat, Pharao, Beamte | S. 52–57 |
+| Schrift | S. 58–59 |
+| Gesellschaft | S. 60–63 |
+| Götter, Tempel und Priester | S. 64–67 |
+| Jenseits | S. 68–71 |
+| Pyramiden | S. 72–75 |
+| Merkmale einer Hochkultur | S. 76–77 |
+| **neu:** Woher wissen wir etwas über Ägypten? | S. 78–80 |
+| Land, Polis, Kolonien | S. 86–91 |
+| Olympische Spiele | S. 92–95 |
+| Götter der Griechen | S. 96–97 |
+| Quellen der Griechen | S. 98–101, 104–105 |
+| Wirtschaft Athen | S. 102–103 |
+| Demokratie | S. 106–111 |
+| Leben in Athen | S. 112–115 |
+| Sparta | S. 116–122 |
+| Vergleich | S. 123 |
+| **neu:** Wahlbereich Alexander und Hellenismus | S. 124–128 |
+| **neu:** Längsschnitt in drei Teilen (Steinzeit, Ägypten, Griechenland) + Vergleich | S. 132–137 |
+
+**Ans Buch angepasst (Auswahl):**
+- **Jahrhunderte wie im Buch:** Das 1. Jahrhundert sind die Jahre unter 100, das 13. Jahrhundert 1200 bis 1299 (vorher 1201–1300).
+  Aufgaben zu Jahrhundert-Spannen nur noch n. Chr. (für v. Chr. sagt das Buch nichts).
+- **Quellenarten wie im Buch:** gegenständliche, bildliche, schriftliche Quelle, mündliche Überlieferung (alte Namen beim Tippen erlaubt).
+  Damit ist die offene Frage „Sachquelle oder gegenständlich?“ beantwortet. Neu: v. u. Z./n. u. Z.
+- **Ägypten ohne „Sklaven“-Stufe:** Das Buch betont, dass es kaum Sklaven gab; Pyramide jetzt Pharao, Wesir, Beamte (Schreiber) und Priester,
+  Handwerker/Künstler/Soldaten, Bauern. Pyramidenbauer: Fachleute und Bauern, keine Sklaven.
+- Götter Ägyptens: die neun des Buchs (Re, Hathor, Anubis, Osiris, Horus, Maat, Amun, Thot, Isis) statt Bastet/Sobek.
+- Zahlen nach dem Buch: Reichseinigung um 3100 v. Chr. (Narmer), erste Schriftzeichen um 3400 v. Chr., Djoser um 2700 v. Chr.,
+  Bronzezeit in Mitteleuropa um 2000 v. Chr., Homo sapiens „über 150.000 Jahre“ (Buch 150.000, neuere Funde 300.000), Europa vor 40.000 Jahren,
+  Ötzi „über 50“ Tätowierungen, Nebra etwa 2 kg, Pnyx etwa 8000 Plätze, Volksversammlung viermal im Monat.
+- Begriffe: Neolithische Revolution, Fruchtbarer Halbmond, Paläolithikum/Neolithikum, Homo habilis „begabter Mensch“,
+  Homo erectus „aufgerichteter Mensch“, Vorgeschichte, Antike, Oikos, Agogé, Gerusia, Ephoren, Apella.
+- Olympia: Siegerpreis „Kranz aus Zweigen“ (Buchtext sagt Lorbeer, Bild zeigt Ölbaumzweig); Ende der Spiele ohne Jahreszahl
+  in der Antwort (Buch nennt 393/394 und 395 n. Chr.).
+
+**Noch offen:** Rechnen über Christi Geburt „ohne Jahr 0“ steht nicht im Buch; GeDax bleibt dabei (es stimmt). Höhlenmalerei
+(Lascaux, Altamira, Chauvet) kommt im Buch nicht vor, bleibt wegen des Arbeitsblatts.

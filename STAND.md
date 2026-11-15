@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v108`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v109`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,24 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-18. GeDax mit dem ganzen Geschichtsbuch abgeglichen (lerndax-v109, 15.11.2026)
+
+Roberto: „Die Seiten aus dem Geschichtsbuch (ANNO 1) liegen in `notizen\schulbuch-geschichte`. Bitte GeDax damit abgleichen wie bei
+GeoDax: Seitenhinweise ergänzen, eng ans Buch halten, fehlende Themen nachbauen.“ 73 Fotos (Doppelseiten, S. 2–144; es fehlen
+S. 12–13, 48–49, 88–89). Ergebnis und Seitentabelle: `faecher/geschichte/lehrplan/schulbuch-abgleich.md`.
+- **Alle Themen mit „📖 Buch S. …“**, auch die Bereiche (`buch` am Lernbereich). GeDax jetzt **42 Themen** (vorher 31).
+- **11 neue Themen:** Von der kleinen zur großen Geschichte (S. 9), Zeit messen und Kalender (S. 10–11), Felsbilder in der Sahara
+  (S. 26–29), Abu-Ballas-Weg mit Rechenaufgaben (S. 32–35), Die Kelten (S. 36–37), Klimawandel Sahara (S. 50–51), Woher wissen wir
+  etwas über Ägypten? (S. 78–80, aus „Hochkultur“ herausgelöst), Wahlbereich Alexander und Hellenismus (S. 124–128), Längsschnitt in
+  drei Teilen (S. 132–133, 134–135, 136–137). Alle Themen ausgebaut mit Fachwörtern und Zahlen aus dem Buch (in eigenen Worten).
+- **Ans Buch angepasst:** Jahrhunderte wie im Buch (13. Jh. = 1200–1299, `jhVon`/`jhBlock`), Quellenarten gegenständlich/bildlich/
+  schriftlich/mündliche Überlieferung, Ägyptens Gesellschaft ohne Sklaven-Stufe (Buch: „kaum Sklaven“), Götter Ägyptens wie im Buch,
+  Vorgeschichte/Antike, Neolithische Revolution, Zahlen (Narmer 3100, Schrift 3400, Djoser 2700, Bronzezeit 2000 v. Chr. u. a.).
+- Knobel: neue getippte Fragen für alle neuen Themen. `faecher.js`: themen 42. Tests: `wissen_gen` GeDax 42 Themen ohne Fehler,
+  `gedax.py 2` und `gedax_knobel.py` siehe unten.
+- **Buch als PDF:** nicht gemacht. Eine fast vollständige Kopie eines Schulbuchs ist auch für den privaten Gebrauch nicht erlaubt
+  (§ 53 Abs. 4 UrhG); die Verlage bieten digitale Ausgaben an. Die Fotos bleiben wie bisher lokal in `notizen/`.
 
 ## 0-neu-17. GeoDax: Sonne–Erde–Mond in Fotos, 30 Erden als Maßband (lerndax-v108, 15.11.2026)
 

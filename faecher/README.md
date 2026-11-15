@@ -75,7 +75,7 @@ Das kann später neu entschieden werden.
 1. MaDax ✅ inhaltlich fertig (36 Themen, Knobel-Stufe, Abgleich mit Buch und Lehrplan; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
 2. DeDax ✅ gebaut (37 Themen, Entdecken, Knobeln; mit dem Deutschbuch abgeglichen; Test mit dem Kind steht aus)
 3. EnDax ✅ gebaut (53 Themen nach den Units des Buchs, Entdecken, Knobeln; Startpunkt `faecher/englisch/README.md`; Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
-4. GeDax ✅ gebaut (31 Themen nach den Kapiteln von ANNO 1, Entdecken, Knobeln; `faecher/geschichte/README.md`); 
+4. GeDax ✅ gebaut (42 Themen nach den Kapiteln von ANNO 1, mit Seitenhinweisen, Entdecken, Knobeln; `faecher/geschichte/README.md`); 
 5. BioDax ✅ gebaut (50 Themen nach den Kapiteln von LINDER Biologie 5, Entdecken, Knobeln; `faecher/bio/README.md`)
 6. GeoDax ✅ gebaut (55 Themen nach den Kapiteln von TERRA Geographie 5, Karten aus Kartendaten, 49 freie Fotos, Entdecken, Knobeln; `faecher/geo/README.md`); **als Nächstes TecDax**
 7. TecDax (Technik/Computer)
