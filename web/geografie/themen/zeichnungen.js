@@ -88,19 +88,46 @@
     { n: 'Jupiter', d: 142984, a: 778.5, f: '#d9a878' }, { n: 'Saturn', d: 120536, a: 1432, f: '#e2c98f', ring: 1 },
     { n: 'Uranus', d: 51118, a: 2867, f: '#8fd3d6' }, { n: 'Neptun', d: 49528, a: 4515, f: '#4a6fd0' },
   ];
-  const ALL = '#1b1d3a', HELL = '#fff', LEISE = '#b9bfe6';
-  const r1 = (z) => +z.toFixed(1);
-  const kugel = (p, x, y, r, extra) => (p.ring ? `<ellipse cx="${x}" cy="${y}" rx="${r1(r * 1.9)}" ry="${r1(r * 0.42)}" fill="none" stroke="#cdb98a" stroke-width="${r1(Math.max(1, r * 0.22))}"/>` : '')
-    + `<circle cx="${x}" cy="${y}" r="${r1(r)}" fill="${p.f}"${extra || ''}/>`
+  const ALL = '#0d0e22', HELL = '#fff', LEISE = '#b9bfe6';
+  const r1 = (z) => +z.toFixed(2);
+  // Echte Aufnahmen (NASA, gemeinfrei, Wikimedia Commons). f = [Mitte x, Mitte y, Radius] als Anteil der Bildbreite bzw. -höhe,
+  // q = Höhe : Breite. Ausgemessen im eingebauten Browser. Ohne Netz bleibt die gezeichnete Kugel stehen.
+  const FOTO = D.planetenFotos = {
+    Sonne: { datei: "The Sun by the Atmospheric Imaging Assembly of NASA's Solar Dynamics Observatory - 20100819.jpg", f: [0.5, 0.4989, 0.405], q: 0.9545, b: 640, von: 'NASA/SDO' },
+    Merkur: { datei: 'Mercury in true color.jpg', f: [0.495, 0.499, 0.459], q: 1, von: 'NASA/JHUAPL' },
+    Venus: { datei: 'PIA23791-Venus-RealAndEnhancedContrastViews-20200608 (cropped).jpg', f: [0.513, 0.4995, 0.428], q: 1, von: 'NASA/JPL-Caltech' },
+    Erde: { datei: 'The Earth seen from Apollo 17.jpg', f: [0.4985, 0.4965, 0.4445], q: 1.0007, von: 'NASA, Apollo 17' },
+    Mars: { datei: 'Mars Valles Marineris.jpeg', f: [0.5, 0.494, 0.494], q: 1, von: 'NASA/USGS' },
+    Jupiter: { datei: 'Jupiter and its shrunken Great Red Spot.jpg', f: [0.502, 0.498, 0.4535], q: 1, von: 'NASA, ESA, A. Simon' },
+    Saturn: { datei: 'Saturn during Equinox.jpg', f: [0.4984, 0.5065, 0.168], q: 0.4844, ring: 1, b: 640, von: 'NASA/JPL/SSI' },
+    Uranus: { datei: "Uranus as seen by NASA's Voyager 2 (remastered) - JPEG converted.jpg", f: [0.494, 0.496, 0.401], q: 1, von: 'NASA' },
+    Neptun: { datei: 'Neptune Full.jpg', f: [0.4875, 0.4955, 0.42], q: 1, von: 'NASA' },
+  };
+  let clipNr = 0;
+  const urlVon = (f) => (window.LernDaxBausteine && LernDaxBausteine.fotoUrl ? LernDaxBausteine.fotoUrl(f.datei, f.b || 320) : '');
+  // Foto als Kugel (beim Saturn mit Ringen). ersatz: Zeichnung, die verschwindet, sobald das Foto geladen ist.
+  D.planetFoto = function (name, x, y, r, ersatz, extra) {
+    const f = FOTO[name], url = f && urlVon(f);
+    if (!url) return `<g${extra || ''}>${ersatz}</g>`;
+    const w = r / f.f[2], h = w * f.q, id = 'gpl' + (++clipNr);
+    const bild = `<image href="${url}" x="${r1(x - f.f[0] * w)}" y="${r1(y - f.f[1] * h)}" width="${r1(w)}" height="${r1(h)}" preserveAspectRatio="none"`
+      + (f.ring ? ' style="mix-blend-mode:screen"' : ` clip-path="url(#${id})"`) + ` onload="this.parentNode.firstChild.setAttribute('visibility','hidden')"/>`;
+    return `<g${extra || ''}><g>${ersatz}</g>${f.ring ? '' : `<clipPath id="${id}"><circle cx="${x}" cy="${y}" r="${r1(r * 0.985)}"/></clipPath>`}${bild}</g>`;
+  };
+  const sonne = (x, y, r) => D.planetFoto('Sonne', x, y, r, `<circle cx="${x}" cy="${y}" r="${r1(r)}" fill="${GELB}"/>`);
+  const nachweis = (W) => tx(W - 6, 12, 'Fotos: NASA', 8, LEISE, 'end', 700);
+  const zeichnung = (p, x, y, r) => (p.ring ? `<ellipse cx="${x}" cy="${y}" rx="${r1(r * 1.9)}" ry="${r1(r * 0.42)}" fill="none" stroke="#cdb98a" stroke-width="${r1(Math.max(1, r * 0.22))}"/>` : '')
+    + `<circle cx="${x}" cy="${y}" r="${r1(r)}" fill="${p.f}"/>`
     + (p.ring ? `<path d="M${r1(x - r * 1.9)} ${y} A${r1(r * 1.9)} ${r1(r * 0.42)} 0 0 0 ${r1(x + r * 1.9)} ${y}" fill="none" stroke="#cdb98a" stroke-width="${r1(Math.max(1, r * 0.22))}"/>` : '');
-  const all = (w, h, inhalt, name) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${name}" style="max-width:100%;height:auto"><rect width="${w}" height="${h}" rx="8" fill="${ALL}"/>${inhalt}</svg>`;
+  const kugel = (p, x, y, r, extra) => D.planetFoto(p.n, x, y, r, zeichnung(p, x, y, r), extra);
+  const all = (w, h, inhalt, name) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${name}" style="max-width:100%;height:auto"><rect width="${w}" height="${h}" rx="8" fill="${ALL}"/>${inhalt}${nachweis(w)}</svg>`;
   const marke = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r1(r)}" fill="none" stroke="#ff6b5e" stroke-width="2.2"/>`;
   const nummer = (x, y, i) => `<circle cx="${x}" cy="${y}" r="9" fill="${HELL}" stroke="${BLAU}" stroke-width="1.6"/>` + tx(x, y + 3.6, i, 11, BLAU);
 
   D.planetenReihe = function (o) {
     o = o || {};
     const W = 330, H = 138, Y = 62, nr = o.nummern || [];
-    let s = `<circle cx="-30" cy="${Y}" r="67" fill="${GELB}"/>` + tx(18, Y + 4, 'Sonne', 10.5, '#5a4300', 'middle');
+    let s = sonne(-30, Y, 67) + `<text x="16" y="${Y + 4}" text-anchor="middle" style="font:800 10.5px Nunito,sans-serif;fill:#fff;paint-order:stroke;stroke:#5a2a00;stroke-width:2.5px">Sonne</text>`;
     PL.forEach((p, i) => {
       const x = 58 + i * 35.5, r = 3.2 + 2.3 * Math.sqrt(p.d / 12756), k = nr.indexOf(i);
       const wahl = k >= 0 ? ` data-wahl="${k}"` : '';
@@ -117,7 +144,7 @@
     o = o || {};
     const W = 330, H = 152, Y = 54, M = 56 / 142984;           // Jupiter ist 56 Einheiten breit
     const X = [42, 63, 84, 105, 146, 222, 282, 312];
-    let s = `<circle cx="${r1(19 - 1392000 * M / 2)}" cy="${Y}" r="${r1(1392000 * M / 2)}" fill="${GELB}"/>` + `<text transform="translate(12.5 ${Y}) rotate(-90)" text-anchor="middle" style="font:800 10.5px Nunito,sans-serif;fill:#5a4300">Rand der Sonne</text>`;
+    let s = sonne(19 - 1392000 * M / 2, Y, 1392000 * M / 2) + `<text transform="translate(12.5 ${Y}) rotate(-90)" text-anchor="middle" style="font:800 10.5px Nunito,sans-serif;fill:#fff;paint-order:stroke;stroke:#5a2a00;stroke-width:2.5px">Rand der Sonne</text>`;
     PL.forEach((p, i) => {
       const r = Math.max(1.2, p.d * M / 2), yN = i % 2 && (i < 4 || i === 7) ? 121 : 106;
       s += kugel(p, X[i], Y, r);
@@ -134,16 +161,16 @@
   D.planetenAbstaende = function (o) {
     o = o || {};
     const W = 330, H = 182, X0 = 16, Y1 = 40, Y2 = 122, M1 = 300 / 4515, M2 = 290 / 800, SCHUB = [-5, 0, 6, 0, 0, 0, 0, 0];
-    const punkt = (p, x, y, i, oben, anker) => `<circle cx="${r1(x)}" cy="${y}" r="${i > 3 ? 4.5 : 3.4}" fill="${p.f}" stroke="${HELL}" stroke-width=".6"/>`
+    const punkt = (p, x, y, i, oben, anker) => kugel(p, r1(x), y, i > 3 ? 5 : 3.8)
       + (o.frage === i ? marke(r1(x), y, 8) + tx(r1(x), oben ? y - 13 : y + 24, '?', 15, '#ff8a7e') : o.frage == null ? tx(r1(x + (y === Y2 ? SCHUB[i] : 0)), oben ? y - 11 : y + 20, p.n, 11.5, HELL, anker || 'middle', 700) : '');
     // oben: alle acht im selben Maßstab
-    let s = `<line x1="${X0}" y1="${Y1}" x2="${W - 8}" y2="${Y1}" stroke="${LEISE}" stroke-width="1"/>` + `<circle cx="${X0 - 6}" cy="${Y1}" r="9" fill="${GELB}"/>`;
+    let s = `<line x1="${X0}" y1="${Y1}" x2="${W - 8}" y2="${Y1}" stroke="${LEISE}" stroke-width="1"/>` + sonne(X0 - 6, Y1, 9);
     PL.forEach((p, i) => { if (i > 3) s += punkt(p, X0 + p.a * M1, Y1, i, true, i === 7 ? 'end' : 'middle'); else s += `<circle cx="${r1(X0 + p.a * M1)}" cy="${Y1}" r="2" fill="${p.f}"/>`; });
     // Lupe: der Anfang bis zum Jupiter
     const xj = X0 + 800 * M1;
     s += `<path d="M${X0} ${Y1 + 7} L${X0} ${Y2 - 36} M${r1(xj)} ${Y1 + 7} L${W - 12} ${Y2 - 36}" stroke="${LEISE}" stroke-width=".8" stroke-dasharray="3 3" fill="none"/>`;
     s += tx(W / 2 - 20, Y2 - 40, 'der Anfang, vergrößert', 10, LEISE, 'middle', 700);
-    s += `<line x1="${X0}" y1="${Y2}" x2="${W - 12}" y2="${Y2}" stroke="${LEISE}" stroke-width="1"/>` + `<circle cx="${X0 - 4}" cy="${Y2}" r="11" fill="${GELB}"/>`;
+    s += `<line x1="${X0}" y1="${Y2}" x2="${W - 12}" y2="${Y2}" stroke="${LEISE}" stroke-width="1"/>` + sonne(X0 - 4, Y2, 11);
     // Asteroidengürtel zwischen Mars und Jupiter
     for (let i = 0; i < 26; i++) s += `<circle cx="${r1(X0 + (330 + (i * 37) % 160) * M2)}" cy="${r1(Y2 - 5 + (i * 7) % 11)}" r=".9" fill="${LEISE}"/>`;
     s += tx(X0 + 425 * M2, Y2 - 12, 'Asteroidengürtel', 10, LEISE, 'middle', 700);

@@ -196,20 +196,25 @@
     // ---------------------------------------------------------------- Planeten
     async planeten(api, x) {
       const PL = D.planeten, Y = 112, HELL = '#fff', LEISE = '#b9bfe6', WORT = ['Mein', 'Vater', 'erklärt', 'mir', 'jeden', 'Sonntag', 'unseren', 'Nachthimmel'];
-      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10, fill: '#1b1d3a' }, api.svg);
-      const sonne = el('circle', { cx: -40, cy: Y, r: 72, fill: '#ffcf4a' }, api.svg);
+      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10, fill: '#0d0e22' }, api.svg);
+      // Fotos in Einheitsgröße (Radius 1 um 0,0), bewegt und vergrößert mit transform
+      const foto = (p, name, farbe) => { const g = el('g', {}, p); g.innerHTML = D.planetFoto(name, 0, 0, 1, `<circle r="1" fill="${farbe}"/>`); return g; };
+      const sonne = foto(api.svg, 'Sonne', '#ffcf4a');
+      const setzS = (cx, r) => sonne.setAttribute('transform', `translate(${cx} ${Y}) scale(${r})`);
+      setzS(-40, 72);
       const linie = el('line', { x1: 20, y1: Y, x2: 354, y2: Y, stroke: LEISE, 'stroke-width': 1, opacity: 0 }, api.svg);
       const satz = txt(api.svg, 180, 26, '', 10.5, '#ffcf4a');
+      txt(api.svg, 354, 234, 'Fotos: NASA', 9, LEISE, 'end');
       const k = PL.map((p, i) => {
         const g = el('g', { opacity: 0 }, api.svg), z = { p, g, x: 58 + i * 38, r: 3.5 + 2.6 * Math.sqrt(p.d / 12756), ty: i % 2 ? Y + 38 : Y - 28 };
-        if (p.ring) z.ring = el('ellipse', { cy: Y, fill: 'none', stroke: '#cdb98a' }, g);
-        z.c = el('circle', { cy: Y, fill: p.f }, g);
+        z.k = foto(g, p.n, p.f);
         z.t = txt(g, z.x, z.ty, p.n, 12, HELL);
         return z;
       });
       const setz = (z, cx, r, ty, tx) => {
-        z.c.setAttribute('cx', cx); z.c.setAttribute('r', r); z.t.setAttribute('x', tx == null ? cx : tx); z.t.setAttribute('y', ty);
-        if (z.ring) { z.ring.setAttribute('cx', cx); z.ring.setAttribute('rx', r * 1.9); z.ring.setAttribute('ry', r * 0.42); z.ring.setAttribute('stroke-width', Math.max(1, r * 0.22)); }
+        z.cx = cx; z.rr = r;
+        z.k.setAttribute('transform', `translate(${cx} ${Y}) scale(${r})`);
+        z.t.setAttribute('x', tx == null ? cx : tx); z.t.setAttribute('y', ty);
       };
       k.forEach((z) => setz(z, z.x, z.r, z.ty));
       api.say('Um die Sonne kreisen acht Planeten. Von der Sonne aus gezählt:');
@@ -221,7 +226,7 @@
       }
       api.say('Die Anfangsbuchstaben im Merksatz sind die Anfangsbuchstaben der Planeten.');
       await api.wait(2200);
-      const zeig = (i) => { if (i == null) return; const z = k[i]; el('circle', { cx: z.c.getAttribute('cx'), cy: Y, r: +z.c.getAttribute('r') + 5, fill: 'none', stroke: '#ff6b5e', 'stroke-width': 2.5 }, api.svg); };
+      const zeig = (i) => { if (i == null) return; const z = k[i]; el('circle', { cx: z.cx, cy: Y, r: z.rr + 5, fill: 'none', stroke: '#ff6b5e', 'stroke-width': 2.5 }, api.svg); };
       if (x.teil === 'reihe') { zeig(x.k); api.say(x.merk); return; }
       satz.textContent = '';
       if (x.teil === 'groesse') {
@@ -231,7 +236,7 @@
         const r0 = 72, r1 = 1392000 * M / 2;
         await api.tw(2200, (t) => {
           const e = t * t * (3 - 2 * t);
-          sonne.setAttribute('r', lerp(r0, r1, e)); sonne.setAttribute('cx', lerp(-40, 22 - r1, e));
+          setzS(lerp(-40, 22 - r1, e), lerp(r0, r1, e));
           k.forEach((z, i) => setz(z, lerp(z.x, X[i], e), lerp(z.r, Math.max(1.2, z.p.d * M / 2), e), lerp(z.ty, TY[i], e), i === 7 ? lerp(z.x, 336, e) : null));
         });
         await api.wait(900);
@@ -251,7 +256,7 @@
       await api.wait(1800);
       await api.tw(2600, (t) => {
         const e = t * t * (3 - 2 * t);
-        sonne.setAttribute('r', lerp(72, 10, e)); sonne.setAttribute('cx', lerp(-40, 14, e)); linie.setAttribute('opacity', e);
+        setzS(lerp(-40, 14, e), lerp(72, 10, e)); linie.setAttribute('opacity', e);
         k.forEach((z, i) => { setz(z, lerp(z.x, XA(z.p), e), lerp(z.r, i > 3 ? 5 : 3, e), lerp(z.ty, Y - 16, e)); if (i < 4) z.t.setAttribute('opacity', 1 - e); if (i === 7) z.t.setAttribute('text-anchor', e > 0.5 ? 'end' : 'middle'); });
       });
       await api.wait(800);
