@@ -71,6 +71,7 @@
     'g5-natur-ag': [['Wie heißt das Gerät mit Eimer und Hebel zum Wasserschöpfen?', ['Schaduf', 'Shadouf'], 'Bis heute in Gebrauch.']],
     'g5-natur-gr': [['Wie heißt das Bergwerk bei Athen, das Luft und Wasser vergiftete?', ['Laurion', 'Laureion'], 'Dort baute man Blei und Silber ab.']],
     'g5-land': [['Wie heißt die Mehrzahl von „Polis“?', ['Poleis'], 'Eine Polis, viele Poleis.'], ['Wie hieß das heutige Istanbul bei den Griechen?', ['Byzantion', 'Byzanz'], 'Später hieß es Konstantinopel.']],
+    'g5-kolonie': [['Wie hieß die neue Polis, die eine Tochterstadt gründete? (…stadt)', ['Enkelstadt'], 'Mutterstadt → Tochterstadt → Enkelstadt.'], ['Welches Seefahrervolk gründete schon vor den Griechen Städte am Mittelmeer?', ['Phöniker', 'die Phöniker', 'Phönizier'], 'Aus Tyros und Sidon.']],
     'g5-olympia': [['Welcher Kaiser verbot 393 n. Chr. die Olympischen Spiele?', ['Theodosius', 'Theodosius I.'], 'Ein christlicher römischer Kaiser.'], ['In welcher Stadt fanden 1896 die ersten Spiele der Neuzeit statt?', ['Athen'], 'Über 1500 Jahre nach dem Ende der antiken Spiele.']],
     'g5-religion-gr': [['Wie heißt der Tempel der Athene auf der Akropolis?', ['Parthenon'], 'Er steht bis heute, als Ruine.'], ['Welcher Gott herrschte über die Unterwelt?', ['Hades'], 'Ein Bruder des Zeus.']],
     'g5-quellen-gr': [['Welches Tier zeigten die Silbermünzen Athens?', ['Eule', 'die Eule'], 'Das Tier der Athene.']],

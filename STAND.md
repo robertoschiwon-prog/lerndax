@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v109`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v110`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,15 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-19. GeDax: die drei fehlenden Doppelseiten (lerndax-v110, 15.11.2026)
+
+Roberto hat S. 12–13, 48–49 und 88–89 im Chat nachgereicht (jetzt auch in `notizen/schulbuch-geschichte/`, nur lokal).
+- Höhlenmalerei: Seitenhinweis S. 12–13 (Lascaux, um 15.000 v. Chr.). Nil: Katarakte, Hochwasser im August/September, Kalender nach
+  Herodot, Jahreszeiten genauer, Geschichtskarte untersuchen (Titel, Legende, Maßstab, 5 Schritte). Hochkultur: Datierung nach
+  Regierungsjahren an einem Beispiel.
+- **Neues Thema „Die griechische Kolonisation“** (S. 88–91): Phöniker vorher, Mutter-/Tochter-/Enkelstadt, Gründe sortieren,
+  „Frösche um einen Teich“; die Kolonie-Fragen aus „Land“ dorthin verschoben. „Land, Klima und Polis“ jetzt S. 86–87. GeDax **43 Themen**.
 
 ## 0-neu-18. GeDax mit dem ganzen Geschichtsbuch abgeglichen (lerndax-v109, 15.11.2026)
 

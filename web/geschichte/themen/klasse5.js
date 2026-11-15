@@ -346,7 +346,8 @@
       { f: 'Wie nennt man <b>Farbpulver</b> aus Erde und Mineralien?', a: 'Pigment', x: ['Pinsel', 'Papyrus', 'Fresko'], w: 'Das Pigment wurde mit Wasser, Fett oder Spucke angerührt.' },
       { f: 'Wie machten die Maler in der dunklen Höhle <b>Licht</b>?', a: 'mit Lampen aus Stein, in denen Tierfett brannte', x: ['mit Taschenlampen', 'mit Kerzen aus Bienenwachs aus dem Laden', 'gar nicht, sie malten im Dunkeln'], w: 'Solche Steinlampen haben Archäologen in Höhlen gefunden.' },
       { f: 'Was malten die Menschen in den Höhlen <b>am häufigsten</b>?', a: 'Tiere wie Pferde, Bisons und Hirsche', x: ['Häuser und Straßen', 'Könige und Pharaonen', 'Blumen im Garten'], w: 'Menschen sind auf den Bildern selten. Meist sieht man die Tiere der Eiszeit.' },
-      { f: 'In welchem Land liegt die Höhle von <b>Lascaux</b>?', a: 'Frankreich', x: ['Spanien', 'Ägypten', 'Griechenland'], w: 'Vier Jugendliche entdeckten sie 1940. Die Bilder sind etwa 17.000 Jahre alt.' },
+      { f: 'In welchem Land liegt die Höhle von <b>Lascaux</b>?', a: 'Frankreich', x: ['Spanien', 'Ägypten', 'Griechenland'], w: 'In Südfrankreich. Vier Jugendliche entdeckten sie 1940. Die Bilder entstanden um 15.000 v. Chr. (dein Buch zeigt sie auf S. 12).' },
+      { f: 'Wann ungefähr entstanden die Felsbilder von <b>Lascaux</b>?', a: 'um 15.000 v. Chr.', x: ['um 1500 v. Chr.', 'um 1500 n. Chr.', 'um 150 v. Chr.'], w: 'Also lange vor Ötzi und den Pyramiden, mitten in der Eiszeit.' },
       { f: 'In welchem Land liegt die Höhle von <b>Altamira</b>?', a: 'Spanien', x: ['Frankreich', 'Italien', 'Deutschland'], w: 'Altamira wurde 1879 als erste Höhle mit Bildern aus der Steinzeit entdeckt. Berühmt sind die farbigen Bisons.' },
       { f: 'Die Höhle von <b>Chauvet</b> (Frankreich) ist besonders, weil …', a: 'ihre Bilder zu den ältesten der Welt gehören (über 30.000 Jahre).', x: ['sie die jüngsten Bilder hat (100 Jahre).', 'dort Pyramiden stehen.', 'dort Hieroglyphen an den Wänden stehen.'], w: 'Sie wurde erst 1994 entdeckt und ist für Besucher geschlossen.' },
       { f: 'Warum malten die Menschen in den Höhlen? Was wissen wir sicher?', a: 'Man weiß es nicht genau. Es gibt nur Vermutungen.', x: ['Sie wollten ihre Höhle schön machen, das steht in einem Brief.', 'Es war eine Schulaufgabe.', 'Sie wollten die Bilder verkaufen.'], w: 'Die Maler haben nichts aufgeschrieben. Vielleicht ging es um Jagdglück oder Religion. Hier kommen die Quellen an ihre Grenzen.' },
@@ -494,7 +495,7 @@
   // =====================================================
   const nil = baue('g5-nil', {
     h: 'Ohne den Nil wäre Ägypten Wüste. Jedes Jahr trat er über die Ufer und ließ fruchtbaren Schlamm zurück. Der Nil fließt von Süden nach Norden ins Mittelmeer.',
-    O: [{ t: 'Das Jahr am Nil: Bringe die Zeiten in die richtige Reihenfolge.', items: ['Überschwemmung (Achet)', 'Wasser geht zurück, Felder neu vermessen', 'Aussaat (Peret)', 'Ernte (Schemu)'], s1: 'So lief ein Jahr der Bauern am Nil:', w: 'Überschwemmung → Felder vermessen → Aussaat → Ernte. Dann kam wieder das Hochwasser.' }],
+    O: [{ t: 'Das Jahr am Nil: Bringe die Zeiten in die richtige Reihenfolge.', items: ['Überschwemmung (Achet)', 'Wasser geht zurück, Felder neu vermessen', 'Aussaat und Wachstum (Peret)', 'Ernte und Trockenzeit (Schemu)'], s1: 'So lief ein Jahr der Bauern am Nil:', w: 'Überschwemmung → Felder vermessen → Aussaat → Ernte. Dann kam wieder das Hochwasser.' }],
     F: [
       { f: 'Warum war die <b>Überschwemmung</b> des Nils gut für die Bauern?', a: 'Sie hinterließ fruchtbaren Schlamm auf den Feldern.', x: ['Sie spülte alle Häuser weg.', 'Sie brachte Fische in die Wüste.', 'Sie machte das Land zu Wüste.'], w: 'Der dunkle Schlamm war guter Dünger. Darum nannten die Ägypter ihr Land „Kemet“: das Schwarze Land.' },
       { f: 'In welche Richtung fließt der Nil?', a: 'von Süden nach Norden', x: ['von Norden nach Süden', 'von Westen nach Osten', 'im Kreis'], w: 'Er mündet im Norden ins Mittelmeer. Auf Karten fließt er also „nach oben“.', svg: 'nilkarte' },
@@ -510,12 +511,18 @@
       { f: 'In welchen Monaten war der Nil über die Ufer getreten?', a: 'etwa von Juli bis Oktober', x: ['von Dezember bis Februar', 'nur im April', 'das ganze Jahr'], w: 'Die Dörfer lagen darum etwas höher. Danach säten die Bauern in den Schlamm.' },
       { f: 'Woran erkannten die Ägypter, dass das <b>neue Jahr</b> begann?', a: 'am ersten Aufgang des Sterns Sirius, kurz bevor der Nil stieg', x: ['am ersten Schnee', 'am Geburtstag des Pharaos', 'an der ersten Ernte'], w: 'Aus der Beobachtung der Sterne entstand ihr Kalender.' },
       { f: 'Warum bringt der Nil heute <b>keinen Schlamm</b> mehr auf die Felder?', a: 'Der Assuan-Staudamm hält ihn im Stausee zurück.', x: ['Der Nil ist ausgetrocknet.', 'Der Pharao hat es verboten.', 'Es regnet zu viel.'], w: 'Den Damm baute man in den 1960er-Jahren. Heute düngen die Bauern mit Kunstdünger.' },
+      { f: 'Was sind die <b>Katarakte</b> des Nils?', a: 'Stromschnellen, an denen Schiffe kaum weiterkamen', x: ['Pyramiden am Ufer', 'Kanäle der Bauern', 'Inseln im Delta'], w: 'Der erste Katarakt liegt bei Assuan. Dort endete lange Zeit das Reich der Pharaonen im Süden.' },
+      { f: 'In welchen Monaten stand der Nil bei Assuan am <b>höchsten</b>?', a: 'im August und September', x: ['im Januar und Februar', 'im Mai und Juni', 'im Dezember'], w: 'Vor dem Bau des Staudamms stieg er dann um mehrere Meter. Im Frühsommer war er am niedrigsten.' },
+      { f: 'Was lobte der Grieche Herodot am <b>Kalender</b> der Ägypter?', a: 'Mit 12 Monaten zu 30 Tagen und 5 Zusatztagen blieb er im Takt mit dem Jahr.', x: ['Dass er keine Monate hatte.', 'Dass jeder Monat 50 Tage hatte.', 'Dass er nur für Pharaonen galt.'], w: 'Die Griechen mussten dagegen alle paar Jahre einen ganzen Schaltmonat einschieben.' },
+      { f: 'Was gehört zu einer <b>Geschichtskarte</b>?', a: 'ein Kartenausschnitt, ein Titel und eine Legende mit Maßstab', x: ['nur ein Foto', 'nur eine Jahreszahl', 'nur der Name des Zeichners'], w: 'Der Titel sagt, worum es geht. Die Legende erklärt Farben und Zeichen.' },
+      { f: 'Womit fängt man an, wenn man eine Geschichtskarte untersucht?', a: 'mit dem Titel: Was ist das Thema der Karte?', x: ['mit dem Maßstab', 'mit der kleinsten Stadt', 'mit dem Zusammenfassen'], w: 'Thema klären → Räume beschreiben → Legende entschlüsseln → zeitlich einordnen → zusammenfassen.' },
       { f: 'Wie lang ist der Nil ungefähr?', a: 'etwa 6800 Kilometer', x: ['etwa 68 Kilometer', 'etwa 680 Kilometer', 'etwa 68.000 Kilometer'], w: 'Er gehört zu den längsten Flüssen der Erde.' },
     ],
     T: [
       { f: 'Der Nil fließt ins ___.', a: 'Mittelmeer', w: 'Vorher teilt er sich in viele Arme: das Nildelta.', svg: 'nilkarte' },
       { f: 'Herodot nannte Ägypten ein „Geschenk des ___“.', a: ['Nils', 'Nil', 'Niles'], w: 'Ohne den Fluss gäbe es dort nur Wüste.' },
-      { f: 'Die Zeit der Überschwemmung hieß ___.', a: 'Achet', w: 'Achet (Überschwemmung), Peret (Aussaat), Schemu (Ernte).' },
+      { f: 'Die Zeit der Überschwemmung hieß ___.', a: 'Achet', w: 'Achet (Überschwemmung), Peret (Aussaat und Wachstum), Schemu (Ernte und Trockenzeit).' },
+      { f: 'Die Stromschnellen des Nils heißen ___.', a: ['Katarakte', 'Katarakt'], w: 'Sechs große Katarakte liegen zwischen Assuan und dem Sudan.' },
       { f: 'Die Ägypter nannten ihr fruchtbares Land Kemet, das ___ Land.', a: 'Schwarze', w: 'Nach dem dunklen Schlamm des Nils.' },
     ],
     A: { w: ['Der Nil fließt von Süden nach Norden.', 'Unterägypten liegt im Norden.', 'Die Überschwemmung brachte fruchtbaren Schlamm.'], f: ['Unterägypten liegt im Süden.', 'In Ägypten regnet es sehr viel.', 'Die Überschwemmung war für die Bauern nur schlecht.'] },
@@ -716,6 +723,7 @@
       { f: 'Warum mussten die Ägypter das Land mit <b>Geometrie</b> vermessen?', a: 'Die Überschwemmung spülte jedes Jahr die Grenzsteine der Felder weg.', x: ['Weil sie gern rechneten.', 'Weil der Nil die Felder vergrößerte.', 'Für die Olympischen Spiele.'], w: 'So entstand die Flächenmessung. Auch der Kalender und die Sternkunde wuchsen aus dem Leben am Nil.' },
       { f: 'Ab wann spricht man von der ägyptischen <b>Hochkultur</b>?', a: 'ab etwa 3000 v. Chr.', x: ['ab etwa 300 n. Chr.', 'ab etwa 30.000 v. Chr.', 'ab 1922'], w: 'Rund 3000 Jahre lang regierten Pharaonen. 30 v. Chr. wurde Ägypten eine Provinz der Römer.' },
       { f: 'Was ist der Unterschied zwischen <b>absoluter</b> und <b>relativer</b> Zeitangabe?', a: 'Absolut zählt man von einem festen Punkt (Christi Geburt), relativ zum Beispiel nach Regierungsjahren eines Königs.', x: ['Es gibt keinen Unterschied.', 'Absolut heißt ungefähr, relativ heißt genau.', 'Relativ gibt es nur bei den Griechen.'], w: 'In Ägypten begann mit jedem neuen König wieder „Jahr 1“. Darum sind ägyptische Jahreszahlen schwer umzurechnen.' },
+      { f: 'Eine Inschrift ist datiert: „Jahr 8, 3. Monat der Überschwemmung, Tag 1 unter König Haremhab“. Was brauchst du, um daraus ein Jahr v. Chr. zu machen?', a: 'Man muss wissen, wann Haremhab König wurde.', x: ['Nichts, das ist schon das Jahr 8 v. Chr.', 'Nur einen Taschenrechner.', 'Das geht nie.'], w: 'Ägypter zählten nach Regierungsjahren. Erst mit Königslisten lässt sich das in unsere Zeitrechnung umrechnen.' },
       { f: 'Wann endete das Reich der Pharaonen?', a: '30 v. Chr., als Ägypten römische Provinz wurde', x: ['1922, als man Tutanchamun fand', '3000 v. Chr.', 'es besteht noch heute'], w: 'Die Pharaonen hatten rund 3000 Jahre lang regiert.' },
       { f: 'Was bedeutet „<b>Arbeitsteilung</b>“?', a: 'Jeder hat seinen Beruf, und man tauscht, was man herstellt.', x: ['Alle machen alles selbst.', 'Niemand arbeitet.', 'Nur der Pharao arbeitet.'], w: 'Weil die Bauern genug ernteten, konnten andere Handwerker, Schreiber oder Priester sein.' },
       { f: 'Warum zogen viele Menschen in der Frühzeit an den Nil?', a: 'Das Land um sie herum wurde immer trockener.', x: ['Weil es am Nil Schnee gab.', 'Weil der Pharao sie einlud.', 'Weil dort schon Pyramiden standen.'], w: 'Die Sahara war vor Tausenden Jahren grüner. Als sie austrocknete, bot nur noch der Nil genug Wasser.' },
@@ -728,7 +736,7 @@
   // Bereich 03: Lebenswelt griechische Polis (ANNO 1, S. 84–131; Lehrplan LB 3)
   // =====================================================
   const land = baue('g5-land', {
-    h: 'Griechenland hat viele Gebirge, wenig fruchtbares Land und überall Meer. Darum gab es viele kleine Stadtstaaten (Poleis). Ab etwa 750 v. Chr. gründeten Griechen Tochterstädte rund ums Mittelmeer.',
+    h: 'Griechenland hat viele Gebirge, wenig fruchtbares Land und überall Meer. Darum gab es viele kleine Stadtstaaten (Poleis). Das Meer war für fast jede Polis das „Tor zur Welt“.',
     F: [
       { f: 'Wie sieht die Landschaft Griechenlands aus?', a: 'viele Berge, wenig fruchtbares Land, überall Meer und Inseln', x: ['flach wie ein Tisch, mit riesigen Feldern', 'dichter Urwald', 'Wüste wie in Ägypten'], w: 'Darum lebten die Griechen eng mit dem Meer: als Fischer, Seefahrer und Händler.' },
       { f: 'Was ist eine <b>Polis</b>?', a: 'ein griechischer Stadtstaat', x: ['ein griechischer Gott', 'ein Tempel', 'ein Schiff'], w: 'Eine Stadt mit dem Umland, auf dem Ackerbau und Viehzucht betrieben wurden. Die Bürger waren stolz auf ihre Freiheit und ihr eigenes Recht. Mehrzahl: Poleis.' },
@@ -736,13 +744,6 @@
       { f: 'Warum war das Meer für fast jede Polis ein „<b>Tor zur Welt</b>“?', a: 'Über Land kam man wegen der Gebirge schlecht voran, übers Meer gut.', x: ['Weil im Meer Gold lag.', 'Weil die Griechen nicht laufen wollten.', 'Weil es keine Berge gab.'], w: 'So wurden die Griechen Seefahrer und Händler, bis nach Karthago und Persien.' },
       { f: 'Welches Klima hat Griechenland?', a: 'Mittelmeerklima: heiße Sommer, milde Winter ohne Frost', x: ['ewiges Eis', 'Regen das ganze Jahr', 'Wüstenklima ohne jeden Regen'], w: 'Trocken, aber nicht zu trocken: Landwirtschaft war möglich, vor allem in tiefen Lagen.' },
       { f: 'Von welchem Volk übernahmen die Griechen das <b>Alphabet</b>?', a: 'von den Phönikern', x: ['von den Ägyptern', 'von den Römern', 'von den Kelten'], w: 'Die Phöniker lebten an der Ostküste des Mittelmeers. Mit der Schrift konnten die Griechen Handel und Wissen aufschreiben.' },
-      { f: 'Warum fragten die Bewohner der Insel Thera das <b>Orakel von Delphi</b>, bevor sie Kyrene gründeten?', a: 'Seit Jahren regnete es nicht, und sie suchten Rat bei Gott Apollon.', x: ['Sie wollten wissen, wer Olympia gewinnt.', 'Sie wollten ein Schiff kaufen.', 'Sie suchten einen König für Ägypten.'], w: 'Das Orakel riet, eine Kolonie in Libyen zu gründen. Herodot schrieb das fast 200 Jahre später auf.' },
-      { f: 'Was gehört <b>zuerst</b> dazu, eine schriftliche Quelle zu erschließen?', a: 'die Quelle genau lesen und unbekannte Wörter klären', x: ['die Haltung des Autors beurteilen', 'die Quelle wegwerfen', 'eine Zeichnung malen'], w: 'Lesen → in Abschnitte teilen → Quelle vorstellen (Autor, Zeit, Textart) → Inhalt wiedergeben → Absicht des Autors prüfen.' },
-      { f: 'Warum gab es in Griechenland <b>viele kleine Staaten</b> statt eines großen Reichs?', a: 'Gebirge trennten die Täler und Inseln voneinander.', x: ['Weil die Griechen keine Könige mochten.', 'Weil der Nil das Land teilte.', 'Weil jede Familie ein Land wollte.'], w: 'Jede Polis regierte sich selbst, zum Beispiel Athen, Sparta oder Korinth.' },
-      { f: 'Warum gründeten viele Griechen ab etwa 750 v. Chr. <b>Tochterstädte</b> (Kolonien)?', a: 'Es gab zu wenig Land und Nahrung für alle.', x: ['Weil sie Ägypten erobern wollten.', 'Weil sie vor den Römern flohen.', 'Weil ihre Städte überschwemmt wurden.'], w: 'Auch Handel und Streit waren Gründe. Die neuen Städte blieben mit der Heimat verbunden.' },
-      { f: 'Welche heutige Stadt war früher die griechische Kolonie <b>Massalia</b>?', a: 'Marseille in Frankreich', x: ['Moskau', 'München', 'Madrid'], w: 'Griechen gründeten Städte von Spanien bis zum Schwarzen Meer.' },
-      { f: 'Welche heutige Stadt hieß bei den Griechen <b>Neapolis</b> („neue Stadt“)?', a: 'Neapel in Italien', x: ['Nürnberg', 'New York', 'Nizza'], w: 'Auch in Süditalien und auf Sizilien gab es viele griechische Städte.' },
-      { f: 'Wie hieß das heutige <b>Istanbul</b> bei den Griechen?', a: 'Byzantion', x: ['Sparta', 'Olympia', 'Alexandria'], w: 'Byzantion lag am Eingang zum Schwarzen Meer.' },
       { f: 'Was <b>verband</b> die Griechen, obwohl sie in vielen Staaten lebten?', a: 'Sprache, Götter und die Olympischen Spiele', x: ['ein gemeinsamer König', 'eine gemeinsame Armee', 'eine gemeinsame Hauptstadt'], w: 'Sie nannten sich alle „Hellenen“, auch in den fernen Kolonien.' },
       { f: 'Was bauten die Griechen vor allem an?', a: 'Oliven, Wein und etwas Getreide', x: ['Reis und Tee', 'Kartoffeln und Mais', 'Bananen und Kakao'], w: 'Ölbäume und Weinstöcke wachsen auch an trockenen Hängen. Getreide musste man oft dazukaufen.' },
       { f: 'Wie nannten die Griechen Menschen, die <b>kein Griechisch</b> sprachen?', a: 'Barbaren', x: ['Hellenen', 'Spartiaten', 'Pharaonen'], w: 'Ihre Sprache klang für Griechen wie „bar-bar“.' },
@@ -750,11 +751,39 @@
     T: [
       { f: 'Ein griechischer Stadtstaat heißt ___.', a: 'Polis', w: 'Mehrzahl: Poleis.' },
       { f: 'Die Griechen nannten sich selbst ___.', a: ['Hellenen', 'Hellene'], w: 'Griechenland heißt auf Griechisch bis heute „Hellas“.' },
-      { f: 'Die Stadt Marseille hieß bei den Griechen ___.', a: 'Massalia', w: 'Eine der vielen Tochterstädte.' },
       { f: 'Der Markt- und Versammlungsplatz einer Polis hieß ___.', a: 'Agora', w: 'Dazu kam oft ein Burgberg, die Akropolis.' },
     ],
     A: { w: ['In Griechenland gab es viele Stadtstaaten.', 'Griechen gründeten Kolonien am Mittelmeer.', 'Die Griechen sprachen eine gemeinsame Sprache.'], f: ['Griechenland hatte nur einen einzigen großen König.', 'Griechenland ist ganz flach und fruchtbar.', 'Die Griechen bauten vor allem Reis an.'] },
   }, { frage: 50, tippen: 22, aussage: 18 });
+
+  // ---------- S. 88–91: Die griechische Kolonisation ----------
+  const kolonie = baue('g5-kolonie', {
+    h: 'Kolonisation heißt: Griechen verlassen ihre Polis und gründen weit weg eine neue Polis. Vom 8. bis 6. Jahrhundert v. Chr. entstanden so Städte rund ums Mittelmeer und am Schwarzen Meer. Vorher hatten das schon die Phöniker getan.',
+    O: [{ t: 'Wer gründete wen? Bringe es in die richtige Reihenfolge: <b>die älteste Stadt zuerst</b>.', items: ['Mutterstadt (die alte Heimat)', 'Tochterstadt (die neue Polis)', 'Enkelstadt (eine Gründung der Tochterstadt)'], s1: 'Wie in einer Familie:', w: 'Mutterstadt → Tochterstadt → Enkelstadt. Sie blieben durch Handel verbunden: Waren gingen hin und her.' },
+      { t: 'Wer kolonisierte das Mittelmeer zuerst? Ordne nach der Zeit.', items: ['Die Phöniker gründen Handelsstädte (ab dem 11. Jh. v. Chr.).', 'Die Griechen gründen Kolonien (8. bis 6. Jh. v. Chr.).', 'Alexander zieht bis zum Indus (4. Jh. v. Chr.).'], s1: 'Erst die Phöniker, dann die Griechen:', w: 'Die Phöniker aus Tyros und Sidon beherrschten das Meer bis ins 8. Jahrhundert v. Chr. Dann kamen die Griechen.' }],
+    S: { kats: ['ein Grund, die Heimat zu verlassen', 'kein Grund'], f: (x) => `War das ein Grund für die Kolonisation? <b>${x}</b>`, h: 'Denk an Hunger, Handel, Rohstoffe und Streit.',
+      items: [['Die Bevölkerung wuchs, das Essen reichte nicht.', 0], ['Man wollte mehr Handel treiben.', 0], ['Man suchte Land für Getreide.', 0], ['Man brauchte Metall und Holz für Schiffe.', 0], ['In der Heimat stritten Gruppen um die Macht.', 0],
+        ['Man wollte die Olympischen Spiele verlegen.', 1], ['Die Pyramiden sollten neue Nachbarn bekommen.', 1], ['In Griechenland war es zu kalt.', 1]] },
+    F: [
+      { f: 'Warum fragten die Bewohner der Insel Thera das <b>Orakel von Delphi</b>, bevor sie Kyrene gründeten?', a: 'Seit Jahren regnete es nicht, und sie suchten Rat bei Gott Apollon.', x: ['Sie wollten wissen, wer Olympia gewinnt.', 'Sie wollten ein Schiff kaufen.', 'Sie suchten einen König für Ägypten.'], w: 'Das Orakel riet, eine Kolonie in Libyen zu gründen. Herodot schrieb das fast 200 Jahre später auf.' },
+      { f: 'Was gehört <b>zuerst</b> dazu, eine schriftliche Quelle zu erschließen?', a: 'die Quelle genau lesen und unbekannte Wörter klären', x: ['die Haltung des Autors beurteilen', 'die Quelle wegwerfen', 'eine Zeichnung malen'], w: 'Lesen → in Abschnitte teilen → Quelle vorstellen (Autor, Zeit, Textart) → Inhalt wiedergeben → Absicht des Autors prüfen.' },
+      { f: 'Warum gab es in Griechenland <b>viele kleine Staaten</b> statt eines großen Reichs?', a: 'Gebirge trennten die Täler und Inseln voneinander.', x: ['Weil die Griechen keine Könige mochten.', 'Weil der Nil das Land teilte.', 'Weil jede Familie ein Land wollte.'], w: 'Jede Polis regierte sich selbst, zum Beispiel Athen, Sparta oder Korinth.' },
+      { f: 'Warum gründeten viele Griechen ab etwa 750 v. Chr. <b>Tochterstädte</b> (Kolonien)?', a: 'Es gab zu wenig Land und Nahrung für alle.', x: ['Weil sie Ägypten erobern wollten.', 'Weil sie vor den Römern flohen.', 'Weil ihre Städte überschwemmt wurden.'], w: 'Auch Handel und Streit waren Gründe. Die neuen Städte blieben mit der Heimat verbunden.' },
+      { f: 'Welche heutige Stadt war früher die griechische Kolonie <b>Massalia</b>?', a: 'Marseille in Frankreich', x: ['Moskau', 'München', 'Madrid'], w: 'Griechen gründeten Städte von Spanien bis zum Schwarzen Meer.' },
+      { f: 'Welche heutige Stadt hieß bei den Griechen <b>Neapolis</b> („neue Stadt“)?', a: 'Neapel in Italien', x: ['Nürnberg', 'New York', 'Nizza'], w: 'Auch in Süditalien und auf Sizilien gab es viele griechische Städte.' },
+      { f: 'Wie hieß das heutige <b>Istanbul</b> bei den Griechen?', a: 'Byzantion', x: ['Sparta', 'Olympia', 'Alexandria'], w: 'Byzantion lag am Eingang zum Schwarzen Meer.' },
+      { f: 'Der Philosoph Platon sagte, die Griechen lebten „<b>wie Frösche um einen Teich</b>“. Was meinte er?', a: 'Die griechischen Städte lagen rund um das Meer verteilt, fast alle an der Küste.', x: ['Die Griechen konnten gut schwimmen.', 'Die Griechen aßen gern Frösche.', 'Die Griechen lebten alle an einem kleinen See.'], w: 'Der „Teich“ ist das Mittelmeer (und das Schwarze Meer), die „Frösche“ sitzen am Ufer.' },
+      { f: 'Welche Orte suchten die Griechen für eine neue Polis aus?', a: 'freie, unbewohnte Plätze nicht weiter als 25 km von der Küste', x: ['Orte mitten in der Wüste', 'Städte, die sie erst erobern mussten', 'Gipfel hoher Berge'], w: 'So blieb der Weg zum Meer und damit zur Heimat kurz.' },
+      { f: 'Wie kamen die neuen Siedler meistens mit ihren <b>Nachbarn</b> aus?', a: 'Meist friedlich: Handel und Austausch überwogen, manchmal gab es Streit.', x: ['Es gab immer Krieg.', 'Sie sprachen nie miteinander.', 'Die Nachbarn wurden alle Sklaven.'], w: 'Um unbewohntes Land führte man in der Regel keinen Krieg.' },
+      { f: 'Woran hielten die Griechen in ihren Kolonien fest?', a: 'an ihrer Sprache, Schrift, Kultur und Lebensweise', x: ['an nichts, sie wurden sofort Ägypter', 'nur an ihren Schiffen', 'am Recht des Pharaos'], w: 'Die Kolonien stärkten das Gefühl, Griechen zu sein, auch fern der Heimat.' },
+      { f: 'Woher kamen die <b>Phöniker</b>?', a: 'aus Städten wie Tyros und Sidon an der Ostküste des Mittelmeers', x: ['aus Athen', 'aus Ägypten', 'aus Spanien'], w: 'Ein Seefahrervolk, von dem die Griechen auch das Alphabet übernahmen.' },
+    ],
+    T: [
+      { f: 'Die Stadt Marseille hieß bei den Griechen ___.', a: 'Massalia', w: 'Eine der vielen Tochterstädte.' },
+      { f: 'Die neue Polis hieß Tochterstadt, die alte Heimat ___.', a: ['Mutterstadt'], w: 'Eine Gründung der Tochterstadt hieß Enkelstadt.' },
+    ],
+    A: { w: ['Die Phöniker gründeten schon vor den Griechen Städte am Mittelmeer.', 'Kolonien lagen meist nah an der Küste.', 'Mutter- und Tochterstadt trieben Handel miteinander.'], f: ['Die Griechen gründeten Kolonien nur in Ägypten.', 'Für jede Kolonie führten die Griechen einen großen Krieg.', 'In den Kolonien sprach man kein Griechisch mehr.'] },
+  }, { ordnen: 16, sortieren: 22, passtNicht: 8, frage: 36, tippen: 8, aussage: 12 });
 
   const olympia = baue('g5-olympia', {
     h: 'Die Olympischen Spiele fanden ab 776 v. Chr. alle vier Jahre in Olympia statt, zu Ehren des Zeus. Mitmachen durften nur freie griechische Männer. Der Sieger bekam einen Kranz aus Zweigen.',
@@ -1223,7 +1252,7 @@
       { id: 'g5-frueh', nr: 2, title: 'Das Leben der Menschen in der Frühgeschichte', buch: 'S. 12–43', topics: [
         { id: 'g5-mensch', buch: 'S. 14–17', title: 'Die Entwicklung zum Menschen', icon: '🚶', gen: mensch },
         { id: 'g5-alt', buch: 'S. 18–21', title: 'Leben in der Altsteinzeit', icon: '🦣', gen: altstein },
-        { id: 'g5-hoehle', title: 'Höhlenmalerei', icon: '🎨', gen: hoehle },
+        { id: 'g5-hoehle', buch: 'S. 12–13', title: 'Höhlenmalerei', icon: '🎨', gen: hoehle },
         { id: 'g5-jung', buch: 'S. 22–25', title: 'Leben in der Jungsteinzeit', icon: '🌾', gen: jung },
         { id: 'g5-altjung', buch: 'S. 20–25', title: 'Alt- oder Jungsteinzeit?', icon: '⚖', gen: altjung },
         { id: 'g5-felsbilder', buch: 'S. 26–29', title: 'Felsbilder in der Sahara', icon: '🦒', gen: felsbilder },
@@ -1246,7 +1275,8 @@
         { id: 'g5-quellen-ag', buch: 'S. 78–80', title: 'Woher wissen wir etwas über Ägypten?', icon: '🔎', gen: quellenAg },
       ] },
       { id: 'g5-polis', nr: 4, title: 'Lebenswelt griechische Polis', buch: 'S. 84–131', topics: [
-        { id: 'g5-land', buch: 'S. 86–91', title: 'Land, Polis und Kolonien', icon: '⛵', gen: land },
+        { id: 'g5-land', buch: 'S. 86–87', title: 'Land, Klima und Polis', icon: '⛰', gen: land },
+        { id: 'g5-kolonie', buch: 'S. 88–91', title: 'Die griechische Kolonisation', icon: '⛵', gen: kolonie },
         { id: 'g5-olympia', buch: 'S. 92–95', title: 'Die Olympischen Spiele', icon: '🏅', gen: olympia },
         { id: 'g5-religion-gr', buch: 'S. 96–97', title: 'Die Götter der Griechen', icon: '⚡', gen: religionGr },
         { id: 'g5-quellen-gr', buch: 'S. 98–101, 104–105', title: 'Woher wissen wir etwas über die Griechen?', icon: '🏺', gen: quellenGr },

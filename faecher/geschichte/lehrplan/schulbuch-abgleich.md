@@ -30,7 +30,7 @@ Lascaux, Altamira, Ocker, Pigment, Felsbild, Archäologe).
 
 ## Abgleich mit den Buchseiten (15.11.2026, `lerndax-v109`)
 
-Roberto hat das ganze Buch fotografiert (`notizen/schulbuch-geschichte/`, nur lokal; es fehlen S. 12–13, 48–49, 88–89).
+Roberto hat das ganze Buch fotografiert (`notizen/schulbuch-geschichte/`, nur lokal). S. 12–13, 48–49, 88–89 kamen in v110 nach (dort als `S012-013.jpeg` usw.).
 Jedes Thema hat jetzt einen Seitenhinweis „📖 Buch S. …“. Inhalte, Fachwörter und Zahlen folgen dem Buch, in eigenen Worten.
 
 | Thema in GeDax | Buch |
@@ -41,7 +41,7 @@ Jedes Thema hat jetzt einen Seitenhinweis „📖 Buch S. …“. Inhalte, Fachw
 | Zeitabschnitte (Vorgeschichte, Antike) | Fachbegriffe S. 138–141 |
 | Entwicklung zum Menschen | S. 14–17 |
 | Altsteinzeit | S. 18–21 |
-| Höhlenmalerei | kein Buchkapitel (Arbeitsblatt im Unterricht) |
+| Höhlenmalerei | S. 12–13 (Kapitelauftakt: Lascaux, um 15.000 v. Chr.) |
 | Jungsteinzeit, Alt- oder Jungsteinzeit | S. 20–25 |
 | **neu:** Felsbilder in der Sahara | S. 26–29 |
 | Ötzi | S. 30–31 |
@@ -58,7 +58,8 @@ Jedes Thema hat jetzt einen Seitenhinweis „📖 Buch S. …“. Inhalte, Fachw
 | Pyramiden | S. 72–75 |
 | Merkmale einer Hochkultur | S. 76–77 |
 | **neu:** Woher wissen wir etwas über Ägypten? | S. 78–80 |
-| Land, Polis, Kolonien | S. 86–91 |
+| Land, Klima und Polis | S. 86–87 |
+| **neu (v110):** Die griechische Kolonisation | S. 88–91 |
 | Olympische Spiele | S. 92–95 |
 | Götter der Griechen | S. 96–97 |
 | Quellen der Griechen | S. 98–101, 104–105 |
@@ -87,4 +88,9 @@ Jedes Thema hat jetzt einen Seitenhinweis „📖 Buch S. …“. Inhalte, Fachw
   in der Antwort (Buch nennt 393/394 und 395 n. Chr.).
 
 **Noch offen:** Rechnen über Christi Geburt „ohne Jahr 0“ steht nicht im Buch; GeDax bleibt dabei (es stimmt). Höhlenmalerei
-(Lascaux, Altamira, Chauvet) kommt im Buch nicht vor, bleibt wegen des Arbeitsblatts.
+(Lascaux) steht im Buch nur auf der Auftaktseite S. 12; Altamira und Chauvet kommen vom Arbeitsblatt.
+
+**v110 (nachgereichte Seiten):** S. 12–13 Kapitelauftakt (Lascaux) → Höhlenmalerei mit Seitenhinweis und Datum.
+S. 48–49 Geschichtskarte untersuchen (5 Schritte), Kalender nach Herodot, Achet/Peret/Schemu, Wasserstand bei Assuan, Datierung nach
+Regierungsjahren → Nil und Hochkultur ergänzt. S. 88–89 Kolonisation (Platon „Frösche um einen Teich“, Phöniker vorher, Mutter-/Tochter-/
+Enkelstadt, Gründe, Orte nah an der Küste) → eigenes Thema „Die griechische Kolonisation“ (S. 88–91). GeDax jetzt 43 Themen.

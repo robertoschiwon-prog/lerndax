@@ -1,6 +1,6 @@
 # GeDax (Geschichte) – Startpunkt
 
-Stand 15.11.2026 (`lerndax-v109`): **Klasse 5 gebaut, live und mit dem ganzen Buch abgeglichen** (42 Themen in 5 Bereichen = Kapitel von ANNO 1, jedes mit „📖 Buch S. …“, Abgleich in `lehrplan/schulbuch-abgleich.md`; Entdecken mit 5 Staunen-Momenten,
+Stand 15.11.2026 (`lerndax-v110`): **Klasse 5 gebaut, live und mit dem ganzen Buch abgeglichen** (43 Themen in 5 Bereichen = Kapitel von ANNO 1, jedes mit „📖 Buch S. …“, Abgleich in `lehrplan/schulbuch-abgleich.md`; Entdecken mit 5 Staunen-Momenten,
 Knobel-Aufgaben zu allen Themen). Lehrplan: `lehrplan/sachsen-gymnasium.md`, Buchabgleich: `lehrplan/schulbuch-abgleich.md`,
 Themenplan: `themenplan.md`, geprüfte Fakten mit Quellen: `fakten.md`. Tests: `tests/gedax.py`, `tests/gedax_knobel.py`.
 
