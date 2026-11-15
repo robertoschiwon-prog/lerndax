@@ -47,8 +47,8 @@
       { f: 'Wie weit ist die Erde ungefähr von der Sonne entfernt?', a: 'rund 150 Millionen km', x: ['rund 384 000 km', 'rund 40 000 km', 'rund 1 Milliarde km'], w: 'Das Licht der Sonne braucht für diesen Weg etwa 8 Minuten. 384 000 km ist der Weg zum Mond.' },
     ],
     O: [
-      { t: 'Ordne die Planeten: der Sonne am nächsten zuerst.', items: PLANETEN, n: 5, w: 'Mein Vater erklärt mir jeden Sonntag unseren Nachthimmel.' },
-      { t: 'Ordne nach der Größe: das Größte zuerst.', items: ['Sonne', 'Erde', 'Mond'], w: 'Die Sonne ist viel größer als die Erde, die Erde ist größer als der Mond.' },
+      { t: 'Ordne die Planeten: der Sonne am nächsten zuerst.', items: PLANETEN, n: 5, w: 'Mein Vater erklärt mir jeden Sonntag unseren Nachthimmel.', ex: { mode: 'planeten', teil: 'reihe', merk: 'Merkur, Venus, Erde, Mars, Jupiter, Saturn, Uranus, Neptun: <b>Mein Vater erklärt mir jeden Sonntag unseren Nachthimmel.</b>' } },
+      { t: 'Ordne nach der Größe: das Größte zuerst.', items: ['Sonne', 'Erde', 'Mond'], w: 'Die Sonne ist viel größer als die Erde, die Erde ist größer als der Mond.', ex: { mode: 'sonneErdeMond' } },
     ],
     S: { kats: ['Stern', 'Planet', 'Mond (Begleiter)'], f: (b) => `<b>${b}</b>: Was ist das?`, h: 'Sterne leuchten selbst. Planeten kreisen um einen Stern, Monde um einen Planeten.',
       items: [['Sonne', 0], ['Erde', 1], ['Mars', 1], ['Jupiter', 1], ['Venus', 1], ['Mond der Erde', 2], ['Polarstern', 0], ['Saturn', 1]] },

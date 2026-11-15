@@ -8,6 +8,7 @@
  *   gezeiten  Wasserstand über einen Tag: zweimal Hochwasser, zweimal Niedrigwasser
  *   steigung  Feuchte Luft steigt am Gebirge auf, Wolken, Regen auf der Seite zum Wind
  *   tal       Die vier Talformen nebeneinander, die gesuchte leuchtet
+ *   sonneErdeMond  Sonne, Erde, Mond als Fotos im selben Maßstab: 109 Erden quer durch die Sonne, fast 4 Monde quer durch die Erde
  *   planeten  Die acht Planeten: erst die Reihenfolge, dann (teil 'groesse') wachsen und schrumpfen sie auf ihre wahre Größe
  *             oder (teil 'abstand') rutschen sie auf ihren wahren Abstand zur Sonne
  */
@@ -193,6 +194,48 @@
       api.say(x.merk);
     },
 
+    // ---------------------------------------------------------------- Sonne, Erde, Mond
+    async sonneErdeMond(api, x) {
+      const Y = 118, LEISE = '#b9bfe6', ID = 'sem' + Date.now(), cp = el('clipPath', { id: ID }, api.svg);
+      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10 }, cp);
+      const S = el('g', { 'clip-path': `url(#${ID})` }, api.svg);
+      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10, fill: '#0d0e22' }, S);
+      txt(S, 354, 234, 'Fotos: NASA', 9, LEISE, 'end');
+      const rE = 30, rM = rE * 3475 / 12756, rS = rE * 109;      // Durchmesser: Erde 12 756 km, Mond 3 475 km, Sonne 109-mal die Erde
+      const teil = (name, cx, r, farbe, nr, wort, tx) => {
+        const g = el('g', { opacity: 0 }, S);
+        g.innerHTML = D.planetFoto(name, cx, Y, r, `<circle cx="${cx}" cy="${Y}" r="${r}" fill="${farbe}"/>`);
+        el('circle', { cx: tx - 22, cy: 30, r: 12, fill: '#0e7f91' }, g);
+        txt(g, tx - 22, 35, nr, 13, '#fff');
+        txt(g, tx - 5, 35, wort, 14, '#fff', 'start');
+        return g;
+      };
+      api.say('Sonne, Erde und Mond, alle im <b>selben Maßstab</b>:');
+      await api.wait(1000);
+      const sonne = teil('Sonne', 62 - rS, rS, '#ffcf4a', 1, 'Sonne', 34);
+      await fade(api, sonne, 500);
+      api.say('Die Sonne ist so riesig, dass nur ein kleines Stück von ihrem Rand ins Bild passt.');
+      await api.wait(2600);
+      const erde = teil('Erde', 190, rE, '#3f7fd9', 2, 'Erde', 190);
+      await fade(api, erde, 500);
+      api.say('Quer durch die Sonne würden <b>109 Erden</b> nebeneinander passen.');
+      await api.wait(2600);
+      const mond = teil('Mond', 300, rM, '#b9b9b9', 3, 'Mond', 302);
+      await fade(api, mond, 500);
+      api.say('Der Mond ist kleiner als die Erde.');
+      await api.wait(1800);
+      // fast vier Monde quer durch die Erde
+      const g = el('g', { opacity: 0 }, S);
+      for (let i = 0; i < 4; i++) {
+        const cx = 190 - rE + rM + i * 2 * rM;
+        g.insertAdjacentHTML('beforeend', D.planetFoto('Mond', cx, Y + rE + 26, rM, `<circle cx="${cx}" cy="${Y + rE + 26}" r="${rM}" fill="#b9b9b9"/>`));
+      }
+      el('line', { x1: 190 - rE, y1: Y + rE + 8, x2: 190 - rE, y2: Y + rE + 44, stroke: LEISE, 'stroke-width': 1, 'stroke-dasharray': '3 3' }, g);
+      el('line', { x1: 190 + rE, y1: Y + rE + 8, x2: 190 + rE, y2: Y + rE + 44, stroke: LEISE, 'stroke-width': 1, 'stroke-dasharray': '3 3' }, g);
+      await fade(api, g, 500);
+      api.say('Quer durch die Erde passen fast <b>4 Monde</b>. Also: <b>Sonne, Erde, Mond</b>.');
+    },
+
     // ---------------------------------------------------------------- Planeten
     async planeten(api, x) {
       const PL = D.planeten, Y = 112, HELL = '#fff', LEISE = '#b9bfe6', WORT = ['Mein', 'Vater', 'erklärt', 'mir', 'jeden', 'Sonntag', 'unseren', 'Nachthimmel'];
@@ -266,12 +309,24 @@
       await api.wait(800);
       api.say('Merkur, Venus, Erde und Mars drängen sich dicht an der Sonne. Die anderen liegen immer weiter auseinander.');
       await api.wait(3200);
-      // Maßband: so weit wie Sonne–Erde, 30-mal bis zum Neptun
-      const g = el('g', { opacity: 0 }, S), sx = 149.6 * M;
-      for (let i = 0; i <= 30; i++) el('line', { x1: 24 + i * sx, y1: Y + 22, x2: 24 + i * sx, y2: Y + (i % 5 ? 30 : 36), stroke: i % 5 ? LEISE : HELL, 'stroke-width': 1 }, g);
-      el('line', { x1: 24, y1: Y + 22, x2: 24 + 30 * sx, y2: Y + 22, stroke: LEISE, 'stroke-width': 1 }, g);
-      [5, 10, 20, 30].forEach((i) => txt(g, 24 + i * sx, Y + 52, i, 12, HELL, i === 30 ? 'end' : 'middle'));
-      txt(g, 180, Y + 78, 'ein Schritt = so weit wie von der Sonne zur Erde', 11.5, LEISE);
+      // 30 kleine Erden, jede so weit weg wie die Erde von der Sonne, darunter das Maßband
+      const sx = 149.6 * M, YE = Y + 24, YL = Y + 40;
+      api.say('Wie oft passt der Weg von der Sonne zur Erde bis zum Neptun? Wir legen ihn immer wieder hintereinander:');
+      const erden = el('g', {}, S), zahl = txt(S, 180, YL + 52, '', 15, '#ffcf4a');
+      for (let i = 1; i <= 30; i++) {
+        const e = el('g', { opacity: 0 }, erden);
+        e.innerHTML = D.planetFoto('Erde', 24 + i * sx, YE, 4.3, `<circle cx="${24 + i * sx}" cy="${YE}" r="4.3" fill="#3f7fd9"/>`);
+        zahl.textContent = i === 1 ? '1 Erde' : `${i} Erden`;
+        await api.tw(i === 1 ? 500 : i < 6 ? 220 : 70, (t) => e.setAttribute('opacity', t));
+        if (i === 1) { api.say('<b>1</b> Schritt: so weit wie von der Sonne zur Erde.'); await api.wait(1600); }
+      }
+      await api.wait(500);
+      zahl.setAttribute('opacity', 0);
+      const g = el('g', { opacity: 0 }, S);
+      for (let i = 0; i <= 30; i++) el('line', { x1: 24 + i * sx, y1: YL, x2: 24 + i * sx, y2: YL + (i % 5 ? 7 : 13), stroke: i % 5 ? LEISE : HELL, 'stroke-width': 1 }, g);
+      el('line', { x1: 24, y1: YL, x2: 24 + 30 * sx, y2: YL, stroke: LEISE, 'stroke-width': 1 }, g);
+      [5, 10, 20, 30].forEach((i) => txt(g, 24 + i * sx, YL + 28, i, 12, HELL, i === 30 ? 'end' : 'middle'));
+      txt(g, 180, YL + 50, 'eine Erde = ein Schritt von der Sonne zur Erde', 11.5, LEISE);
       await fade(api, g, 500);
       api.say('Bis zum Jupiter ist es etwa 5-mal so weit wie bis zur Erde, bis zum Neptun etwa <b>30-mal</b>.');
       await api.wait(3400);

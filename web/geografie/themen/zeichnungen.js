@@ -102,6 +102,7 @@
     Saturn: { datei: 'Saturn during Equinox.jpg', f: [0.4984, 0.5065, 0.168], q: 0.4844, ring: 1, b: 640, von: 'NASA/JPL/SSI' },
     Uranus: { datei: "Uranus as seen by NASA's Voyager 2 (remastered) - JPEG converted.jpg", f: [0.494, 0.496, 0.401], q: 1, von: 'NASA' },
     Neptun: { datei: 'Neptune Full.jpg', f: [0.4875, 0.4955, 0.42], q: 1, von: 'NASA' },
+    Mond: { datei: 'Moon nearside LRO.jpg', f: [0.5, 0.5, 0.5], q: 1, von: 'NASA/GSFC/ASU' },
   };
   let clipNr = 0;
   const urlVon = (f) => (window.LernDaxBausteine && LernDaxBausteine.fotoUrl ? LernDaxBausteine.fotoUrl(f.datei, f.b || 320) : '');

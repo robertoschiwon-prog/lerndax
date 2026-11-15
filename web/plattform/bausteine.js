@@ -6,7 +6,7 @@
  * Danach stehen in D.util (= U): R, pick, shuffle, fmt, wahl, reihum, nurText, mische und die Bausteine
  *   auswahl  { f: Frage, a: richtig, x: [falsche …], w: warum, svg?: Bildname, h?: Tipp }
  *   tippen   { f: 'Satz mit ___', a: 'Wort' oder ['Wort', 'andere Schreibweise'], w }
- *   ordnen   { t: Aufgabe, items: [in richtiger Reihenfolge], w: Merksatz, bilder?: [Bildnamen] }
+ *   ordnen   { t: Aufgabe, items: [in richtiger Reihenfolge], w: Merksatz, bilder?: [Bildnamen], ex?: eigene Erklärung (mode …) }
  *   sortiere { kats: [...], items: [[Begriff, Kategorie, warum?], ...], f: (Begriff) => Frage, h }
  *   passtNicht (aus derselben Sammlung wie sortiere), aussage { w: [wahre], f: [falsche] }
  *   beschriften { svg: Bildname, teile: [...], was: { Teil: Erklärung } }   (Bild mit Nummern)
@@ -55,7 +55,7 @@
       if (n && n < idx.length) idx = shuffle(idx).slice(0, n).sort((a, b) => a - b);
       const teile = idx.map((i) => e.items[i]);
       const loes = teile.map((x, k) => `${k + 1}. ${x}${opt.ordnenZusatz ? opt.ordnenZusatz(e, idx[k]) : ''}`).join('<br>');
-      const ex = (opt.ordnenEx && opt.ordnenEx(art, e, idx, teile))
+      const ex = (opt.ordnenEx && opt.ordnenEx(art, e, idx, teile)) || (e.ex && Object.assign({ art }, e.ex))
         || { mode: 'reihe', art, items: teile, bilder: e.bilder ? idx.map((i) => e.bilder[i]) : null, s1: e.s1 || 'Schritt für Schritt:', merk: e.w || `Die richtige Reihenfolge: ${teile.join(' → ')}` };
       const t = { prompt: e.t, order: { words: mische(teile), answer: teile.join(' '), end: '' }, hint: e.h || hint, solution: `${loes}${e.w ? '<br>' + e.w : ''}`, ex };
       if (e.svg) t.figure = bild(e.svg);
