@@ -8,7 +8,7 @@
  * Dazu Aufgabenarten für vorhandene Themen: Geschickt rechnen mit Dezimalzahlen und Dezimalzahl : einstellige Zahl
  * (k5-dezimal), Koordinaten mit Halben (k5-koord), zusammengesetzte Körper (k5-quader).
  * Außerdem bringt diese Datei alle Themen in die Reihenfolge des Schulbuchs (ganz unten).
- * Wird NACH klasse5.js und klasse5-luecken.js geladen.
+ * Wird NACH klasse5.js, klasse5-luecken.js und klasse5-abgleich.js geladen.
  */
 (function () {
   const M = window.Mathelix;
@@ -652,7 +652,7 @@
         prompt: `Rechne geschickt: <b>${parts.join(' · ')}</b>`,
         fields: [{ answer: erg }],
         hint: 'Welche zwei Zahlen ergeben malgenommen eine Zahl ohne Komma? Fange mit ihnen an.',
-        solution: `Erst ${fmt(x)} · ${fmt(y)} = ${glatt} (Vertauschungsgesetz).<br>${glatt} · ${fmt(k)} = <b>${fmt(erg)}</b>`,
+        solution: `Erst ${fmt(x)} · ${fmt(y)} = ${glatt} (Kommutativgesetz).<br>${glatt} · ${fmt(k)} = <b>${fmt(erg)}</b>`,
         ex: geschicktEx(parts, pos[0], pos[1], '·', String(glatt), fmt(erg)),
       };
     }
@@ -666,7 +666,7 @@
       prompt: `Rechne geschickt: <b>${parts.join(' + ')}</b>`,
       fields: [{ answer: erg }],
       hint: 'Suche zwei Zahlen, deren Nachkommastellen sich zu einer glatten Zahl ergänzen.',
-      solution: `Erst ${fmt(A)} + ${fmt(C)} = ${ganz} (Vertauschungsgesetz).<br>${ganz} + ${fmt(B)} = <b>${fmt(erg)}</b>`,
+      solution: `Erst ${fmt(A)} + ${fmt(C)} = ${ganz} (Kommutativgesetz).<br>${ganz} + ${fmt(B)} = <b>${fmt(erg)}</b>`,
       ex: geschicktEx(parts, pos[0], pos[1], '+', String(ganz), fmt(erg)),
     };
   }
@@ -767,16 +767,50 @@
   lb(2).topics.push({ id: 'k5-bruchstrahl', title: 'Brüche am Zahlenstrahl', icon: '½', gen: bruchstrahl });
   lb(3).topics.push({ id: 'k5-lage', title: 'Senkrecht & parallel', icon: '∥', gen: senkParallel });
   lb(3).topics.push({ id: 'k5-winkelmessen', title: 'Winkel messen', icon: '∡', gen: winkelMessen });
-  // Reihenfolge nach Lambacher Schweizer 5 Sachsen (Kapitel und Lerneinheit stehen in faecher/mathe/lehrplan/schulbuch-abgleich.md)
-  const FOLGE = {
-    1: ['k5-zahlen', 'k5-runden', 'k5-ueberschlag', 'k5-schriftlich', 'k5-gleichung', 'k5-vorrang', 'k5-gesetze', 'k5-vorteil', 'k5-potenz', 'k5-teilbar', 'k5-prim', 'k5-division', 'k5-text'],
-    2: ['k5-anteil', 'k5-kuerzen', 'k5-erweitern', 'k5-bruchstrahl', 'k5-gemischt', 'k5-umwandeln', 'k5-vergleich', 'k5-dezrunden', 'k5-dezimal', 'k5-mittel'],
-    3: ['k5-lage', 'k5-koord', 'k5-winkelart', 'k5-winkelmessen', 'k5-winkelpaar', 'k5-symmetrie'],
-    4: ['k5-rechteck', 'k5-netze', 'k5-quader'],
-    5: ['k5-einheit', 'k5-fahrplan', 'k5-sach', 'k5-fermi'],
+  // =====================================================
+  // Kapitel und Reihenfolge wie im Schulbuch (Lambacher Schweizer 5 Sachsen, Fotos am 15.11.2026 abgeglichen)
+  // Die Bereiche sind die fünf Buchkapitel I–V. Jedes Thema bekommt seinen Seitenhinweis („📖 Buch S. …“) und,
+  // wo das Buch ein anderes Wort benutzt, den Titel aus dem Buch. Lernstand und Sterne hängen an der Themen-ID,
+  // deshalb geht beim Umsortieren nichts verloren. Einzelheiten: faecher/mathe/lehrplan/schulbuch-abgleich.md
+  // =====================================================
+  const KAPITEL = [
+    { nr: 1, title: 'Arbeiten mit natürlichen Zahlen', buch: 'S. 6–53', themen: [
+      ['k5-fermi', 'S. 7'], ['k5-zahlen', 'S. 8–13'], ['k5-runden', 'S. 11–14'], ['k5-fachbegriffe', 'S. 15–18'],
+      ['k5-schriftlich', 'S. 223'], ['k5-ueberschlag', 'S. 38, 101, 223'], ['k5-gleichung', 'S. 15–18'], ['k5-vorrang', 'S. 19–22'],
+      ['k5-gesetze', 'S. 23–28'], ['k5-vorteil', 'S. 23–28'], ['k5-potenz', 'S. 29–31'], ['k5-teilbar', 'S. 32–34'],
+      ['k5-prim', 'S. 35–37'], ['k5-division', 'S. 38–40'], ['k5-text', 'S. 41–44'], ['k5-sach', 'S. 41–44']] },
+    { nr: 2, title: 'Gemeine Brüche und Prozente', buch: 'S. 56–85', themen: [
+      ['k5-anteil', 'S. 58–62'], ['k5-erweitern', 'S. 63–67'], ['k5-kuerzen', 'S. 63–67'], ['k5-bruchvergleich', 'S. 68–71'],
+      ['k5-prozent', 'S. 72–75'], ['k5-bruchstrahl', 'S. 76–81'], ['k5-gemischt', 'S. 79–81']] },
+    { nr: 3, title: 'Dezimalzahlen', buch: 'S. 88–125', themen: [
+      ['k5-umwandeln', 'S. 90–93'], ['k5-vergleich', 'S. 94–97'], ['k5-dezrunden', 'S. 94–97'], ['k5-einheit', 'S. 98–100, 225–226'],
+      ['k5-fahrplan', 'S. 226'], ['k5-dezimal', 'S. 101–112, 116–118'], ['k5-mittel', 'S. 113–115']] },
+    { nr: 4, title: 'Lagebeziehungen geometrischer Objekte', buch: 'S. 128–167', themen: [
+      ['k5-lage', 'S. 130–132'], ['k5-koord', 'S. 133–135'], ['k5-winkelart', 'S. 136–139'], ['k5-winkelmessen', 'S. 140–143'],
+      ['k5-winkelpaar', 'S. 144–147'], ['k5-symmetrie', 'S. 148–159']] },
+    { nr: 5, title: 'Rechtecke und Quader', buch: 'S. 170–215', themen: [
+      ['k5-flaecheneinheit', 'S. 174–177'], ['k5-rechteck', 'S. 172–173, 180–186'], ['k5-netze', 'S. 187–193'],
+      ['k5-volumeneinheit', 'S. 197–200'], ['k5-quader', 'S. 194–196, 201–207']] },
+  ];
+  // Titel wie im Buch (nur wo MaDax vorher ein anderes Wort hatte). \u00AD = weiches Trennzeichen für schmale Handys
+  const TITEL = {
+    'k5-vorteil': 'Rechenvorteile', 'k5-teilbar': 'Teilbarkeit', 'k5-text': 'Sachaufgaben systematisch lösen',
+    'k5-anteil': 'Bruch und Anteil', 'k5-gemischt': 'Unechte und gemischte Brüche', 'k5-umwandeln': 'Dezimal\u00ADschreibweise',
+    'k5-vergleich': 'Dezimal\u00ADzahlen vergleichen', 'k5-einheit': 'Größen\u00ADangaben in Komma\u00ADschreibweise', 'k5-lage': 'Senkrechte und parallele Geraden',
+    'k5-winkelart': 'Winkel', 'k5-winkelpaar': 'Winkel an sich schneiden\u00ADden Geraden', 'k5-symmetrie': 'Symmetrie und Verschiebungen',
+    'k5-rechteck': 'Flächeninhalt und Umfang', 'k5-netze': 'Quader, Netze, Schrägbilder', 'k5-quader': 'Volumen und Ober\u00ADflächen\u00ADinhalt',
   };
-  for (const nr in FOLGE) {
-    const pos = (id) => { const i = FOLGE[nr].indexOf(id); return i < 0 ? 99 : i; };
-    lb(+nr).topics.sort((a, b) => pos(a.id) - pos(b.id));
-  }
+  const alle = new Map(M.grades[5].lbs.flatMap((l) => l.topics).map((t) => [t.id, t]));
+  M.grades[5].lbs = KAPITEL.map((k) => ({
+    id: 'k5-lb' + k.nr, nr: k.nr, title: k.title, color: 'c' + k.nr, buch: k.buch,
+    topics: k.themen.filter(([id]) => alle.has(id) || console.error('MaDax: Thema fehlt: ' + id)).map(([id, seiten]) => {
+      const t = alle.get(id);
+      alle.delete(id);
+      t.buch = seiten;
+      if (TITEL[id]) t.title = TITEL[id];
+      return t;
+    }),
+  }));
+  // Sicherheitsnetz: Ein Thema ohne Eintrag oben geht nicht verloren, es landet in Kapitel I (und meldet sich in der Konsole).
+  if (alle.size) { console.error('MaDax: Thema ohne Kapitel: ' + [...alle.keys()].join(', ')); M.grades[5].lbs[0].topics.push(...alle.values()); }
 })();

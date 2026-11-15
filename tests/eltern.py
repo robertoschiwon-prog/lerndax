@@ -28,8 +28,8 @@ async def main():
         h = await pg.inner_text('h1'); karten = await pg.eval_on_selector_all('.ecard[data-fach]', 'e=>e.map(x=>x.dataset.fach)')
         text = await pg.inner_text('#app')
         await pg.screenshot(path=str(SHOTS / 'eltern-start.png'), full_page=True)
-        ok = h == 'Für Eltern' and karten == ['mathe', 'deutsch'] and '2 / 36' in text and '1 / 30' in text and '94 %' in text
-        print('Überschrift:', h, '| Karten:', karten, '| Zahlen stimmen:', '2 / 36' in text, '1 / 30' in text, '94 %' in text)
+        ok = h == 'Für Eltern' and karten[:2] == ['mathe', 'deutsch'] and '2 / 41' in text and '1 / 37' in text and '94 %' in text
+        print('Überschrift:', h, '| Karten:', karten, '| Zahlen stimmen:', '2 / 41' in text, '1 / 37' in text, '94 %' in text)
         await pg.click('.ecard[data-fach="deutsch"] .elink'); await pg.wait_for_timeout(500)
         de = await pg.inner_text('h1'); print('Link DeDax führt zu:', de, '|', 'Zeitformen' in await pg.inner_text('#app'))
         ok = ok and de == 'Für Eltern' and '/deutsch/' in pg.url

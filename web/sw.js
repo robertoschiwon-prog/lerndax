@@ -1,7 +1,7 @@
 /* LernDax – Service Worker: App läuft auch offline.
  * Eigene Dateien: immer zuerst frisch vom Server, der Speicher ist nur der Offline-Ersatz.
  * So kommen Änderungen sofort an. Bei neuer Version VERSION erhöhen. */
-const VERSION = 'lerndax-v111';
+const VERSION = 'lerndax-v112';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './plattform/config.js', './plattform/sync.js', './plattform/avatare.js', './plattform/trainings.js', './plattform/faecher.js', './plattform/symbole.js', './plattform/fach.js', './plattform/fach.css', './plattform/bausteine.js', './plattform/erklaer.js',
   './deutsch/', './deutsch/index.html', './deutsch/themen/klasse5.js', './deutsch/themen/klasse5-knobel.js', './deutsch/erklaerungen/klasse5.js', './deutsch/erklaerungen/entdecken.js', './deutsch/symbole.js',
@@ -9,8 +9,8 @@ const SHELL = [
   './bio/', './bio/index.html', './bio/bildnachweis.html', './bio/themen/basis.js', './bio/themen/klasse5-1.js', './bio/themen/klasse5-2.js', './bio/themen/klasse5-3.js', './bio/themen/klasse5-knobel.js', './bio/erklaerungen/klasse5.js', './bio/erklaerungen/entdecken.js', './bio/symbole.js',
   './geografie/', './geografie/index.html', './geografie/bildnachweis.html', './geografie/karten/daten.js', './geografie/karten/karten.js', './geografie/themen/basis.js', './geografie/themen/zeichnungen.js', './geografie/themen/klasse5-1.js', './geografie/themen/klasse5-2.js', './geografie/themen/klasse5-3.js', './geografie/themen/fotos.js', './geografie/themen/klasse5-knobel.js', './geografie/erklaerungen/klasse5.js', './geografie/erklaerungen/entdecken.js', './geografie/symbole.js',
   './geschichte/', './geschichte/index.html', './geschichte/themen/klasse5.js', './geschichte/themen/klasse5-knobel.js', './geschichte/erklaerungen/klasse5.js', './geschichte/erklaerungen/entdecken.js', './geschichte/symbole.js',
-  './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js', './mathe/generatoren/klasse5-luecken.js', './mathe/generatoren/klasse5-buch.js', './mathe/generatoren/klasse5-knobel.js', './mathe/symbole.js',
-  './mathe/erklaerungen/klasse5.js', './mathe/erklaerungen/klasse5-luecken.js', './mathe/erklaerungen/klasse5-buch.js', './mathe/erklaerungen/entdecken.js',
+  './mathe/', './mathe/index.html', './mathe/generatoren/klasse5.js', './mathe/generatoren/klasse5-luecken.js', './mathe/generatoren/klasse5-abgleich.js', './mathe/generatoren/klasse5-buch.js', './mathe/generatoren/klasse5-knobel.js', './mathe/symbole.js',
+  './mathe/erklaerungen/klasse5.js', './mathe/erklaerungen/klasse5-luecken.js', './mathe/erklaerungen/klasse5-buch.js', './mathe/erklaerungen/klasse5-abgleich.js', './mathe/erklaerungen/entdecken.js',
   './icons/dachs.svg', './icons/madax.svg', './icons/madax-klein.svg', './icons/madax-staunt.svg', './icons/dedax.svg', './icons/endax.svg', './icons/biodax.svg', './icons/gedax.svg', './icons/geodax.svg', './icons/tecdax.svg', './icons/icon-192-v4.png', './icons/icon-512-v4.png',
   './icons/apple-touch-icon-v4.png', './icons/favicon-v4.png',
 ];

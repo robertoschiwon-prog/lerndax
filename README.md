@@ -106,17 +106,17 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 übrigen Klassen (Details in `faecher/README.md`).
 
 **Mathe (MaDax)**
-- [x] Klasse 5: alle 5 Lernbereiche, 36 Themen (Reihenfolge wie im Schulbuch), Tipps und Lösungswege
-- [x] Erklär-Animationen zu allen 36 Themen, Pause und Langsam-Modus
-- [x] Beispiel vorher / Lösung als Animation nachher für alle 36 Themen
-- [x] Knobel-Stufe: schwerere, freiwillige Aufgaben zu allen 36 Themen (zählen nicht für die Sterne)
+- [x] Klasse 5: 5 Bereiche = Buchkapitel I–V, 41 Themen in der Reihenfolge des Schulbuchs, jedes mit „📖 Buch S. …“, Tipps und Lösungswege
+- [x] Erklär-Animationen zu allen 41 Themen, Pause und Langsam-Modus
+- [x] Beispiel vorher / Lösung als Animation nachher für alle 41 Themen
+- [x] Knobel-Stufe: schwerere, freiwillige Aufgaben zu allen 41 Themen (zählen nicht für die Sterne)
 - [x] Entdecken: 16 visuelle Beweise und Staunen-Momente
 - [x] Abgleich mit Schulbuch (Lambacher Schweizer 5 Sachsen) und Lehrplantext, Themen in Buch-Reihenfolge
 - [x] Entscheidungen aus der Prüfung vom 11.11.2026 umgesetzt: weniger Raten, leichtere Zahlen, „Gemischt“ nur aus geübten Themen, breite Darstellung am Tablet und PC
-- [ ] Verfahren beim schriftlichen Minus mit der Schule abgleichen
-- [x] Lehrplan-Lücken Klasse 5 geschlossen (36 Themen)
+- [x] Schriftliche Rechenverfahren wie im Buch (Grundwissen S. 223: Minus mit Übertrag, Mal versetzt)
+- [x] Lehrplan-Lücken Klasse 5 geschlossen
 - [ ] Test mit dem Kind (geplant 13.11.2026), danach Klasse 5 abnehmen
-- [ ] Reihenfolge mit dem Schulbuch abgleichen
+- [x] Mit dem ganzen Schulbuch abgeglichen (Fotos, 15.11.2026): Kapitel, Reihenfolge, Begriffe, Rechenwege, 5 neue Themen
 - [ ] Klasse 6, danach Klasse 4 und die übrigen Klassen
 
 **Plattform**

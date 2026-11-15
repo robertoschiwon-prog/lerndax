@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v111`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v112`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,39 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-21. MaDax mit dem ganzen Mathebuch abgeglichen (lerndax-v112, 15.11.2026)
+
+Roberto: „Die Fotos aus dem Mathebuch liegen in `notizen\schulbuch-mathe`. Bitte MaDax damit abgleichen, so wie bei GeDax und GeoDax.“
+138 Fotos (Doppelseiten S. 2–269, eine Datei doppelt), **ISBN 978-3-12-733150-9 am Buch bestätigt**. Ergebnis und Seitentabelle:
+`faecher/mathe/lehrplan/schulbuch-abgleich.md`. Gelesen mit Texterkennung (nur im Arbeitsbereich) und den Merkkästen jeder Lerneinheit.
+- **Entscheidung Roberto: Bereiche genau wie das Buch.** Die fünf Bereiche sind jetzt die Kapitel I–V (Arbeiten mit natürlichen Zahlen ·
+  Gemeine Brüche und Prozente · Dezimalzahlen · Lagebeziehungen geometrischer Objekte · Rechtecke und Quader). „Mathe im Alltag“ ist
+  aufgelöst: Fermi und Geld in I, Größen und Zeit in III. Tabelle `KAPITEL` (mit Seiten) und `TITEL` in `generatoren/klasse5-buch.js`;
+  die alte Tabelle `FOLGE` ist ersetzt. Lernstand hängt an der Themen-ID, es geht nichts verloren.
+- **Jedes Thema mit „📖 Buch S. …“**, Reihenfolge wie die Lerneinheiten, Titel wie im Buch (z. B. Teilbarkeit, Rechenvorteile,
+  Sachaufgaben systematisch lösen, Unechte und gemischte Brüche, Dezimalschreibweise, Winkel an sich schneidenden Geraden).
+- **Entscheidung Roberto: alle vier vorgeschlagenen Themen bauen.** Neu (`generatoren/klasse5-abgleich.js`, `erklaerungen/klasse5-abgleich.js`):
+  **Fachbegriffe** (Summand … Quotient, Aufgaben in Worten, Zahlenmauern; S. 15–18), **Brüche vergleichen** (S. 68–71),
+  **Prozente** (Bruch ↔ Prozent ohne Dezimalzahlen; S. 72–75), **Flächeneinheiten** (km², ha, a … mm²; S. 174–177),
+  **Volumeneinheiten** (m³ … mm³, l, ml; S. 197–200). Je mit Animation (Stellenwerttafel mit zwei bzw. drei Spalten je Einheit,
+  Hundertertafel, Rechteckstreifen, Zahlenmauer), Knobel-Aufgaben und Symbol. **MaDax jetzt 41 Themen.**
+  „Größenangaben in Kommaschreibweise“ (früher „Einheiten umrechnen“) übt jetzt Länge, Masse, Zeit und neu Euro/Cent; Flächen und
+  Volumen haben eigene Themen.
+- **Rechenwege wie im Buch (Grundwissen S. 223):** schriftlich subtrahieren mit Übertrag („2 − 5 geht nicht, 12 − 5 = 7, übertrage 1;
+  6 − 3 − 1 = 2“, die 1 in eigener Zeile) in Lösung und Animation, **damit ist die offene Frage zum schriftlichen Minus geklärt**;
+  schriftlich multiplizieren vorn beginnend und versetzt; Primfaktorzerlegung als Kette mit Potenzschreibweise; „übertrage“ statt „merke“.
+- **Begriffe wie im Buch:** Kommutativ-/Assoziativ-/Distributivgesetz ohne deutsche Ersatznamen; Grundzahl/Hochzahl (oder Basis/Exponent);
+  Endstellen- und Quersummenregel; vier Schritte bei Sachaufgaben (Verstehen – Zerlegen – Durchführen – Rückschau und Antwort);
+  gemischter und unechter Bruch; Scheitelpunkt.
+- `tests/gen-test.js` lädt jetzt ohne Argument alle Generatoren aus `web/mathe/index.html` und prüft auch die Knobel-Aufgaben.
+  `tests/eltern.py`: Themenzahlen aktualisiert (Mathe 41, Deutsch 37).
+- Tests: `gen-test.js` (41 Themen, 246 000 Aufgaben, 0 Fehler), `ui2.py` (656 Antworten richtig erkannt), `ex.py` (alle Erklärungen),
+  `loesung.py 8` für die neuen und geänderten Themen (80 Animationen ohne Problem) und `loesung.py 4` für die umbenannten,
+  `bild_audit.py` (neue Bilder), `knobel.py`, `sync_test.py`, `training.py`, `ex_aufgabe.py`, `prim.py`, `pause.py`, `two.py`,
+  `hub.py`, `eltern.py`, `design_audit.py`. Bio-Nachtrag (S. 106, S. 156–165) war schon in v111 erledigt.
+- **Offen (siehe Abgleich):** Diagramme, Verhältnisse, alle Teiler aus der Primfaktorzerlegung, Drehwinkel bei Drehsymmetrie als
+  eigene Aufgabenarten; Zeichnen bleibt Heftarbeit.
 
 ## 0-neu-20. Nur Unterlagen: Bio-Abgleich ergänzt, Buchfotos, Mathe als Nächstes (lerndax-v111, 15.11.2026)
 
@@ -738,18 +771,21 @@ dort ändern, testen, pushen; danach geänderte Dateien in den OneDrive-Ordner k
   44-Pixel-Kästchen. Vorher standen dort kleine Schriftzeichen (≈, ÷, ↘ …), die auf dem Handy
   kaum zu erkennen waren. Datei `web/mathe/symbole.js`; fehlt ein Symbol (z. B. neue Klasse),
   zeigt die App das Zeichen aus `icon` im Generator.
-- **5 Lernbereiche, 36 Themen** (nach Lehrplan Gymnasium Sachsen Klasse 5):
-  - LB 1 Natürliche Zahlen: Große Zahlen & Zahlenstrahl · Runden · Überschlagen · Schriftlich rechnen · Einfache Gleichungen ·
-    **Vorrangregeln** · **Rechengesetze** · Geschickt rechnen · Potenzen · Teiler & Vielfache · Primzahlen & Primfaktoren ·
-    Schriftlich dividieren · **Textaufgaben**
-  - LB 2 Brüche & Dezimalzahlen: Anteile berechnen · Kürzen · Erweitern · Brüche am Zahlenstrahl · Gemischte Zahlen ·
-    Bruch · Dezimal · Prozent · Zahlen vergleichen · Dezimalzahlen runden · Mit Dezimalzahlen rechnen · Arithmetisches Mittel
-  - LB 3 Geometrie: Senkrecht & parallel · Koordinatensystem · Winkelarten · Winkel messen · Winkel an Geraden · Symmetrie & Spiegeln
-  - LB 4 Rechtecke & Quader: Umfang & Fläche · Netze & Schrägbilder · Volumen & Oberfläche
-  - LB 5 Mathe im Alltag: Einheiten umrechnen · Fahrpläne & Zeit · Sachaufgaben mit Geld · Schätzen wie Fermi
+- **5 Bereiche = Buchkapitel I–V, 41 Themen** (Reihenfolge und Titel wie im Schulbuch, jedes mit „📖 Buch S. …“, seit v112):
+  - I Arbeiten mit natürlichen Zahlen: Schätzen wie Fermi · Große Zahlen & Zahlenstrahl · Runden · **Fachbegriffe** · Schriftlich rechnen ·
+    Überschlagen · Einfache Gleichungen · Vorrangregeln · Rechengesetze · Rechenvorteile · Potenzen · Teilbarkeit ·
+    Primzahlen & Primfaktoren · Schriftlich dividieren · Sachaufgaben systematisch lösen · Sachaufgaben mit Geld
+  - II Gemeine Brüche und Prozente: Bruch und Anteil · Erweitern · Kürzen · **Brüche vergleichen** · **Prozente** · Brüche am Zahlenstrahl ·
+    Unechte und gemischte Brüche
+  - III Dezimalzahlen: Dezimalschreibweise · Dezimalzahlen vergleichen · Dezimalzahlen runden · Größenangaben in Kommaschreibweise ·
+    Fahrpläne & Zeit · Mit Dezimalzahlen rechnen · Arithmetisches Mittel
+  - IV Lagebeziehungen geometrischer Objekte: Senkrechte und parallele Geraden · Koordinatensystem · Winkel · Winkel messen ·
+    Winkel an sich schneidenden Geraden · Symmetrie und Verschiebungen
+  - V Rechtecke und Quader: **Flächeneinheiten** · Flächeninhalt und Umfang · Quader, Netze, Schrägbilder · **Volumeneinheiten** ·
+    Volumen und Oberflächeninhalt
 - **Übungsrunde:** Aufgabe → Eingabe (Zahl, Bruch, Uhrzeit, Primfaktoren oder Auswahl) →
   bei Fehler erst ein **Tipp**, dann der **Lösungsweg**. Fehler fließen ins Fehler-Training.
-- **Erklär-Animationen** zu allen 36 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
+- **Erklär-Animationen** zu allen 41 Themen, jede Kachel hat den ▶-Knopf (seit `lerndax-v20` auch
   Textaufgaben „in vier Schritten“, Zahlen vergleichen und Sachaufgaben „Wechselgeld ergänzen“). Liste der Grund-Animationen: Runden am Zahlenstrahl · Der Rechenbaum (Vorrangregeln) ·
   Drei Rechengesetze zum Anschauen (Punkte drehen, Streifen umklammern, Rechteck teilen) · Dividieren: Bonbons in Tüten und
   schriftlich Stelle für Stelle · Teilbarkeit: Regeln und Teiler (Quersumme, Endziffern, durch 6,
@@ -917,7 +953,7 @@ Pause und Langsam-Modus für alle Animationen gleich. `discover` ⇒ erscheint u
 ### Tests
 Siehe `tests/README.md`. Vor jedem Veröffentlichen mindestens `ui2.py` und `sync_test.py` laufen lassen, nach
 Änderungen an Aufgaben oder Animationen auch `loesung.py`, `knobel.py` und `bild_audit.py`, nach Änderungen am
-Aussehen `design_audit.py`. (`gen-test.js` braucht den Pfad einer Generator-Datei als Argument und kennt nur `klasse5.js`.)
+Aussehen `design_audit.py`. (`node tests/gen-test.js` ohne Argument prüft alle MaDax-Generatoren und Knobel-Aufgaben, seit v112.)
 
 ## 5. Wichtige Entscheidungen (mit Begründung)
 
@@ -1099,9 +1135,8 @@ Infos zur ersten Arbeit:
 - Dunkle Schrift auf Orange und Gelb; Rückfrage beim ✕; Tipp-Knopf verschwindet nach dem Tipp;
   „0.125“ zählt wie „0,125“; Zurücksetzen nur nach Eintippen des Wortes LÖSCHEN.
 - Mehr Abwechslung bei Themen mit wenigen Aufgabenarten.
-- **Noch offen:** Wie rechnet die Schule schriftlich minus (Ergänzen mit „1 merken“ wie in der
-  Animation, oder Entbündeln)? Der Auftraggeber fragt nach; bis dahin bleibt die Animation, wie sie ist.
-  Das neue Thema „Schriftlich rechnen“ zeigt bei Minus deshalb nur die Probe mit Plus (passt zu beiden Wegen).
+- **Geklärt (v112):** Schriftlich minus rechnet das Buch mit Übertrag (Grundwissen S. 223: „12 − 5 = 7, übertrage 1; 6 − 3 − 1 = 2“).
+  „Schriftlich rechnen“ zeigt das jetzt Schritt für Schritt (Lösung und Animation).
 
 **Als Nächstes sinnvoll**
 - [x] Testrunde 1 mit dem Kind (10.11.2026)

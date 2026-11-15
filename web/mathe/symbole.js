@@ -48,6 +48,12 @@ window.MathelixIcons = (function () {
     'k5-winkelmessen': `<path d="M2.5 18.5a9.5 9.5 0 0 1 19 0z"/><path d="M12 18.5 17.2 8.6" stroke-width="2.4"/><path d="M12 9v2M6 12.5l1.4 1.4" stroke-width="1.6"/>`,
     'k5-lage': `<path d="M3 20 14 4M10 20 21 4"/><path d="M4.500 9.500l6 4.200" stroke-width="1.8"/>`.replace(/(\.\d)00/g, '$1'),
     'k5-fermi': `<path d="M8.4 8.6a3.700 3.700 0 1 1 5.800 3c-1.300.900-2.200 1.700-2.200 3.400"/><circle cx="12" cy="19" r="1.5" ${F}/><path d="M3 20.500c1-1.200 2.100-1.200 3 0M18 20.500c1-1.200 2.100-1.200 3 0" stroke-width="1.5"/>`.replace(/(\.\d)00/g, '$1'),
+    // Neue Themen aus dem Buchabgleich (15.11.2026)
+    'k5-fachbegriffe': `<rect x="1.8" y="4" width="5.4" height="5.4" rx="1"/><rect x="9.3" y="4" width="5.4" height="5.4" rx="1"/><rect x="16.8" y="4" width="5.4" height="5.4" rx="1" ${F}/><path d="M2 15h5M9.5 15h5M17 15h5M2 19.5h3.5M9.5 19.5h3.5M17 19.5h3.5" stroke-width="1.7"/>`,
+    'k5-bruchvergleich': `<rect x="2" y="4" width="20" height="6" rx="1.2"/><rect x="2" y="4" width="13.3" height="6" rx="1.2" ${F}/><rect x="2" y="14" width="20" height="6" rx="1.2"/><rect x="2" y="14" width="7.5" height="6" rx="1.2" ${F}/>`,
+    'k5-prozent': `<rect x="2.5" y="2.5" width="19" height="19" rx="1.5"/><path d="M2.5 15.2h19M2.5 8.8h19M8.8 2.5v19M15.2 2.5v19" stroke-width="1.2" opacity=".7"/><path d="M2.5 15.2h19v6.3h-19zM2.5 8.8h6.3v6.4H2.5z" ${F}/>`,
+    'k5-flaecheneinheit': `<text x="12" y="16.8" text-anchor="middle" font-size="13" font-weight="900" font-family="Nunito, system-ui, sans-serif" ${F}>m²</text>`,
+    'k5-volumeneinheit': `<text x="12" y="16.8" text-anchor="middle" font-size="13" font-weight="900" font-family="Nunito, system-ui, sans-serif" ${F}>m³</text>`,
   };
   function svg(id) {
     const body = I[id];

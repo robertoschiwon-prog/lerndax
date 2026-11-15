@@ -524,7 +524,7 @@
             api.say(`Am Schenkel stehen immer zwei Zahlen: ${Math.min(c.th, 180 - c.th)} und ${Math.max(c.th, 180 - c.th)}. Zusammen ergeben sie 180. Welche gilt?`);
             await api.wait(3600);
           }
-          api.say('Geodreieck anlegen: Der <b>Nullpunkt</b> (Mitte der langen Kante) kommt genau auf den Scheitel. Die lange Kante liegt auf dem blauen Schenkel.');
+          api.say('Geodreieck anlegen: Der <b>Nullpunkt</b> (Mitte der langen Kante) kommt genau auf den Scheitelpunkt. Die lange Kante liegt auf dem blauen Schenkel.');
           await api.tw(900, (t) => { show(g.geo, t); g.geo.setAttribute('transform', `translate(0 ${-36 * (1 - t)})`); });
           g.schenkel.innerHTML = M.winkelSchenkel(c.th, c.links, false);
           show(g.recht, 0);

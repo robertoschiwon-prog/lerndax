@@ -134,7 +134,7 @@
         prompt: `Rechne geschickt: <b>${parts.join(' · ')}</b>`,
         fields: [{ answer: 100 * k }],
         hint: 'Welche zwei Zahlen ergeben malgenommen eine glatte Zahl?',
-        solution: `Erst 25 · 4 = 100 (Vertauschungsgesetz).<br>100 · ${k} = <b>${fmt(100 * k)}</b>`,
+        solution: `Erst 25 · 4 = 100 (Kommutativgesetz).<br>100 · ${k} = <b>${fmt(100 * k)}</b>`,
         ex: tauschEx(parts, '25', '4', '·', '100'),
       };
     }
@@ -165,7 +165,7 @@
         prompt: `Rechne geschickt: <b>${a} · ${b} + ${a} · ${c}</b>`,
         fields: [{ answer: 100 * a }],
         hint: 'Beide Produkte haben einen gemeinsamen Faktor. Klammere ihn aus.',
-        solution: `${a} · ${b} + ${a} · ${c} = ${a} · (${b} + ${c}) = ${a} · 100 = <b>${fmt(100 * a)}</b> (Verteilungsgesetz)`,
+        solution: `${a} · ${b} + ${a} · ${c} = ${a} · (${b} + ${c}) = ${a} · 100 = <b>${fmt(100 * a)}</b> (Distributivgesetz)`,
         ex: { mode: 'ges', law: 'dis', f: a, x: b, y: c, back: true },
       };
     }
@@ -339,12 +339,12 @@
 
   // ---------- Rechengesetze ----------
   const GESETZE = [
-    'Kommutativgesetz<br><small>Vertauschungsgesetz</small>',
-    'Assoziativgesetz<br><small>Verbindungsgesetz</small>',
-    'Distributivgesetz<br><small>Verteilungsgesetz</small>',
+    'Kommutativgesetz<br><small>Summanden oder Faktoren vertauschen</small>',
+    'Assoziativgesetz<br><small>Klammern setzen oder weglassen</small>',
+    'Distributivgesetz<br><small>ausmultiplizieren oder ausklammern</small>',
   ];
-  const GESETZ_HINT = '<b>Kommutativ</b>: Zahlen vertauschen. <b>Assoziativ</b>: Klammern verschieben. <b>Distributiv</b>: einen Faktor auf eine Summe verteilen.';
-  const GESETZ_KURZ = ['Kommutativgesetz (Vertauschungsgesetz)', 'Assoziativgesetz (Verbindungsgesetz)', 'Distributivgesetz (Verteilungsgesetz)'];
+  const GESETZ_HINT = '<b>Kommutativgesetz</b>: Summanden oder Faktoren vertauschen. <b>Assoziativgesetz</b>: Klammern setzen oder weglassen. <b>Distributivgesetz</b>: ausmultiplizieren oder ausklammern.';
+  const GESETZ_KURZ = ['Kommutativgesetz', 'Assoziativgesetz', 'Distributivgesetz'];
   function gesetze() {
     // Mischung: Gesetz benennen (3 Auswahl) 19 %, Lücken 37 %, „Stimmt das?“ 6 %, Ausklammern 13 %,
     // im Kopf mit dem Distributivgesetz 12,5 %, beide Seiten ausrechnen 12,5 %
@@ -502,7 +502,7 @@
           prompt: `Schreibe als Zahl: <b>10${sup(k)}</b>`,
           ex: { mode: 'zehn', k },
           fields: [{ answer: 10 ** k }],
-          hint: 'Der Exponent sagt dir, wie viele Nullen hinter der 1 stehen.',
+          hint: 'Die Hochzahl (Exponent) sagt dir, wie viele Nullen hinter der 1 stehen.',
           solution: `10${sup(k)} = 1 mit ${k} Nullen = <b>${fmt(10 ** k)}</b>`,
         };
       return {
@@ -527,7 +527,7 @@
           ? `Hoch 1 heißt: Die ${b} kommt nur <b>einmal</b> als Faktor vor.`
           : b === 1
             ? 'Die 1 kommt mehrmals als Faktor vor: 1 · 1 · 1 · …'
-            : `Die Basis ${b} kommt <b>${e}-mal</b> als Faktor vor: ${prod(b, Math.min(e, 3))}${e > 3 ? ' · …' : ''}. Nicht ${b} · ${e}!`,
+            : `Die Grundzahl ${b} kommt <b>${e}-mal</b> als Faktor vor: ${prod(b, Math.min(e, 3))}${e > 3 ? ' · …' : ''}. Nicht ${b} · ${e}!`,
         solution: `${b}${sup(e)} = ${e > 1 ? prod(b, e) + ' = ' : ''}<b>${fmt(b ** e)}</b>${e === 1 ? ' (hoch 1: die Zahl selbst)' : b === 1 ? ' (1 mal 1 bleibt immer 1)' : ''}`,
       };
     }
@@ -536,9 +536,9 @@
       return {
         prompt: `Schreibe als Potenz: <b>${prod(b, e)}</b>`,
         ex: { mode: 'pow', b, e },
-        fields: [{ answer: b, label: 'Basis' }, { answer: e, label: 'Exponent' }],
-        hint: 'Die Basis ist die Zahl, die malgenommen wird. Der Exponent zählt, wie oft sie vorkommt.',
-        solution: `Die ${b} kommt <b>${e}-mal</b> vor → <b>${b}${sup(e)}</b> (Basis ${b}, Exponent ${e})`,
+        fields: [{ answer: b, label: 'Grundzahl' }, { answer: e, label: 'Hochzahl' }],
+        hint: 'Die Grundzahl (Basis) ist die Zahl, die malgenommen wird. Die Hochzahl (Exponent) zählt, wie oft sie als Faktor vorkommt.',
+        solution: `Die ${b} kommt <b>${e}-mal</b> vor → <b>${b}${sup(e)}</b> (Grundzahl oder Basis ${b}, Hochzahl oder Exponent ${e})`,
         answerText: `${b}${sup(e)}`,
       };
     }
@@ -551,7 +551,7 @@
         ex: { mode: 'pow', b, e },
         choices: opts.map(fmt),
         correct: opts.indexOf(b ** e),
-        hint: `Der Exponent sagt, wie oft die ${b} als Faktor vorkommt.`,
+        hint: `Die Hochzahl sagt, wie oft die Grundzahl ${b} als Faktor vorkommt.`,
         solution: `${b}${sup(e)} = ${prod(b, e)} = <b>${fmt(b ** e)}</b><br><small>Achtung: ${b} · ${e} = ${b * e} ist ein häufiger Fehler!</small>`,
       };
     }
@@ -831,14 +831,15 @@
     };
   }
 
+  // Namen der Regeln wie im Buch (S. 32–34): Endstellenregel und Quersummenregel
   const TEILER_REGELN = {
-    2: 'Eine Zahl ist durch 2 teilbar, wenn ihre letzte Ziffer gerade ist (0, 2, 4, 6, 8).',
-    3: 'Eine Zahl ist durch 3 teilbar, wenn ihre Quersumme durch 3 teilbar ist.',
-    4: 'Eine Zahl ist durch 4 teilbar, wenn die Zahl aus ihren letzten zwei Ziffern durch 4 teilbar ist.',
-    5: 'Eine Zahl ist durch 5 teilbar, wenn ihre letzte Ziffer 0 oder 5 ist.',
+    2: '<b>Endstellenregel</b>: Eine Zahl ist durch 2 teilbar, wenn ihre letzte Ziffer gerade ist (0, 2, 4, 6, 8).',
+    3: '<b>Quersummenregel</b>: Eine Zahl ist durch 3 teilbar, wenn ihre Quersumme durch 3 teilbar ist.',
+    4: '<b>Endstellenregel</b>: Eine Zahl ist durch 4 teilbar, wenn die Zahl aus ihren letzten zwei Ziffern durch 4 teilbar ist.',
+    5: '<b>Endstellenregel</b>: Eine Zahl ist durch 5 teilbar, wenn ihre letzte Ziffer 0 oder 5 ist.',
     6: 'Eine Zahl ist durch 6 teilbar, wenn sie durch 2 <i>und</i> durch 3 teilbar ist.',
-    9: 'Eine Zahl ist durch 9 teilbar, wenn ihre Quersumme durch 9 teilbar ist.',
-    10: 'Eine Zahl ist durch 10 teilbar, wenn ihre letzte Ziffer 0 ist.',
+    9: '<b>Quersummenregel</b>: Eine Zahl ist durch 9 teilbar, wenn ihre Quersumme durch 9 teilbar ist.',
+    10: '<b>Endstellenregel</b>: Eine Zahl ist durch 10 teilbar, wenn ihre letzte Ziffer 0 ist.',
   };
   function teilbarkeit() {
     // Mischung: Teilermengen 27 %, Vielfache 27 %, „Welche ist teilbar?“ (4 Auswahl) 22 %, Ja/Nein 24 %
@@ -929,8 +930,6 @@
       f = Array.from({ length: cnt }, () => pick([2, 2, 2, 3, 3, 3, 5, 5, 7, 11, 13])).sort((a, b) => a - b);
       n = f.reduce((a, b) => a * b, 1);
     } while (n < 12 || n > 400);
-    let rest = n;
-    const steps = f.map((p) => { const s = `${rest} : ${p} = ${rest / p}`; rest /= p; return s; });
     return {
       prompt: `Zerlege <b>${n}</b> in Primfaktoren.`,
       ex: { mode: 'tree', n },
@@ -940,7 +939,9 @@
         const cnt = {}; f.forEach((p) => { cnt[p] = (cnt[p] || 0) + 1; });
         const pot = Object.keys(cnt).map((p) => (cnt[p] > 1 ? `${p}${sup(cnt[p])}` : p)).join(' · ');
         const withPow = Object.values(cnt).some((c) => c > 1);
-        return `${steps.join('<br>')}<br>→ ${n} = <b>${f.join(' · ')}</b>${withPow ? `<br>Kürzer als Potenz: ${n} = <b>${pot}</b>` : ''}`;
+        // wie im Buch (S. 35): immer den kleinsten Primfaktor abspalten, 72 = 2 · 36 = 2 · 2 · 18 = …
+        const kette = f.slice(0, -1).map((_, k) => `${f.slice(0, k + 1).join(' · ')} · ${f.slice(k + 1).reduce((a, b) => a * b, 1)}`);
+        return `${n} = ${kette.join(' = ')} = <b>${f.join(' · ')}</b>${withPow ? `<br>In der Potenzschreibweise: ${n} = <b>${pot}</b>` : ''}`;
       })(),
       answerText: f.join(' · '),
     };

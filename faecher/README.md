@@ -72,7 +72,7 @@ Das kann später neu entschieden werden.
 ## Fahrplan in drei Phasen
 
 **Phase 1: Klasse 5 fertig bauen, alle Fächer**
-1. MaDax ✅ inhaltlich fertig (36 Themen, Knobel-Stufe, Abgleich mit Buch und Lehrplan; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
+1. MaDax ✅ inhaltlich fertig (41 Themen in den Buchkapiteln I–V, Knobel-Stufe, mit dem ganzen Schulbuch abgeglichen; Abnahme nach dem Test mit dem Kind, siehe `STAND.md` Abschnitt 0)
 2. DeDax ✅ gebaut (37 Themen, Entdecken, Knobeln; mit dem Deutschbuch abgeglichen; Test mit dem Kind steht aus)
 3. EnDax ✅ gebaut (53 Themen nach den Units des Buchs, Entdecken, Knobeln; Startpunkt `faecher/englisch/README.md`; Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
 4. GeDax ✅ gebaut (43 Themen nach den Kapiteln von ANNO 1, mit Seitenhinweisen, Entdecken, Knobeln; `faecher/geschichte/README.md`); 

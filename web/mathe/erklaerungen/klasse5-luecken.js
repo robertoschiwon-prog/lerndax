@@ -98,10 +98,15 @@
     create(api, ctx) {
       ctx = ctx || {};
       let c;
-      const neu = (op) => { c = op === '·' ? { mode: 'schr', op: '·', a: R(123, 987), b: R(3, 9) } : { mode: 'schr', op: '+', nums: [R(1200, 8900), R(180, 980)] }; };
+      const neu = (op) => {
+        if (op === '·') c = { mode: 'schr', op: '·', a: R(123, 987), b: R(3, 9) };
+        else if (op === '··') { let b; do b = R(12, 79); while (b % 10 === 0); c = { mode: 'schr', op: '··', a: R(112, 980), b }; }
+        else if (op === '−') { const a = R(2100, 9800); c = { mode: 'schr', op: '−', a, b: R(150, a - 900) }; }
+        else c = { mode: 'schr', op: '+', nums: [R(1200, 8900), R(180, 980)] };
+      };
       if (ctx.mode === 'schr' && ctx.post) c = ctx;
       else if (ctx.mode === 'schr' && ctx.pre) c = aehnlich('k5-schriftlich', ctx, (e) => e.op === ctx.op);
-      else { neu('+'); api.chips([{ label: 'Plus', onClick() { neu('+'); api.replay(); } }, { label: 'Mal', onClick() { neu('·'); api.replay(); } }]); }
+      else { neu('+'); api.chips([['Plus', '+'], ['Minus', '−'], ['Mal', '·'], ['Mal zweistellig', '··']].map(([label, op]) => ({ label, onClick() { neu(op); api.replay(); } }))); }
       const CW = 24, RX = 250; // Spaltenbreite, rechte Kante
       const X = (i) => RX - i * CW - CW / 2; // i = Stelle von rechts (0 = Einer)
       let g;
@@ -121,7 +126,7 @@
         for (const s of st) {
           g.hl.setAttribute('x', X(s.i) - CW / 2); show(g.hl, 1);
           const teile = s.ds.filter((d, j) => String(nums[j]).length > s.i);
-          api.say(`<b>${STELLEN[s.i]}:</b> ${teile.length ? teile.join(' + ') : '0'}${s.carryIn ? ' + ' + s.carryIn + ' (gemerkt)' : ''} = ${s.sum}${teile.length ? ` → schreibe <b>${s.digit}</b>${s.carry ? `, merke <b>${s.carry}</b>` : ''}` : ' → der Übertrag kommt nach vorn'}`);
+          api.say(`<b>${STELLEN[s.i]}:</b> ${teile.length ? teile.join(' + ') : '0'}${s.carryIn ? ' + ' + s.carryIn + ' (Übertrag)' : ''} = ${s.sum}${teile.length ? ` → schreibe <b>${s.digit}</b>${s.carry ? `, übertrage <b>${s.carry}</b>` : ''}` : ' → der Übertrag kommt nach vorn'}`);
           await api.wait(1500);
           const d = el('text', { x: X(s.i), y: g.resY, class: 'ex-b f1', 'text-anchor': 'middle', text: s.digit, opacity: 0 }, api.svg);
           await api.tw(300, (t) => show(d, t));
@@ -134,7 +139,15 @@
         reset() {
           api.clear(); api.sub(subText(ctx)); g = {};
           if (c.op === '+') addSzene(c.nums, 40);
-          else if (c.op === '−') addSzene([c.a - c.b, c.b], 60);
+          else if (c.op === '−') {
+            // wie im Buch: Minuend, Subtrahend, darunter die Zeile für die Überträge, dann der Strich
+            const len = String(c.a).length;
+            zahl(c.a, 40); zahl(c.b, 66);
+            el('text', { x: X(len) - 4, y: 66, class: 'ex-b', 'text-anchor': 'middle', text: '−' }, api.svg);
+            el('line', { x1: X(len) - 18, y1: 96, x2: RX + 4, y2: 96, class: 'ray' }, api.svg);
+            g.hl = el('rect', { x: 0, y: 18, width: CW, height: 110, rx: 6, class: 'hl2', opacity: 0 }, api.svg);
+            g.carryY = 88; g.resY = 122;
+          }
           else if (c.op === '·') {
             g.fak = zahl(c.a, 50);
             el('text', { x: RX + 16, y: 50, class: 'ex-b', 'text-anchor': 'middle', text: '·' }, api.svg);
@@ -142,9 +155,17 @@
             el('line', { x1: X(String(c.a * c.b).length - 1) - 16, y1: 62, x2: RX + 48, y2: 62, class: 'ray' }, api.svg);
             g.hl = el('rect', { x: 0, y: 28, width: CW, height: 30, rx: 6, class: 'hl2', opacity: 0 }, api.svg);
           } else {
-            const z = Math.floor(c.b / 10) * 10, e = c.b % 10;
-            g.zeilen = [[`${fmt(c.a)} · ${c.b}`, 'ex-b'], [`${fmt(c.a)} · ${z} = ${fmt(c.a * z)}`, 'ex-b f2'], [`${fmt(c.a)} · ${e} = ${fmt(c.a * e)}`, 'ex-b f3'], [`${fmt(c.a * z)} + ${fmt(c.a * e)} = ${fmt(c.a * c.b)}`, 'ex-b f1']]
-              .map(([t, cls], i) => el('text', { x: 180, y: 36 + i * 40, class: cls, 'text-anchor': 'middle', text: t, opacity: i ? 0 : 1 }, api.svg));
+            // zweistellig wie im Buch: a · b oben, die Teilergebnisse versetzt darunter, dann addieren
+            const la = String(c.a).length;
+            String(c.a).split('').forEach((z, k) => el('text', { x: X(la + 2 - k), y: 34, class: 'ex-b', 'text-anchor': 'middle', text: z }, api.svg));
+            el('text', { x: X(2), y: 34, class: 'ex-b', 'text-anchor': 'middle', text: '·' }, api.svg);
+            g.bz = el('text', { x: X(1), y: 34, class: 'ex-b', 'text-anchor': 'middle', text: Math.floor(c.b / 10) }, api.svg);
+            g.be = el('text', { x: X(0), y: 34, class: 'ex-b', 'text-anchor': 'middle', text: c.b % 10 }, api.svg);
+            el('line', { x1: X(la + 3) - 12, y1: 42, x2: RX + 4, y2: 42, class: 'ray' }, api.svg);
+            g.plus = el('text', { x: X(la + 3), y: 90, class: 'ex-b', 'text-anchor': 'middle', text: '+', opacity: 0 }, api.svg);
+            g.strich = el('line', { x1: X(la + 3) - 12, y1: 98, x2: RX + 4, y2: 98, class: 'ray', opacity: 0 }, api.svg);
+            g.hl = el('rect', { x: 0, y: 14, width: CW, height: 26, rx: 6, class: 'hl2', opacity: 0 }, api.svg);
+            g.carryY = 114; g.resY = 140;
           }
         },
         async play() {
@@ -154,11 +175,22 @@
             await addSpiel(c.nums);
             api.say(`Fertig: ${c.nums.map(fmt).join(' + ')} = <b>${fmt(c.nums.reduce((a, b) => a + b, 0))}</b><br><small>Mach vorher einen Überschlag. Dann merkst du sofort, ob das Ergebnis stimmen kann.</small>`);
           } else if (c.op === '−') {
-            const d = c.a - c.b;
-            api.say(`<b>${fmt(c.a)} − ${fmt(c.b)} = ${fmt(d)}</b>. Stimmt das? Die <b>Probe</b> geht mit Plus: Ergebnis + abgezogene Zahl muss wieder ${fmt(c.a)} ergeben.<br><small>Wie ihr in der Schule schriftlich minus rechnet (ergänzen oder entbündeln), übst du im Heft. Die Probe passt zu beiden Wegen.</small>`);
-            await api.wait(5200);
-            await addSpiel([d, c.b]);
-            api.say(`${fmt(d)} + ${fmt(c.b)} = <b>${fmt(c.a)}</b> ✓ Die Probe stimmt, also ist <b>${fmt(c.a)} − ${fmt(c.b)} = ${fmt(d)}</b> richtig.`);
+            const d = c.a - c.b, st = U.subSchritte(c.a, c.b), len = String(c.a).length;
+            api.say(`Die Zahlen stehen <b>stellengerecht</b> untereinander. Gerechnet wird <b>von rechts nach links</b>.<br><small>Geht es an einer Stelle nicht, rechnest du mit 10 mehr und überträgst 1 in die nächste Spalte.</small>`);
+            await api.wait(3600);
+            for (const s1 of st) {
+              g.hl.setAttribute('x', X(s1.i) - CW / 2); show(g.hl, 1);
+              api.say(`<b>${STELLEN[s1.i]}:</b> ${U.subText(s1)}`);
+              await api.wait(s1.leiht ? 2600 : 1600);
+              if (!(s1.i === len - 1 && s1.digit === 0 && len > 1)) {
+                const dd = el('text', { x: X(s1.i), y: g.resY, class: 'ex-b f1', 'text-anchor': 'middle', text: s1.digit, opacity: 0 }, api.svg);
+                await api.tw(300, (t) => show(dd, t));
+              }
+              if (s1.carry) { const u = el('text', { x: X(s1.i + 1), y: g.carryY, class: 'ex-xs', style: 'fill:var(--c2)', 'text-anchor': 'middle', text: '1', opacity: 0 }, api.svg); await api.tw(300, (t) => show(u, t)); }
+              await api.wait(1200);
+            }
+            show(g.hl, 0);
+            api.say(`Fertig: ${fmt(c.a)} − ${fmt(c.b)} = <b>${fmt(d)}</b><br><small>Probe mit Plus: ${fmt(d)} + ${fmt(c.b)} = ${fmt(c.a)} ✓</small>`);
           } else if (c.op === '·') {
             api.say(`<b>${fmt(c.a)} · ${c.b}</b>: Multipliziere die <b>${c.b}</b> nacheinander mit jeder Ziffer, rechts beginnend.`);
             await api.wait(3000);
@@ -166,7 +198,7 @@
             for (let i = 0; i < ds.length; i++) {
               const p = ds[i] * c.b + carry, last = i === ds.length - 1;
               g.hl.setAttribute('x', X(i) - CW / 2); show(g.hl, 1);
-              api.say(`<b>${STELLEN[i]}:</b> ${c.b} · ${ds[i]}${carry ? ' + ' + carry + ' (gemerkt)' : ''} = ${p} → schreibe <b>${last ? p : p % 10}</b>${!last && p >= 10 ? `, merke <b>${Math.floor(p / 10)}</b>` : ''}`);
+              api.say(`<b>${STELLEN[i]}:</b> ${c.b} · ${ds[i]}${carry ? ' + ' + carry + ' (Übertrag)' : ''} = ${p} → schreibe <b>${last ? p : p % 10}</b>${!last && p >= 10 ? `, übertrage <b>${Math.floor(p / 10)}</b>` : ''}`);
               await api.wait(1500);
               const out = last ? String(p).split('').reverse() : [String(p % 10)];
               for (let k = 0; k < out.length; k++) { const d = el('text', { x: X(i + k), y: 88, class: 'ex-b f1', 'text-anchor': 'middle', text: out[k], opacity: 0 }, api.svg); await api.tw(250, (t) => show(d, t)); }
@@ -177,17 +209,30 @@
             show(g.hl, 0);
             api.say(`Fertig: ${fmt(c.a)} · ${c.b} = <b>${fmt(c.a * c.b)}</b>`);
           } else {
-            const z = Math.floor(c.b / 10) * 10, e = c.b % 10;
-            api.say(`<b>${fmt(c.a)} · ${c.b}</b>: Zerlege die ${c.b} in <b>${z}</b> und <b>${e}</b>. Dann sind es zwei leichtere Rechnungen.`);
-            await api.wait(3400);
-            await api.tw(400, (t) => show(g.zeilen[1], t));
-            api.say(`Zuerst die Zehner: ${fmt(c.a)} · ${z} = <b>${fmt(c.a * z)}</b><br><small>Rechne ${fmt(c.a)} · ${z / 10} und hänge eine Null an.</small>`);
-            await api.wait(3400);
-            await api.tw(400, (t) => show(g.zeilen[2], t));
-            api.say(`Dann die Einer: ${fmt(c.a)} · ${e} = <b>${fmt(c.a * e)}</b>`);
+            const zz = Math.floor(c.b / 10), e = c.b % 10, pz = c.a * zz, pe = c.a * e;
+            api.say(`<b>${fmt(c.a)} · ${c.b}</b>: Multipliziere ${fmt(c.a)} nacheinander mit jeder Ziffer von ${c.b}, <b>vorn beginnend</b>.`);
             await api.wait(3000);
-            await api.tw(400, (t) => show(g.zeilen[3], t));
-            api.say(`Beides zusammenzählen: ${fmt(c.a * z)} + ${fmt(c.a * e)} = <b>${fmt(c.a * c.b)}</b><br><small>Genau das passiert auch beim schriftlichen Multiplizieren: eine Zeile für die Zehner, eine für die Einer, dann addieren.</small>`);
+            const zeile = async (n, endCol, y, mark) => {
+              mark.setAttribute('class', 'ex-b f2');
+              for (const [k, z] of String(n).split('').reverse().entries()) { const t1 = el('text', { x: X(endCol + k), y, class: 'ex-b f2', 'text-anchor': 'middle', text: z, opacity: 0 }, api.svg); await api.tw(220, (t) => show(t1, t)); }
+              mark.setAttribute('class', 'ex-b');
+            };
+            api.say(`Zehnerziffer: ${fmt(c.a)} · ${zz} = <b>${fmt(pz)}</b>. Die letzte Ziffer schreibst du <b>unter die ${zz}</b>.`);
+            await zeile(pz, 1, 66, g.bz);
+            await api.wait(2400);
+            api.say(`Einerziffer: ${fmt(c.a)} · ${e} = <b>${fmt(pe)}</b>. Diese Zeile steht <b>eine Stelle weiter rechts</b>, unter der ${e}.`);
+            await zeile(pe, 0, 90, g.be);
+            await api.wait(2400);
+            show(g.plus, 1); show(g.strich, 1);
+            api.say('Jetzt die beiden Zeilen <b>addieren</b>, wieder von rechts nach links.');
+            await api.wait(1800);
+            for (const s1 of U.addSchritte([pz * 10, pe])) {
+              const dd = el('text', { x: X(s1.i), y: g.resY, class: 'ex-b f1', 'text-anchor': 'middle', text: s1.digit, opacity: 0 }, api.svg);
+              await api.tw(260, (t) => show(dd, t));
+              if (s1.carry) { const u = el('text', { x: X(s1.i + 1), y: g.carryY, class: 'ex-xs', style: 'fill:var(--c2)', 'text-anchor': 'middle', text: s1.carry, opacity: 0 }, api.svg); await api.tw(200, (t) => show(u, t)); }
+              await api.wait(500);
+            }
+            api.say(`Fertig: ${fmt(c.a)} · ${c.b} = <b>${fmt(c.a * c.b)}</b><br><small>Überschlag zur Kontrolle: ${fmt(Math.round(c.a / 100) * 100)} · ${Math.round(c.b / 10) * 10} = ${fmt(Math.round(c.a / 100) * 100 * Math.round(c.b / 10) * 10)}</small>`);
           }
         },
       };
@@ -207,7 +252,7 @@
   // Gemischte Zahlen: Stücke zu Ganzen zusammenlegen
   // =====================================================
   reg('k5-gemischt', {
-    title: 'Gemischte Zahlen: Stücke zu Ganzen legen',
+    title: 'Gemischte Brüche: Stücke zu Ganzen legen',
     viewBox: '0 0 360 150',
     create(api, ctx) {
       ctx = ctx || {};

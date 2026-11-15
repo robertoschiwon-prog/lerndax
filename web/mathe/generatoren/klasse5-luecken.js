@@ -114,8 +114,29 @@
     }
     return out;
   }
+  // Schritte der schriftlichen Subtraktion wie im Buch (S. 223): von rechts nach links; reicht es nicht,
+  // rechnet man mit 10 mehr („12 − 5“) und überträgt 1 in die nächste Spalte, die dort mit abgezogen wird („6 − 3 − 1“).
+  function subSchritte(a, b) {
+    const len = String(a).length, out = []; let carry = 0;
+    for (let i = 0; i < len; i++) {
+      const m = Math.floor(a / 10 ** i) % 10, sd = Math.floor(b / 10 ** i) % 10, hatS = String(b).length > i;
+      const leiht = m < sd + carry;
+      const digit = (leiht ? m + 10 : m) - sd - carry;
+      out.push({ i, m, s: sd, hatS, carryIn: carry, leiht, digit, carry: leiht ? 1 : 0 });
+      carry = leiht ? 1 : 0;
+    }
+    return out;
+  }
+  // Ein Schritt in Worten, z. B. „2 − 5 geht nicht → 12 − 5 = 7, schreibe 7, übertrage 1“
+  function subText(st) {
+    const glied = (m) => `${m}${st.hatS ? ' − ' + st.s : ''}${st.carryIn ? ' − ' + st.carryIn : ''}`;
+    if (!st.hatS && !st.carryIn) return `${st.m} → schreibe <b>${st.digit}</b>`;
+    return st.leiht ? `${glied(st.m)} geht nicht → ${glied(st.m + 10)} = ${st.digit}, schreibe <b>${st.digit}</b>, übertrage 1` : `${glied(st.m)} = ${st.digit} → schreibe <b>${st.digit}</b>`;
+  }
   const STELLEN = ['Einer', 'Zehner', 'Hunderter', 'Tausender', 'Zehntausender', 'Hunderttausender'];
   U.addSchritte = addSchritte;
+  U.subSchritte = subSchritte;
+  U.subText = subText;
   function schriftlich() {
     const v = R(1, 6);
     if (v <= 2) {
@@ -123,7 +144,7 @@
       const nums = Array.from({ length: k }, (_, i) => (i === 0 ? R(1200, 48000) : R(180, 9800)));
       const sum = nums.reduce((a, b) => a + b, 0);
       const st = addSchritte(nums);
-      const txt = st.filter((s) => s.i < 3 || s.carry).slice(0, 3).map((s) => `${STELLEN[s.i]}: ${s.ds.filter((d, j) => String(nums[j]).length > s.i).join(' + ')}${s.carryIn ? ' + ' + s.carryIn : ''} = ${s.sum} → schreibe <b>${s.digit}</b>${s.carry ? ', merke ' + s.carry : ''}`).join('<br>');
+      const txt = st.filter((s) => s.i < 3 || s.carry).slice(0, 3).map((s) => `${STELLEN[s.i]}: ${s.ds.filter((d, j) => String(nums[j]).length > s.i).join(' + ')}${s.carryIn ? ' + ' + s.carryIn : ''} = ${s.sum} → schreibe <b>${s.digit}</b>${s.carry ? ', übertrage ' + s.carry : ''}`).join('<br>');
       return {
         prompt: `Rechne schriftlich:${stapel(nums.map((n, i) => (i === nums.length - 1 ? '+ ' : '') + roh(n)))}`,
         fields: [{ answer: sum }],
@@ -138,8 +159,8 @@
       return {
         prompt: `Rechne schriftlich:${stapel([roh(a), '− ' + roh(b)])}`,
         fields: [{ answer: d }],
-        hint: 'Stellengerecht untereinander schreiben und rechts beginnen. Reicht es an einer Stelle nicht, brauchst du einen Übertrag. Mach am Ende die Probe mit Plus.',
-        solution: `${fmt(a)} − ${fmt(b)} = <b>${fmt(d)}</b><br>Probe mit Plus: ${fmt(d)} + ${fmt(b)} = ${fmt(a)} ✓`,
+        hint: 'Stellengerecht untereinander schreiben und rechts beginnen. Geht es an einer Stelle nicht (z. B. 2 − 5), rechnest du mit 10 mehr (12 − 5) und überträgst 1 in die nächste Spalte. Dort ziehst du die 1 mit ab.',
+        solution: `${subSchritte(a, b).slice(0, 3).map((st) => `${STELLEN[st.i]}: ${subText(st)}`).join('<br>')}<br>… und so weiter bis zur vordersten Stelle.<br>${fmt(a)} − ${fmt(b)} = <b>${fmt(d)}</b><br><small>Probe mit Plus: ${fmt(d)} + ${fmt(b)} = ${fmt(a)} ✓</small>`,
         ex: { mode: 'schr', op: '−', a, b },
       };
     }
@@ -147,11 +168,11 @@
       const a = R(123, 4980), b = R(3, 9);
       const ds = String(a).split('').reverse().map(Number);
       let c = 0;
-      const txt = ds.map((z, i) => { const p = z * b + c; const line = `${b} · ${z}${c ? ' + ' + c : ''} = ${p} → schreibe <b>${i === ds.length - 1 ? p : p % 10}</b>${i < ds.length - 1 && p >= 10 ? ', merke ' + Math.floor(p / 10) : ''}`; c = Math.floor(p / 10); return line; }).join('<br>');
+      const txt = ds.map((z, i) => { const p = z * b + c; const line = `${b} · ${z}${c ? ' + ' + c : ''} = ${p} → schreibe <b>${i === ds.length - 1 ? p : p % 10}</b>${i < ds.length - 1 && p >= 10 ? ', übertrage ' + Math.floor(p / 10) : ''}`; c = Math.floor(p / 10); return line; }).join('<br>');
       return {
         prompt: `Rechne schriftlich: <b>${fmt(a)} · ${b}</b>`,
         fields: [{ answer: a * b }],
-        hint: `Multipliziere ${b} nacheinander mit jeder Ziffer, rechts beginnend. Überträge merken und dazuzählen.`,
+        hint: `Multipliziere ${b} nacheinander mit jeder Ziffer, rechts beginnend. Überträge in die nächste Stelle mitnehmen und dazuzählen.`,
         solution: `Von rechts nach links:<br>${txt}<br>${fmt(a)} · ${b} = <b>${fmt(a * b)}</b>`,
         ex: { mode: 'schr', op: '·', a, b },
       };
@@ -162,8 +183,8 @@
     return {
       prompt: `Rechne schriftlich: <b>${fmt(a)} · ${b}</b>`,
       fields: [{ answer: a * b }],
-      hint: `Zerlege ${b} in ${z} und ${e}: erst ${fmt(a)} · ${z}, dann ${fmt(a)} · ${e}, dann beides zusammenzählen.`,
-      solution: `${fmt(a)} · ${z} = ${fmt(a * z)}<br>${fmt(a)} · ${e} = ${fmt(a * e)}<br>${fmt(a * z)} + ${fmt(a * e)} = <b>${fmt(a * b)}</b>`,
+      hint: `Multipliziere ${fmt(a)} nacheinander mit der Zehnerziffer ${z / 10} und mit der Einerziffer ${e}. Schreibe die Teilergebnisse versetzt untereinander (das zweite eine Stelle weiter rechts) und addiere.`,
+      solution: `${fmt(a)} · ${z / 10} = ${fmt(a * z / 10)} <small>(Zehnerziffer: Die letzte Ziffer steht unter der ${z / 10})</small><br>${fmt(a)} · ${e} = ${fmt(a * e)} <small>(Einerziffer: eine Stelle weiter rechts)</small><br>Versetzt addieren: ${fmt(a * z)} + ${fmt(a * e)} = <b>${fmt(a * b)}</b>`,
       ex: { mode: 'schr', op: '··', a, b },
     };
   }
@@ -203,7 +224,7 @@
     const gem = `${w} ${fr(r, d)}`;
     if (v <= 2) {
       return {
-        prompt: `Schreibe ${fr(n, d)} als <b>gemischte Zahl</b>.`,
+        prompt: `Schreibe ${fr(n, d)} in <b>gemischter Schreibweise</b> (als gemischten Bruch).`,
         fields: [{ answer: w, label: 'Ganze' }, { answer: r, label: `Zähler (Nenner bleibt ${d})` }],
         hint: `Wie oft passt ${d} in ${n}? So viele Ganze sind es. Der Rest bleibt als Bruch stehen.`,
         solution: `${n} : ${d} = ${w} Rest ${r}<br>${fr(n, d)} = <b>${gem}</b>`,
@@ -213,7 +234,7 @@
     }
     if (v <= 4) {
       return {
-        prompt: `Schreibe <b>${gem}</b> als einen einzigen Bruch.`,
+        prompt: `Schreibe <b>${gem}</b> als <b>unechten Bruch</b>.`,
         layout: 'frac',
         fields: [{ answer: n, label: 'Zähler' }, { answer: d, label: 'Nenner' }],
         check([a, b]) {

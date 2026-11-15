@@ -547,7 +547,9 @@
           await api.wait(a === b ? 1800 : 1100);
         }
         const all = [...pairs.map((p) => p[0]), ...pairs.map((p) => p[1]).reverse()].filter((v, i, arr) => arr.indexOf(v) === i);
-        el('text', { x: 180, y: 222, class: 'ex-b', 'text-anchor': 'middle' }, api.svg).innerHTML = `T<tspan dy="5" font-size="12">${n}</tspan><tspan dy="-5"> = {${all.join(', ')}}</tspan>`;
+        // viele Teiler (z. B. 60): Schrift kleiner, damit die Liste ins Bild passt
+        const tl = `T${n} = {${all.join(', ')}}`.length, tfs = Math.min(18, Math.floor(330 / (tl * 0.58)));
+        el('text', { x: 180, y: 222, class: 'ex-b', 'text-anchor': 'middle', style: `font-size:${tfs}px` }, api.svg).innerHTML = `T<tspan dy="5" font-size="${Math.min(12, tfs - 4)}">${n}</tspan><tspan dy="-5"> = {${all.join(', ')}}</tspan>`;
         api.say(`<b>${n}</b> hat <b>${all.length} Teiler</b>. <small>Man kann aufhören, sobald die linke Zahl größer wäre als die rechte.</small>`);
         await api.wait(3000);
         // Sachaufgabe „gleich große Gruppen“: 1 und die Zahl selbst zählen nicht mit
@@ -813,14 +815,14 @@
         await api.wait(1400);
         const lb = el('g', { opacity: 0 }, api.svg);
         el('line', { x1: 120, y1: 74, x2: 158, y2: 60, class: 'tk' }, lb);
-        el('text', { x: 116, y: 80, class: 'ex-s f2', 'text-anchor': 'end', text: 'Basis' }, lb);
+        el('text', { x: 116, y: 80, class: 'ex-s f2', 'text-anchor': 'end', text: 'Grundzahl' }, lb);
         const le = el('g', { opacity: 0 }, api.svg);
         el('line', { x1: 240, y1: 30, x2: 200, y2: 36, class: 'tk' }, le);
-        el('text', { x: 244, y: 34, class: 'ex-s f1', 'text-anchor': 'start', text: 'Exponent' }, le);
-        api.say(`Die <b class="f2">Basis</b> ${B} ist die Zahl, die malgenommen wird.`);
+        el('text', { x: 244, y: 34, class: 'ex-s f1', 'text-anchor': 'start', text: 'Hochzahl' }, le);
+        api.say(`Die <b class="f2">Grundzahl</b> (oder Basis) ${B} ist die Zahl, die malgenommen wird.`);
         await api.tw(500, (t) => lb.setAttribute('opacity', t));
         await api.wait(1800);
-        api.say(`Der <b class="f1">Exponent</b> ${E} sagt, <b>wie oft</b> sie als Faktor vorkommt.`);
+        api.say(`Die <b class="f1">Hochzahl</b> (oder Exponent) ${E} sagt, <b>wie oft</b> sie als Faktor vorkommt.`);
         await api.tw(500, (t) => le.setAttribute('opacity', t));
         await api.wait(1800);
         const n = E, gap = Math.min(58, 300 / n), w = Math.min(40, gap - 12), x0 = 180 - ((n - 1) * gap) / 2;
@@ -963,7 +965,7 @@
       const go = (m) => { mode = m; task = null; showSl(m === 'quad'); api.replay(); };
       api.chips([
         { label: 'Alles', onClick() { go('alle'); } },
-        { label: 'Basis & Exponent', onClick() { go('grund'); } },
+        { label: 'Grundzahl & Hochzahl', onClick() { go('grund'); } },
         { label: '2 hoch n', onClick() { go('zwei'); } },
         { label: 'Zehnerpotenzen', onClick() { go('zehn'); } },
         { label: 'hoch 1 · Basis 1', onClick() { go('sonder'); } },
@@ -983,7 +985,7 @@
           if (mode === 'alle') {
             await grund(); await zwei(); await zehn(); await sonder();
             showSl(true); await quad();
-            api.say('<b>Merke:</b> Der Exponent zählt, <b>wie oft</b> die Basis als Faktor vorkommt. <small>2⁵ = 32 · 10³ = 1 000 · 7¹ = 7 · 1⁵ = 1 · 4² = 16</small>');
+            api.say('<b>Merke:</b> Die Hochzahl zählt, <b>wie oft</b> die Grundzahl als Faktor vorkommt. <small>2⁵ = 32 · 10³ = 1 000 · 7¹ = 7 · 1⁵ = 1 · 4² = 16</small>');
             return;
           }
           if (task) {
@@ -2719,7 +2721,7 @@
       async function kommutativ() {
         api.clear(); sub();
         const op = ctx.law === 'kom' && ctx.op ? ctx.op : '·';
-        head('KOMMUTATIVGESETZ (Vertauschungsgesetz)');
+        head('KOMMUTATIVGESETZ');
         if (op === '+') {
           const a = N(0, 3, 9), b = N(1, 3, 9), u = Math.min(26, 280 / (a + b)), x0 = 180 - ((a + b) * u) / 2, y = 96;
           const gA = el('g', {}, api.svg), gB = el('g', {}, api.svg);
@@ -2754,7 +2756,7 @@
       async function assoziativ() {
         api.clear(); sub();
         const op = ctx.law === 'ass' && ctx.op ? ctx.op : '+';
-        head('ASSOZIATIVGESETZ (Verbindungsgesetz)');
+        head('ASSOZIATIVGESETZ');
         const a = N(0, 2, 5), b = N(1, 2, 6), c = N(2, 2, 5);
         if (op === '·') {
           const ex = T(180, 70, `(${a} · ${b}) · ${c}`, 'vexpr'), l1 = T(180, 110, '', 'ex-b'), ex2 = T(180, 160, '', 'vexpr'), l2 = T(180, 200, '', 'ex-b');
@@ -2765,7 +2767,7 @@
           api.say(`Jetzt die Klammer verschoben: ${b} · ${c} = ${b * c}.`);
           l2.textContent = `= ${a} · ${b * c} = ${a * b * c}`;
           await api.wait(2400);
-          api.say(`Beide Male <b>${a * b * c}</b>. <small>Bei Plus und Mal darf man die Klammer verschieben.</small>`);
+          api.say(`Beide Male <b>${a * b * c}</b>. <small>Bei Plus und Mal darf man Klammern beliebig setzen oder weglassen (Assoziativgesetz).</small>`);
           await api.wait(3000);
           return;
         }
@@ -2793,7 +2795,7 @@
         bl.textContent = `${b} + ${c} = ${b + c}`;
         await api.wait(1200);
         tot.textContent = `${a} + ${b + c} = ${a + b + c}`;
-        api.say(`Wieder <b>${a + b + c}</b>, der Streifen ist ja derselbe! <small>Bei Plus und Mal darf man die Klammer verschieben.</small>`);
+        api.say(`Wieder <b>${a + b + c}</b>, der Streifen ist ja derselbe! <small>Bei Plus und Mal darf man Klammern beliebig setzen oder weglassen (Assoziativgesetz).</small>`);
         await api.wait(3200);
       }
       async function distributiv() {
@@ -2810,7 +2812,7 @@
         const o = minus ? '−' : '+';
         const W = minus ? x : x + y, u = Math.min(14, 250 / W), h = Math.max(24, Math.min(110, f * u * (W > 40 ? 3 : 1)));
         const w1 = (minus ? x - y : x) * u, w2 = y * u, x0 = 180 - (W * u + (minus ? 0 : 20)) / 2, y0 = 100;
-        head('DISTRIBUTIVGESETZ (Verteilungsgesetz)');
+        head('DISTRIBUTIVGESETZ');
         const sumTxt = `${f} · (${x} ${o} ${y})`, splitTxt = `${f} · ${x} ${o} ${f} · ${y}`;
         const ex = T(180, 62, back ? splitTxt : sumTxt, 'vexpr');
         el('rect', { x: x0, y: y0, width: w1, height: h, class: 'blk' }, api.svg);
@@ -2914,10 +2916,10 @@
           if (mode === 'alle' || mode === 'ass') await assoziativ();
           if (mode === 'alle' || mode === 'dis') await distributiv();
           if (ctx.mode === 'ges') {
-            const NAME = { kom: ['Kommutativgesetz', 'Vertauschungsgesetz', 'Zahlen vertauschen'], ass: ['Assoziativgesetz', 'Verbindungsgesetz', 'Klammer verschieben'], dis: ['Distributivgesetz', 'Verteilungsgesetz', 'einen Faktor auf eine Summe verteilen (oder ausklammern)'] }[ctx.law];
-            api.say(`→ Das ist das <b>${NAME[0]}</b> (${NAME[1]}): ${NAME[2]}.`);
+            const NAME = { kom: ['Kommutativgesetz', 'Summanden oder Faktoren vertauschen'], ass: ['Assoziativgesetz', 'Klammern setzen oder weglassen'], dis: ['Distributivgesetz', 'ausmultiplizieren oder ausklammern'] }[ctx.law];
+            api.say(`→ Das ist das <b>${NAME[0]}</b>: ${NAME[1]}.`);
           }
-          if (mode === 'alle') api.say('<b>Kommutativ</b>: vertauschen · <b>Assoziativ</b>: Klammer verschieben · <b>Distributiv</b>: verteilen. <small>Die ersten beiden gelten nur für Plus und Mal!</small>');
+          if (mode === 'alle') api.say('<b>Kommutativgesetz</b>: vertauschen · <b>Assoziativgesetz</b>: Klammern setzen oder weglassen · <b>Distributivgesetz</b>: ausmultiplizieren oder ausklammern. <small>Die ersten beiden gelten nur für Plus und Mal!</small>');
         },
       };
     },
@@ -2937,14 +2939,14 @@
     create: (api, ctx) => EX['k5-dezimal'].create(api, Object.assign({}, ctx, { mode: 'wechsel' })),
   });
   reg('k5-text', {
-    title: 'Textaufgaben: in vier Schritten',
+    title: 'Sachaufgaben in vier Schritten',
     viewBox: '0 0 360 200',
     create(api) {
       let d, n, g = [];
       const pickN = () => { d = R(3, 9); n = R(150, 900); };
       pickN();
       api.chips([{ label: 'Neues Beispiel', onClick() { pickN(); api.replay(); } }]);
-      const rows = ['Was ist gesucht?', 'Was ist gegeben?', 'Rechnung aufschreiben', 'Rechnen, antworten'];
+      const rows = ['Verstehen der Aufgabe', 'Zerlegen in Teilprobleme', 'Rechenweg durchführen', 'Rückschau und Antwort']; // wie im Buch S. 42
       return {
         reset() {
           api.clear(); api.sub('');
@@ -2962,10 +2964,10 @@
           api.say(`Beispiel: <b>${fmt(n)} Fotos</b> kommen in ein Album. Auf jede Seite passen <b>${d}</b>. Wie viele Seiten werden voll, und wie viele Fotos bleiben übrig?`);
           await api.wait(4600);
           const step = async (i, out, txt, ms) => { await api.tw(300, (t) => g[i].setAttribute('opacity', 0.3 + 0.7 * t)); g[i].out.textContent = out; api.say(txt); if (ms) await api.wait(ms); };
-          await step(0, 'volle Seiten, Rest', '<b>1. Was ist gesucht?</b> Lies die Frage genau: die Anzahl der vollen Seiten und die Fotos, die übrig bleiben.', 3800);
-          await step(1, `${fmt(n)} und ${d}`, `<b>2. Was ist gegeben?</b> ${fmt(n)} Fotos, immer ${d} auf eine Seite. „Immer ${d}“ heißt: gleich große Gruppen bilden, also <b>teilen</b>.`, 4200);
-          await step(2, `${fmt(n)} : ${d}`, `<b>3. Rechnung aufschreiben:</b> ${fmt(n)} : ${d}<br><small>Signalwörter helfen: „je“, „verteilen“ → teilen · „zusammen“, „insgesamt“ → plus oder mal · „übrig“, „zurück“ → minus oder Rest.</small>`, 5600);
-          await step(3, `${fmt(q)} Rest ${r}`, `<b>4. Rechnen und antworten:</b> ${fmt(n)} : ${d} = ${fmt(q)} Rest ${r}.<br>Antwort: <b>${fmt(q)} Seiten</b> werden voll, <b>${r === 1 ? '1 Foto bleibt' : r + ' Fotos bleiben'}</b> übrig.<br><small>Zum Schluss prüfen: Passt die Antwort zur Frage? Probe: ${fmt(q)} · ${d} + ${r} = ${fmt(n)} ✓</small>`, 0);
+          await step(0, `${fmt(n)}, je ${d}`, `<b>1. Verstehen der Aufgabe:</b> Was ist gesucht? Die Zahl der vollen Seiten und der Rest. Welche Informationen sind wichtig? ${fmt(n)} Fotos, immer ${d} auf eine Seite.`, 4400);
+          await step(1, `${fmt(n)} : ${d}`, `<b>2. Zerlegen in Teilprobleme:</b> Rechenweg planen. „Immer ${d}“ heißt: gleich große Gruppen bilden, also <b>teilen</b>.<br><small>Signalwörter helfen: „je“, „verteilen“ → teilen · „zusammen“, „insgesamt“ → plus oder mal · „übrig“, „zurück“ → minus</small>`, 4600);
+          await step(2, `${fmt(q)} Rest ${r}`, `<b>3. Rechenweg durchführen:</b> ${fmt(n)} : ${d} = ${fmt(q)} Rest ${r}. Zwischenergebnisse aufschreiben.`, 3800);
+          await step(3, 'Probe ✓', `<b>4. Rückschau und Antwort:</b> Probe: ${fmt(q)} · ${d} + ${r} = ${fmt(n)} ✓<br>Antwort: <b>${fmt(q)} Seiten</b> werden voll, <b>${r === 1 ? '1 Foto bleibt' : r + ' Fotos bleiben'}</b> übrig.`);
         },
       };
     },

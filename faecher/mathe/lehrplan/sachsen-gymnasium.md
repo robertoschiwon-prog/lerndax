@@ -8,7 +8,7 @@ Pro Klassenstufe sind 25 Wochen Pflicht-Lernbereiche verbindlich, dazu ein Wahlb
 
 ---
 
-## Klasse 5 (umgesetzt, 36 Themen)
+## Klasse 5 (umgesetzt, 41 Themen; Aufbau wie das Schulbuch, siehe `schulbuch-abgleich.md`)
 
 Abgleich mit dem Schulbuch (Lambacher Schweizer 5 Sachsen): siehe `schulbuch-abgleich.md`.
 
