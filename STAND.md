@@ -32,7 +32,8 @@ Roberto: „Kannst du echte Bilder nehmen? Das sieht doch bestimmt cooler aus.�
 - Saturn braucht Platz für seine echten Ringe: in der Reihenfolge kleiner gezeichnet, bei den Größen andere Abstände.
 - Animation `planeten` nutzt dieselben Fotos (Gruppe mit `transform`), alles im dunklen Rahmen abgeschnitten (vorher ragte die
   große Sonne über den Rand).
-- Geprüft: Vorschau über einen Testzweig (raw.githack.com) im eingebauten Browser mit echten Fotos, Testzweig danach gelöscht;
+- Geprüft: Vorschau über einen Testzweig (raw.githack.com) im eingebauten Browser mit echten Fotos. Den Testzweig `vorschau` durfte ich nicht löschen (GitHub-Zugang
+  verweigert): Roberto kann ihn auf GitHub löschen, er schadet aber nicht;
   `wissen_gen` GeoDax 13 200 Aufgaben, `geodax.py 2` (660 Antworten, 65 Animationen) ohne Meldung.
 
 ## 0-neu-15. GeoDax: Planeten als Bilder (lerndax-v106, 15.11.2026)
