@@ -115,7 +115,7 @@
     const w = r / f.f[2] * (zoom || 1), h = w * f.q, id = 'gpl' + (++clipNr);
     const bild = `<image href="${url}" x="${r1(x - f.f[0] * w)}" y="${r1(y - f.f[1] * h)}" width="${r1(w)}" height="${r1(h)}" preserveAspectRatio="none"`
       + (f.ring ? ' style="mix-blend-mode:screen"' : ` clip-path="url(#${id})"`) + ` onload="this.parentNode.firstChild.setAttribute('visibility','hidden')"/>`;
-    return `<g${extra || ''}><g>${ersatz}</g>${f.ring ? '' : `<clipPath id="${id}"><circle cx="${x}" cy="${y}" r="${r1(r * 0.985)}"/></clipPath>`}${bild}</g>`;
+    return `<g${extra || ''}><g>${ersatz}</g>${f.ring ? '' : `<clipPath id="${id}"><circle cx="${x}" cy="${y}" r="${r1(r - Math.min(r * 0.015, 0.8))}"/></clipPath>`}${bild}</g>`;
   };
   const sonne = (x, y, r) => D.planetFoto('Sonne', x, y, r, `<circle cx="${x}" cy="${y}" r="${r1(r)}" fill="${GELB}"/>`);
   const nachweis = (W) => tx(W - 6, 12, 'Fotos: NASA', 8, LEISE, 'end', 700);
