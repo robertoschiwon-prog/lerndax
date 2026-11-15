@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v107`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v108`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,20 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-17. GeoDax: Sonne–Erde–Mond in Fotos, 30 Erden als Maßband (lerndax-v108, 15.11.2026)
+
+Roberto (mit Handyfotos): In der Lösung „Ordne nach der Größe: Sonne, Erde, Mond“ die Bilder einbauen; in der Abstands-Animation
+über dem Maßband 30 kleine Erden zeigen.
+- `plattform/bausteine.js`: Ordnen-Aufgaben dürfen eine eigene Erklärung mitbringen (`ex: { mode … }`), sonst wie bisher „reihe“.
+- Neue Animation `sonneErdeMond`: Sonne (nur der Rand passt ins Bild), Erde, Mond als NASA-Fotos im selben Maßstab; 109 Erden quer
+  durch die Sonne, fast 4 Monde (gezeigt) quer durch die Erde. Mondfoto: „Moon nearside LRO.jpg“ (NASA, gemeinfrei).
+- Ordnen der Planeten zeigt jetzt die Planeten-Animation (Reihenfolge mit Merksatz) statt einer Textliste.
+- Abstands-Animation: 30 kleine Erdfotos erscheinen nacheinander mit Zähler („1 Erde … 30 Erden“), darunter das Maßband.
+- `D.planetFoto(…, zoom)`: Rand der riesigen Sonne zeigt hellen Teil; Fehler behoben, dass bei sehr großen Kugeln der
+  Ausschnitt zu klein war (Randabzug jetzt höchstens 0,8).
+- Tests: wissen_gen Geo 13 200, Bio, Ge ohne Fehler; geodax.py 2, gedax, biodax, dedax, endax ohne Meldung; hub ohne
+  Fehlerseite (nur nicht erreichbare Fotos/Schriften aus der Shell). Vorschau mit echten Fotos im eingebauten Browser angesehen.
 
 ## 0-neu-16. GeoDax: echte Fotos der Planeten (lerndax-v107, 15.11.2026)
 

@@ -207,7 +207,7 @@
         g.innerHTML = D.planetFoto(name, cx, Y, r, `<circle cx="${cx}" cy="${Y}" r="${r}" fill="${farbe}"/>`, '', zoom);
         el('circle', { cx: tx - 22, cy: 30, r: 12, fill: '#0e7f91' }, g);
         txt(g, tx - 22, 35, nr, 13, '#fff');
-        txt(g, tx - 5, 35, wort, 14, '#fff', 'start');
+        txt(g, tx - 5, 35, wort, 14, '#fff', 'start', { 'paint-order': 'stroke', stroke: '#0d0e22', 'stroke-width': 3 });
         return g;
       };
       api.say('Sonne, Erde und Mond, alle im <b>selben Maßstab</b>:');
