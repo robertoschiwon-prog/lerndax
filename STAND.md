@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v110`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v111`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,21 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-20. Nur Unterlagen: Bio-Abgleich ergänzt, Buchfotos, Mathe als Nächstes (lerndax-v111, 15.11.2026)
+
+Keine Änderung an der App, nur Dokumentation.
+- **Bio-Buch ganz gelesen.** In `faecher/bio/lehrplan/schulbuch-abgleich.md` sind die offenen Punkte geklärt: S. 106 ist
+  „Fortpflanzung beim Haushuhn“, und der Inhalt von S. 156–165 ist beschrieben.
+- **Private Zusammenfassungen** für Geschichte, Erdkunde und Bio liegen in `notizen/lernuebersichten/` (nur lokal, siehe Regel 9).
+  Roberto sagt, dass sie ihm wenig bringen. Er will beim Telefonieren mit Bruno die echte Seite sehen. Darum: keine weiteren
+  Zusammenfassungen bauen.
+- **Buchfotos nicht verarbeiten:** Keine PDF aus den Fotos und kein Zuschneiden oder Begradigen aller Fotos. Das wäre eine
+  vollständige Kopie des Buchs (§ 53 Abs. 4 UrhG), Roberto hat das akzeptiert. Er öffnet seine Fotos selbst in der OneDrive-App.
+  Wenn er eine einzelne Seite braucht, schickt er das Foto in den Chat; dann wird diese eine Seite erklärt.
+- **Als Nächstes Mathe:** Roberto legt die Fotos des Mathebuchs in `notizen/schulbuch-mathe/` ab. Der Abgleich von MaDax
+  (Seitenhinweise, Reihenfolge `FOLGE` in `web/mathe/generatoren/klasse5-buch.js`, Begriffe, fehlende Themen) läuft in einem neuen
+  Chat. Von Deutsch und Englisch gibt es nur Fotos vom Inhaltsverzeichnis; bei Englisch wären die „Vocabulary“-Seiten am wertvollsten.
 
 ## 0-neu-19. GeDax: die drei fehlenden Doppelseiten (lerndax-v110, 15.11.2026)
 

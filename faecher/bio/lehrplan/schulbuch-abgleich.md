@@ -25,7 +25,7 @@ Aus dem Buch wird nichts abgeschrieben, es dient nur für Reihenfolge, Begriffe 
 | **Fische in ihren Lebensräumen** (18): 1 Fische – ein Leben im Wasser (20), Praktikum Körperformen unter Wasser (22), Praktikum Forelle (23), 2 Fische atmen mit Kiemen (24), 3 Fische leben in verschiedenen Gewässern (26), 4 Fortpflanzung bei Fischen (32), 5 Nahrungsbeziehungen bei Fischen (34), 6 Schutz von Fischbeständen (36) | LB 2 | 2 Fische |
 | **Lurche in ihren Lebensräumen** (40): 1 Lurche – ein Leben im Wasser und an Land (42), Methode Tiere bestimmen (47), 2 Fortpflanzung und Entwicklung bei Lurchen (48), 3 Die Schwanzlurche (50), 4 Lurche sind gefährdet (54) | LB 3 | 3 Lurche |
 | **Kriechtiere in ihren Lebensräumen** (58): 1 Die Vielfalt der Kriechtiere (60), Methoden Steckbrief (66) und Informationsplakat (67), 2 Heimische Eidechsen (68), 3 Heimische Schlangen (72), 4 Kriechtiere benötigen Schutz (76), 5 Wahlbereich: Reptilien vergangener Zeiten (78) | LB 4, Wahl 2 | 4 Kriechtiere |
-| **Vögel in ihren Lebensräumen** (84): 1 Die Vielfalt der Vögel (86), Internet und Apps (88–89), 2 Vögel – an das Fliegen angepasst (90), 3 Wie Vögel fliegen (92), Methode Zeichnerisches Darstellen (95), 4 Die Stockente ist ein Wasservogel (96), 5 Der Mäusebussard ist ein Greifvogel (98), 6 Die Schleiereule ist ein Nachtjäger (100), 7 Der Buntspecht ist ein Klettervogel (102), 8 (106, im Inhaltsverzeichnis steht noch einmal „Wie Vögel fliegen“, vermutlich Fortpflanzung; Seite prüfen), Praktikum Das Hühnerei (109), 9 Verhaltensweisen von Amseln (110), 10 Viele Vögel sind gefährdet (112) | LB 5 | 5 Vögel |
+| **Vögel in ihren Lebensräumen** (84): 1 Die Vielfalt der Vögel (86), Internet und Apps (88–89), 2 Vögel – an das Fliegen angepasst (90), 3 Wie Vögel fliegen (92), Methode Zeichnerisches Darstellen (95), 4 Die Stockente ist ein Wasservogel (96), 5 Der Mäusebussard ist ein Greifvogel (98), 6 Die Schleiereule ist ein Nachtjäger (100), 7 Der Buntspecht ist ein Klettervogel (102), 8 Fortpflanzung beim Haushuhn (106; im Inhaltsverzeichnis steht versehentlich noch einmal „Wie Vögel fliegen“, auf S. 106 geprüft), Praktikum Das Hühnerei (109), 9 Verhaltensweisen von Amseln (110), 10 Viele Vögel sind gefährdet (112) | LB 5 | 5 Vögel |
 | **Säugetiere in ihren Lebensräumen** (116): 1 Die Vielfalt der Säugetiere (118), 2 Merkmale von Säugetieren (122), 3 Die Vielfalt der Hunde (124), 4 Katzen sind Schleichjäger (128), Praktika Säugetierfell und Verhalten von Katze und Hund (131), 5 Das Rind ist ein Pflanzenfresser (132), 6 Das Schwein ist ein Allesfresser (134), 7 Der Maulwurf lebt im Boden (136), 8 Fledermäuse jagen in der Luft (138), Methode Sachtext lesen (141), 9 Säugetiere im Wasser (142), 10 Schutz heimischer Säugetiere (144), 11 Wahlbereich: Artgerechte Tierhaltung (146), Methode Exkursion planen (151), 12 Merkmale des Menschen (152), 13 Fortpflanzung des Menschen (156) | LB 6, Wahl 3 | 6 Säugetiere |
 | **Systematisierung der Wirbeltiere** (170): 1 Wirbeltiere im Vergleich (172), 2 Entwicklung der Wirbeltiere (176), 3 Wahlbereich: Wechselwarme Wirbeltiere im Winter (178), 4 Wahlbereich: Gleichwarme Wirbeltiere im Winter (180) | LB 7, Wahl 1 | 7 Wirbeltiere im Vergleich |
 
@@ -48,6 +48,14 @@ Knobel-Stufe.
 
 ## Offen
 
-- Die übrigen Kapitel werden beim Bauen Seite für Seite auf Begriffe und Arten durchgesehen (Fotos liegen vor).
-- Buch S. 106: richtiger Titel von Abschnitt 8 im Vogel-Kapitel.
-- Buch S. 156–165: Was genau zur Fortpflanzung des Menschen drinsteht (für die Entscheidung von Roberto).
+- Die übrigen Kapitel werden beim Bauen Seite für Seite auf Begriffe und Arten durchgesehen (Fotos liegen vor, seit 15.11.2026
+  ganz gelesen; private Zusammenfassung in eigenen Worten unter `notizen/lernuebersichten/nachschlagen-biologie.md`).
+
+## Geklärt (15.11.2026, ganzes Buch gelesen)
+
+- Buch S. 106: Abschnitt 8 heißt „Fortpflanzung beim Haushuhn“ (S. 106–109, mit Praktikum Hühnerei und Eiercode).
+- Buch S. 156–165, „Fortpflanzung des Menschen“: Pubertät (Hormone, primäre und sekundäre Geschlechtsmerkmale, Veränderungen im
+  Verhalten, Mobbing), Geschlechtsorgane von Jungen und Mädchen, Menstruationszyklus, Befruchtung, Schwangerschaft (Embryo, Fetus,
+  Fruchtblase, Plazenta, Nabelschnur, Schadstoffe), Geburt, Säugling (Reflexe, Stillen, erstes Jahr, Urvertrauen), Grenzen setzen
+  und Schutz vor sexueller Belästigung und Missbrauch (Hilfe holen, Nummer gegen Kummer). Passt zur Entscheidung von Roberto vom
+  14.11.2026 (Fortpflanzung ja, Schutz vor Missbrauch als kurzes Thema).
