@@ -26,7 +26,11 @@ window.LERNDAX_TRAININGS = {
       { titel: 'Potenzen', buch: 'S. 30–31', themen: ['k5-potenz'] },
       { titel: 'Teilbarkeit und Primzahlen', buch: 'S. 33–37', themen: ['k5-teilbar', 'k5-prim'] },
       { titel: 'Schriftliches Dividieren', buch: 'S. 40', themen: ['k5-division'] },
-      { titel: 'Querbeet: Textaufgaben', buch: 'S. 45–47', themen: ['k5-text'] },
+      // Seit 15.11.2026 (Abgleich mit dem Buch): Was „Querbeet“ (S. 45–47) und Rückblick/Test (S. 52–53) zusätzlich abfragen
+      { titel: 'Große Zahlen und Runden', buch: 'S. 45, 52–53', themen: ['k5-zahlen', 'k5-runden'] },
+      { titel: 'Fachbegriffe und Zahlenmauern', buch: 'S. 47, 52–53', themen: ['k5-fachbegriffe'] },
+      { titel: 'Überschlagen und schriftlich rechnen', buch: 'S. 44, 53', themen: ['k5-ueberschlag', 'k5-schriftlich'] },
+      { titel: 'Querbeet: Sachaufgaben', buch: 'S. 45–47, 53', themen: ['k5-text', 'k5-sach'] },
     ],
     buch: [
       { text: 'Querbeet-Aufgaben zu allen Themen', seiten: 'S. 45–47' },

@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v112`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v113`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,18 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-22. Training für die Mathe-Arbeit am 24.11. erweitert (lerndax-v113, 15.11.2026)
+
+Roberto: „Nehmen alles für die Mathematikarbeit Relevante auf.“ Grundlage: Die Themenliste der Schule nennt außer den vier Themen
+auch „Querbeet“ (S. 45–47) und Rückblick mit Übungstests (S. 52/53). Am Buch nachgesehen: Dort kommen zusätzlich große Zahlen,
+Runden, die Fachbegriffe (Summand … Quotient), Zahlenmauern, Überschlag mit schriftlichem Rechnen und Sachaufgaben mit Geld vor.
+- `web/plattform/trainings.js`: vier neue Gruppen „Große Zahlen und Runden“ (k5-zahlen, k5-runden), „Fachbegriffe und Zahlenmauern“
+  (k5-fachbegriffe), „Überschlagen und schriftlich rechnen“ (k5-ueberschlag, k5-schriftlich), „Querbeet: Sachaufgaben“ (k5-text, k5-sach;
+  ersetzt „Querbeet: Textaufgaben“). **Training jetzt 8 Gruppen, 13 Themen.** Die vier Gruppen der Schulliste bleiben unverändert vorn.
+- Bewusst nicht aufgenommen: Gleichungen (S. 15–18, im Rückblick nicht abgefragt), Zeitspannen (nur eine Querbeet-Aufgabe),
+  Diagramme (S. 46, kein MaDax-Thema).
+- Test `training.py` ohne Meldung; Trainingsseite auf 390 px angesehen.
 
 ## 0-neu-21. MaDax mit dem ganzen Mathebuch abgeglichen (lerndax-v112, 15.11.2026)
 
@@ -600,7 +612,7 @@ Stattdessen (seine Wahl „beides“):
 4. ~~Prüfen, ob das Schulbuch die ISBN 978-3-12-733150-9 hat~~ **erledigt 13.11.2026: ja** (Foto der Rückseite).
 5. Oberflächeninhalt zusammengesetzter Körper (bisher nur Volumen).
 6. Danach „MaDax Klasse 5 abnehmen“.
-Die Trainingsseite für die Arbeit am 24.11.2026 ist unverändert (8 Themen aus der Themenliste der Schule).
+Die Trainingsseite für die Arbeit am 24.11.2026 hat seit v113 13 Themen (Themenliste der Schule plus Querbeet und Rückblick, siehe 0-neu-22).
 
 **Nächster Schritt: DeDax**
 Startpunkt und Vorgehen stehen in **`faecher/deutsch/README.md`**. Kurz: erst Lehrplan Deutsch Klasse 5 auswerten und
@@ -1054,7 +1066,8 @@ Infos zur ersten Arbeit:
   2. Potenzen (S. 30–31)
   3. Teilbarkeit und Primzahlen (S. 33–37)
   4. Schriftliches Dividieren (S. 40)
-  Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53).
+  Dazu Querbeet-Aufgaben (S. 45–47) und Rückblick mit Übungstests (S. 52/53). Seit v113 sind auch deren Themen im Training:
+  große Zahlen und Runden, Fachbegriffe und Zahlenmauern, Überschlag und schriftlich rechnen, Sachaufgaben (auch mit Geld).
 - Diese Themen sind seit 10.11. alle als **allgemeine** Mathelix-Themen vorhanden (siehe
   Abschnitt 3). Ein Klassen-Bereich müsste sie nur auswählen und bündeln, nicht neu bauen.
 - **Gebaut am 10.11.2026 (`lerndax-v10`)**, Link: https://robertoschiwon-prog.github.io/lerndax/mathe/?t=mathe-2026-11-24
