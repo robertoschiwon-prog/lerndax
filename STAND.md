@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v106`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v107`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,20 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-16. GeoDax: echte Fotos der Planeten (lerndax-v107, 15.11.2026)
+
+Roberto: „Kannst du echte Bilder nehmen? Das sieht doch bestimmt cooler aus.“
+- Sonne und alle acht Planeten sind jetzt NASA-Aufnahmen (gemeinfrei, Wikimedia Commons), ausgesucht und ausgemessen im eingebauten
+  Browser. `D.planetenFotos` in `themen/zeichnungen.js`: Datei, Lage der Kugel im Foto (Mitte, Radius als Anteil), Seitenverhältnis.
+  `D.planetFoto(name, x, y, r, ersatz)` schneidet das Foto rund aus (Saturn: ganzes Foto mit Ringen, `mix-blend-mode:screen`, damit
+  der schwarze Hintergrund verschwindet). Bis das Foto geladen ist (oder ohne Netz), bleibt die gezeichnete Kugel stehen.
+- Hintergrund dunkler (#0d0e22), in jedem Bild „Fotos: NASA“, Einträge in `geografie/bildnachweis.html`.
+- Saturn braucht Platz für seine echten Ringe: in der Reihenfolge kleiner gezeichnet, bei den Größen andere Abstände.
+- Animation `planeten` nutzt dieselben Fotos (Gruppe mit `transform`), alles im dunklen Rahmen abgeschnitten (vorher ragte die
+  große Sonne über den Rand).
+- Geprüft: Vorschau über einen Testzweig (raw.githack.com) im eingebauten Browser mit echten Fotos, Testzweig danach gelöscht;
+  `wissen_gen` GeoDax 13 200 Aufgaben, `geodax.py 2` (660 Antworten, 65 Animationen) ohne Meldung.
 
 ## 0-neu-15. GeoDax: Planeten als Bilder (lerndax-v106, 15.11.2026)
 
