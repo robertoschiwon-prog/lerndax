@@ -40,6 +40,10 @@
       { f: 'Welcher Planet ist der <b>dritte</b> von der Sonne aus?', a: 'die Erde', x: ['der Mars', 'die Venus', 'der Jupiter'], w: 'Merkur, Venus, <b>Erde</b>: Mein Vater <b>e</b>rklärt …' },
       { f: 'Warum ist <b>Pluto</b> seit 2006 kein Planet mehr?', a: 'Die Astronomen haben festgelegt, was ein Planet ist. Pluto ist zu klein und teilt seine Bahn mit vielen anderen Körpern.', x: ['Er ist auf die Sonne gestürzt.', 'Er wurde zerstört.', 'Er ist ein Stern geworden.'], w: 'Seit 2006 heißt Pluto Zwergplanet.' },
       { f: 'Leuchtet der Mond selbst?', a: 'Nein, er wird von der Sonne angestrahlt.', x: ['Ja, wie die Sonne.', 'Ja, aber nur nachts.', 'Nein, er wird von der Erde angestrahlt.'], w: 'Der Mond wirft das Sonnenlicht zurück. Darum sehen wir ihn mal ganz und mal nur zum Teil.' },
+      { f: 'Wie nennt man Himmelskörper, die um einen <b>Planeten</b> kreisen?', a: 'Trabanten oder Monde', x: ['Kometen', 'Sterne', 'Asteroiden'], w: 'Trabant heißt Begleiter. Der Trabant der Erde ist der Mond. Der Jupiter hat sogar Dutzende.' },
+      { f: 'Was ist die <b>Milchstraße</b>?', a: 'unsere Galaxis: eine riesige Ansammlung von Sternen, zu der auch die Sonne gehört', x: ['die Bahn der Erde um die Sonne', 'der Ring um den Saturn', 'ein anderes Wort für Sonnensystem'], w: 'Alle Sterne, die du nachts siehst, gehören dazu. Im Weltall gibt es noch Milliarden andere Galaxien.' },
+      { f: 'Was gehört alles zum <b>Sonnensystem</b>?', a: 'die Sonne, ihre acht Planeten und Tausende kleinere Himmelskörper', x: ['nur die Sonne und die Erde', 'alle Sterne am Nachthimmel', 'die Erde und der Mond'], w: 'Zu den kleineren Himmelskörpern gehören Monde, Asteroiden und Kometen.' },
+      { f: 'Woran erkennst du einen <b>Kometen</b>, wenn er der Sonne nahe kommt?', a: 'an seinem Schweif', x: ['an seinen Ringen', 'an seiner blauen Farbe', 'an seinen Monden'], w: 'Kometen bestehen aus festen Teilen und gefrorenen Gasen. Nahe der Sonne bilden sich eine Gaswolke und ein Schweif.' },
       { f: 'Wie weit ist die Erde ungefähr von der Sonne entfernt?', a: 'rund 150 Millionen km', x: ['rund 384 000 km', 'rund 40 000 km', 'rund 1 Milliarde km'], w: 'Das Licht der Sonne braucht für diesen Weg etwa 8 Minuten. 384 000 km ist der Weg zum Mond.' },
     ],
     O: [
@@ -51,8 +55,70 @@
     T: [
       { f: 'Die Sonne ist kein Planet, sondern ein ___.', a: 'Stern', w: 'Sterne leuchten selbst.' },
       { f: 'Seit 2006 ist Pluto ein ___.', a: ['Zwergplanet', 'Zwerg-Planet'], w: 'Die Astronomen haben festgelegt, was ein Planet ist.' },
+      { f: 'Der größte Planet im Sonnensystem ist der ___.', a: 'Jupiter', w: 'Quer durch den Jupiter würden etwa 11 Erdkugeln nebeneinander passen.' },
     ],
-  });
+    extra: { planetReihe: () => planetReihe(), planetGroesse: () => planetGroesse(), planetAbstand: () => planetAbstand() },
+  }, { planetReihe: 16, planetGroesse: 16, planetAbstand: 16 });
+
+  // ---- Planeten im Bild: Reihenfolge, Größen, Abstände
+  const P_DER = ['der Merkur', 'die Venus', 'die Erde', 'der Mars', 'der Jupiter', 'der Saturn', 'der Uranus', 'der Neptun'];
+  const P_DEN = P_DER.map((n) => n.replace(/^der /, 'den '));
+  const MERK = ['Mein', 'Vater', 'erklärt', 'mir', 'jeden', 'Sonntag', 'unseren', 'Nachthimmel'];
+  const merksatz = (k) => 'Merksatz: ' + MERK.map((w, i) => (i === k ? `<b>${w}</b>` : w)).join(' ') + '.';
+  const gross = (t) => t[0].toUpperCase() + t.slice(1);
+  // vier Antworten: der gesuchte Planet und drei andere
+  const vierPlaneten = (k) => { const ch = shuffle([k, ...shuffle([0, 1, 2, 3, 4, 5, 6, 7].filter((i) => i !== k)).slice(0, 3)]); return { ch: ch.map((i) => PLANETEN[i]), ok: ch.indexOf(k) }; };
+  function planetReihe() {
+    const art = 'planetReihe';
+    if (R(0, 1)) {
+      const k = R(0, 7), v = vierPlaneten(k);
+      return { prompt: 'Die Planeten in ihrer Reihenfolge von der Sonne aus. Welcher Planet ist mit <b>?</b> markiert?', figure: D.planetenReihe({ frage: k }), choices: v.ch, correct: v.ok, hint: 'Mein Vater erklärt mir jeden Sonntag unseren Nachthimmel.',
+        solution: `Das ist <b>${P_DER[k]}</b>, der ${k + 1}. Planet von der Sonne aus.<br>${merksatz(k)}`, ex: { mode: 'planeten', art, teil: 'reihe', k, merk: `${gross(P_DER[k])} ist der <b>${k + 1}. Planet</b> von der Sonne aus.` } };
+    }
+    const nr = shuffle([0, 1, 2, 3, 4, 5, 6, 7]).slice(0, 4).sort((a, b) => a - b), j = R(0, 3), k = nr[j];
+    return { prompt: `Hier fehlen die Namen. Tippe auf <b>${P_DEN[k]}</b>.`, figure: D.planetenReihe({ nummern: nr }), choices: ['1', '2', '3', '4'], correct: j, hint: 'Zähle von der Sonne aus: Mein Vater erklärt mir jeden Sonntag unseren Nachthimmel.',
+      solution: `Nummer ${j + 1} ist <b>${P_DER[k]}</b>, der ${k + 1}. Planet von der Sonne aus.<br>${merksatz(k)}`, ex: { mode: 'planeten', art, teil: 'reihe', k, merk: `${gross(P_DER[k])} ist der <b>${k + 1}. Planet</b> von der Sonne aus.` } };
+  }
+  const bildFrage = (art, teil, bild, e) => { const ch = shuffle([e.a, ...e.x]); return { prompt: e.f, figure: bild, choices: ch, correct: ch.indexOf(e.a), hint: e.h || 'Schau genau ins Bild und lies die Namen.', solution: `<b>${e.a}</b><br>${e.w}`, ex: { mode: 'planeten', art, teil, k: e.k, merk: e.w } }; };
+  const GROESSE = [
+    { f: 'Alle Planeten im selben Maßstab. Welcher ist der <b>größte</b>?', a: 'der Jupiter', x: ['der Saturn', 'die Erde', 'der Neptun'], k: 4, w: 'Quer durch den Jupiter würden etwa 11 Erdkugeln nebeneinander passen.' },
+    { f: 'Alle Planeten im selben Maßstab. Welcher ist der <b>kleinste</b>?', a: 'der Merkur', x: ['der Mars', 'die Erde', 'der Uranus'], k: 0, w: 'Der Merkur ist nicht einmal halb so breit wie die Erde.' },
+    { f: 'Welcher Planet ist fast genauso groß wie die <b>Erde</b>?', a: 'die Venus', x: ['der Mars', 'der Merkur', 'der Uranus'], k: 1, w: 'Die Venus ist nur ein kleines bisschen kleiner als die Erde. Der Mars ist etwa halb so breit.' },
+    { f: 'Welche vier Planeten sind die <b>großen</b>?', a: 'Jupiter, Saturn, Uranus, Neptun', x: ['Merkur, Venus, Erde, Mars', 'Erde, Mars, Jupiter, Saturn', 'Venus, Erde, Uranus, Neptun'], w: 'Die vier Planeten nahe der Sonne sind klein. Die vier äußeren sind viel größer.' },
+    { f: 'Wie viele Erdkugeln passen nebeneinander quer durch den <b>Jupiter</b>?', a: 'etwa 11', x: ['etwa 2', 'etwa 100', 'etwa 1 000'], k: 4, w: 'Der Jupiter ist rund 143 000 km breit, die Erde knapp 13 000 km.' },
+    { f: 'Von der Sonne passt nur der Rand ins Bild. Wie viele Erdkugeln passen nebeneinander quer durch die <b>Sonne</b>?', a: 'etwa 109', x: ['etwa 11', 'etwa 20', 'etwa 5'], w: 'Die Sonne ist rund 1,4 Millionen km breit, die Erde knapp 13 000 km.' },
+    { f: 'Woran erkennst du den <b>Saturn</b> sofort?', a: 'an seinen Ringen', x: ['an seiner blauen Farbe', 'an seinem Schweif', 'daran, dass er der kleinste ist'], k: 5, w: 'Der Saturn ist nach dem Jupiter der zweitgrößte Planet.' },
+  ];
+  const groesseReihum = (() => { let i = R(0, 6); return () => GROESSE[i++ % GROESSE.length]; })();
+  function planetGroesse() {
+    const art = 'planetGroesse';
+    if (R(0, 2) === 0) {
+      const k = pick([1, 2, 4, 5, 6, 7]), v = vierPlaneten(k);
+      return { prompt: 'Alle Planeten im selben Maßstab, in ihrer Reihenfolge von der Sonne aus. Welcher Planet ist <b>rot</b> markiert?', figure: D.planetenGroessen({ frage: k }), choices: v.ch, correct: v.ok, hint: 'Zähle von der Sonne aus und achte auf die Größe.',
+        solution: `Das ist <b>${P_DER[k]}</b>, der ${k + 1}. Planet von der Sonne aus.<br>${merksatz(k)}`, ex: { mode: 'planeten', art, teil: 'groesse', k, merk: `${gross(P_DER[k])}: der <b>${k + 1}. Planet</b> von der Sonne aus.` } };
+    }
+    return bildFrage(art, 'groesse', D.planetenGroessen(), groesseReihum());
+  }
+  const ABSTAND = [
+    { f: 'Die Abstände im selben Maßstab. Welche Planeten liegen <b>dicht bei der Sonne</b>?', a: 'Merkur, Venus, Erde, Mars', x: ['Jupiter, Saturn, Uranus, Neptun', 'Erde, Mars, Jupiter, Saturn', 'nur der Merkur'], w: 'Im oberen Streifen liegen diese vier so eng an der Sonne, dass man sie erst in der Vergrößerung auseinanderhalten kann.' },
+    { f: 'Zwischen welchen beiden Planeten liegt der <b>Asteroidengürtel</b>?', a: 'zwischen Mars und Jupiter', x: ['zwischen Erde und Mars', 'zwischen Jupiter und Saturn', 'zwischen Merkur und Venus'], w: 'Asteroiden sind kleine Brocken, meist unter 100 km breit. Fast alle kreisen dort um die Sonne.' },
+    { f: 'Welcher Planet ist am <b>weitesten</b> von der Sonne entfernt?', a: 'der Neptun', x: ['der Uranus', 'der Jupiter', 'der Mars'], k: 7, w: 'Bis zum Neptun sind es rund 4 500 Millionen km.' },
+    { f: 'Die Erde ist rund 150 Millionen km von der Sonne entfernt. Wie weit ist es bis zum <b>Neptun</b>?', a: 'etwa 30-mal so weit', x: ['etwa doppelt so weit', 'etwa 5-mal so weit', 'etwa 1 000-mal so weit'], k: 7, w: '30 · 150 Millionen km = 4 500 Millionen km.' },
+    { f: 'Die Erde ist rund 150 Millionen km von der Sonne entfernt. Wie weit ist es bis zum <b>Jupiter</b>?', a: 'etwa 5-mal so weit', x: ['etwa doppelt so weit', 'etwa 30-mal so weit', 'genauso weit'], k: 4, w: 'Bis zum Jupiter sind es fast 780 Millionen km.' },
+    { f: 'Was fällt dir an den Abständen auf?', a: 'Die inneren Planeten liegen eng beisammen, die äußeren weit auseinander.', x: ['Alle Planeten haben denselben Abstand voneinander.', 'Die äußeren Planeten liegen eng beisammen.', 'Die Erde ist am weitesten von der Sonne entfernt.'], w: 'Vom Uranus zum Neptun ist es weiter als von der Sonne bis zum Saturn.' },
+    { f: 'Auf welchen Planeten ist es <b>am kältesten</b>?', a: 'auf denen, die weit von der Sonne entfernt sind', x: ['auf denen, die nah an der Sonne sind', 'auf den kleinsten', 'auf denen mit den meisten Monden'], k: 7, w: 'Je weiter weg, desto weniger Sonnenwärme kommt an. Auf dem Neptun sind es etwa −200 °C.' },
+    { f: 'Größen und Abstände stimmen nie zugleich in einem Bild. Warum nicht?', a: 'Die Abstände sind riesig im Vergleich zu den Planeten.', x: ['Die Planeten sind alle gleich groß.', 'Die Planeten stehen dicht nebeneinander.', 'Man kennt die Abstände nicht.'], w: 'Wäre die Erde nur 1 mm groß, dann wäre der Neptun trotzdem rund 350 m entfernt. Das passt auf kein Blatt.' },
+  ];
+  const abstandReihum = (() => { let i = R(0, 7); return () => ABSTAND[i++ % ABSTAND.length]; })();
+  function planetAbstand() {
+    const art = 'planetAbstand';
+    if (R(0, 3) === 0) {
+      const k = R(4, 7), v = vierPlaneten(k);
+      return { prompt: 'Die Abstände im selben Maßstab. Welcher Planet ist <b>rot</b> markiert?', figure: D.planetenAbstaende({ frage: k }), choices: v.ch, correct: v.ok, hint: 'Zähle von der Sonne aus. Die ersten vier liegen ganz dicht an der Sonne.',
+        solution: `Das ist <b>${P_DER[k]}</b>, der ${k + 1}. Planet von der Sonne aus.<br>${merksatz(k)}`, ex: { mode: 'planeten', art, teil: 'abstand', k, merk: `${gross(P_DER[k])}: der <b>${k + 1}. Planet</b> von der Sonne aus.` } };
+    }
+    return bildFrage(art, 'abstand', D.planetenAbstaende(), abstandReihum());
+  }
 
   G.tagNacht = baue('geo5-tagnacht', {
     h: 'Die Erde dreht sich in 24 Stunden einmal um sich selbst, von West nach Ost. Die Seite, die zur Sonne zeigt, hat Tag.',

@@ -8,6 +8,8 @@
  *   gezeiten  Wasserstand über einen Tag: zweimal Hochwasser, zweimal Niedrigwasser
  *   steigung  Feuchte Luft steigt am Gebirge auf, Wolken, Regen auf der Seite zum Wind
  *   tal       Die vier Talformen nebeneinander, die gesuchte leuchtet
+ *   planeten  Die acht Planeten: erst die Reihenfolge, dann (teil 'groesse') wachsen und schrumpfen sie auf ihre wahre Größe
+ *             oder (teil 'abstand') rutschen sie auf ihren wahren Abstand zur Sonne
  */
 (function () {
   const D = window.GeoDax;
@@ -189,6 +191,82 @@
       el('rect', { x: 110, y: 140, width: 140, height: 84, rx: 5, fill: 'none', stroke: BLAU, 'stroke-width': 2.5 }, g);
       await fade(api, g, 500);
       api.say(x.merk);
+    },
+
+    // ---------------------------------------------------------------- Planeten
+    async planeten(api, x) {
+      const PL = D.planeten, Y = 112, HELL = '#fff', LEISE = '#b9bfe6', WORT = ['Mein', 'Vater', 'erklärt', 'mir', 'jeden', 'Sonntag', 'unseren', 'Nachthimmel'];
+      el('rect', { x: 0, y: 0, width: 360, height: 240, rx: 10, fill: '#1b1d3a' }, api.svg);
+      const sonne = el('circle', { cx: -40, cy: Y, r: 72, fill: '#ffcf4a' }, api.svg);
+      const linie = el('line', { x1: 20, y1: Y, x2: 354, y2: Y, stroke: LEISE, 'stroke-width': 1, opacity: 0 }, api.svg);
+      const satz = txt(api.svg, 180, 26, '', 10.5, '#ffcf4a');
+      const k = PL.map((p, i) => {
+        const g = el('g', { opacity: 0 }, api.svg), z = { p, g, x: 58 + i * 38, r: 3.5 + 2.6 * Math.sqrt(p.d / 12756), ty: i % 2 ? Y + 38 : Y - 28 };
+        if (p.ring) z.ring = el('ellipse', { cy: Y, fill: 'none', stroke: '#cdb98a' }, g);
+        z.c = el('circle', { cy: Y, fill: p.f }, g);
+        z.t = txt(g, z.x, z.ty, p.n, 12, HELL);
+        return z;
+      });
+      const setz = (z, cx, r, ty, tx) => {
+        z.c.setAttribute('cx', cx); z.c.setAttribute('r', r); z.t.setAttribute('x', tx == null ? cx : tx); z.t.setAttribute('y', ty);
+        if (z.ring) { z.ring.setAttribute('cx', cx); z.ring.setAttribute('rx', r * 1.9); z.ring.setAttribute('ry', r * 0.42); z.ring.setAttribute('stroke-width', Math.max(1, r * 0.22)); }
+      };
+      k.forEach((z) => setz(z, z.x, z.r, z.ty));
+      api.say('Um die Sonne kreisen acht Planeten. Von der Sonne aus gezählt:');
+      await api.wait(1200);
+      for (let i = 0; i < 8; i++) {
+        satz.textContent = WORT.slice(0, i + 1).join(' ') + (i === 7 ? '.' : ' …');
+        await fade(api, k[i].g, 300);
+        await api.wait(420);
+      }
+      api.say('Die Anfangsbuchstaben im Merksatz sind die Anfangsbuchstaben der Planeten.');
+      await api.wait(2200);
+      const zeig = (i) => { if (i == null) return; const z = k[i]; el('circle', { cx: z.c.getAttribute('cx'), cy: Y, r: +z.c.getAttribute('r') + 5, fill: 'none', stroke: '#ff6b5e', 'stroke-width': 2.5 }, api.svg); };
+      if (x.teil === 'reihe') { zeig(x.k); api.say(x.merk); return; }
+      satz.textContent = '';
+      if (x.teil === 'groesse') {
+        const M = 70 / 142984, X = [44, 61, 80, 99, 152, 246, 318, 345], TY = [Y - 54, Y + 50, Y - 40, Y + 64, Y - 46, Y + 52, Y - 26, Y + 30];
+        api.say('Im ersten Bild waren die Größen nur angedeutet. Jetzt alle im <b>selben Maßstab</b>:');
+        await api.wait(1800);
+        const r0 = 72, r1 = 1392000 * M / 2;
+        await api.tw(2200, (t) => {
+          const e = t * t * (3 - 2 * t);
+          sonne.setAttribute('r', lerp(r0, r1, e)); sonne.setAttribute('cx', lerp(-40, 22 - r1, e));
+          k.forEach((z, i) => setz(z, lerp(z.x, X[i], e), lerp(z.r, Math.max(1.2, z.p.d * M / 2), e), lerp(z.ty, TY[i], e), i === 7 ? lerp(z.x, 336, e) : null));
+        });
+        await api.wait(900);
+        api.say('Merkur, Venus, Erde und Mars sind winzig. Von der Sonne passt nur noch der Rand ins Bild.');
+        await api.wait(3000);
+        const rE = 12756 * M / 2, g = el('g', { opacity: 0 }, api.svg);
+        for (let i = 0; i < 11; i++) el('circle', { cx: 152 - 35 + rE + i * (70 - 2 * rE) / 10, cy: Y, r: rE, fill: '#3f7fd9', stroke: HELL, 'stroke-width': 0.6 }, g);
+        await fade(api, g, 500);
+        api.say('Quer durch den Jupiter passen etwa <b>11 Erdkugeln</b> nebeneinander, durch die Sonne sogar 109.');
+        await api.wait(3200);
+        zeig(x.k); api.say(x.merk);
+        return;
+      }
+      // Abstände
+      const M = 322 / 4515, XA = (p) => 24 + p.a * M;
+      api.say('Im ersten Bild standen alle gleich weit auseinander. Jetzt die Abstände im <b>selben Maßstab</b>:');
+      await api.wait(1800);
+      await api.tw(2600, (t) => {
+        const e = t * t * (3 - 2 * t);
+        sonne.setAttribute('r', lerp(72, 10, e)); sonne.setAttribute('cx', lerp(-40, 14, e)); linie.setAttribute('opacity', e);
+        k.forEach((z, i) => { setz(z, lerp(z.x, XA(z.p), e), lerp(z.r, i > 3 ? 5 : 3, e), lerp(z.ty, Y - 16, e)); if (i < 4) z.t.setAttribute('opacity', 1 - e); if (i === 7) z.t.setAttribute('text-anchor', e > 0.5 ? 'end' : 'middle'); });
+      });
+      await api.wait(800);
+      api.say('Merkur, Venus, Erde und Mars drängen sich dicht an der Sonne. Die anderen liegen immer weiter auseinander.');
+      await api.wait(3200);
+      // Maßband: so weit wie Sonne–Erde, 30-mal bis zum Neptun
+      const g = el('g', { opacity: 0 }, api.svg), sx = 149.6 * M;
+      for (let i = 0; i <= 30; i++) el('line', { x1: 24 + i * sx, y1: Y + 22, x2: 24 + i * sx, y2: Y + (i % 5 ? 30 : 36), stroke: i % 5 ? LEISE : HELL, 'stroke-width': 1 }, g);
+      el('line', { x1: 24, y1: Y + 22, x2: 24 + 30 * sx, y2: Y + 22, stroke: LEISE, 'stroke-width': 1 }, g);
+      [5, 10, 20, 30].forEach((i) => txt(g, 24 + i * sx, Y + 52, i, 12, HELL, i === 30 ? 'end' : 'middle'));
+      txt(g, 180, Y + 78, 'ein Schritt = so weit wie von der Sonne zur Erde', 11.5, LEISE);
+      await fade(api, g, 500);
+      api.say('Bis zum Jupiter ist es etwa 5-mal so weit wie bis zur Erde, bis zum Neptun etwa <b>30-mal</b>.');
+      await api.wait(3400);
+      zeig(x.k != null && x.k > 3 ? x.k : null); api.say(x.merk);
     },
   });
 

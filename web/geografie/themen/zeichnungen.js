@@ -3,6 +3,11 @@
  *   D.jahrBild(k)       Sonne in der Mitte, Erde links (k = 0, Sommer auf der Nordhalbkugel) oder rechts (k = 1, Winter)
  *   D.steigungBild()    Gebirge im Querschnitt, Wind von links
  *   D.talBild(k)        Talquerschnitt; k = 0 Klamm, 1 Kerbtal, 2 Sohlental, 3 Muldental
+ *   D.planeten          die acht Planeten: Name, Durchmesser in km, Abstand zur Sonne in Mio. km (NASA), Farbe
+ *   D.planetenReihe(o)  Reihenfolge von der Sonne aus (Größen und Abstände nur angedeutet)
+ *                       o.frage = k: Planet k ohne Name, mit „?“; o.nummern = [k, …]: keine Namen, diese Planeten mit 1, 2, … zum Antippen
+ *   D.planetenGroessen(o)  alle im selben Maßstab, Sonne als Rand; o.frage = k: Namen weg, Planet k markiert
+ *   D.planetenAbstaende(o) Abstände im selben Maßstab, darunter der Anfang vergrößert; o.frage = k wie oben
  */
 (function () {
   const D = window.GeoDax;
@@ -73,5 +78,77 @@
     let s = `<path d="${TAELER[k]}" fill="#c9b48a" stroke="${T}" stroke-width="1.4"/>`;
     s += `<path d="M${a} ${y} L${b} ${y} L${(a + b) / 2 + 2} ${y + 6} L${(a + b) / 2 - 2} ${y + 6}Z" fill="#5aa0e6"/>`;
     return svg(200, 120, s, 'Querschnitt durch ein Tal');
+  };
+
+  // ===================================================== Planeten
+  // Durchmesser (km) und mittlerer Abstand zur Sonne (Mio. km): NASA Planetary Fact Sheet
+  const PL = D.planeten = [
+    { n: 'Merkur', d: 4879, a: 57.9, f: '#9a948c' }, { n: 'Venus', d: 12104, a: 108.2, f: '#e3b563' },
+    { n: 'Erde', d: 12756, a: 149.6, f: '#3f7fd9' }, { n: 'Mars', d: 6792, a: 228, f: '#c8553a' },
+    { n: 'Jupiter', d: 142984, a: 778.5, f: '#d9a878' }, { n: 'Saturn', d: 120536, a: 1432, f: '#e2c98f', ring: 1 },
+    { n: 'Uranus', d: 51118, a: 2867, f: '#8fd3d6' }, { n: 'Neptun', d: 49528, a: 4515, f: '#4a6fd0' },
+  ];
+  const ALL = '#1b1d3a', HELL = '#fff', LEISE = '#b9bfe6';
+  const r1 = (z) => +z.toFixed(1);
+  const kugel = (p, x, y, r, extra) => (p.ring ? `<ellipse cx="${x}" cy="${y}" rx="${r1(r * 1.9)}" ry="${r1(r * 0.42)}" fill="none" stroke="#cdb98a" stroke-width="${r1(Math.max(1, r * 0.22))}"/>` : '')
+    + `<circle cx="${x}" cy="${y}" r="${r1(r)}" fill="${p.f}"${extra || ''}/>`
+    + (p.ring ? `<path d="M${r1(x - r * 1.9)} ${y} A${r1(r * 1.9)} ${r1(r * 0.42)} 0 0 0 ${r1(x + r * 1.9)} ${y}" fill="none" stroke="#cdb98a" stroke-width="${r1(Math.max(1, r * 0.22))}"/>` : '');
+  const all = (w, h, inhalt, name) => `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${name}" style="max-width:100%;height:auto"><rect width="${w}" height="${h}" rx="8" fill="${ALL}"/>${inhalt}</svg>`;
+  const marke = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r1(r)}" fill="none" stroke="#ff6b5e" stroke-width="2.2"/>`;
+  const nummer = (x, y, i) => `<circle cx="${x}" cy="${y}" r="9" fill="${HELL}" stroke="${BLAU}" stroke-width="1.6"/>` + tx(x, y + 3.6, i, 11, BLAU);
+
+  D.planetenReihe = function (o) {
+    o = o || {};
+    const W = 330, H = 138, Y = 62, nr = o.nummern || [];
+    let s = `<circle cx="-30" cy="${Y}" r="67" fill="${GELB}"/>` + tx(18, Y + 4, 'Sonne', 10.5, '#5a4300', 'middle');
+    PL.forEach((p, i) => {
+      const x = 58 + i * 35.5, r = 3.2 + 2.3 * Math.sqrt(p.d / 12756), k = nr.indexOf(i);
+      const wahl = k >= 0 ? ` data-wahl="${k}"` : '';
+      s += kugel(p, x, Y, r, wahl);
+      if (k >= 0) s += `<g${wahl}><rect x="${x - 16}" y="${Y - 34}" width="32" height="80" fill="transparent"/>${nummer(x, Y + 30, k + 1)}</g>`;
+      else if (o.frage === i) s += marke(x, Y, r + 5) + tx(x, Y + (i % 2 ? 36 : -24), '?', 16, '#ff8a7e');
+      else if (!nr.length) s += tx(i === 7 ? Math.min(x, W - 22) : x, Y + (i % 2 ? 34 : -23), p.n, 11.5, HELL, 'middle', 700);
+    });
+    s += tx(W / 2, H - 9, 'Die Reihenfolge stimmt, Größen und Abstände nicht.', 9.5, LEISE, 'middle', 700);
+    return all(W, H, s, 'Die acht Planeten in ihrer Reihenfolge von der Sonne aus');
+  };
+
+  D.planetenGroessen = function (o) {
+    o = o || {};
+    const W = 330, H = 152, Y = 54, M = 56 / 142984;           // Jupiter ist 56 Einheiten breit
+    const X = [42, 63, 84, 105, 146, 222, 282, 312];
+    let s = `<circle cx="${r1(19 - 1392000 * M / 2)}" cy="${Y}" r="${r1(1392000 * M / 2)}" fill="${GELB}"/>` + `<text transform="translate(12.5 ${Y}) rotate(-90)" text-anchor="middle" style="font:800 10.5px Nunito,sans-serif;fill:#5a4300">Rand der Sonne</text>`;
+    PL.forEach((p, i) => {
+      const r = Math.max(1.2, p.d * M / 2), yN = i % 2 && (i < 4 || i === 7) ? 121 : 106;
+      s += kugel(p, X[i], Y, r);
+      if (o.frage === i) s += marke(X[i], Y, r + 4) + tx(X[i], 108, '?', 16, '#ff8a7e');
+      else if (o.frage == null) {
+        s += i === 7 ? tx(W - 5, yN, p.n, 11.5, HELL, 'end', 700) : tx(X[i], yN, p.n, 11.5, HELL, 'middle', 700);
+        if (i < 4) s += `<line x1="${X[i]}" y1="${Y + r + 3}" x2="${X[i]}" y2="${yN - 11}" stroke="${LEISE}" stroke-width=".7"/>`;
+      }
+    });
+    s += tx(W / 2, H - 9, 'Die Größen stimmen, die Abstände nicht.', 9.5, LEISE, 'middle', 700);
+    return all(W, H, s, 'Die Sonne und die acht Planeten im selben Größenmaßstab');
+  };
+
+  D.planetenAbstaende = function (o) {
+    o = o || {};
+    const W = 330, H = 182, X0 = 16, Y1 = 40, Y2 = 122, M1 = 300 / 4515, M2 = 290 / 800, SCHUB = [-5, 0, 6, 0, 0, 0, 0, 0];
+    const punkt = (p, x, y, i, oben, anker) => `<circle cx="${r1(x)}" cy="${y}" r="${i > 3 ? 4.5 : 3.4}" fill="${p.f}" stroke="${HELL}" stroke-width=".6"/>`
+      + (o.frage === i ? marke(r1(x), y, 8) + tx(r1(x), oben ? y - 13 : y + 24, '?', 15, '#ff8a7e') : o.frage == null ? tx(r1(x + (y === Y2 ? SCHUB[i] : 0)), oben ? y - 11 : y + 20, p.n, 11.5, HELL, anker || 'middle', 700) : '');
+    // oben: alle acht im selben Maßstab
+    let s = `<line x1="${X0}" y1="${Y1}" x2="${W - 8}" y2="${Y1}" stroke="${LEISE}" stroke-width="1"/>` + `<circle cx="${X0 - 6}" cy="${Y1}" r="9" fill="${GELB}"/>`;
+    PL.forEach((p, i) => { if (i > 3) s += punkt(p, X0 + p.a * M1, Y1, i, true, i === 7 ? 'end' : 'middle'); else s += `<circle cx="${r1(X0 + p.a * M1)}" cy="${Y1}" r="2" fill="${p.f}"/>`; });
+    // Lupe: der Anfang bis zum Jupiter
+    const xj = X0 + 800 * M1;
+    s += `<path d="M${X0} ${Y1 + 7} L${X0} ${Y2 - 36} M${r1(xj)} ${Y1 + 7} L${W - 12} ${Y2 - 36}" stroke="${LEISE}" stroke-width=".8" stroke-dasharray="3 3" fill="none"/>`;
+    s += tx(W / 2 - 20, Y2 - 40, 'der Anfang, vergrößert', 10, LEISE, 'middle', 700);
+    s += `<line x1="${X0}" y1="${Y2}" x2="${W - 12}" y2="${Y2}" stroke="${LEISE}" stroke-width="1"/>` + `<circle cx="${X0 - 4}" cy="${Y2}" r="11" fill="${GELB}"/>`;
+    // Asteroidengürtel zwischen Mars und Jupiter
+    for (let i = 0; i < 26; i++) s += `<circle cx="${r1(X0 + (330 + (i * 37) % 160) * M2)}" cy="${r1(Y2 - 5 + (i * 7) % 11)}" r=".9" fill="${LEISE}"/>`;
+    s += tx(X0 + 425 * M2, Y2 - 12, 'Asteroidengürtel', 10, LEISE, 'middle', 700);
+    PL.forEach((p, i) => { if (i < 5) s += punkt(p, X0 + p.a * M2, Y2, i, i % 2 === 1, 'middle'); });
+    s += tx(W / 2, H - 9, 'Die Abstände stimmen, die Größen nicht.', 9.5, LEISE, 'middle', 700);
+    return all(W, H, s, 'Die Abstände der Planeten von der Sonne im selben Maßstab');
   };
 })();

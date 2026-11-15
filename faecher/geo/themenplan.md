@@ -47,7 +47,7 @@ Erklärungen nach Robertos Grundsatz: Merkzettel (kurz das Warum), Animation nur
 
 | Thema | Inhalt | Beispiel-Aufgaben |
 |---|---|---|
-| Die Erde im Sonnensystem (S. 10–11) | Sonne ist ein Stern, 8 Planeten, Mond als Begleiter, Pluto Zwergplanet | Planeten in die richtige Reihenfolge ziehen · „Stern, Planet oder Mond: Sonne, Erde, Mond, Jupiter“ |
+| Die Erde im Sonnensystem (S. 10–11) | Sonne ist ein Stern, 8 Planeten, Mond als Begleiter, Pluto Zwergplanet | Planeten in die richtige Reihenfolge ziehen · „Stern, Planet oder Mond: Sonne, Erde, Mond, Jupiter“ · seit v106 drei Bilder: Reihenfolge (auch zum Antippen), Größen im selben Maßstab, Abstände im selben Maßstab |
 | Tag und Nacht (S. 12–13) | Erde dreht sich in 24 Stunden von West nach Ost | „Warum geht die Sonne im Osten auf?“ · Animation: Dresden wandert in den Tag |
 | Jahr und Jahreszeiten (S. 12–13) | Umlauf um die Sonne, Schaltjahr, schräge Erdachse | „Warum gibt es alle vier Jahre einen 29. Februar?“ · „Ist im Sommer die Erde näher an der Sonne?“ (nein) |
 | Abbildungen der Erde (S. 14–15) | Weltraumbild, Globus, Weltkarte; Vor- und Nachteile; Karte verzerrt | „Was zeigt alles richtig, aber nie die ganze Erde auf einmal?“ (Globus) · Grönland auf der Karte und in echt |

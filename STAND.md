@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 14.11.2026, Version `lerndax-v105`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 15.11.2026, Version `lerndax-v106`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,24 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-15. GeoDax: Planeten als Bilder (lerndax-v106, 15.11.2026)
+
+Roberto: „Dort könntest du Grafiken für die Planeten einbauen. Reihenfolge, Größen, Entfernungen kann man grafisch super darstellen.“
+Grundlage ist Buch S. 10–11 (dort: ein Bild mit richtigen Größen, eines mit den Bahnen, Aufgabe 3: warum beides nicht in ein Bild passt).
+
+- `themen/zeichnungen.js`: `D.planeten` (Name, Durchmesser, Abstand, Farbe) und drei eigene Bilder auf dunklem Grund:
+  `D.planetenReihe` (Reihenfolge; ein Planet mit „?“ oder vier Planeten mit Nummern zum Antippen), `D.planetenGroessen`
+  (alle im selben Maßstab, von der Sonne nur der Rand), `D.planetenAbstaende` (Abstände im selben Maßstab, darunter der Anfang
+  bis zum Jupiter vergrößert, mit Asteroidengürtel). Unter jedem Bild steht, was stimmt und was nicht.
+- Thema `geo5-weltall`: drei neue Aufgabenarten `planetReihe`, `planetGroesse`, `planetAbstand` (je Gewicht 16), dazu vier Fragen
+  aus dem Buch (Trabanten, Milchstraße, Sonnensystem, Komet) und ein Lückenwort.
+- `erklaerungen/klasse5.js`: neue Animation `planeten`: Planeten erscheinen der Reihe nach mit dem Merksatz; dann wachsen und
+  schrumpfen sie auf ihre wahre Größe (11 Erdkugeln quer durch den Jupiter) oder rutschen auf ihren wahren Abstand (Maßband:
+  30 Schritte bis zum Neptun).
+- Zahlen stehen nicht im Buch: NASA Planetary Fact Sheet, in `faecher/geo/fakten.md` eingetragen.
+- Tests v106: `wissen_gen` GeoDax 19 800 Aufgaben ohne Fehler; `geodax.py 2` (660 Antworten, 69 Animationen) ohne Meldung; die drei
+  neuen Arten samt Animation bei 390 px angesehen. An `plattform/` nichts geändert.
 
 ## 0-neu-14. GeoDax: Durchsicht in Handy-Größe, Darstellung korrigiert (lerndax-v105, 14.11.2026)
 
