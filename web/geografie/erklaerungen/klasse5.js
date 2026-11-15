@@ -206,7 +206,7 @@
       const satz = txt(api.svg, 180, 26, '', 10.5, '#ffcf4a');
       txt(api.svg, 354, 234, 'Fotos: NASA', 9, LEISE, 'end');
       const k = PL.map((p, i) => {
-        const g = el('g', { opacity: 0 }, api.svg), z = { p, g, x: 58 + i * 38, r: 3.5 + 2.6 * Math.sqrt(p.d / 12756), ty: i % 2 ? Y + 38 : Y - 28 };
+        const g = el('g', { opacity: 0 }, api.svg), z = { p, g, x: 58 + i * 38, r: (3.5 + 2.6 * Math.sqrt(p.d / 12756)) * (p.ring ? 0.7 : 1), ty: i % 2 ? Y + 38 : Y - 28 };
         z.k = foto(g, p.n, p.f);
         z.t = txt(g, z.x, z.ty, p.n, 12, HELL);
         return z;
@@ -230,20 +230,20 @@
       if (x.teil === 'reihe') { zeig(x.k); api.say(x.merk); return; }
       satz.textContent = '';
       if (x.teil === 'groesse') {
-        const M = 70 / 142984, X = [44, 61, 80, 99, 152, 246, 318, 345], TY = [Y - 54, Y + 50, Y - 40, Y + 64, Y - 46, Y + 52, Y - 26, Y + 30];
+        const M = 60 / 142984, X = [40, 58, 76, 94, 130, 226, 302, 334], TY = [Y - 54, Y + 50, Y - 40, Y + 64, Y - 46, Y + 52, Y - 26, Y + 30];
         api.say('Im ersten Bild waren die Größen nur angedeutet. Jetzt alle im <b>selben Maßstab</b>:');
         await api.wait(1800);
         const r0 = 72, r1 = 1392000 * M / 2;
         await api.tw(2200, (t) => {
           const e = t * t * (3 - 2 * t);
           setzS(lerp(-40, 22 - r1, e), lerp(r0, r1, e));
-          k.forEach((z, i) => setz(z, lerp(z.x, X[i], e), lerp(z.r, Math.max(1.2, z.p.d * M / 2), e), lerp(z.ty, TY[i], e), i === 7 ? lerp(z.x, 336, e) : null));
+          k.forEach((z, i) => setz(z, lerp(z.x, X[i], e), lerp(z.r, Math.max(1.2, z.p.d * M / 2), e), lerp(z.ty, TY[i], e)));
         });
         await api.wait(900);
         api.say('Merkur, Venus, Erde und Mars sind winzig. Von der Sonne passt nur noch der Rand ins Bild.');
         await api.wait(3000);
         const rE = 12756 * M / 2, g = el('g', { opacity: 0 }, api.svg);
-        for (let i = 0; i < 11; i++) el('circle', { cx: 152 - 35 + rE + i * (70 - 2 * rE) / 10, cy: Y, r: rE, fill: '#3f7fd9', stroke: HELL, 'stroke-width': 0.6 }, g);
+        for (let i = 0; i < 11; i++) el('circle', { cx: 130 - 30 + rE + i * (60 - 2 * rE) / 10, cy: Y, r: rE, fill: '#3f7fd9', stroke: HELL, 'stroke-width': 0.6 }, g);
         await fade(api, g, 500);
         api.say('Quer durch den Jupiter passen etwa <b>11 Erdkugeln</b> nebeneinander, durch die Sonne sogar 109.');
         await api.wait(3200);

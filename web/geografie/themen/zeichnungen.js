@@ -129,7 +129,7 @@
     const W = 330, H = 138, Y = 62, nr = o.nummern || [];
     let s = sonne(-30, Y, 67) + `<text x="16" y="${Y + 4}" text-anchor="middle" style="font:800 10.5px Nunito,sans-serif;fill:#fff;paint-order:stroke;stroke:#5a2a00;stroke-width:2.5px">Sonne</text>`;
     PL.forEach((p, i) => {
-      const x = 58 + i * 35.5, r = 3.2 + 2.3 * Math.sqrt(p.d / 12756), k = nr.indexOf(i);
+      const x = 58 + i * 35.5, r = (3.2 + 2.3 * Math.sqrt(p.d / 12756)) * (p.ring ? 0.7 : 1), k = nr.indexOf(i);   // Saturn kleiner: seine echten Ringe sind breit
       const wahl = k >= 0 ? ` data-wahl="${k}"` : '';
       s += kugel(p, x, Y, r, wahl);
       if (k >= 0) s += `<g${wahl}><rect x="${x - 16}" y="${Y - 34}" width="32" height="80" fill="transparent"/>${nummer(x, Y + 30, k + 1)}</g>`;
@@ -143,7 +143,7 @@
   D.planetenGroessen = function (o) {
     o = o || {};
     const W = 330, H = 152, Y = 54, M = 56 / 142984;           // Jupiter ist 56 Einheiten breit
-    const X = [42, 63, 84, 105, 146, 222, 282, 312];
+    const X = [38, 56, 75, 94, 135, 224, 295, 317];   // Saturns Ringe brauchen Platz
     let s = sonne(19 - 1392000 * M / 2, Y, 1392000 * M / 2) + `<text transform="translate(12.5 ${Y}) rotate(-90)" text-anchor="middle" style="font:800 10.5px Nunito,sans-serif;fill:#fff;paint-order:stroke;stroke:#5a2a00;stroke-width:2.5px">Rand der Sonne</text>`;
     PL.forEach((p, i) => {
       const r = Math.max(1.2, p.d * M / 2), yN = i % 2 && (i < 4 || i === 7) ? 121 : 106;
