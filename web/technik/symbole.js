@@ -1,0 +1,65 @@
+// Themen-Symbole für TecDax (Technik/Computer): kleine, selbst gezeichnete Bilder. Schlüssel = Themen-ID.
+// Fehlt ein Symbol, zeigt die App das Zeichen aus `icon` im Thema. viewBox 0 0 24 24, Linien in Schriftfarbe.
+window.TecDaxIcons = (function () {
+  const W = 'currentColor';
+  const F = `fill="${W}" stroke="none"`;
+  const RAD = (cx, cy, r) => { let d = ''; for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2, b = a + Math.PI / 8; d += `${i ? 'L' : 'M'}${(cx + r * Math.cos(a)).toFixed(1)} ${(cy + r * Math.sin(a)).toFixed(1)}L${(cx + (r + 2) * Math.cos(a + 0.12)).toFixed(1)} ${(cy + (r + 2) * Math.sin(a + 0.12)).toFixed(1)}L${(cx + (r + 2) * Math.cos(b - 0.12)).toFixed(1)} ${(cy + (r + 2) * Math.sin(b - 0.12)).toFixed(1)}L${(cx + r * Math.cos(b)).toFixed(1)} ${(cy + r * Math.sin(b)).toFixed(1)}`; } return `<path d="${d}Z"/><circle cx="${cx}" cy="${cy}" r="${(r / 3).toFixed(1)}"/>`; };
+  const SCHIRM = `<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/>`;
+  const BLATT = `<path d="M6 2h9l4 4v16H6z"/><path d="M15 2v4h4"/>`;
+  const I = {
+    'tc5-arbeitsplatz': `${SCHIRM}<path d="M2 22h8"/>`,
+    'tc5-eva': `<rect x="1.5" y="8" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="8" rx="1" ${F}/><rect x="17.5" y="8" width="5" height="8" rx="1"/><path d="M6.5 12h3M14.5 12h3"/>`,
+    'tc5-hardware': `<rect x="6" y="6" width="12" height="12" rx="1.5"/><rect x="9" y="9" width="6" height="6" ${F}/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>`,
+    'tc5-gesund': `<circle cx="7" cy="5" r="2.2"/><path d="M7 7.5v7h6v6M7 11h6"/><path d="M17 5v10M15 15h5"/>`,
+    'tc5-oberflaeche': `<rect x="2" y="3" width="20" height="18" rx="1.5"/><path d="M2 8h20"/><path d="M16 5.5h1M18.5 5.5h1"/><path d="M12 13l0 6 2-2 2 3 1-.6-2-3h3z" ${F}/>`,
+    'tc5-dateien': `${BLATT}<path d="M9 12h7M9 15h7M9 18h4"/>`,
+    'tc5-ordner': `<path d="M2 6h7l2 2h11v12H2z"/><path d="M6 13h5M6 16h8"/>`,
+    'tc5-schulnetz': `<circle cx="8" cy="12" r="4"/><path d="M12 12h10M18 12v3M21 12v4"/>`,
+    'tc5-zeichen': `<path d="M6 4h7a4 4 0 0 1 0 8H6zM6 12h8a4 4 0 0 1 0 8H6z" stroke-width="2.2"/>`,
+    'tc5-absatz': `<path d="M3 5h18M6 10h12M3 15h18M7 20h10"/>`,
+    'tc5-inhalt': `<path d="M14 3v18M18 3v18M14 3h-3a4 4 0 0 0 0 8h3"/>`,
+    'tc5-tabellen': `<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M3 14.5h18M9 4v16M15 4v16"/>`,
+    'tc5-medien': `<path d="M3 4h10v16H3z"/><path d="M5 8h6M5 11h6M5 14h4"/><rect x="15" y="6" width="7" height="13" rx="1.5"/><circle cx="18.5" cy="16.5" r=".8" ${F}/>`,
+    'tc5-browser': `<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>`,
+    'tc5-suchen': `<circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/>`,
+    'tc5-quellen': `${BLATT}<path d="M9 14l2 2 4-5"/>`,
+    'tc5-frei': `<circle cx="12" cy="12" r="9"/><path d="M15 9.5a4 4 0 1 0 0 5"/>`,
+    'tc5-gefahren': `<path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".9" ${F}/>`,
+    'tc5-email': `<rect x="2" y="5" width="20" height="14" rx="1.5"/><path d="M2 6l10 7 10-7"/>`,
+    'tc5-zusammen': `<circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-4 3-6 6-6s6 2 6 6M10 20c0-4 3-6 6-6s6 2 6 6"/>`,
+    'tc5-maschine': RAD(12, 12, 6),
+    'tc5-funktion': `<rect x="2" y="9" width="6" height="6" rx="1"/><path d="M8 12h4"/>${RAD(16, 12, 3.5)}`,
+    'tc5-getriebe': `${RAD(8, 10, 4.5)}${RAD(17, 15, 3)}`,
+    'tc5-zugmittel': `<circle cx="6" cy="12" r="4"/><circle cx="18" cy="12" r="2.5"/><path d="M6 8l12 1.5M6 16l12-1.5"/>`,
+    'tc5-raeder': `${RAD(8, 12, 4)}${RAD(17.5, 12, 3)}`,
+    'tc5-uebersetzung': `<circle cx="6" cy="16" r="4.5"/><circle cx="18" cy="16" r="4.5"/><path d="M6 16l5-7h6l1 7M11 9l-1-3h-2M15 6h3"/>`,
+    'tc5-umformung': `<circle cx="6" cy="12" r="4"/><circle cx="8.5" cy="9" r="1" ${F}/><path d="M8.5 9L17 12"/><rect x="15" y="9.5" width="6" height="5"/>`,
+    'tc5-sinnbild': `<circle cx="7" cy="12" r="5"/><circle cx="17" cy="12" r="3"/><path d="M7 7l10 2M7 17l10-2"/><circle cx="7" cy="12" r="1" ${F}/><circle cx="17" cy="12" r="1" ${F}/>`,
+    'tc5-konstruieren': `<path d="M9 18h6M10 21h4M12 3a6 6 0 0 1 4 10.5c-1 1-1 2-1 3H9c0-1 0-2-1-3A6 6 0 0 1 12 3z"/>`,
+    'tc5-modelle': `<path d="M4 21V5h14M4 5l5 5M18 5v6"/><rect x="15.5" y="11" width="5" height="4"/><path d="M2 21h8"/>`,
+    'tc5-linien': `<path d="M3 6h18" stroke-width="2.6"/><path d="M3 12h18" stroke-dasharray="3 2"/><path d="M3 18h18" stroke-dasharray="6 2 1 2"/>`,
+    'tc5-bemassung': `<rect x="4" y="4" width="16" height="9"/><path d="M4 15v6M20 15v6M4 19h16M4 19l2-1v2zM20 19l-2-1v2z"/>`,
+    'tc5-ansichten': `<path d="M4 9l4-4h12v10l-4 4H4z"/><path d="M4 9h12v10M16 9l4-4"/>`,
+    'tc5-stueckliste': `<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h9M8 12h9M8 16h9M6 8h.5M6 12h.5M6 16h.5"/>`,
+    'tc5-ablaufplan': `<rect x="3" y="3" width="8" height="5" rx="1"/><rect x="13" y="10" width="8" height="5" rx="1"/><rect x="3" y="17" width="8" height="5" rx="1"/><path d="M11 5.5h4v4.5M13 12.5H7v4.5"/>`,
+    'tc5-messen': `<rect x="2" y="8" width="20" height="8" rx="1"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/>`,
+    'tc5-werkstoffe': `<rect x="3" y="4" width="8" height="7" rx="1"/><path d="M5 6h4M5 8.5h4"/><circle cx="17" cy="7.5" r="3.5"/><path d="M3 14h8v7H3z" ${F}/><path d="M14 14c2 2 5 2 7 0v7c-2 2-5 2-7 0z"/>`,
+    'tc5-din8580': `<path d="M2 21V10l5 3V10l5 3V10l5 3V4h4v17z"/>`,
+    'tc5-urformen': `<path d="M4 4h9l-2 5H6z"/><path d="M9 9v3"/><path d="M5 14h14v7H5z"/><path d="M8 16h8" ${F}/>`,
+    'tc5-umformen': `<path d="M3 18h9a6 6 0 0 0 6-6V4"/><path d="M3 21h9a9 9 0 0 0 9-9V4"/>`,
+    'tc5-trennen': `<path d="M3 15h14l4-4-4-4H3z"/><path d="M5 15l1.5 2 1.5-2 1.5 2 1.5-2 1.5 2 1.5-2"/>`,
+    'tc5-fuegen': `<path d="M8 3h8v3H8zM12 6v15"/><path d="M10 9l4 1.5M10 12l4 1.5M10 15l4 1.5M10 18l4 1.5"/>`,
+    'tc5-maschinen': `<path d="M4 21h16M8 21V5h9v6H8M12 11v5"/><path d="M11 16h2v2h-2z" ${F}/>`,
+    'tc5-sicher': `<path d="M2 11c0-3 8-3 9 0 1-3 11-3 11 0v2c0 3-7 3-8 0l-2-1-2 1c-1 3-8 3-8 0z"/>`,
+    'tc5-pruefen': `<path d="M4 4v16h16"/><path d="M4 4h4v12h12v4"/><path d="M13 7l2 2 4-5"/>`,
+    'tc5-cnc': `<rect x="5" y="8" width="14" height="10" rx="2"/><circle cx="9.5" cy="13" r="1.5" ${F}/><circle cx="14.5" cy="13" r="1.5" ${F}/><path d="M12 4v4M10 4h4M3 12v3M21 12v3"/>`,
+    'tc5-vermeiden': `<path d="M12 3l3 5h-6zM20 17l-5 3v-6zM4 17l5-6 1 6z"/><path d="M12 8v0M15 8l4 6M9 8l-4 6M15 20H9"/>`,
+    'tc5-muell': `<path d="M4 6h16M9 6V3h6v3M6 6l1.5 15h9L18 6"/><path d="M10 10v8M14 10v8"/>`,
+    'tc5-kunststoff': `<path d="M9 2h6v3l2 3v14H7V8l2-3z"/><path d="M7 12h10"/>`,
+    'tc5-nachrichten': `<path d="M12 12v10M8 22h8"/><circle cx="12" cy="10" r="2"/><path d="M8 6a6 6 0 0 0 0 8M16 6a6 6 0 0 1 0 8M5 3a10 10 0 0 0 0 14M19 3a10 10 0 0 1 0 14"/>`,
+    'tc5-mikrocontroller': `<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6" ${F}/><circle cx="7" cy="7" r=".9" ${F}/><path d="M17 17l3 3"/>`,
+    'tc5-energie': `<path d="M12 12V22M9 22h6"/><path d="M12 12L12 3c2 1 3 4 0 9M12 12l7.5 4.5c-2 1-5 1-7.5-4.5M12 12l-7.5 4.5c1.5 1.5 5 2 7.5-4.5"/>`,
+    'tc5-handwerk': `<path d="M4 20L20 4"/><circle cx="18" cy="6" r="2"/><path d="M4 20c4-1 6-5 8-8"/>`,
+  };
+  return { svg: (id) => (I[id] ? `<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="${W}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[id]}</svg>` : null), ids: Object.keys(I) };
+})();

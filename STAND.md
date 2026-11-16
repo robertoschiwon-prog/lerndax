@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 16.11.2026, Version `lerndax-v117`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 16.11.2026, Version `lerndax-v118`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -15,11 +15,44 @@ Weitere Dokumente:
 - `faecher/mathe/lehrplan/sachsen-gymnasium.md`: Lehrplan Mathe Gymnasium Sachsen, Klasse 5–10
 - `faecher/mathe/lehrplan/schulbuch-abgleich.md`: Abgleich MaDax ↔ Schulbuch (Lambacher Schweizer 5 Sachsen)
 - `faecher/deutsch/README.md`: **Startpunkt für DeDax** (Deutsch), Vorgehen und offene Fragen
+- `faecher/technik/README.md`: **Startpunkt für TecDax** (Technik/Computer), Bauweise, Tests
 - `notizen/feedback.md`: offene Fragen an das Kind und Vorlage für Testrunden (nur lokal, nicht auf GitHub)
 - `notizen/familie.md`: persönliche Angaben (Kind, Schule, Geräte, Termine, Pfade). **Nur lokal**, weil
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-27. TecDax gebaut: Technik/Computer Klasse 5/6 (lerndax-v118, 16.11.2026)
+
+Auftrag Roberto: TecDax bauen (Fach-ID `technik`, Kürzel TC, Farbe #5b6378, Dachs mit Headset), Aufbau wie die anderen Sachfächer.
+**Entscheidungen Roberto:** kein Schulbuch oder Arbeitsheft · Themenliste „Ja, so bauen“ (ganzer Stoff 5/6) · Wahlthemen: „die 4 spannendsten“ ·
+was gerade im Unterricht dran ist, weiß er nicht (Reihenfolge wie im Lehrplan).
+- **Lehrplan** am Originaltext ausgewertet (`faecher/technik/lehrplan/sachsen-gymnasium.md`): Fassung 2019, gilt laut Landesliste auch 2026/27;
+  **ein Lehrplan für Klasse 5 und 6 zusammen** (50 Stunden, je 1 Wochenstunde in Kl. 5 und 6), ab Klasse 7 Informatik.
+  Darum enthält TecDax den ganzen Stoff 5/6 (steht unter Klasse 5, `faecher.js`: `fertig: [5]`).
+- **53 Themen in 8 Bereichen** (`faecher/technik/themenplan.md`): Computer und Daten (8), Texte gestalten (4), Im Netz (8),
+  Maschinen und Getriebe (10), Planen wie in der Werkstatt (6), Werkstoffe/Werkzeuge/Fertigen (10), Umwelt (3), Wahlthemen (4:
+  Nachrichten/Morsen, Mikrocontroller, Wind- und Wasserkraft, Handwerk). Entdecken (5): Zählen mit 0 und 1, Bild aus Zahlen,
+  Fahrradgänge, Morsen, Suchmaschine. Knobel-Aufgaben zu allen Themen (137 Varianten).
+- **Erzeugte Aufgaben** (`web/technik/themen/basis.js`): Zahnräder (Drehrichtung, Übersetzung; die Zähne greifen wirklich ineinander,
+  `D.radWinkel`), Riemen/Kette, Ordnerbaum und Pfad, Dateiarten, E-Mail- und Internetadresse, Absatz-Ausrichtung, Tabellenzelle,
+  Linienarten, Bemaßung lesen, **Ansichten eines Würfelkörpers** (Bild antippen), Stückliste, Kostenaufstellung, Stahlmaßstab, Morsen.
+- **Animationen** (`erklaerungen/klasse5.js`): Zahnräder drehen sich und zählen Umdrehungen, Getriebe in Bewegung, EVA, Pfad im
+  Ordnerbaum, Adressen zerlegen, Maßstab ablesen, Bemaßung, Ansichten, Kostenaufstellung, Linienarten, Morselampe.
+- **Bilder:** eigene Zeichnungen (Schemata, Getriebe, Sinnbilder, Sicherheitszeichen …) und **20 freie Fotos** von Wikimedia Commons
+  für Geräte und Werkzeuge (`themen/fotos.js`, `bildnachweis.html`), im eingebauten Browser ausgesucht und angesehen; ohne Netz bleibt
+  die Ersatzzeichnung.
+- Fakten mit Quellen: `faecher/technik/fakten.md` (DIN 8580, Linienarten, Abfallhierarchie § 6 KrWG, Dresdner Mülltrennung, Rücknahme
+  von Elektrogeräten, Passwortregeln, Bildschirmarbeitsplatz, Mikroplastik, Silicon Saxony, Markersbach).
+- **Raten erschwert:** Die richtige Antwort war anfangs oft die längste (193 von 309 Fragen). Gekürzt, die Einzelheiten stehen jetzt in
+  der Erklärung; übrig sind 9 knappe Fälle.
+- Startseite: `faecher.js` `status: 'fertig'` (große Kachel). Neue Tests `tests/tecdax.py`, `tests/tecdax_knobel.py`.
+- Tests: `wissen_gen` TecDax 19 080 Aufgaben ohne Fehler; `tecdax.py 2` (636 Antworten, 78 Lösungs-Animationen, alle freien Erklärungen,
+  5 Entdeckungen) und `tecdax_knobel.py` (685 Knobel-Aufgaben) ohne Meldung nach Korrekturen (Fächer-Animation braucht kurze Spaltennamen,
+  lange Pfade brechen jetzt um, Beschriftung der Seitenansicht passt); Handy 320 und 390 px ohne Überlauf; `hub.py`, `eltern.py` (TecDax-Karte erscheint),
+  `belohnung.py` ohne Meldung, `design_audit.py` nur die alten Punkte. Fotos in der Vorschau (Zweig `vorschau`) im eingebauten Browser angesehen.
+- **Wartet auf Roberto:** TecDax durchsehen (vor allem Getriebe, Ansichten, Bemaßung); was ist im Unterricht gerade dran? Welches
+  Werkstück baut die Klasse? Rückmeldung von Bruno.
 
 ## 0-neu-26. Blöcke stapeln: Vorschau des nächsten Steins, kein Zielschatten (lerndax-v117, 16.11.2026)
 
@@ -1241,7 +1274,7 @@ Infos zur ersten Arbeit:
 - [ ] Klassen-Bereich für die Klasse des Kindes (eigenes Thema, siehe oben), evtl. mit Terminen aus dem Familienkalender
 - [ ] „Heute geübt“ im Familienkalender anzeigen (gemeinsam mit dem Kalender-Projekt)
 - [x] Elternbereich auf der Startseite für alle Fächer (v53: Übersicht je Fach, Einzelheiten weiter im Fach)
-- [ ] Phase 1 (Klasse 5): DeDax, EnDax, dann BioDax, GeoDax, GeDax, TecDax; vielleicht MuDax, KuDax, EthDax
+- [x] Phase 1 (Klasse 5): DeDax, EnDax, BioDax, GeoDax, GeDax, TecDax (v118); vielleicht noch MuDax, KuDax, EthDax
       (Fahrplan und offene Fragen in `faecher/README.md`)
 - [ ] Welche 2. Fremdsprache ab Klasse 6? Stundenplan-Kürzel der Schule mit der amtlichen Liste vergleichen
 

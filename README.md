@@ -59,7 +59,7 @@ LernDax
  ├─ DeDax    Deutsch    Phase 1
  ├─ EnDax    Englisch   Phase 1
  ├─ GeDax · BioDax   ✅ Klasse 5
- ├─ GeoDax · TecDax   Phase 1 (Klasse 5)
+ ├─ GeoDax · TecDax   ✅ Klasse 5 (TecDax: Stoff 5/6)
  └─ PhDax · ChDax · GrwDax · 2. Fremdsprache · SuDax   ab Phase 2
 ```
 
@@ -79,10 +79,12 @@ geplante unter „Kommt bald“.
 | `web/plattform/` | Gemeinsame Teile: **die Fach-App** (`fach.js`, `fach.css`: Übungsrunde, Sterne, Tagesziel, Knobeln, Erklär-Player, Elternbereich), Fächerliste (`faecher.js`), eigene Symbole statt Emojis (`symbole.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare mit Sachen zum Anziehen (`avatare.js`), Belohnungen: Münzen, Kronen, Spielzeit (`belohnung.js`), Trainings für Klassenarbeiten (`trainings.js`) |
 | `web/mathe/` | **MaDax**: `index.html` (beschreibt nur das Fach), `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
 | `web/deutsch/` | **DeDax** (Klasse 5: 30 Themen, Entdecken, Knobeln): `themen/` (Wortlisten, Aufgaben, Knobel-Aufgaben), `erklaerungen/`, `symbole.js` |
+| `web/technik/` | **TecDax** (Technik/Computer, Stoff Klasse 5/6): `themen/` (Aufgaben, eigene Zeichnungen, freie Fotos), `erklaerungen/` (Zahnräder, Getriebe, Pfad, Bemaßung, Ansichten …), `bildnachweis.html` |
 | `web/belohnung/` | **Laden** (Avatar-Sachen für Münzen) und **Spielhalle** mit vier Minispielen (`spiele.js`), erst nach der ersten Runde des Tages, höchstens 15 Min. |
 | `web/icons/` | Dachs-Logo und App-Icons |
 | `faecher/README.md` | **Fächerplan:** alle Fächer, Namen, Klassen, Fahrplan in drei Phasen |
 | `faecher/mathe/lehrplan/` | Lehrplan-Auswertung Mathe |
+| `faecher/technik/` | TecDax: Lehrplan TC 5/6, Themenplan, Fakten mit Quellen |
 | `supabase/` | Datenbank-Schema (`lerndax_`-Tabellen im Familienkalender-Projekt) |
 | `notizen/` | Feedback und Ideen. Bleibt lokal und kommt nicht auf GitHub |
 | `tests/` | Automatische Tests (siehe `tests/README.md`) |
@@ -140,4 +142,4 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] GeDax (Geschichte) Klasse 5: 43 Themen (mit Seitenhinweisen ANNO 1)
 - [x] BioDax (Biologie) Klasse 5: 50 Themen in 7 Bereichen, „Entdecken“ (5), Knobel-Aufgaben; `web/bio/`
 - [x] GeoDax (Geografie) Klasse 5: 55 Themen in 9 Bereichen, Karten zum Antippen, freie Fotos, „Entdecken“ (5), Knobel-Aufgaben; `web/geografie/`
-- [ ] TecDax (Technik/Computer)
+- [x] TecDax (Technik/Computer) Klasse 5/6: 53 Themen in 8 Bereichen nach dem Lehrplan (kein Schulbuch), erzeugte Aufgaben zu Zahnrädern, Pfaden, Bemaßung, Ansichten, Stückliste, „Entdecken“ (5), Knobel-Aufgaben; `web/technik/`

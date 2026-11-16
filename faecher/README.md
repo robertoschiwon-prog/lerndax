@@ -1,6 +1,6 @@
 # Fächerplan LernDax
 
-Stand: 14.11.2026 · Die technische Liste aller Fächer steht in `web/plattform/faecher.js`.
+Stand: 16.11.2026 · Die technische Liste aller Fächer steht in `web/plattform/faecher.js`.
 Diese Datei erklärt, welche Fächer es gibt, wie sie heißen und in welcher Reihenfolge sie kommen.
 
 ## Namensschema
@@ -34,7 +34,7 @@ Startseite und App-Icon.
 | BioDax | Fliegenpilz als Hut | `biodax.svg` ✅ eingebaut |
 | GeDax | Pharaonen-Kopftuch | `gedax.svg` ✅ eingebaut |
 | GeoDax | Globus als Mütze | `geodax.svg` (liegt bereit) |
-| TecDax | Headset mit Mikrofon | `tecdax.svg` (liegt bereit) |
+| TecDax | Headset mit Mikrofon | `tecdax.svg` ✅ eingebaut |
 
 Alle sieben stehen auf der Startseite (MaDax und DeDax als große Kacheln, die übrigen unter „Kommt bald“).
 Ideen für später: PhDax/ChDax Schutzbrille auf der Stirn.
@@ -56,7 +56,7 @@ Klassen laut Stundentafel Sachsen (Grundschule Kl. 1–4, Gymnasium Sekundarstuf
 | **BioDax** | Biologie | Bio | 5–10 | Sachfach | ✅ Klasse 5 |
 | **GeDax** | Geschichte | Ge | 5–10 | Sachfach | ✅ Klasse 5 |
 | **GeoDax** | Geografie | Geo | 5–10 | Sachfach | ✅ Klasse 5 |
-| **TecDax** | Technik/Computer, ab Kl. 7 Informatik | TC / Inf | 5–10 | Sachfach | geplant |
+| **TecDax** | Technik/Computer, ab Kl. 7 Informatik | TC / Inf | 5–10 | Sachfach | ✅ Klasse 5 (Stoff 5/6) |
 | **PhDax** | Physik | Ph | 6–10 | Sachfach | geplant |
 | **ChDax** | Chemie | Ch | 7–10 | Sachfach | geplant |
 | **GrwDax** | Gemeinschaftskunde/Rechtserziehung/Wirtschaft | GRW | 7–10 | Sachfach | geplant |
@@ -77,12 +77,12 @@ Das kann später neu entschieden werden.
 3. EnDax ✅ gebaut (53 Themen nach den Units des Buchs, Entdecken, Knobeln; Startpunkt `faecher/englisch/README.md`; Schulbuch Green Line 1, Klett, Ausgabe ab 2021, ISBN 978-3-12-864011-2, geprüft 13.11.2026)
 4. GeDax ✅ gebaut (43 Themen nach den Kapiteln von ANNO 1, mit Seitenhinweisen, Entdecken, Knobeln; `faecher/geschichte/README.md`); 
 5. BioDax ✅ gebaut (50 Themen nach den Kapiteln von LINDER Biologie 5, Entdecken, Knobeln; `faecher/bio/README.md`)
-6. GeoDax ✅ gebaut (55 Themen nach den Kapiteln von TERRA Geographie 5, Karten aus Kartendaten, 49 freie Fotos, Entdecken, Knobeln; `faecher/geo/README.md`); **als Nächstes TecDax**
-7. TecDax (Technik/Computer)
+6. GeoDax ✅ gebaut (55 Themen nach den Kapiteln von TERRA Geographie 5, Karten aus Kartendaten, 49 freie Fotos, Entdecken, Knobeln; `faecher/geo/README.md`)
+7. TecDax ✅ gebaut (53 Themen nach dem Lehrplan TC 5/6, kein Schulbuch; Entdecken, Knobeln; `faecher/technik/README.md`)
 8. Vielleicht: MuDax, KuDax, EthDax
 
 **Phase 2: die Nachbarklassen 4 und 6 in allen Fächern**
-- Klasse 6: dazu PhDax und die 2. Fremdsprache, die das Kind wählt
+- Klasse 6: dazu PhDax und die 2. Fremdsprache, die das Kind wählt (TecDax hat den TC-Stoff 5/6 schon)
 - Klasse 4: MaDax, DeDax, EnDax, SuDax
 
 **Phase 3: alle übrigen Klassen (1–3 und 7–10)**

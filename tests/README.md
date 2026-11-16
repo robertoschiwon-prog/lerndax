@@ -58,7 +58,9 @@ Seit `lerndax-v44` steckt die App in `web/plattform/fach.js`; die Mathe-Tests la
 - `biodax.py [Runden] [Themen]`: **BioDax (Biologie).** Wie `gedax.py` (aus ihm abgeleitet): jedes Thema durchspielen, Lösungs-Animationen, freie Erklärungen, Entdecken.
 - `biodax_knobel.py`: Knobel-Aufgaben von BioDax (alle Varianten). Bildschirmfotos in `tests/shots/knobel-bio/`.
 - `geodax.py [Runden] [Themen]`: **GeoDax (Geografie).** Wie `biodax.py` (daraus abgeleitet).
-- `wissen_gen.js <Fach-Ordner> [Anzahl]`: **Schnelltest ohne Browser** für die Wissensfächer (BioDax, GeDax, GeoDax): lädt die Skripte
+- `tecdax.py [Runden] [Themen]`: **TecDax (Technik/Computer).** Wie `geodax.py` (daraus abgeleitet); Zahlen in der Animation dürfen mit Komma stehen.
+- `tecdax_knobel.py`: Knobel-Aufgaben von TecDax (alle Varianten), Bildschirmfotos in `tests/shots/knobel-tc/`.
+- `wissen_gen.js <Fach-Ordner> [Anzahl]`: **Schnelltest ohne Browser** für die Wissensfächer (BioDax, GeDax, GeoDax, TecDax): lädt die Skripte
   der `index.html` in Node, ruft jeden Generator und jede Knobel-Aufgabe vielfach auf und prüft: keine leeren Werte, richtige Antwort
   vorhanden, keine doppelten Antworten, Reihenfolge nicht schon gelöst, Bilder und Erklär-Arten vorhanden, Entdecken angemeldet.
   Beispiel: `node tests/wissen_gen.js web/geografie 200`.
