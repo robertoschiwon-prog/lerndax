@@ -5,6 +5,7 @@ SHOTS = HERE / 'shots'; SHOTS.mkdir(exist_ok=True)
 CHROME = {'executable_path': '/usr/bin/google-chrome'} if os.path.exists('/usr/bin/google-chrome') else {}
 from playwright.async_api import async_playwright
 WEB = (ROOT / 'web').as_uri()
+FREI = "const SPIELHALLE_FREI = true" in open(ROOT / 'web/plattform/belohnung.js').read()
 ANSWER = open(HERE / 'sync_test.py').read().split('ANSWER = """')[1].split('"""')[0]
 fehler = []
 def check(ok, was):
@@ -33,7 +34,8 @@ async def main():
 
         # --- Spielhalle ist zu, solange heute keine Runde geschafft ist ---
         await pg.evaluate("localStorage.clear()"); await pg.goto(WEB + '/belohnung/index.html#spiele'); await pg.wait_for_timeout(300)
-        check('Erst üben' in await pg.inner_text('#app'), 'Spielhalle ohne Runde gesperrt')
+        if FREI: check('Testmodus' in await pg.inner_text('#app'), 'Testschalter: Spielhalle ohne Runde offen')
+        else: check('Erst üben' in await pg.inner_text('#app'), 'Spielhalle ohne Runde gesperrt')
 
         # --- Eine fehlerfreie Runde in Mathe ---
         await pg.goto(WEB + '/mathe/index.html'); await pg.evaluate("localStorage.setItem('lerndax.avatar.asked','1')")
@@ -60,7 +62,7 @@ async def main():
 
         # --- Hub ---
         await pg.goto(WEB + '/index.html'); await pg.wait_for_timeout(300)
-        check('Heute offen' in await pg.inner_text('body'), 'Hub: Spielhalle heute offen')
+        check(('Testmodus: frei' if FREI else 'Heute offen') in await pg.inner_text('body'), 'Hub: Spielhalle offen')
 
         # --- Laden ---
         await pg.goto(WEB + '/belohnung/index.html'); await pg.wait_for_timeout(300)
@@ -84,32 +86,40 @@ async def main():
         check('<svg' in await pg.inner_html('.top') or True, 'Avatar im Fach')
 
         # --- Spielhalle ---
-        await pg.goto(WEB + '/belohnung/index.html#spiele'); await pg.wait_for_timeout(200)
-        check(await pg.query_selector('[data-zeit][disabled]') is not None, 'Zu wenig Münzen: Spielzeit-Knopf gesperrt')
-        await pg.evaluate("LernDaxBelohnung.verdienen(100)"); await pg.reload(); await pg.wait_for_timeout(200)
-        await pg.click('[data-spiel="schlange"]'); await pg.wait_for_timeout(100)
-        check('Hol dir zuerst Spielzeit' in await pg.inner_text('#app'), 'Ohne Spielzeit kein Spiel')
-        m0 = await pg.evaluate("LernDaxBelohnung.muenzen()")
-        await pg.click('[data-zeit]'); await pg.wait_for_timeout(100)
-        check(await pg.evaluate("LernDaxBelohnung.guthaben()") == 180 and await pg.evaluate("LernDaxBelohnung.muenzen()") == m0 - 10, '3 Minuten für 10 Münzen')
-        await pg.screenshot(path=f'{SHOTS}/bel4_spielhalle.png', full_page=True)
-        for sp, keys in [('sprung', ['Space'] * 3), ('schlange', ['ArrowUp', 'ArrowRight']), ('stapeln', ['ArrowLeft', 'ArrowUp', 'ArrowDown']), ('zahlen', ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'])]:
-            await pg.goto(WEB + f'/belohnung/index.html#spiel-{sp}'); await pg.wait_for_timeout(400)
-            for k in keys: await pg.keyboard.press(k); await pg.wait_for_timeout(120)
-            for t in await pg.query_selector_all('[data-taste]'): await t.dispatch_event('pointerdown')
-            await pg.wait_for_timeout(900)
-            await pg.screenshot(path=f'{SHOTS}/bel5_{sp}.png', full_page=True)
-            check(await pg.query_selector('#cv') is not None, f'Spiel {sp} läuft')
-        g = await pg.evaluate("LernDaxBelohnung.guthaben()")
-        check(g < 180, f'Spielzeit läuft ab ({g} s übrig)')
-        # Zeit um
-        await pg.evaluate("(() => { const s = JSON.parse(localStorage.getItem('lerndax.spielguthaben')); s.s = 2; localStorage.setItem('lerndax.spielguthaben', JSON.stringify(s)); })()")
-        await pg.goto(WEB + '/belohnung/index.html#spiel-zahlen'); await pg.wait_for_timeout(3300)
-        check('Zeit um' in await pg.inner_text('#app'), 'Bei 0 Sekunden: „Zeit um“')
-        # Tagesgrenze 15 Minuten
-        await pg.evaluate("LernDaxBelohnung.verdienen(500)")
-        res = await pg.evaluate("(() => { const B = LernDaxBelohnung, r = []; for (let i = 0; i < 8; i++) { r.push(B.zeitKaufen()); for (let s = 0; s < 180; s++) B.sekundeGespielt(); } return {r, heute: B.gespieltHeute()}; })()")
-        check(res['r'].count('ok') <= 5 and res['r'][-1] == 'grenze' and res['heute'] <= 900, f'Höchstens 15 Minuten am Tag ({res})')
+        if FREI:
+            await pg.goto(WEB + '/belohnung/index.html#spiele'); await pg.wait_for_timeout(200)
+            m0 = await pg.evaluate("LernDaxBelohnung.muenzen()")
+            for sp in ('sprung', 'schlange', 'stapeln', 'zahlen'):
+                await pg.goto(WEB + f'/belohnung/index.html#spiel-{sp}'); await pg.wait_for_timeout(1300)
+                check(await pg.inner_text('#rest') == 'frei', f'Testschalter: {sp} läuft ohne Zeitgrenze')
+            check(await pg.evaluate("LernDaxBelohnung.muenzen()") == m0 and await pg.evaluate("LernDaxBelohnung.gespieltHeute()") == 0, 'Testschalter: keine Münzen, keine Spielzeit gezählt')
+        else:
+            await pg.goto(WEB + '/belohnung/index.html#spiele'); await pg.wait_for_timeout(200)
+            check(await pg.query_selector('[data-zeit][disabled]') is not None, 'Zu wenig Münzen: Spielzeit-Knopf gesperrt')
+            await pg.evaluate("LernDaxBelohnung.verdienen(100)"); await pg.reload(); await pg.wait_for_timeout(200)
+            await pg.click('[data-spiel="schlange"]'); await pg.wait_for_timeout(100)
+            check('Hol dir zuerst Spielzeit' in await pg.inner_text('#app'), 'Ohne Spielzeit kein Spiel')
+            m0 = await pg.evaluate("LernDaxBelohnung.muenzen()")
+            await pg.click('[data-zeit]'); await pg.wait_for_timeout(100)
+            check(await pg.evaluate("LernDaxBelohnung.guthaben()") == 180 and await pg.evaluate("LernDaxBelohnung.muenzen()") == m0 - 10, '3 Minuten für 10 Münzen')
+            await pg.screenshot(path=f'{SHOTS}/bel4_spielhalle.png', full_page=True)
+            for sp, keys in [('sprung', ['Space'] * 3), ('schlange', ['ArrowUp', 'ArrowRight']), ('stapeln', ['ArrowLeft', 'ArrowUp', 'ArrowDown']), ('zahlen', ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'])]:
+                await pg.goto(WEB + f'/belohnung/index.html#spiel-{sp}'); await pg.wait_for_timeout(400)
+                for k in keys: await pg.keyboard.press(k); await pg.wait_for_timeout(120)
+                for t in await pg.query_selector_all('[data-taste]'): await t.dispatch_event('pointerdown')
+                await pg.wait_for_timeout(900)
+                await pg.screenshot(path=f'{SHOTS}/bel5_{sp}.png', full_page=True)
+                check(await pg.query_selector('#cv') is not None, f'Spiel {sp} läuft')
+            g = await pg.evaluate("LernDaxBelohnung.guthaben()")
+            check(g < 180, f'Spielzeit läuft ab ({g} s übrig)')
+            # Zeit um
+            await pg.evaluate("(() => { const s = JSON.parse(localStorage.getItem('lerndax.spielguthaben')); s.s = 2; localStorage.setItem('lerndax.spielguthaben', JSON.stringify(s)); })()")
+            await pg.goto(WEB + '/belohnung/index.html#spiel-zahlen'); await pg.wait_for_timeout(3300)
+            check('Zeit um' in await pg.inner_text('#app'), 'Bei 0 Sekunden: „Zeit um“')
+            # Tagesgrenze 15 Minuten
+            await pg.evaluate("LernDaxBelohnung.verdienen(500)")
+            res = await pg.evaluate("(() => { const B = LernDaxBelohnung, r = []; for (let i = 0; i < 8; i++) { r.push(B.zeitKaufen()); for (let s = 0; s < 180; s++) B.sekundeGespielt(); } return {r, heute: B.gespieltHeute()}; })()")
+            check(res['r'].count('ok') <= 5 and res['r'][-1] == 'grenze' and res['heute'] <= 900, f'Höchstens 15 Minuten am Tag ({res})')
 
         # --- Schmale Handys ---
         for w in (320, 390):

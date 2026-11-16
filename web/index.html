@@ -229,7 +229,7 @@ a.pill.coin{text-decoration:none;background:#fff6d6}
       </div>
       ${B ? `<div class="schatz">
         <a class="schatzk laden" href="belohnung/#laden"><span class="ic">🛍️</span><span><b>Laden</b><small>Hüte, Brillen &amp; mehr für deinen Avatar</small></span></a>
-        <a class="schatzk spiele" href="belohnung/#spiele"><span class="ic">🎮</span><span><b>Spielhalle</b><small>${B.rundenHeute() ? (B.restHeute() + B.guthaben() > 0 ? 'Heute offen' : 'Für heute ausgespielt') : 'Öffnet nach der ersten Runde'}</small></span></a>
+        <a class="schatzk spiele" href="belohnung/#spiele"><span class="ic">🎮</span><span><b>Spielhalle</b><small>${B.FREI ? 'Testmodus: frei' : B.rundenHeute() ? (B.restHeute() + B.guthaben() > 0 ? 'Heute offen' : 'Für heute ausgespielt') : 'Öffnet nach der ersten Runde'}</small></span></a>
       </div>` : ''}
       ${aktiv.filter((f) => f.entdecken).map((f) => `<a class="disc" href="${f.href}#entdecken">
         <span class="ic">✦</span>

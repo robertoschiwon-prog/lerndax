@@ -24,6 +24,10 @@
   };
   const SPIEL = { preis: 10, sekunden: 180, proTag: 900 }; // 3 Minuten für 10 Münzen, höchstens 15 Minuten am Tag
   const MUENZEN = { erster: 2, zweiter: 1, knobel: 3, perfekt: 5, tagesziel: 5 };
+  // TESTSCHALTER (Roberto, 16.11.2026): Spielhalle vorübergehend ganz frei – keine Sperre, keine Zeitgrenze, keine Münzen,
+  // nichts wird als Spielzeit gezählt. Zum Zurückstellen auf false setzen (Version hochzählen, hochladen).
+  const SPIELHALLE_FREI = true;
+  const FREI_SEK = 99 * 60;
 
   const ls = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -98,11 +102,12 @@
   // ---------- Spielhalle ----------
   const gespieltHeute = () => summe(W.spiel[tag()]);
   // Guthaben: gekaufte, noch nicht verspielte Sekunden – nur auf diesem Gerät und nur heute
-  function guthaben() { try { const g = JSON.parse(ls.get(TKEY) || '{}'); return g.tag === tag() ? g.s || 0 : 0; } catch (e) { return 0; } }
+  function guthaben() { if (SPIELHALLE_FREI) return FREI_SEK; try { const g = JSON.parse(ls.get(TKEY) || '{}'); return g.tag === tag() ? g.s || 0 : 0; } catch (e) { return 0; } }
   const setGuthaben = (s) => ls.set(TKEY, JSON.stringify({ tag: tag(), s: Math.max(0, Math.round(s)) }));
   const restHeute = () => Math.max(0, SPIEL.proTag - gespieltHeute() - guthaben());
   // Antwort: 'ok' | 'ziel' (erst Tagesrunde) | 'grenze' (15 Minuten erreicht) | 'muenzen' (zu wenig Münzen)
   function zeitKaufen() {
+    if (SPIELHALLE_FREI) return 'ok';
     if (!rundenHeute()) return 'ziel';
     const rest = restHeute();
     if (rest <= 0) return 'grenze';
@@ -112,6 +117,7 @@
   }
   // Eine gespielte Sekunde abbuchen; Antwort: noch übrige Sekunden
   function sekundeGespielt() {
+    if (SPIELHALLE_FREI) return FREI_SEK;
     const g = guthaben(); if (g <= 0) return 0;
     setGuthaben(g - 1);
     const d = tag(); W.spiel[d] = Object.assign({}, W.spiel[d], { [GERAET]: ((W.spiel[d] || {})[GERAET] || 0) + 1 });
@@ -123,12 +129,13 @@
   function rekord(spiel, punkte) { if (punkte > (W.rekord[spiel] || 0)) { W.rekord[spiel] = punkte; speichern(); return true; } return false; }
 
   window.LernDaxBelohnung = {
-    PREISE, SPIEL, MUENZEN, merge, tag,
+    PREISE, SPIEL, MUENZEN, FREI: SPIELHALLE_FREI, merge, tag,
     getState: () => JSON.parse(JSON.stringify(W)),
     setState(s) { W = Object.assign(leer(), s || {}); ls.set(KEY, JSON.stringify(W)); hoerer.forEach((f) => { try { f('sync'); } catch (e) {} }); },
     onChange(f) { hoerer.push(f); },
     muenzen, verdienen, ausgeben, hat, kaufen, getragen, anziehen,
     krone, hatKrone, kronenZahl, kronen: () => Object.assign({}, W.kronen), rundeFertig, rundenHeute,
+    offen: () => SPIELHALLE_FREI || rundenHeute() > 0,
     gespieltHeute, guthaben, restHeute, zeitKaufen, sekundeGespielt, rekord, rekorde: () => Object.assign({}, W.rekord),
   };
 })();

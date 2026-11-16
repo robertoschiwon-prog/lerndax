@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 16.11.2026, Version `lerndax-v114`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 16.11.2026, Version `lerndax-v115`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,14 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-24. Spielhalle vorübergehend ganz frei zum Testen (lerndax-v115, 16.11.2026)
+
+Roberto: „Gib die Spielhalle temporär komplett frei, damit ich das testen kann. Wir stellen das später zurück.“
+- Schalter `SPIELHALLE_FREI = true` oben in `web/plattform/belohnung.js`: keine Sperre bis zur ersten Runde, keine 15-Minuten-Grenze,
+  keine Münzen für Spielzeit, es wird nichts als Spielzeit gezählt. Auf der Seite steht „🧪 Testmodus“, die Uhr zeigt „frei“.
+- **ZURÜCKSTELLEN (offen):** Zeile auf `false` setzen, VERSION hochzählen, hochladen. Sonst nichts zu tun; `tests/belohnung.py`
+  erkennt den Schalter und prüft dann wieder Sperre, Spielzeit und Tagesgrenze (vorab mit `false` getestet: alles OK).
 
 ## 0-neu-23. Belohnungen wie bei Anton: Münzen, Kronen, Laden, Spielhalle (lerndax-v114, 16.11.2026)
 
