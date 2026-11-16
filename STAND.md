@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 16.11.2026, Version `lerndax-v118`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 16.11.2026, Version `lerndax-v119`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,15 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-28. Blöcke stapeln: ▲ lässt nicht mehr fallen (lerndax-v119, 16.11.2026)
+
+Roberto: „Beim Knopf nach oben fällt das Ding einfach nach unten. Das müssen wir deaktivieren.“
+- ▲ hat im Blöcke-Spiel keine Aufgabe mehr (Knopf blass, Pfeiltaste oben ohne Wirkung). Das sofortige Fallenlassen ist ganz entfernt:
+  Auch Wischen nach unten lässt den Stein jetzt nur eine Reihe tiefer rutschen (wie ▼), statt ihn ganz fallen zu lassen.
+  Wischen nach oben und Tippen drehen weiter.
+- Belegung jetzt: ◀▶ schieben, ▼ schneller (Halten wiederholt), A drehen ⟳, B drehen ⟲, Start Pause.
+- Test `tests/steuerung.py` angepasst (▲ ohne Wirkung und blass, Vorschau-Prüfung über ▼); `steuerung.py` und `belohnung.py` ohne Meldung.
 
 ## 0-neu-27. TecDax gebaut: Technik/Computer Klasse 5/6 (lerndax-v118, 16.11.2026)
 
@@ -74,7 +83,7 @@ Roberto: „Für die Navigation am Gameboy orientieren … benutzerfreundlicher 
   - Kurzes Vibrieren beim Drücken (nur Android). Tastatur: Pfeile, Leertaste/X = A, Y/Z = B, Enter/P = Start.
   - Wischen und Tippen auf dem Bildschirm gehen weiterhin.
 - Belegung (in `web/belohnung/spiele.js`, Feld `steuer`):
-  Blöcke stapeln ◀▶ schieben, ▼ schneller, ▲ fallen lassen, A drehen ⟳, B drehen ⟲ · Schlange und 2048: Steuerkreuz ·
+  Blöcke stapeln ◀▶ schieben, ▼ schneller, A drehen ⟳, B drehen ⟲ (▲ seit v119 ohne Aufgabe) · Schlange und 2048: Steuerkreuz ·
   Dachs-Sprung: A oder ▲ springen.
 - Bildschirm so groß wie möglich, Konsole passt ohne Scrollen auf den Bildschirm (geprüft 320×568 bis 768×1000); auf niedrigen
   Bildschirmen kompaktere Konsole.

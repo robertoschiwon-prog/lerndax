@@ -123,7 +123,7 @@
   const FARBEN = ['#18b6c4', '#ffc53d', '#8b5cf6', '#14a06c', '#e5383b', '#3d7bff', '#ff6b3d'];
   const stapeln = {
     id: 'stapeln', name: 'Blöcke stapeln', ziel: 'Eine volle Reihe verschwindet und bringt Punkte.',
-    steuer: { links: ['links', 'schieben'], rechts: ['rechts', 'schieben'], runter: ['runter', 'schneller'], hoch: ['fallen', 'fallen lassen'], a: ['drehen', 'drehen ⟳'], b: ['drehenLinks', 'drehen ⟲'] },
+    steuer: { links: ['links', 'schieben'], rechts: ['rechts', 'schieben'], runter: ['runter', 'schneller'], a: ['drehen', 'drehen ⟳'], b: ['drehenLinks', 'drehen ⟲'] },
     wiederholen: ['links', 'rechts', 'runter'],
     start(canvas, api) {
       // Rechts neben dem Feld eine Leiste wie beim Gameboy: nächster Stein und Reihen (Wunsch Roberto, 16.11.2026; kein Zielschatten)
@@ -149,7 +149,6 @@
         if (t === 'links' && passt(st.f, st.x - 1, st.y)) st.x--;
         else if (t === 'rechts' && passt(st.f, st.x + 1, st.y)) st.x++;
         else if (t === 'runter') runter();
-        else if (t === 'fallen') { while (passt(st.f, st.x, st.y + 1)) st.y++; festsetzen(); }
         else if (t === 'drehen' || t === 'drehenLinks' || t === 'hoch') { const g = t === 'drehenLinks' ? drehenLinks(st.f) : drehen(st.f); for (const dx of [0, -1, 1, -2, 2]) if (passt(g, st.x + dx, st.y)) { st.f = g; st.x += dx; break; } }
       };
       neu();
@@ -177,7 +176,7 @@
         c.font = '800 12px Nunito, system-ui, sans-serif'; c.fillText('STUFE', lx + LEISTE / 2 + 1, 176);
         c.font = '800 22px Nunito, system-ui, sans-serif'; c.fillText(String(1 + Math.floor(reihen / 10)), lx + LEISTE / 2 + 1, 202);
       });
-      return { taste, wisch: (r) => taste(r === 'hoch' ? 'drehen' : r === 'runter' ? 'fallen' : r), tipp: () => taste('drehen'), pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true), _zustand: () => ({ x: st.x, y: st.y, f: JSON.stringify(st.f), n: st.n, naechster }) };
+      return { taste, wisch: (r) => taste(r === 'hoch' ? 'drehen' : r), tipp: () => taste('drehen'), pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true), _zustand: () => ({ x: st.x, y: st.y, f: JSON.stringify(st.f), n: st.n, naechster }) };
     },
   };
 

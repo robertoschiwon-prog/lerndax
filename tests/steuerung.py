@@ -50,12 +50,20 @@ async def main():
         await pg.screenshot(path=f'{SHOTS}/gb_pause.png')
         await pg.keyboard.press('Enter'); await pg.wait_for_timeout(100)
         check('Pause' not in await pg.inner_text('#buehne'), 'Enter macht weiter')
-        # Tastatur: Pfeil oben = fallen lassen
+        # Pfeil oben hat keine Aufgabe mehr (kein Fallenlassen, v119), ▲ ist blass
         vor = await pg.evaluate(Z)
-        y0 = vor['y']; await pg.keyboard.press('ArrowUp'); await pg.wait_for_timeout(50)
+        await pg.keyboard.press('ArrowUp'); await pg.wait_for_timeout(50)
+        nach = await pg.evaluate(Z)
+        check(nach['y'] == vor['y'] and nach['n'] == vor['n'], '▲ lässt den Block nicht mehr fallen')
+        check(await pg.query_selector('.kreuz i[data-r="hoch"].aus') is not None, '▲ ist blass (ohne Aufgabe)')
+        check("'fallen'" not in open(ROOT / 'web/belohnung/spiele.js').read(), 'Kein Fallenlassen mehr im Blöcke-Spiel')
+        # ▼ bis der Stein liegt: der angekündigte Stein kommt als nächster
+        vor = await pg.evaluate(Z)
+        for _ in range(30):
+            await pg.keyboard.press('ArrowDown'); await pg.wait_for_timeout(15)
+            if (await pg.evaluate(Z))['naechster'] != vor['naechster'] or (await pg.evaluate(Z))['y'] < vor['y']: break
         check((await pg.evaluate(Z))['n'] == vor['naechster'], 'Vorschau: der angekündigte Stein kommt als nächster')
         check('globalAlpha' not in open(ROOT / 'web/belohnung/spiele.js').read(), 'Kein durchscheinender Zielschatten')
-        check((await pg.evaluate(Z))['y'] <= 0 or (await pg.evaluate(Z))['y'] != y0, '▲ lässt den Block fallen')
         await pg.screenshot(path=f'{SHOTS}/gb_stapeln_390.png')
         # Andere Spiele: richtige Belegung, Tasten ohne Funktion sind blass
         for sp, aktiv in [('sprung', ['hoch', 'a']), ('schlange', ['hoch', 'runter', 'links', 'rechts']), ('zahlen', ['hoch', 'runter', 'links', 'rechts'])]:
