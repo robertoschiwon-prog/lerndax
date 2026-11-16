@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 16.11.2026, Version `lerndax-v116`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 16.11.2026, Version `lerndax-v117`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,14 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-26. Blöcke stapeln: Vorschau des nächsten Steins, kein Zielschatten (lerndax-v117, 16.11.2026)
+
+Roberto: „Zeige eine Vorschau des nächsten Steins und zeige nicht semitransparent, wo der Stein hinkommt.“
+- Rechts neben dem Feld eine Leiste wie beim Gameboy: **„Nächster“** mit dem kommenden Stein, darunter **Reihen** und **Stufe**
+  (alle 10 Reihen eine Stufe schneller).
+- Der durchscheinende Zielschatten ist weg. Nebenwirkung: Das Spielfeld wird auf dem Handy breiter (320 px: 217 statt 149 px).
+- Test `tests/steuerung.py`: der angekündigte Stein kommt wirklich als nächster; kein Zielschatten mehr im Code.
 
 ## 0-neu-25. Spielhalle: Steuerung wie beim Gameboy (lerndax-v116, 16.11.2026)
 

@@ -51,7 +51,10 @@ async def main():
         await pg.keyboard.press('Enter'); await pg.wait_for_timeout(100)
         check('Pause' not in await pg.inner_text('#buehne'), 'Enter macht weiter')
         # Tastatur: Pfeil oben = fallen lassen
-        y0 = (await pg.evaluate(Z))['y']; await pg.keyboard.press('ArrowUp'); await pg.wait_for_timeout(50)
+        vor = await pg.evaluate(Z)
+        y0 = vor['y']; await pg.keyboard.press('ArrowUp'); await pg.wait_for_timeout(50)
+        check((await pg.evaluate(Z))['n'] == vor['naechster'], 'Vorschau: der angekündigte Stein kommt als nächster')
+        check('globalAlpha' not in open(ROOT / 'web/belohnung/spiele.js').read(), 'Kein durchscheinender Zielschatten')
         check((await pg.evaluate(Z))['y'] <= 0 or (await pg.evaluate(Z))['y'] != y0, '▲ lässt den Block fallen')
         await pg.screenshot(path=f'{SHOTS}/gb_stapeln_390.png')
         # Andere Spiele: richtige Belegung, Tasten ohne Funktion sind blass

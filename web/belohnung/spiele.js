@@ -126,11 +126,14 @@
     steuer: { links: ['links', 'schieben'], rechts: ['rechts', 'schieben'], runter: ['runter', 'schneller'], hoch: ['fallen', 'fallen lassen'], a: ['drehen', 'drehen ⟳'], b: ['drehenLinks', 'drehen ⟲'] },
     wiederholen: ['links', 'rechts', 'runter'],
     start(canvas, api) {
-      const B = 10, HH = 18, Z = 18, c = leinwand(canvas, B * Z, HH * Z);
+      // Rechts neben dem Feld eine Leiste wie beim Gameboy: nächster Stein und Reihen (Wunsch Roberto, 16.11.2026; kein Zielschatten)
+      const B = 10, HH = 18, Z = 18, LEISTE = 82, c = leinwand(canvas, B * Z + LEISTE, HH * Z);
       const feld = Array.from({ length: HH }, () => Array(B).fill(0));
       let st, takt = 0, vorbei = false, pkt = 0, reihen = 0;
       const passt = (f, x, y) => f.every((zeile, j) => zeile.every((v, i) => !v || (x + i >= 0 && x + i < B && y + j < HH && (y + j < 0 || !feld[y + j][x + i]))));
-      const neu = () => { const n = Math.floor(Math.random() * FORMEN.length); st = { f: FORMEN[n], n, x: Math.floor((B - FORMEN[n][0].length) / 2), y: -1 }; if (!passt(st.f, st.x, st.y + 1)) { vorbei = true; api.ende(pkt); } };
+      const zufall = () => Math.floor(Math.random() * FORMEN.length);
+      let naechster = zufall();
+      const neu = () => { const n = naechster; naechster = zufall(); st = { f: FORMEN[n], n, x: Math.floor((B - FORMEN[n][0].length) / 2), y: -1 }; if (!passt(st.f, st.x, st.y + 1)) { vorbei = true; api.ende(pkt); } };
       const drehen = (f) => f[0].map((_, i) => f.map((z) => z[i]).reverse());
       const drehenLinks = (f) => f[0].map((_, i) => f.map((z) => z[z.length - 1 - i]));
       const festsetzen = () => {
@@ -158,12 +161,23 @@
         const block = (x, y, farbe) => rund(c, x * Z + 1, y * Z + 1, Z - 2, Z - 2, 4, farbe, INK);
         feld.forEach((zeile, y) => zeile.forEach((v, x) => v && block(x, y, FARBEN[v - 1])));
         if (st && !vorbei) {
-          let gy = st.y; while (passt(st.f, st.x, gy + 1)) gy++;
-          c.globalAlpha = 0.22; st.f.forEach((zeile, j) => zeile.forEach((v, i) => v && gy + j >= 0 && block(st.x + i, gy + j, FARBEN[st.n]))); c.globalAlpha = 1;
           st.f.forEach((zeile, j) => zeile.forEach((v, i) => v && st.y + j >= 0 && block(st.x + i, st.y + j, FARBEN[st.n])));
         }
+        // Leiste: „Nächster“ mit dem kommenden Stein, darunter Reihen und Stufe
+        const lx = B * Z;
+        c.fillStyle = '#e6e1d6'; c.fillRect(lx, 0, LEISTE, HH * Z);
+        c.strokeStyle = INK; c.lineWidth = 2; c.beginPath(); c.moveTo(lx + 1, 0); c.lineTo(lx + 1, HH * Z); c.stroke();
+        c.fillStyle = INK; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+        c.font = '800 12px Nunito, system-ui, sans-serif'; c.fillText('NÄCHSTER', lx + LEISTE / 2 + 1, 20);
+        rund(c, lx + 9, 27, LEISTE - 16, 58, 8, '#fff', INK);
+        const nf = FORMEN[naechster], kz = 14, bw = nf[0].length * kz, bh = nf.length * kz, nx = lx + 1 + (LEISTE - bw) / 2, ny = 27 + (58 - bh) / 2;
+        nf.forEach((zeile, j) => zeile.forEach((v, i) => v && rund(c, nx + i * kz + 1, ny + j * kz + 1, kz - 2, kz - 2, 3, FARBEN[naechster], INK)));
+        c.fillStyle = INK; c.font = '800 12px Nunito, system-ui, sans-serif'; c.fillText('REIHEN', lx + LEISTE / 2 + 1, 116);
+        c.font = '800 22px Nunito, system-ui, sans-serif'; c.fillText(String(reihen), lx + LEISTE / 2 + 1, 142);
+        c.font = '800 12px Nunito, system-ui, sans-serif'; c.fillText('STUFE', lx + LEISTE / 2 + 1, 176);
+        c.font = '800 22px Nunito, system-ui, sans-serif'; c.fillText(String(1 + Math.floor(reihen / 10)), lx + LEISTE / 2 + 1, 202);
       });
-      return { taste, wisch: (r) => taste(r === 'hoch' ? 'drehen' : r === 'runter' ? 'fallen' : r), tipp: () => taste('drehen'), pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true), _zustand: () => ({ x: st.x, y: st.y, f: JSON.stringify(st.f) }) };
+      return { taste, wisch: (r) => taste(r === 'hoch' ? 'drehen' : r === 'runter' ? 'fallen' : r), tipp: () => taste('drehen'), pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true), _zustand: () => ({ x: st.x, y: st.y, f: JSON.stringify(st.f), n: st.n, naechster }) };
     },
   };
 
