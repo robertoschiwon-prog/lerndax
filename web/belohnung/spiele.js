@@ -2,7 +2,9 @@
  * Vier eigene, einfache Spiele: Dachs-Sprung, Schlange, Blöcke stapeln, 2048-Zahlenschieben (Auswahl Roberto, 16.11.2026).
  * Kein Netz, keine Werbung, keine fremden Figuren. Die Spielzeit regelt die Seite (belohnung/index.html), nicht das Spiel.
  *
- * Jedes Spiel: { id, name, hilfe, tasten: [[taste, beschriftung], …], start(canvas, api) → { taste(t), wisch(richtung), tipp(), stop() } }
+ * Steuerung wie beim Gameboy (Wunsch Roberto, 16.11.2026): Steuerkreuz links, A und B rechts, Start = Pause. Die Seite baut das Pult.
+ * Jedes Spiel: { id, name, ziel, steuer: { hoch|runter|links|rechts|a|b: [aktion, kurzer Text] }, wiederholen: [aktionen, die beim Halten wiederholen],
+ *                start(canvas, api) → { taste(aktion), wisch(richtung), tipp(), pause(an), stop() } }
  *   api.punkte(n)  aktuelle Punkte melden · api.ende(n)  Spiel vorbei (Seite zeigt „Nochmal“)
  */
 (function () {
@@ -19,10 +21,10 @@
     if (fill) { c.fillStyle = fill; c.fill(); }
     if (stroke) { c.strokeStyle = stroke; c.lineWidth = 2; c.stroke(); }
   }
-  // Schleife mit requestAnimationFrame; f(dt in Sekunden), stoppt mit lauf.aus = true
+  // Schleife mit requestAnimationFrame; f(dt in Sekunden), stoppt mit lauf.aus = true, hält an mit lauf.pause = true
   function schleife(f) {
-    const lauf = { aus: false }; let t0 = null;
-    const tick = (t) => { if (lauf.aus) return; if (t0 === null) t0 = t; const dt = Math.min(0.05, (t - t0) / 1000); t0 = t; f(dt); requestAnimationFrame(tick); };
+    const lauf = { aus: false, pause: false }; let t0 = null;
+    const tick = (t) => { if (lauf.aus) return; if (lauf.pause || t0 === null) { t0 = t; requestAnimationFrame(tick); return; } const dt = Math.min(0.05, (t - t0) / 1000); t0 = t; f(dt); requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
     return lauf;
   }
@@ -33,8 +35,8 @@
   const dachsBild = new Image();
   dachsBild.src = '../icons/dachs.svg';
   const sprung = {
-    id: 'sprung', name: 'Dachs-Sprung', hilfe: 'Tippe, damit der Dachs springt. In der Luft kannst du noch einmal springen.',
-    tasten: [['sprung', 'Springen ⤒']],
+    id: 'sprung', name: 'Dachs-Sprung', ziel: 'Spring über Steine und Stämme. In der Luft geht noch ein zweiter Sprung.',
+    steuer: { a: ['sprung', 'springen'], hoch: ['sprung', 'springen'] }, wiederholen: [],
     start(canvas, api) {
       const W = 360, H = 210, BODEN = 176, c = leinwand(canvas, W, H);
       const d = { y: BODEN - 40, vy: 0, spruenge: 0 };
@@ -72,7 +74,7 @@
         if (dachsBild.complete && dachsBild.naturalWidth) c.drawImage(dachsBild, 38, d.y, 44, 44);
         else rund(c, 40, d.y, 40, 40, 12, '#ff6b3d', INK);
       });
-      return { taste: springen, tipp: springen, wisch: (r) => { if (r === 'hoch') springen(); }, stop: () => (lauf.aus = true) };
+      return { taste: springen, tipp: springen, wisch: (r) => { if (r === 'hoch') springen(); }, pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true) };
     },
   };
 
@@ -80,8 +82,8 @@
   // Schlange: Futter fressen, länger werden, nicht an den Rand und nicht in sich selbst
   // =====================================================
   const schlange = {
-    id: 'schlange', name: 'Schlange', hilfe: 'Wische oder tippe die Pfeile. Friss die Äpfel, aber stoß nicht an den Rand oder an dich selbst.',
-    tasten: [['links', '◀'], ['hoch', '▲'], ['runter', '▼'], ['rechts', '▶']],
+    id: 'schlange', name: 'Schlange', ziel: 'Friss die Äpfel, aber stoß nicht an den Rand oder an dich selbst.',
+    steuer: { hoch: ['hoch', 'lenken'], runter: ['runter', 'lenken'], links: ['links', 'lenken'], rechts: ['rechts', 'lenken'] }, wiederholen: [],
     start(canvas, api) {
       const N = 16, Z = 20, c = leinwand(canvas, N * Z, N * Z);
       let k = [{ x: 5, y: 8 }, { x: 4, y: 8 }, { x: 3, y: 8 }], r = { x: 1, y: 0 }, naechste = r, futter = null, takt = 0, vorbei = false, pkt = 0;
@@ -108,7 +110,7 @@
         const h = k[0]; c.fillStyle = '#fff';
         [[-0.2, -0.2], [0.2, -0.2]].forEach(([ax, ay]) => { c.beginPath(); c.arc(h.x * Z + Z / 2 + (r.y ? ax * Z : r.x * 4), h.y * Z + Z / 2 + (r.x ? ay * Z : r.y * 4), 2.6, 0, 7); c.fill(); });
       });
-      return { taste: lenken, wisch: lenken, tipp() {}, stop: () => (lauf.aus = true) };
+      return { taste: lenken, wisch: lenken, tipp() {}, pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true) };
     },
   };
 
@@ -120,8 +122,9 @@
   ];
   const FARBEN = ['#18b6c4', '#ffc53d', '#8b5cf6', '#14a06c', '#e5383b', '#3d7bff', '#ff6b3d'];
   const stapeln = {
-    id: 'stapeln', name: 'Blöcke stapeln', hilfe: 'Schiebe und drehe die Formen. Eine volle Reihe verschwindet und bringt Punkte.',
-    tasten: [['links', '◀'], ['drehen', '⟳'], ['runter', '▼'], ['rechts', '▶'], ['fallen', '⤓']],
+    id: 'stapeln', name: 'Blöcke stapeln', ziel: 'Eine volle Reihe verschwindet und bringt Punkte.',
+    steuer: { links: ['links', 'schieben'], rechts: ['rechts', 'schieben'], runter: ['runter', 'schneller'], hoch: ['fallen', 'fallen lassen'], a: ['drehen', 'drehen ⟳'], b: ['drehenLinks', 'drehen ⟲'] },
+    wiederholen: ['links', 'rechts', 'runter'],
     start(canvas, api) {
       const B = 10, HH = 18, Z = 18, c = leinwand(canvas, B * Z, HH * Z);
       const feld = Array.from({ length: HH }, () => Array(B).fill(0));
@@ -129,6 +132,7 @@
       const passt = (f, x, y) => f.every((zeile, j) => zeile.every((v, i) => !v || (x + i >= 0 && x + i < B && y + j < HH && (y + j < 0 || !feld[y + j][x + i]))));
       const neu = () => { const n = Math.floor(Math.random() * FORMEN.length); st = { f: FORMEN[n], n, x: Math.floor((B - FORMEN[n][0].length) / 2), y: -1 }; if (!passt(st.f, st.x, st.y + 1)) { vorbei = true; api.ende(pkt); } };
       const drehen = (f) => f[0].map((_, i) => f.map((z) => z[i]).reverse());
+      const drehenLinks = (f) => f[0].map((_, i) => f.map((z) => z[z.length - 1 - i]));
       const festsetzen = () => {
         st.f.forEach((zeile, j) => zeile.forEach((v, i) => { if (v && st.y + j >= 0) feld[st.y + j][st.x + i] = st.n + 1; }));
         let weg = 0;
@@ -143,7 +147,7 @@
         else if (t === 'rechts' && passt(st.f, st.x + 1, st.y)) st.x++;
         else if (t === 'runter') runter();
         else if (t === 'fallen') { while (passt(st.f, st.x, st.y + 1)) st.y++; festsetzen(); }
-        else if (t === 'drehen' || t === 'hoch') { const g = drehen(st.f); for (const dx of [0, -1, 1, -2, 2]) if (passt(g, st.x + dx, st.y)) { st.f = g; st.x += dx; break; } }
+        else if (t === 'drehen' || t === 'drehenLinks' || t === 'hoch') { const g = t === 'drehenLinks' ? drehenLinks(st.f) : drehen(st.f); for (const dx of [0, -1, 1, -2, 2]) if (passt(g, st.x + dx, st.y)) { st.f = g; st.x += dx; break; } }
       };
       neu();
       const lauf = schleife((dt) => {
@@ -159,7 +163,7 @@
           st.f.forEach((zeile, j) => zeile.forEach((v, i) => v && st.y + j >= 0 && block(st.x + i, st.y + j, FARBEN[st.n])));
         }
       });
-      return { taste, wisch: (r) => taste(r === 'hoch' ? 'drehen' : r === 'runter' ? 'fallen' : r), tipp: () => taste('drehen'), stop: () => (lauf.aus = true) };
+      return { taste, wisch: (r) => taste(r === 'hoch' ? 'drehen' : r === 'runter' ? 'fallen' : r), tipp: () => taste('drehen'), pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true), _zustand: () => ({ x: st.x, y: st.y, f: JSON.stringify(st.f) }) };
     },
   };
 
@@ -168,8 +172,8 @@
   // =====================================================
   const FARB2048 = { 2: '#fff8ee', 4: '#ffe8cc', 8: '#ffc078', 16: '#ffa94d', 32: '#ff8a3d', 64: '#ff6b3d', 128: '#ffd43b', 256: '#fcc419', 512: '#94d82d', 1024: '#3dbb6a', 2048: '#3d7bff' };
   const zahlen = {
-    id: 'zahlen', name: '2048', hilfe: 'Wische in eine Richtung. Zwei gleiche Zahlen werden zu einer: 2 + 2 = 4, 4 + 4 = 8 … Schaffst du 2048?',
-    tasten: [['links', '◀'], ['hoch', '▲'], ['runter', '▼'], ['rechts', '▶']],
+    id: 'zahlen', name: '2048', ziel: 'Zwei gleiche Zahlen werden zu einer: 2 + 2 = 4, 4 + 4 = 8 … Schaffst du 2048?',
+    steuer: { hoch: ['hoch', 'schieben'], runter: ['runter', 'schieben'], links: ['links', 'schieben'], rechts: ['rechts', 'schieben'] }, wiederholen: [],
     start(canvas, api) {
       const N = 4, Z = 76, R = 8, c = leinwand(canvas, N * Z + R, N * Z + R);
       let f = Array.from({ length: N }, () => Array(N).fill(0)), pkt = 0, vorbei = false, neuPos = null, gewonnen = false;
@@ -201,7 +205,7 @@
         }));
         if (gewonnen) { c.fillStyle = 'rgba(61,123,255,.85)'; rund(c, 20, (N * Z) / 2 - 22, N * Z - 32, 50, 12, 'rgba(255,255,255,.92)', INK); c.fillStyle = INK; c.font = '800 20px Nunito, system-ui, sans-serif'; c.textAlign = 'center'; c.fillText('2048 geschafft! 🎉', (N * Z + R) / 2, (N * Z) / 2 + 4); }
       });
-      return { taste: (t) => { gewonnen = false; pop = 0; zug(t); }, wisch: (t) => { gewonnen = false; pop = 0; zug(t); }, tipp() {}, stop: () => (lauf.aus = true) };
+      return { taste: (t) => { gewonnen = false; pop = 0; zug(t); }, wisch: (t) => { gewonnen = false; pop = 0; zug(t); }, tipp() {}, pause: (an) => (lauf.pause = an), stop: () => (lauf.aus = true) };
     },
   };
 

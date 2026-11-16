@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 16.11.2026, Version `lerndax-v115`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 16.11.2026, Version `lerndax-v116`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,24 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-25. Spielhalle: Steuerung wie beim Gameboy (lerndax-v116, 16.11.2026)
+
+Roberto: „Für die Navigation am Gameboy orientieren … benutzerfreundlicher machen, und schauen, wie es bei Anton gelöst war.“
+- Anton: Im Netz ist nur das Prinzip beschrieben (Münzen durch Lektionen, damit Spiele freischalten), nicht die Steuerung der Spiele.
+- Jedes Spiel läuft jetzt in einer **Spielkonsole**: Bildschirm oben, darunter **Steuerkreuz links, A und B rechts, Start in der Mitte**.
+  - Steuerkreuz ist eine Fläche: Richtung nach Fingerposition, Daumen rollen wechselt die Richtung ohne Loslassen.
+  - **Halten wiederholt** (nach 170 ms alle 55 ms) bei Blöcke schieben und schneller fallen.
+  - **Start = Pause** (Spiel und Spielzeit stehen still); beim Verlassen der Seite oder Sperren des Handys automatisch Pause.
+  - Spiel vorbei: **A startet neu**. Tasten ohne Aufgabe sind blass. Unter A/B steht, was sie tun; darunter eine Kurzanleitung.
+  - Kurzes Vibrieren beim Drücken (nur Android). Tastatur: Pfeile, Leertaste/X = A, Y/Z = B, Enter/P = Start.
+  - Wischen und Tippen auf dem Bildschirm gehen weiterhin.
+- Belegung (in `web/belohnung/spiele.js`, Feld `steuer`):
+  Blöcke stapeln ◀▶ schieben, ▼ schneller, ▲ fallen lassen, A drehen ⟳, B drehen ⟲ · Schlange und 2048: Steuerkreuz ·
+  Dachs-Sprung: A oder ▲ springen.
+- Bildschirm so groß wie möglich, Konsole passt ohne Scrollen auf den Bildschirm (geprüft 320×568 bis 768×1000); auf niedrigen
+  Bildschirmen kompaktere Konsole.
+- Neuer Test `tests/steuerung.py`. Testschalter `SPIELHALLE_FREI` steht weiter auf `true` (siehe 0-neu-24).
 
 ## 0-neu-24. Spielhalle vorübergehend ganz frei zum Testen (lerndax-v115, 16.11.2026)
 

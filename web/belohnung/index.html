@@ -77,20 +77,44 @@ button{font:inherit;color:inherit}
 .spiel small{color:var(--soft);font-weight:800;font-size:13px}
 .zu{text-align:center}
 .zu .gross{font-size:46px;line-height:1.1}
-/* Spielen */
+/* Spielen: Spielkonsole wie ein Gameboy (Steuerkreuz links, A/B rechts, Start = Pause), v116 */
 .spielkopf{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .spielkopf .uhr{margin-left:auto}
-.spielkopf .pkt{font-weight:800}
-.buehne{position:relative;border:2px solid var(--ink);border-radius:16px;overflow:hidden;background:var(--card);touch-action:none;user-select:none;-webkit-user-select:none;margin:0 auto}
+.gb{background:#e6e1d6;border:2px solid var(--ink);border-radius:22px 22px 54px 22px;box-shadow:4px 4px 0 var(--ink);padding:12px 12px 16px;max-width:460px;margin:0 auto;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.gb-schirm{background:#4a4766;border-radius:12px 12px 30px 12px;padding:10px 10px 8px}
+.buehne{position:relative;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:var(--card);touch-action:none;margin:0 auto}
 .buehne canvas{display:block;width:100%;height:auto}
-.deckel{position:absolute;inset:0;display:grid;place-items:center;background:rgba(251,246,238,.92);text-align:center;padding:16px}
-.deckel h2{font-size:26px;margin-bottom:6px}
+.gb-info{display:flex;justify-content:space-between;gap:8px;color:#e9e6f5;font-weight:800;font-size:14px;margin-top:6px;padding:0 2px}
+.gb-info b{color:#fff}
+.deckel{position:absolute;inset:0;display:grid;place-items:center;background:rgba(251,246,238,.93);text-align:center;padding:12px}
+.deckel h2{font-size:24px;margin-bottom:4px}
 .deckel .btn{margin-top:10px}
-.tasten{display:flex;gap:8px;justify-content:center;margin-top:12px}
-.taste{flex:1;max-width:84px;height:58px;border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);background:var(--card);font-size:22px;font-weight:800;cursor:pointer;touch-action:manipulation}
-.taste.breit{max-width:none}
-.taste:active{transform:translate(3px,3px);box-shadow:none;background:var(--tint)}
-.hilfe{color:var(--soft);font-weight:700;font-size:14px;text-align:center;margin:10px 0 0}
+.gb-marke{font:800 12px "Bricolage Grotesque",Nunito,sans-serif;letter-spacing:.18em;color:#8a8597;margin:8px 2px 0}
+.gb-pult{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;touch-action:none}
+.kreuz{position:relative;width:clamp(128px,40vw,150px);aspect-ratio:1;flex:0 0 auto;touch-action:none;cursor:pointer}
+.kreuz i{position:absolute;background:#2a2840;border:2px solid var(--ink);display:grid;place-items:center;color:#8f8ba8;font-style:normal;font-size:15px;transition:background .05s}
+.kreuz .k-h,.kreuz .k-r{left:33.3%;width:33.4%;height:36%}
+.kreuz .k-h{top:0;border-radius:8px 8px 0 0;border-bottom:0}
+.kreuz .k-r{bottom:0;border-radius:0 0 8px 8px;border-top:0}
+.kreuz .k-l,.kreuz .k-re{top:33.3%;height:33.4%;width:36%}
+.kreuz .k-l{left:0;border-radius:8px 0 0 8px;border-right:0}
+.kreuz .k-re{right:0;border-radius:0 8px 8px 0;border-left:0}
+.kreuz .k-m{left:33.3%;top:33.3%;width:33.4%;height:33.4%;border:0;border-radius:0}
+.kreuz .k-m::after{content:"";width:40%;height:40%;border-radius:50%;background:#1d1b2e}
+.kreuz i.an{background:#5b5880;color:#fff}
+.kreuz i.aus{color:#3d3a57}
+.ab{position:relative;width:clamp(132px,40vw,150px);height:clamp(110px,33vw,124px);flex:0 0 auto}
+.knopf{position:absolute;width:clamp(58px,18vw,66px);aspect-ratio:1;border-radius:50%;border:2px solid var(--ink);box-shadow:2px 3px 0 var(--ink);background:#c43a6e;color:#fff;font:800 22px "Bricolage Grotesque",Nunito,sans-serif;cursor:pointer;touch-action:none;padding:0}
+.knopf.a{right:0;top:0}.knopf.b{left:0;bottom:0}
+.knopf.an{transform:translate(2px,3px);box-shadow:none;background:#a52c5a}
+.knopf.aus{background:#d9a3b8;box-shadow:none;border-color:#9c8f9a;color:#f5e8ee}
+.knopf small{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:5px;white-space:nowrap;font:800 11px Nunito,sans-serif;color:var(--soft)}
+.gb-start{display:flex;justify-content:center;margin-top:20px}
+.start{border:2px solid var(--ink);border-radius:99px;background:#8a8597;color:#fff;font:800 12px Nunito,sans-serif;letter-spacing:.12em;padding:5px 18px;cursor:pointer;transform:rotate(-20deg);touch-action:manipulation}
+.start.an{background:#5f5a70}
+.hilfe{color:var(--soft);font-weight:700;font-size:14px;text-align:center;margin:12px 0 0}
+@media (max-height:700px){.spielkopf{margin-bottom:6px}.spielkopf .back{width:38px;height:38px}.gb{padding:8px 10px 10px}.gb-marke{display:none}.gb-pult{margin-top:8px}
+  .kreuz{width:116px}.ab{width:124px;height:96px}.knopf{width:54px;font-size:19px}.gb-start{margin-top:14px}}
 </style>
 </head>
 <body>
@@ -183,63 +207,138 @@ button{font:inherit;color:inherit}
     const def = SPIELE.find((s) => s.id === id);
     if (!def) return go('#spiele');
     if (B.guthaben() <= 0) { meldung = 'Hol dir zuerst Spielzeit.'; return go('#spiele'); }
-    const breit = id === 'sprung' ? 560 : id === 'stapeln' ? 260 : 380;
+    const ST = def.steuer || {}, WDH = def.wiederholen || [];
+    const pfeil = { hoch: '▲', runter: '▼', links: '◀', rechts: '▶' };
+    const arm = (r, k) => `<i class="${k}${ST[r] ? '' : ' aus'}" data-r="${r}">${pfeil[r]}</i>`;
+    const knopf = (t) => `<button class="knopf ${t}${ST[t] ? '' : ' aus'}" data-k="${t}" aria-label="${t.toUpperCase()}${ST[t] ? ': ' + ST[t][1] : ''}">${t.toUpperCase()}${ST[t] ? `<small>${esc(ST[t][1])}</small>` : ''}</button>`;
+    // Kurzanleitung aus der Belegung: gleiche Texte für das Steuerkreuz zusammenfassen
+    const gruppen = new Map();
+    ['hoch', 'runter', 'links', 'rechts', 'a', 'b'].filter((k) => ST[k]).forEach((k) => { const t = ST[k][1]; if (!gruppen.has(t)) gruppen.set(t, []); gruppen.get(t).push(k); });
+    const anleitung = [...gruppen].map(([t, ks]) => { const p = ks.filter((k) => pfeil[k]).map((k) => pfeil[k]).join(''), l = ks.filter((k) => !pfeil[k]).map((k) => k.toUpperCase()); return `${[p, ...l].filter(Boolean).join(' oder ')}: ${t}`; }).concat('Start: Pause').join(' · ');
     $.innerHTML = `<div class="spielkopf"><a class="back" href="#spiele" aria-label="Spiel beenden">←</a><h1 style="font-size:22px">${esc(def.name)}</h1>
         <span class="pill uhr" title="Spielzeit übrig">⏱ <span id="rest">${B.FREI ? 'frei' : mmss(B.guthaben())}</span></span></div>
-      <p class="pkt">Punkte: <span id="pkt">0</span> · Rekord: <span id="rek">${B.rekorde()[id] || 0}</span></p>
-      <div class="buehne" id="buehne" style="max-width:${breit}px"><canvas id="cv"></canvas></div>
-      <div class="tasten">${def.tasten.map(([t, l]) => `<button class="taste${def.tasten.length === 1 ? ' breit' : ''}" data-taste="${t}" aria-label="${t}">${l}</button>`).join('')}</div>
-      <p class="hilfe">${esc(def.hilfe)}</p>`;
-    let ctl = null, laeuft = false;
-    const buehne = document.getElementById('buehne'), cv = document.getElementById('cv');
-    const deckel = (html) => { const d = document.createElement('div'); d.className = 'deckel'; d.innerHTML = `<div>${html}</div>`; buehne.appendChild(d); return d; };
+      <div class="gb" id="gb">
+        <div class="gb-schirm"><div class="buehne" id="buehne"><canvas id="cv"></canvas></div>
+          <div class="gb-info"><span>Punkte <b id="pkt">0</b></span><span>Rekord <b id="rek">${B.rekorde()[id] || 0}</b></span></div></div>
+        <div class="gb-marke">LERNDAX</div>
+        <div class="gb-pult">
+          <div class="kreuz" id="kreuz" role="group" aria-label="Steuerkreuz">${arm('hoch', 'k-h')}${arm('links', 'k-l')}<i class="k-m"></i>${arm('rechts', 'k-re')}${arm('runter', 'k-r')}</div>
+          <div class="ab">${knopf('b')}${knopf('a')}</div>
+        </div>
+        <div class="gb-start"><button class="start" id="startK" aria-label="Start: Pause">START</button></div>
+      </div>
+      <p class="hilfe">${esc(def.ziel || '')}<br>${esc(anleitung)}</p>`;
+    let ctl = null, laeuft = false, pausiert = false;
+    const buehne = document.getElementById('buehne'), cv = document.getElementById('cv'), gb = document.getElementById('gb');
+    const deckel = (html) => { buehne.querySelectorAll('.deckel').forEach((d) => d.remove()); const d = document.createElement('div'); d.className = 'deckel'; d.innerHTML = `<div>${html}</div>`; buehne.appendChild(d); return d; };
+    // Bildschirm so groß wie möglich, aber Spiel und Knöpfe passen zusammen auf den Bildschirm
+    const groesse = () => {
+      const verh = cv.width / cv.height || 1, innen = buehne.parentElement.clientWidth - 20;
+      const sonst = gb.offsetHeight - buehne.offsetHeight, oben = gb.getBoundingClientRect().top + window.scrollY;
+      const hoeheFrei = window.innerHeight - oben - sonst - 10;
+      buehne.style.width = Math.round(Math.max(140, Math.min(innen, hoeheFrei * verh))) + 'px';
+    };
     const neu = () => {
       buehne.querySelectorAll('.deckel').forEach((d) => d.remove());
       if (ctl) ctl.stop();
       document.getElementById('pkt').textContent = '0';
-      laeuft = true;
+      laeuft = true; pausiert = false;
       ctl = def.start(cv, {
         punkte(n) { document.getElementById('pkt').textContent = n; },
         ende(n) {
           laeuft = false;
           const neuerRekord = B.rekord(id, n);
           document.getElementById('rek').textContent = B.rekorde()[id] || 0;
-          deckel(`<h2>${neuerRekord ? 'Neuer Rekord! 🏆' : 'Vorbei!'}</h2><p class="leise">${n} Punkte</p><button class="btn" data-nochmal>Nochmal</button>`);
+          deckel(`<h2>${neuerRekord ? 'Neuer Rekord! 🏆' : 'Vorbei!'}</h2><p class="leise">${n} Punkte</p><button class="btn" data-nochmal>Nochmal</button><p class="leise">oder A drücken</p>`);
         },
       });
+      groesse();
+      if (window.__belohnung) window.__belohnung.spiel = ctl;
+    };
+    const pause = (an) => {
+      if (!ctl || !laeuft) return;
+      pausiert = an; if (ctl.pause) ctl.pause(an);
+      document.getElementById('startK').classList.toggle('an', an);
+      if (an) deckel(`<h2>Pause ⏸</h2><p class="leise">Die Spielzeit steht still.</p><button class="btn" data-weiter>Weiter</button><p class="leise">oder Start drücken</p>`);
+      else buehne.querySelectorAll('.deckel').forEach((d) => d.remove());
     };
     neu();
-    aktiv = { stop() { laeuft = false; if (ctl) ctl.stop(); clearInterval(uhr); document.removeEventListener('keydown', tastatur); } };
-    // Spielzeit: nur zählen, solange wirklich gespielt wird und die Seite sichtbar ist
-    clearInterval(uhr);
-    uhr = setInterval(() => {
-      if (!laeuft || document.visibilityState !== 'visible') return;
-      const rest = B.sekundeGespielt();
-      const el = document.getElementById('rest'); if (el && !B.FREI) el.textContent = mmss(rest);
-      if (rest <= 0) {
-        laeuft = false; if (ctl) ctl.stop(); clearInterval(uhr);
-        B.rekord(id, +document.getElementById('pkt').textContent || 0);
-        buehne.querySelectorAll('.deckel').forEach((d) => d.remove());
-        deckel(`<h2>Zeit um! ⏱</h2><p class="leise">${document.getElementById('pkt').textContent} Punkte. ${B.restHeute() > 0 ? 'Mit Münzen kannst du dir neue Spielzeit holen.' : 'Für heute ist Schluss. Morgen geht es weiter!'}</p><a class="btn" href="#spiele">Zur Spielhalle</a>`);
-      }
-    }, 1000);
-    // Steuerung: Knöpfe, Wischen, Tippen, Pfeiltasten
+    const summ = () => { try { if (navigator.vibrate) navigator.vibrate(8); } catch (e) {} };
+    // Eine Taste des Pults: Spiel vorbei → A startet neu; Pause → jede Taste macht weiter
+    const druck = (taste) => {
+      if (taste === 'start') { if (laeuft) pause(!pausiert); return; }
+      if (!laeuft) { if (taste === 'a' && buehne.querySelector('[data-nochmal]')) neu(); return; }
+      if (pausiert) { pause(false); return; }
+      const b = ST[taste]; if (b && ctl) ctl.taste(b[0]);
+    };
+    // Halten wiederholt (wie beim Gameboy-Tetris): erst nach 170 ms, dann alle 55 ms
+    let wdh = null;
+    const halten = (taste) => {
+      clearTimeout(wdh); clearInterval(wdh); wdh = null;
+      if (!taste) return;
+      druck(taste);
+      if (ST[taste] && WDH.includes(ST[taste][0])) wdh = setTimeout(() => { wdh = setInterval(() => (laeuft && !pausiert ? druck(taste) : null), 55); }, 170);
+    };
+    // Steuerkreuz als eine Fläche: Richtung nach der Fingerposition, Wechsel durch Rollen des Daumens
+    const kreuz = document.getElementById('kreuz');
+    let kreuzR = null;
+    const richtungAus = (e) => {
+      const r = kreuz.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      if (Math.hypot(dx, dy) < r.width * 0.12) return kreuzR;
+      return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'rechts' : 'links') : dy > 0 ? 'runter' : 'hoch';
+    };
+    const kreuzSetzen = (rNeu) => {
+      if (rNeu === kreuzR) return;
+      kreuzR = rNeu;
+      kreuz.querySelectorAll('i[data-r]').forEach((i) => i.classList.toggle('an', i.dataset.r === rNeu));
+      if (rNeu) summ();
+      halten(rNeu);
+    };
+    kreuz.addEventListener('pointerdown', (e) => { e.preventDefault(); kreuz.setPointerCapture(e.pointerId); kreuzSetzen(richtungAus(e)); });
+    kreuz.addEventListener('pointermove', (e) => { if (kreuzR) kreuzSetzen(richtungAus(e)); });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((n) => kreuz.addEventListener(n, () => kreuzSetzen(null)));
+    gb.querySelectorAll('.knopf, .start').forEach((k) => {
+      const taste = k.dataset.k || 'start';
+      k.addEventListener('pointerdown', (e) => { e.preventDefault(); k.classList.add('an'); summ(); halten(taste); });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach((n) => k.addEventListener(n, () => { if (taste !== 'start' || !pausiert) k.classList.remove('an'); if (wdh) halten(null); }));
+      k.addEventListener('contextmenu', (e) => e.preventDefault());
+    });
+    gb.addEventListener('contextmenu', (e) => e.preventDefault());
+    // Tastatur: Pfeile = Steuerkreuz, Leertaste/X = A, Y/Z = B, Enter/P = Start
+    const TASTE = { ArrowUp: 'hoch', ArrowDown: 'runter', ArrowLeft: 'links', ArrowRight: 'rechts', ' ': 'a', x: 'a', X: 'a', y: 'b', Y: 'b', z: 'b', Z: 'b', Enter: 'start', p: 'start', P: 'start' };
     const tastatur = (e) => {
-      const m = { ArrowLeft: 'links', ArrowRight: 'rechts', ArrowUp: 'hoch', ArrowDown: 'runter', ' ': 'sprung' }[e.key];
-      if (!m || !ctl || !laeuft) return; e.preventDefault();
-      if (id === 'sprung') ctl.tipp(); else if (id === 'stapeln' && m === 'hoch') ctl.taste('drehen'); else ctl.taste(m);
+      const t = TASTE[e.key]; if (!t) return; e.preventDefault();
+      if (e.repeat && !(ST[t] && WDH.includes(ST[t][0]))) return;
+      druck(t);
     };
     document.addEventListener('keydown', tastatur);
-    $.querySelectorAll('[data-taste]').forEach((b) => b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (ctl && laeuft) ctl.taste(b.dataset.taste); }));
+    // Wischen und Tippen auf dem Bildschirm gehen weiterhin
     let start = null;
     buehne.addEventListener('pointerdown', (e) => { start = { x: e.clientX, y: e.clientY }; });
     buehne.addEventListener('pointerup', (e) => {
-      if (!start || !ctl || !laeuft) return;
+      if (!start || !ctl || !laeuft || pausiert) return;
       const dx = e.clientX - start.x, dy = e.clientY - start.y; start = null;
       if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return ctl.tipp();
       ctl.wisch(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'rechts' : 'links') : dy > 0 ? 'runter' : 'hoch');
     });
-    buehne.addEventListener('click', (e) => { if (e.target.closest('[data-nochmal]')) neu(); });
+    buehne.addEventListener('click', (e) => { if (e.target.closest('[data-nochmal]')) neu(); else if (e.target.closest('[data-weiter]')) pause(false); });
+    // Seite verlassen oder Handy gesperrt: automatisch Pause
+    const sichtbar = () => { if (document.visibilityState !== 'visible' && laeuft && !pausiert) pause(true); };
+    document.addEventListener('visibilitychange', sichtbar);
+    window.addEventListener('resize', groesse);
+    aktiv = { stop() { laeuft = false; if (ctl) ctl.stop(); clearInterval(uhr); halten(null); document.removeEventListener('keydown', tastatur); document.removeEventListener('visibilitychange', sichtbar); window.removeEventListener('resize', groesse); } };
+    // Spielzeit: nur zählen, solange wirklich gespielt wird (nicht in der Pause) und die Seite sichtbar ist
+    clearInterval(uhr);
+    uhr = setInterval(() => {
+      if (!laeuft || pausiert || document.visibilityState !== 'visible') return;
+      const rest = B.sekundeGespielt();
+      const el = document.getElementById('rest'); if (el && !B.FREI) el.textContent = mmss(rest);
+      if (rest <= 0) {
+        laeuft = false; if (ctl) ctl.stop(); clearInterval(uhr); halten(null);
+        B.rekord(id, +document.getElementById('pkt').textContent || 0);
+        deckel(`<h2>Zeit um! ⏱</h2><p class="leise">${document.getElementById('pkt').textContent} Punkte. ${B.restHeute() > 0 ? 'Mit Münzen kannst du dir neue Spielzeit holen.' : 'Für heute ist Schluss. Morgen geht es weiter!'}</p><a class="btn" href="#spiele">Zur Spielhalle</a>`);
+      }
+    }, 1000);
   }
 
   // ---------- Ablauf ----------
