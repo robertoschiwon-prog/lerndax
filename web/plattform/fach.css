@@ -618,3 +618,30 @@ body.noscroll{overflow:hidden}
 /* Seitenhinweis zum Schulbuch (Thema hat buch: 'S. …') */
 .topic .tt .tb{display:block;font-size:11.5px;font-weight:700;opacity:.65;margin-top:2px}
 .tbuch{display:inline-block;font-size:12px;font-weight:700;opacity:.7;margin:0 0 12px 8px;vertical-align:middle}
+
+/* ---------- Belohnungen (seit lerndax-v114): Münzen, Kronen ---------- */
+a.pill.coin{text-decoration:none;color:var(--ink);background:#fff6d6}
+.krn{position:absolute;bottom:9px;right:12px;font-size:17px;line-height:1;filter:drop-shadow(1px 1px 0 var(--ink))}
+.lohn{margin:14px 0 4px;padding:12px 12px 14px;border:2px solid var(--ink);border-radius:16px;background:#fff6d6;text-align:center}
+.lohn .muenzen{display:inline-block;font:800 30px "Bricolage Grotesque",Nunito,system-ui,sans-serif;animation:muenzhupf .7s ease-out}
+.lohn small{display:block;color:var(--soft);font-weight:800;font-size:14px;margin-top:2px}
+.lohn .krone{margin:10px 0 0;font-weight:800;color:#8a5a00}
+.lohn .kasse{margin:8px 0 10px;font-weight:700}
+.lohn .lohnbtn{display:block;text-decoration:none;text-align:center;background:var(--card)}
+@keyframes muenzhupf{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.lohn .muenzen{animation:none}}
+/* Kopfzeile auf schmalen Handys: 🔥 ⭐ 🪙 passen nebeneinander, die Wolke (☁︎) sitzt dann als kleines Abzeichen am Dachs-Knopf (v114) */
+.pill{white-space:nowrap}
+@media (max-width:400px){
+  .top{gap:7px;position:relative}.pills{gap:4px}.pill{padding:3px 7px;gap:2px;font-size:14px}.logo{font-size:21px}
+  .pill.syncpill{position:absolute;left:28px;top:-7px;padding:0 4px;font-size:11px;line-height:16px;border-width:1.5px;z-index:2}
+}
+@media (max-width:350px){.top{gap:5px}.pills{gap:3px}.pill{padding:2px 5px;font-size:13px}.logo{font-size:18px;gap:4px}.hubbtn{width:36px;height:36px}.pill.syncpill{left:24px}}
+/* Themenkacheln: lange Wörter („Prädikat“, „Buch S. 12–13“) dürfen die Spalte auf 320 px nicht sprengen (v114) */
+.topics{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.twrap,.topic{min-width:0}
+.topic .tt{overflow-wrap:anywhere;hyphens:auto}
+@media (min-width:700px){.topics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* Anzeigen im Kopf groß genug zum Antippen (🪙 führt zum Laden), v114 */
+.pills .pill{min-height:36px}
+@media (max-width:400px){.pills .pill.syncpill{min-height:0}}

@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 15.11.2026, Version `lerndax-v113`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 16.11.2026, Version `lerndax-v114`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -20,6 +20,41 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-23. Belohnungen wie bei Anton: Münzen, Kronen, Laden, Spielhalle (lerndax-v114, 16.11.2026)
+
+Wunsch des Kindes: „ein Belohnungssystem wie bei Anton“. Roberto: „beim Bau generell an den Anton-Approach halten“.
+Entscheidungen von Roberto:
+- Münzen werden **im Laden (Avatar-Sachen) und in der Spielhalle (Minispiele)** ausgegeben.
+- Spielzeit: **erst nach der ersten geschafften Runde des Tages, höchstens 15 Minuten am Tag**; 3 Minuten kosten 10 Münzen.
+- Spiele: **Dachs-Sprung, Schlange, Blöcke stapeln, 2048** (alle eigene Umsetzungen, ohne Netz und ohne Werbung).
+
+So verdient man Münzen (gilt in allen Fächern, ein gemeinsamer Geldbeutel):
+- richtig beim ersten Versuch 2, beim zweiten 1, Knobel-Aufgabe geknackt 3;
+- Runde ganz ohne Fehler (mind. 8 Aufgaben) +5 und eine 👑 **Krone** für das Thema (wie Antons Pokale), sichtbar auf der Themenkachel;
+- Tagesziel geschafft +5.
+
+Was neu ist:
+- `web/plattform/belohnung.js` (`window.LernDaxBelohnung`): Münzen, Käufe, Kronen, Runden je Tag, Spielzeit, Rekorde.
+  Preise: Laden 25–150 Münzen (Königskrone 150, Weltall 120). Spielguthaben gilt nur auf dem Gerät, auf dem es geholt wurde.
+- Synchronisation: eigene Zeile in `lerndax_progress` mit `subject = 'belohnung'` (**keine Änderung an der Datenbank nötig**).
+  Zusammenführen ohne Verlust: Münzen je Gerät (Maximum), Käufe und Kronen werden vereinigt, beim Getragenen gewinnt das Neuere,
+  Tageszähler bleiben 30 Tage.
+- `web/plattform/avatare.js`: 25 Sachen zum Anziehen in 4 Gruppen (8 Hüte, 5 Brillen, 5 Halsschmuck, 7 Hintergründe), für jede
+  der 12 Figuren an Kopf, Augen und Kinn ausgerichtet; `AVA.ich()` zeigt den eigenen Avatar mit allem, was er trägt.
+- `web/belohnung/index.html`: Übersicht (Münzen, Kronen, Regeln), **Laden** (`#laden`: anprobieren, kaufen, an- und ausziehen),
+  **Spielhalle** (`#spiele`: gesperrt bis zur ersten Runde, Spielzeit-Anzeige, Spiele mit Rekord). Die Uhr läuft nur, solange
+  wirklich gespielt wird und die Seite sichtbar ist; bei 0 kommt „Zeit um“.
+- `web/belohnung/spiele.js`: die vier Spiele (Wischen, Tippen, Knöpfe, Pfeiltasten).
+- Fach-Apps: Münz-Anzeige 🪙 im Kopf (führt zum Laden), Belohnungs-Kasten im Ergebnis, Krone auf der Themenkachel.
+- Startseite: Münz-Anzeige und zwei Kacheln „Laden“ und „Spielhalle“ mit Hinweis, ob die Spielhalle heute offen ist.
+- Schmale Handys: Auf ≤ 400 px sitzt die Wolke (☁︎) als kleines Abzeichen am Dachs-Knopf, damit 🔥 ⭐ 🪙 nebeneinander passen.
+  Dabei gleich behoben (war schon vorher so): Themenkacheln in DeDax, BioDax und GeoDax ragten auf 320 px über den Rand.
+- Test `tests/belohnung.py` (Zusammenführen, Münzen nach perfekter Runde = 26, Krone, Laden, Spielzeit, 15-Minuten-Grenze,
+  alle vier Spiele, 320/390 px).
+
+Offen / Ideen für später: vom Kind ausprobieren lassen und Preise anpassen; weitere Sachen für den Laden; Kronen-Sammlung je Fach im
+Elternbereich zeigen.
 
 ## 0-neu-22. Training für die Mathe-Arbeit am 24.11. erweitert (lerndax-v113, 15.11.2026)
 

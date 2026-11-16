@@ -21,6 +21,7 @@ Voraussetzung: Python 3 mit `pip install playwright` und `playwright install chr
 | `python3 tests/training.py` | Trainingsseite für eine Klassenarbeit (`mathe/?t=…`): nur Arbeitsthemen in den Runden, Rückweg ins Training, Fit-Anzeige, unbekanntes Training, Fortschritt im allgemeinen Lernstand |
 | `python3 tests/hub.py` | LernDax-Startseite, Sprünge zu #eltern und #entdecken |
 | `python3 tests/ava_hub.py` | Avatar-Auswahl: öffnet sich beim ersten Besuch genau einmal |
+| `python3 tests/belohnung.py` | Belohnungen: Münzen und Krone nach einer fehlerfreien Runde, Laden (kaufen, an- und ausziehen), Spielhalle (Sperre, Spielzeit, 15-Minuten-Grenze, alle vier Spiele), Zusammenführen über Geräte, 320/390 px |
 
 Bildschirmfotos landen in `tests/shots/` (nicht auf GitHub). Meldungen wie
 `ERR_TUNNEL_CONNECTION_FAILED` bedeuten nur, dass Schriftarten aus dem Internet nicht geladen

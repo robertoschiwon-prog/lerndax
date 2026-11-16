@@ -31,6 +31,8 @@
   const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
   const SYNC = window.LernDaxSync || window.MathelixSync || null;
   const AVA = window.LernDaxAvatare || null;
+  const BEL = window.LernDaxBelohnung || null; // Münzen, Kronen, Laden, Spielhalle (plattform/belohnung.js)
+  const kroneKey = (id) => F.id + ':' + id;
   const save = () => { saveLocal(); if (SYNC) SYNC.changed(); };
   let VIEW = 'home';
   let SYS = { enabled: false };
@@ -133,6 +135,7 @@
       <div class="pills">
         <span class="pill" title="Tage in Folge geübt">🔥 ${streak()}</span>
         <span class="pill" title="Gesammelte Sterne">⭐ ${totalStars()}</span>
+        ${BEL ? `<a class="pill coin" href="../belohnung/" title="Münzen: im Laden und in der Spielhalle ausgeben" aria-label="${BEL.muenzen()} Münzen, zum Laden und zur Spielhalle">🪙 ${BEL.muenzen()}</a>` : ''}
         ${SYS.enabled && SYS.profileId ? `<span class="pill syncpill" id="syncpill" title="${syncTitle()}">${syncIcon()}</span>` : ''}
       </div>
     </div>`;
@@ -164,7 +167,7 @@
               <button class="topic" data-topic="${t.id}">
                 <span class="ti bg${nr}">${(F.icons && F.icons.svg(t.id)) || t.icon}</span>
                 <span class="tt">${t.title}${t.buch ? `<small class="tb">📖 Buch ${t.buch}</small>` : ''}</span>
-                ${starHtml(mastery(t.id).stars)}${(S.knobel || {})[t.id] && S.knobel[t.id].ok ? `<span class="knz" title="${S.knobel[t.id].ok} Knobel-Aufgaben geknackt">🧩 ${S.knobel[t.id].ok}</span>` : ''}
+                ${starHtml(mastery(t.id).stars)}${BEL && BEL.hatKrone(kroneKey(t.id)) ? '<span class="krn" title="Krone: eine Runde ganz ohne Fehler">👑</span>' : ''}${(S.knobel || {})[t.id] && S.knobel[t.id].ok ? `<span class="knz" title="${S.knobel[t.id].ok} Knobel-Aufgaben geknackt">🧩 ${S.knobel[t.id].ok}</span>` : ''}
               </button>
               ${EXP[t.id] ? `<button class="explbtn" data-explain="${t.id}" aria-label="Erklärung zu ${t.title} ansehen">▶</button>` : ''}
             </div>`;
@@ -216,7 +219,7 @@
     const greet = S.name ? `Hallo ${esc(S.name)}!` : 'Hallo!';
     $app.innerHTML = header() + nameCard() + `
       <div class="card trhero">
-        <div class="trtop">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 44)}</button>` : ''}<span class="trhi">${greet}</span><span class="trbadge">🎯 Training</span></div>
+        <div class="trtop">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.ich(44)}</button>` : ''}<span class="trhi">${greet}</span><span class="trbadge">🎯 Training</span></div>
         <h1>${esc(TR.titel)}</h1>
         <p class="trdate">${dstr} · ${count}</p>
         <div class="trfit"><span>So fit bist du</span><b>${total} %</b></div>
@@ -249,7 +252,7 @@
     const greet = S.name ? `Hallo ${esc(S.name)}!` : 'Hallo!';
     $app.innerHTML = header() + `
       ${nameCard()}
-      <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.html(AVA.get() || AVA.STANDARD, 56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p><p class="goal${roundsToday() >= 1 ? ' done' : ''}">${goalLine()}</p></div></div>
+      <div class="hello">${AVA ? `<button class="avabtn" data-ava aria-label="Avatar ändern">${AVA.ich(56)}</button>` : ''}<div><h1>${greet}</h1><p>Klasse 5 · Gymnasium Sachsen</p><p class="goal${roundsToday() >= 1 ? ' done' : ''}">${goalLine()}</p></div></div>
       <div class="grades">${Array.from({ length: 10 }, (_, i) => i + 1).map((g) => `<button class="gchip ${g === 5 ? 'on' : 'soon'}" data-grade="${g}">${g}</button>`).join('')}</div>
       ${weiterBtn()}
       ${!hasDisc() ? knobelBar(allTopics()) : knobelReif(allTopics()).length ? `<div class="jumps"><button class="jump" data-jump="entdecken"><i>✦</i>Entdecken<small>↓</small></button>${knobelBar(allTopics(), true)}</div>` : `<button class="jump" data-jump="entdecken"><i>✦</i>Entdecken: ${F.entdeckenKurz}<small>↓</small></button>`}
@@ -331,7 +334,7 @@
     if (!pool.length) return home();
     let seq = Array.from({ length: TASKS_PER_ROUND }, () => (pool.length === 1 ? pool[0] : weightedPick(pool)));
     if (mode === 'knobel') { const mix = U.shuffle(pool.slice()); seq = Array.from({ length: KNOBEL_N }, (_, i) => mix[i % mix.length]); }
-    R = { mode, arg, title, seq, idx: 0, results: [], knobel: mode === 'knobel', before: mode === 'topic' ? mastery(arg).stars : null };
+    R = { mode, arg, title, seq, idx: 0, results: [], muenzen: 0, knobel: mode === 'knobel', before: mode === 'topic' ? mastery(arg).stars : null };
     nextTask();
   }
 
@@ -551,6 +554,8 @@
     if (!S.days.includes(today())) S.days.push(today());
     if (S.days.length > 400) S.days = S.days.slice(-400);
     S.total = (S.total || 0) + 1;
+    // Münzen wie bei Anton: erster Versuch 2, zweiter 1, Knobel geknackt 3
+    if (BEL) R.muenzen += BEL.verdienen(R.knobel ? (score > 0 ? BEL.MUENZEN.knobel : 0) : score === 1 ? BEL.MUENZEN.erster : score > 0 ? BEL.MUENZEN.zweiter : 0);
     save();
   }
 
@@ -566,7 +571,7 @@
     const du = S.name ? `, ${esc(S.name)}` : '';
     const head = R.knobel ? ['', 'Harte Nüsse! Die knackst du noch.', 'Gut getüftelt!', `Stark geknobelt${du}!`][stufe]
       : [`Das üben wir nochmal${du}.`, 'Gut dabei, weiter so!', `Richtig gut${du}!`, `Mega stark${du}!`][stufe];
-    const ich = AVA && AVA.get() ? AVA.html(AVA.get(), 92) : '';
+    const ich = AVA && AVA.get() ? AVA.ich(92) : '';
     const firstToday = roundsToday() === 0;
     S.rounds = Object.assign({}, S.rounds || {}, { [today()]: roundsToday() + 1 });
     const keep = Object.keys(S.rounds).sort().slice(-60);
@@ -580,6 +585,21 @@
       starBlock += `${starHtml(now)}${now > R.before ? '<p style="color:#0b7a50">Neuer Stern! ⭐</p>' : ''}<p class="sternhint">${sternTipp}</p>`;
     }
     if (R.knobel) starBlock += '<p class="sternhint">🧩 Knobel-Aufgaben sind zum Tüfteln da. Sie zählen nicht für die Sterne.</p>';
+    // Belohnung: fehlerfreie Runde (+5, bei Themen-Runden eine Krone am Thema), Tagesziel (+5), Runde für die Spielhalle zählen
+    let lohn = '';
+    if (BEL) {
+      const perfekt = !R.knobel && n >= TASKS_PER_ROUND && first === n;
+      let neueKrone = false;
+      if (perfekt) { R.muenzen += BEL.verdienen(BEL.MUENZEN.perfekt); if (R.mode === 'topic') neueKrone = BEL.krone(kroneKey(R.arg)); }
+      if (firstToday) R.muenzen += BEL.verdienen(BEL.MUENZEN.tagesziel);
+      const spielhalleNeu = BEL.rundenHeute() === 0;
+      BEL.rundeFertig();
+      const grund = [solved ? (R.knobel ? 'für geknackte Nüsse' : 'für richtige Antworten') : '', perfekt ? `Runde ohne Fehler +${BEL.MUENZEN.perfekt}` : '', firstToday ? `Tagesziel +${BEL.MUENZEN.tagesziel}` : ''].filter(Boolean).join(' · ');
+      lohn = `<div class="lohn"><span class="muenzen">🪙 +${R.muenzen}</span>${grund ? `<small>${grund}</small>` : ''}
+        ${perfekt && R.mode === 'topic' ? `<p class="krone">👑 ${neueKrone ? 'Neue Krone' : 'Krone'} für „${esc(R.title)}“: alles beim ersten Versuch richtig!</p>` : perfekt ? '<p class="krone">👑 Alles beim ersten Versuch richtig!</p>' : ''}
+        <p class="kasse">Du hast jetzt <b>${BEL.muenzen()} Münzen</b>.${spielhalleNeu ? ' Die <b>Spielhalle</b> ist für heute offen!' : ''}</p>
+        <a class="btn wide lohnbtn" href="../belohnung/">🛍️ Laden &amp; 🎮 Spielhalle</a></div>`;
+    }
     const kn = !R.knobel && ratio >= 0.75 ? [...new Set(R.seq.filter((t) => t.knobel).map((t) => t.id))] : [];
     $app.innerHTML = header() + `
       <div class="card res">
@@ -590,6 +610,7 @@
         <p>${first} von ${n} beim ersten Versuch richtig${solved > first ? `, ${solved - first} im zweiten` : ''}</p>
         <div class="dots">${R.results.map((r) => `<i class="r${r === 1 ? 1 : r === 0.5 ? 2 : 0}"></i>`).join('')}</div>
         ${starBlock}
+        ${lohn}
         <div class="btns">
           ${kn.length ? `<button class="btn wide knb" data-knobel="${kn.join(',')}">🧩 Jetzt knobeln: ${KNOBEL_N} harte Nüsse</button>` : ''}
           <button class="btn org wide" data-again>${R.knobel ? 'Nochmal knobeln' : 'Nochmal üben'}</button>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6ee">
+<title>Laden &amp; Spielhalle · LernDax</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" type="image/png" href="../icons/favicon-v4.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon-v4.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<!-- Belohnungen wie bei Anton (Wunsch des Kindes, 16.11.2026): Münzen ausgeben im Laden (Avatar) und in der Spielhalle.
+     Regeln und Speicher: ../plattform/belohnung.js · Spiele: spiele.js -->
+<style>
+:root{--ink:#1c1a33;--soft:#6b6680;--paper:#fbf6ee;--card:#fff;--tint:#f3ede2;--c1:#ff6b3d;--c2:#3d7bff;--c3:#14a06c;--c4:#8b5cf6;--c5:#e9a800;--gold:#fff6d6;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:500 17px/1.45 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+h1,h2,h3{font-family:"Bricolage Grotesque",Nunito,system-ui,sans-serif;letter-spacing:-.01em;margin:0}
+button{font:inherit;color:inherit}
+#app{max-width:560px;margin:0 auto;padding:14px 16px 40px;min-height:100vh}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.back{flex:0 0 auto;width:44px;height:44px;border-radius:13px;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);background:var(--card);display:grid;place-items:center;font-size:22px;font-weight:800;text-decoration:none;color:var(--ink);cursor:pointer}
+.top h1{font-size:24px;flex:1;min-width:0}
+.pill{display:flex;align-items:center;gap:4px;background:var(--gold);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;min-height:36px;font-weight:800;font-size:16px;white-space:nowrap}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);padding:14px;margin-bottom:16px}
+.btn{display:block;width:100%;border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);background:var(--c1);font-weight:800;font-size:18px;padding:12px;cursor:pointer;text-align:center;text-decoration:none;color:var(--ink)}
+.btn:active{transform:translate(3px,3px);box-shadow:none}
+.btn.hell{background:var(--card)}
+.btn:disabled{background:#e9e4da;color:#8a8597;box-shadow:none;cursor:default}
+.leise{color:var(--soft);font-weight:700;font-size:15px;margin:6px 0 0}
+/* Übersicht */
+.held{display:flex;align-items:center;gap:16px;margin:4px 0 18px}
+.held h2{font-size:26px;line-height:1.15}
+.held p{margin:4px 0 0;color:var(--soft);font-weight:700}
+.wahl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.wahl a{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-decoration:none;color:var(--ink);background:var(--gold);border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);padding:14px}
+.wahl a.sp{background:#e8f0ff}
+.wahl a:active{transform:translate(4px,4px);box-shadow:none}
+.wahl .ic{font-size:34px;line-height:1}
+.wahl b{font:800 20px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
+.wahl small{color:var(--soft);font-weight:800;font-size:13px;line-height:1.3}
+.regeln h3{font-size:18px;margin-bottom:6px}
+.regeln ul{margin:0;padding-left:20px}
+.regeln li{margin:3px 0;font-weight:700}
+/* Laden */
+.vorschau{display:flex;align-items:center;gap:14px}
+.vorschau .tx{flex:1;min-width:0}
+.vorschau h2{font-size:21px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 12px;padding:2px 16px 6px}
+.tab{flex:0 0 auto;border:2px solid var(--ink);border-radius:99px;background:var(--card);padding:6px 13px;font-weight:800;font-size:15px;cursor:pointer}
+.tab.on{background:var(--ink);color:#fff}
+.waren{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:96px}
+.ware{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:8px 4px 6px;cursor:pointer;min-width:0}
+.ware.sel{box-shadow:0 0 0 3px var(--c1)}
+.ware b{font-size:13px;line-height:1.15;text-align:center}
+.ware .preis{font-weight:800;font-size:14px}
+.ware .preis.hat{color:var(--c3)}
+.ware .an{position:absolute;top:4px;right:6px;font-size:13px;font-weight:800;color:#fff;background:var(--c3);border:2px solid var(--ink);border-radius:99px;padding:0 6px}
+.leiste{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--paper) 30%)}
+.leiste .btn{max-width:528px;margin:0 auto}
+/* Spielhalle */
+.zeit{display:flex;gap:10px;margin:8px 0 12px}
+.zeit div{flex:1;background:var(--tint);border-radius:12px;padding:8px 10px}
+.zeit b{display:block;font:800 22px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
+.zeit span{font-size:13px;font-weight:800;color:var(--soft)}
+.balken{height:10px;border:2px solid var(--ink);border-radius:99px;background:var(--card);overflow:hidden;margin:4px 0 2px}
+.balken i{display:block;height:100%;background:var(--c2)}
+.spiele{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.spiel{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--card);border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);padding:14px 8px 12px;cursor:pointer}
+.spiel:active{transform:translate(4px,4px);box-shadow:none}
+.spiel .bild{width:64px;height:64px;border-radius:16px;border:2px solid var(--ink);display:grid;place-items:center;font:800 22px "Bricolage Grotesque",Nunito,sans-serif;overflow:hidden}
+.spiel .bild img{width:54px;height:54px}
+.spiel b{font-size:17px}
+.spiel small{color:var(--soft);font-weight:800;font-size:13px}
+.zu{text-align:center}
+.zu .gross{font-size:46px;line-height:1.1}
+/* Spielen */
+.spielkopf{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.spielkopf .uhr{margin-left:auto}
+.spielkopf .pkt{font-weight:800}
+.buehne{position:relative;border:2px solid var(--ink);border-radius:16px;overflow:hidden;background:var(--card);touch-action:none;user-select:none;-webkit-user-select:none;margin:0 auto}
+.buehne canvas{display:block;width:100%;height:auto}
+.deckel{position:absolute;inset:0;display:grid;place-items:center;background:rgba(251,246,238,.92);text-align:center;padding:16px}
+.deckel h2{font-size:26px;margin-bottom:6px}
+.deckel .btn{margin-top:10px}
+.tasten{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.taste{flex:1;max-width:84px;height:58px;border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);background:var(--card);font-size:22px;font-weight:800;cursor:pointer;touch-action:manipulation}
+.taste.breit{max-width:none}
+.taste:active{transform:translate(3px,3px);box-shadow:none;background:var(--tint)}
+.hilfe{color:var(--soft);font-weight:700;font-size:14px;text-align:center;margin:10px 0 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="../plattform/config.js"></script>
+<script src="../plattform/avatare.js"></script>
+<script src="../plattform/belohnung.js"></script>
+<script src="../plattform/sync.js"></script>
+<script src="spiele.js"></script>
+<script>
+(function () {
+  const $ = document.getElementById('app');
+  const A = window.LernDaxAvatare, B = window.LernDaxBelohnung, SPIELE = window.LernDaxSpiele || [];
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  const SPIELBILD = { sprung: ['#ff6b3d', '<img src="../icons/dachs.svg" alt="">'], schlange: ['#3dbb6a', '🐍'], stapeln: ['#8b5cf6', '🧱'], zahlen: ['#ffc53d', '2048'] };
+  let auswahl = { slot: 'hut', id: '' }, aktiv = null, uhr = null, meldung = '';
+  A.style();
+
+  const kopf = (titel, zurueck) => `<div class="top"><a class="back" href="${zurueck}" aria-label="Zurück">←</a><h1>${titel}</h1><span class="pill" title="Deine Münzen">🪙 <span id="muenzzahl">${B.muenzen()}</span></span></div>`;
+
+  // ---------- Übersicht ----------
+  function uebersicht() {
+    const k = B.kronenZahl(), M = B.MUENZEN;
+    $.innerHTML = kopf('Belohnungen', '../') + `
+      <div class="held">${A.ich(96)}<div><h2>Du hast ${B.muenzen()} Münzen</h2><p>${k ? `👑 ${k} ${k === 1 ? 'Krone' : 'Kronen'} gesammelt` : 'Noch keine Krone. Schaffst du eine Runde ohne Fehler?'}</p></div></div>
+      <div class="wahl">
+        <a href="#laden"><span class="ic">🛍️</span><b>Laden</b><small>Hüte, Brillen, Halsschmuck und Hintergründe für deinen Avatar</small></a>
+        <a class="sp" href="#spiele"><span class="ic">🎮</span><b>Spielhalle</b><small>${B.rundenHeute() ? 'Heute offen: vier Spiele' : 'Öffnet nach deiner ersten Runde heute'}</small></a>
+      </div>
+      <div class="card regeln"><h3>So verdienst du Münzen</h3><ul>
+        <li>Richtig beim ersten Versuch: 🪙 ${M.erster}</li>
+        <li>Richtig beim zweiten Versuch: 🪙 ${M.zweiter}</li>
+        <li>Knobel-Aufgabe geknackt: 🪙 ${M.knobel}</li>
+        <li>Runde ganz ohne Fehler: 🪙 +${M.perfekt} und eine 👑 Krone</li>
+        <li>Tagesziel geschafft: 🪙 +${M.tagesziel}</li></ul>
+        <p class="leise">Münzen gelten in allen Fächern.</p></div>`;
+  }
+
+  // ---------- Laden ----------
+  function laden() {
+    const slots = A.SLOTS, preise = B.PREISE, an = B.getragen();
+    const waren = A.DECO.filter((d) => d.slot === auswahl.slot);
+    const probe = Object.assign({}, an, auswahl.id ? { [auswahl.slot]: auswahl.id } : {});
+    const sel = A.DECO.find((d) => d.id === auswahl.id);
+    let knopf = '<button class="btn hell" disabled>Tipp auf etwas, um es anzuprobieren</button>';
+    if (sel) {
+      const p = preise[sel.id];
+      if (an[sel.slot] === sel.id) knopf = `<button class="btn hell" data-aus="${sel.slot}">${esc(sel.name)} ausziehen</button>`;
+      else if (B.hat(sel.id)) knopf = `<button class="btn" data-an="${sel.id}">${esc(sel.name)} anziehen</button>`;
+      else if (B.muenzen() >= p) knopf = `<button class="btn" data-kauf="${sel.id}">Kaufen für 🪙 ${p}</button>`;
+      else knopf = `<button class="btn" disabled>Dir fehlen noch 🪙 ${p - B.muenzen()}</button>`;
+    }
+    $.innerHTML = kopf('Laden', '#') + `
+      <div class="card vorschau">${A.html(A.get() || A.STANDARD, 104, '', probe)}<div class="tx"><h2>${sel ? esc(sel.name) : 'Dein Avatar'}</h2>
+        <p class="leise">${meldung || (sel ? (B.hat(sel.id) ? 'Gehört dir schon.' : `Kostet 🪙 ${preise[sel.id]}. So sähe es aus.`) : 'Gekauftes bleibt für immer deins. Du kannst es jederzeit an- und ausziehen.')}</p></div></div>
+      <div class="tabs" role="tablist">${slots.map(([id, name]) => `<button class="tab${id === auswahl.slot ? ' on' : ''}" data-slot="${id}" role="tab">${name}</button>`).join('')}</div>
+      <div class="waren">${waren.map((d) => `<button class="ware${d.id === auswahl.id ? ' sel' : ''}" data-ware="${d.id}">
+          ${an[d.slot] === d.id ? '<span class="an">an</span>' : ''}${A.html(A.get() || A.STANDARD, 64, '', Object.assign({}, an, { [d.slot]: d.id }))}
+          <b>${esc(d.name)}</b><span class="preis${B.hat(d.id) ? ' hat' : ''}">${B.hat(d.id) ? '✓ deins' : `🪙 ${preise[d.id]}`}</span></button>`).join('')}</div>
+      <div class="leiste">${knopf}</div>`;
+    meldung = '';
+  }
+
+  // ---------- Spielhalle ----------
+  function spielhalle() {
+    const S = B.SPIEL, gespielt = B.gespieltHeute(), gut = B.guthaben(), rek = B.rekorde();
+    let status;
+    if (!B.rundenHeute()) status = `<div class="card zu"><div class="gross">🔒</div><h2>Erst üben, dann spielen</h2>
+        <p class="leise">Die Spielhalle öffnet, sobald du heute eine ganze Runde in einem Fach geschafft hast.</p>
+        <a class="btn" href="../" style="margin-top:12px">Zu den Fächern</a></div>`;
+    else {
+      const kann = B.restHeute() > 0, genug = B.muenzen() >= S.preis;
+      status = `<div class="card">
+        <div class="zeit"><div><b id="guthaben">${mmss(gut)}</b><span>Spielzeit übrig</span></div><div><b>${mmss(gespielt)}</b><span>heute gespielt (höchstens ${S.proTag / 60} Min.)</span></div></div>
+        <div class="balken" aria-hidden="true"><i style="width:${Math.min(100, Math.round((gespielt / S.proTag) * 100))}%"></i></div>
+        ${kann ? `<button class="btn" data-zeit ${genug ? '' : 'disabled'} style="margin-top:12px">${genug ? `${S.sekunden / 60} Minuten holen für 🪙 ${S.preis}` : `Dir fehlen noch 🪙 ${S.preis - B.muenzen()}`}</button>`
+          : `<p class="leise" style="margin-top:10px">${gut > 0 ? 'Das ist deine letzte Spielzeit für heute.' : 'Für heute ist die Spielzeit aufgebraucht. Morgen geht es weiter!'}</p>`}
+        ${meldung ? `<p class="leise">${meldung}</p>` : ''}</div>
+      <div class="spiele">${SPIELE.map((s) => `<button class="spiel" data-spiel="${s.id}"><span class="bild" style="background:${SPIELBILD[s.id][0]}">${SPIELBILD[s.id][1]}</span><b>${esc(s.name)}</b><small>${rek[s.id] ? `Rekord: ${rek[s.id]}` : 'Noch kein Rekord'}</small></button>`).join('')}</div>`;
+    }
+    $.innerHTML = kopf('Spielhalle', '#') + status;
+    meldung = '';
+  }
+
+  // ---------- Ein Spiel spielen ----------
+  function spielen(id) {
+    const def = SPIELE.find((s) => s.id === id);
+    if (!def) return go('#spiele');
+    if (B.guthaben() <= 0) { meldung = 'Hol dir zuerst Spielzeit.'; return go('#spiele'); }
+    const breit = id === 'sprung' ? 560 : id === 'stapeln' ? 260 : 380;
+    $.innerHTML = `<div class="spielkopf"><a class="back" href="#spiele" aria-label="Spiel beenden">←</a><h1 style="font-size:22px">${esc(def.name)}</h1>
+        <span class="pill uhr" title="Spielzeit übrig">⏱ <span id="rest">${mmss(B.guthaben())}</span></span></div>
+      <p class="pkt">Punkte: <span id="pkt">0</span> · Rekord: <span id="rek">${B.rekorde()[id] || 0}</span></p>
+      <div class="buehne" id="buehne" style="max-width:${breit}px"><canvas id="cv"></canvas></div>
+      <div class="tasten">${def.tasten.map(([t, l]) => `<button class="taste${def.tasten.length === 1 ? ' breit' : ''}" data-taste="${t}" aria-label="${t}">${l}</button>`).join('')}</div>
+      <p class="hilfe">${esc(def.hilfe)}</p>`;
+    let ctl = null, laeuft = false;
+    const buehne = document.getElementById('buehne'), cv = document.getElementById('cv');
+    const deckel = (html) => { const d = document.createElement('div'); d.className = 'deckel'; d.innerHTML = `<div>${html}</div>`; buehne.appendChild(d); return d; };
+    const neu = () => {
+      buehne.querySelectorAll('.deckel').forEach((d) => d.remove());
+      if (ctl) ctl.stop();
+      document.getElementById('pkt').textContent = '0';
+      laeuft = true;
+      ctl = def.start(cv, {
+        punkte(n) { document.getElementById('pkt').textContent = n; },
+        ende(n) {
+          laeuft = false;
+          const neuerRekord = B.rekord(id, n);
+          document.getElementById('rek').textContent = B.rekorde()[id] || 0;
+          deckel(`<h2>${neuerRekord ? 'Neuer Rekord! 🏆' : 'Vorbei!'}</h2><p class="leise">${n} Punkte</p><button class="btn" data-nochmal>Nochmal</button>`);
+        },
+      });
+    };
+    neu();
+    aktiv = { stop() { laeuft = false; if (ctl) ctl.stop(); clearInterval(uhr); document.removeEventListener('keydown', tastatur); } };
+    // Spielzeit: nur zählen, solange wirklich gespielt wird und die Seite sichtbar ist
+    clearInterval(uhr);
+    uhr = setInterval(() => {
+      if (!laeuft || document.visibilityState !== 'visible') return;
+      const rest = B.sekundeGespielt();
+      const el = document.getElementById('rest'); if (el) el.textContent = mmss(rest);
+      if (rest <= 0) {
+        laeuft = false; if (ctl) ctl.stop(); clearInterval(uhr);
+        B.rekord(id, +document.getElementById('pkt').textContent || 0);
+        buehne.querySelectorAll('.deckel').forEach((d) => d.remove());
+        deckel(`<h2>Zeit um! ⏱</h2><p class="leise">${document.getElementById('pkt').textContent} Punkte. ${B.restHeute() > 0 ? 'Mit Münzen kannst du dir neue Spielzeit holen.' : 'Für heute ist Schluss. Morgen geht es weiter!'}</p><a class="btn" href="#spiele">Zur Spielhalle</a>`);
+      }
+    }, 1000);
+    // Steuerung: Knöpfe, Wischen, Tippen, Pfeiltasten
+    const tastatur = (e) => {
+      const m = { ArrowLeft: 'links', ArrowRight: 'rechts', ArrowUp: 'hoch', ArrowDown: 'runter', ' ': 'sprung' }[e.key];
+      if (!m || !ctl || !laeuft) return; e.preventDefault();
+      if (id === 'sprung') ctl.tipp(); else if (id === 'stapeln' && m === 'hoch') ctl.taste('drehen'); else ctl.taste(m);
+    };
+    document.addEventListener('keydown', tastatur);
+    $.querySelectorAll('[data-taste]').forEach((b) => b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (ctl && laeuft) ctl.taste(b.dataset.taste); }));
+    let start = null;
+    buehne.addEventListener('pointerdown', (e) => { start = { x: e.clientX, y: e.clientY }; });
+    buehne.addEventListener('pointerup', (e) => {
+      if (!start || !ctl || !laeuft) return;
+      const dx = e.clientX - start.x, dy = e.clientY - start.y; start = null;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return ctl.tipp();
+      ctl.wisch(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'rechts' : 'links') : dy > 0 ? 'runter' : 'hoch');
+    });
+    buehne.addEventListener('click', (e) => { if (e.target.closest('[data-nochmal]')) neu(); });
+  }
+
+  // ---------- Ablauf ----------
+  function go(h) { if (location.hash === h) render(); else location.hash = h; }
+  function render() {
+    if (aktiv) { aktiv.stop(); aktiv = null; }
+    const h = location.hash;
+    if (h === '#laden') laden();
+    else if (h === '#spiele') spielhalle();
+    else if (h.startsWith('#spiel-')) spielen(h.slice(7));
+    else uebersicht();
+  }
+  $.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.slot) { auswahl = { slot: b.dataset.slot, id: '' }; laden(); }
+    else if (b.dataset.ware) { auswahl.id = auswahl.id === b.dataset.ware ? '' : b.dataset.ware; laden(); }
+    else if (b.dataset.kauf) { const d = A.DECO.find((x) => x.id === b.dataset.kauf); if (B.kaufen(d.id)) { B.anziehen(d.slot, d.id); meldung = `🎉 ${d.name} gehört jetzt dir!`; } laden(); }
+    else if (b.dataset.an) { const d = A.DECO.find((x) => x.id === b.dataset.an); B.anziehen(d.slot, d.id); laden(); }
+    else if (b.dataset.aus) { B.anziehen(b.dataset.aus, ''); laden(); }
+    else if ('zeit' in b.dataset) { const r = B.zeitKaufen(); meldung = r === 'ok' ? `Los geht's: ${B.SPIEL.sekunden / 60} Minuten Spielzeit!` : r === 'muenzen' ? 'Dafür reichen deine Münzen noch nicht.' : r === 'grenze' ? 'Für heute ist die Spielzeit aufgebraucht.' : 'Mach zuerst eine Runde in einem Fach.'; spielhalle(); }
+    else if (b.dataset.spiel) { if (B.guthaben() > 0) location.hash = '#spiel-' + b.dataset.spiel; else { meldung = 'Hol dir zuerst Spielzeit mit dem Knopf oben.'; spielhalle(); } }
+  });
+  window.addEventListener('hashchange', render);
+  B.onChange((art) => { const z = document.getElementById('muenzzahl'); if (z) z.textContent = B.muenzen(); if (art === 'sync' && !location.hash.startsWith('#spiel-')) render(); });
+  render();
+  if (window.LernDaxSync) window.LernDaxSync.init({ getState: () => ({}), applyState() {}, onStatus() {} });
+  window.__belohnung = { B, render };
+})();
+</script>
+</body>
+</html>

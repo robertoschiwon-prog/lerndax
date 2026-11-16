@@ -11,6 +11,8 @@
  *  - pro Thema gewinnt der Stand mit mehr bearbeiteten Aufgaben
  *  - Übungstage und gesehene Entdeckungen werden vereinigt
  *  - „Fortschritt zurücksetzen“ setzt einen Zeitstempel; ältere Stände werden verworfen
+ *  - Belohnungen (Münzen, Laden, Spielzeit) liegen für alle Fächer in einer eigenen Zeile (subject 'belohnung'),
+ *    zusammengeführt mit LernDaxBelohnung.merge (plattform/belohnung.js)
  */
 (function () {
   const CFG = window.MATHELIX_CONFIG || {};
@@ -85,10 +87,10 @@
       emit();
     })();
     await ready;
-    if (status.loggedIn && status.profileId) { syncAvatar(); syncNow(); }
-    window.addEventListener('online', () => { status.online = true; emit(); syncAvatar(); syncNow(); });
+    if (status.loggedIn && status.profileId) { syncAvatar(); syncNow(); syncBelohnung().then(emit); }
+    window.addEventListener('online', () => { status.online = true; emit(); syncAvatar(); syncNow(); syncBelohnung(); });
     window.addEventListener('offline', () => { status.online = false; emit(); });
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { syncAvatar(); syncNow(); } });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { syncAvatar(); syncNow(); syncBelohnung().then(emit); } });
   }
   function setUser(u) {
     status.loggedIn = !!u; status.email = u ? u.email : ''; status.userId = u ? u.id : '';
@@ -145,6 +147,7 @@
     emit();
     await syncAvatar();
     await syncNow();
+    await syncBelohnung(); emit();
   }
 
   // ---------- Avatar: im Profil gespeichert, auf allen Geräten gleich ----------
@@ -215,5 +218,29 @@
     pushTimer = setTimeout(syncNow, 2500);
   }
 
-  window.LernDaxSync = window.MathelixSync = { setAvatar, syncAvatar, init, status: () => Object.assign({}, status), signIn, signUp, signOut, listProfiles, createProfile, bindProfile, syncNow, changed, setPin, checkPin, getPinHash, merge };
+  // ---------- Belohnungen (Münzen, Laden, Spielzeit): eine Zeile für alle Fächer, subject 'belohnung' ----------
+  const BEL = () => window.LernDaxBelohnung;
+  let belTimer = null, belBusy = false;
+  async function syncBelohnung() {
+    if (!enabled || !sb || !status.loggedIn || !status.profileId || !BEL() || !navigator.onLine || belBusy) return;
+    belBusy = true;
+    try {
+      const { data, error } = await sb.from(T.progress).select('state').eq('profile_id', status.profileId).eq('subject', 'belohnung').maybeSingle();
+      if (error) throw error;
+      const remote = data ? data.state : null, local = BEL().getState();
+      const merged = BEL().merge(local, remote);
+      if (!same(merged, BEL().merge(local, null))) BEL().setState(merged);
+      if (!remote || !same(merged, BEL().merge(remote, null))) {
+        const { error: e2 } = await sb.from(T.progress).upsert({ profile_id: status.profileId, subject: 'belohnung', owner: status.userId, state: merged, updated_at: new Date().toISOString() }, { onConflict: 'profile_id,subject' });
+        if (e2) throw e2;
+      }
+    } catch (e) {}
+    belBusy = false;
+  }
+  if (BEL()) BEL().onChange((art) => {
+    if (art === 'sync' || !enabled || !status.profileId) return;
+    clearTimeout(belTimer); belTimer = setTimeout(syncBelohnung, 2500);
+  });
+
+  window.LernDaxSync = window.MathelixSync = { setAvatar, syncAvatar, syncBelohnung, init, status: () => Object.assign({}, status), signIn, signUp, signOut, listProfiles, createProfile, bindProfile, syncNow, changed, setPin, checkPin, getPinHash, merge };
 })();

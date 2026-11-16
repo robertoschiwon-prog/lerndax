@@ -76,9 +76,10 @@ geplante unter „Kommt bald“.
 |---|---|
 | `web/` | Alles, was online geht (wird automatisch veröffentlicht) |
 | `web/index.html` | LernDax-Startseite mit den Fächern |
-| `web/plattform/` | Gemeinsame Teile: **die Fach-App** (`fach.js`, `fach.css`: Übungsrunde, Sterne, Tagesziel, Knobeln, Erklär-Player, Elternbereich), Fächerliste (`faecher.js`), eigene Symbole statt Emojis (`symbole.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare (`avatare.js`), Trainings für Klassenarbeiten (`trainings.js`) |
+| `web/plattform/` | Gemeinsame Teile: **die Fach-App** (`fach.js`, `fach.css`: Übungsrunde, Sterne, Tagesziel, Knobeln, Erklär-Player, Elternbereich), Fächerliste (`faecher.js`), eigene Symbole statt Emojis (`symbole.js`), Einstellungen (`config.js`), Synchronisation (`sync.js`), Avatare mit Sachen zum Anziehen (`avatare.js`), Belohnungen: Münzen, Kronen, Spielzeit (`belohnung.js`), Trainings für Klassenarbeiten (`trainings.js`) |
 | `web/mathe/` | **MaDax**: `index.html` (beschreibt nur das Fach), `generatoren/` (Aufgaben), `erklaerungen/` (Animationen, Entdecken) |
 | `web/deutsch/` | **DeDax** (Klasse 5: 30 Themen, Entdecken, Knobeln): `themen/` (Wortlisten, Aufgaben, Knobel-Aufgaben), `erklaerungen/`, `symbole.js` |
+| `web/belohnung/` | **Laden** (Avatar-Sachen für Münzen) und **Spielhalle** mit vier Minispielen (`spiele.js`), erst nach der ersten Runde des Tages, höchstens 15 Min. |
 | `web/icons/` | Dachs-Logo und App-Icons |
 | `faecher/README.md` | **Fächerplan:** alle Fächer, Namen, Klassen, Fahrplan in drei Phasen |
 | `faecher/mathe/lehrplan/` | Lehrplan-Auswertung Mathe |
@@ -124,6 +125,7 @@ Die Datenbank muss dafür nicht geändert werden, der Lernstand wird automatisch
 - [x] Installierbare App, offline nutzbar
 - [x] LernDax-Startseite mit Fächern
 - [x] Avatare (12 Figuren × 8 Farben), im Profil synchronisiert
+- [x] Belohnungen wie bei Anton: Münzen, Kronen, Laden mit 25 Avatar-Sachen, Spielhalle mit 4 Minispielen (v114)
 - [ ] Elternbereich von MaDax auf die Startseite verlegen (sobald ein zweites Fach kommt)
 - [x] Fächerliste für alle Fächer (`plattform/faecher.js`), Startseite mit „Kommt bald“
 - [ ] Link „📚 LernDax“ im Familienkalender (Auftrag übergeben; ob umgesetzt, im Kalender-Projekt prüfen)

@@ -35,7 +35,18 @@ a{color:inherit}
 .brand .mark img{width:33px;height:33px}
 .brand b{color:var(--c1)}
 .pills{margin-left:auto;display:flex;gap:6px}
-.pill{display:flex;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;font-weight:800;font-size:15px}
+@media (max-width:360px){.top{gap:6px}.brand{font-size:22px;gap:7px}.brand .mark{width:40px;height:40px}.pills{gap:4px}.pill{padding:3px 7px;gap:2px;font-size:14px}}
+.pill{display:flex;align-items:center;gap:4px;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:3px 10px;font-weight:800;font-size:15px;min-height:36px;white-space:nowrap}
+a.pill.coin{text-decoration:none;background:#fff6d6}
+.schatz{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:-8px 0 22px}
+.schatzk{display:flex;align-items:center;gap:10px;text-decoration:none;background:#fff6d6;border:2px solid var(--ink);border-radius:18px;box-shadow:4px 4px 0 var(--ink);padding:12px;min-width:0}
+.schatzk.spiele{background:#e8f0ff}
+.schatzk:active{transform:translate(4px,4px);box-shadow:none}
+.schatzk .ic{flex:0 0 auto;font-size:30px;line-height:1}
+.schatzk b{display:block;font:800 18px "Bricolage Grotesque",Nunito,system-ui,sans-serif}
+.schatzk small{display:block;color:var(--soft);font-weight:800;font-size:12.5px;line-height:1.25}
+.schatzk>span:last-child{min-width:0}
+@media (max-width:400px){.schatzk{flex-direction:column;align-items:flex-start;gap:6px}}
 .hero{display:flex;align-items:center;gap:14px;margin:6px 0 20px}
 .avabtn{position:relative;flex:0 0 auto;border:0;background:none;padding:0;cursor:pointer;line-height:0}
 .avabtn .ldx-ava{box-shadow:3px 3px 0 var(--ink)}
@@ -97,6 +108,7 @@ a{color:inherit}
 <div id="app"></div>
 <script src="plattform/symbole.js"></script>
 <script src="plattform/avatare.js"></script>
+<script src="plattform/belohnung.js"></script>
 <script src="plattform/faecher.js"></script>
 <script src="plattform/config.js"></script>
 <script src="plattform/sync.js"></script>
@@ -114,6 +126,7 @@ a{color:inherit}
   const dayStr = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   let SYS = { enabled: false };
   const A = window.LernDaxAvatare;
+  const B = window.LernDaxBelohnung; // Münzen, Laden, Spielhalle (plattform/belohnung.js)
   function choose(first) {
     if (!A) return;
     A.picker(A.get() || A.STANDARD, (v) => {
@@ -197,11 +210,12 @@ a{color:inherit}
         <div class="brand"><span class="mark"><img src="icons/dachs.svg" alt=""></span><span>Lern<b>Dax</b></span></div>
         <div class="pills">
           <span class="pill" title="Tage in Folge gelernt">🔥 ${streak(days)}</span>
+          ${B ? `<a class="pill coin" href="belohnung/" title="Münzen: im Laden und in der Spielhalle ausgeben">🪙 ${B.muenzen()}</a>` : ''}
           ${SYS.enabled && SYS.profileId ? `<span class="pill" title="Mit allen Geräten abgeglichen">☁︎ ✓</span>` : ''}
         </div>
       </div>
       <div class="hero">
-        <button class="avabtn" id="avaBtn" aria-label="Avatar ändern">${A ? A.html(avatar || A.STANDARD, 80) : ''}<span class="pen">✏️</span></button>
+        <button class="avabtn" id="avaBtn" aria-label="Avatar ändern">${A ? A.ich(80) : ''}<span class="pen">✏️</span></button>
         <div><h1>${name ? `Hallo ${esc(name)}!` : 'Hallo!'}</h1>
         <p>${!avatar ? 'Tipp auf das Bild und such dir deinen Avatar aus!' : goal ? 'Tagesziel geschafft – stark! 💪' : today ? 'Heute schon geübt. Für das Tagesziel fehlt noch eine ganze Runde.' : 'Was möchtest du heute lernen?'}</p></div>
       </div>
@@ -213,6 +227,10 @@ a{color:inherit}
             <span class="go">→</span></a>`).join('')}
         ${bald.length ? `<div class="soonbox"><small>Kommt bald</small><div class="chips">${bald.map((f) => `<span class="chip" title="${esc(fachname(f, k))}"><i style="background:${f.farbe}${dunkel(f.farbe) ? ';color:var(--ink)' : ''}">${f.dachs ? `<img src="${f.dachs}" alt="">` : f.icon}</i><span><b>${f.name}</b><em>${esc(fachname(f, k))}</em></span></span>`).join('')}</div></div>` : ''}
       </div>
+      ${B ? `<div class="schatz">
+        <a class="schatzk laden" href="belohnung/#laden"><span class="ic">🛍️</span><span><b>Laden</b><small>Hüte, Brillen &amp; mehr für deinen Avatar</small></span></a>
+        <a class="schatzk spiele" href="belohnung/#spiele"><span class="ic">🎮</span><span><b>Spielhalle</b><small>${B.rundenHeute() ? (B.restHeute() + B.guthaben() > 0 ? 'Heute offen' : 'Für heute ausgespielt') : 'Öffnet nach der ersten Runde'}</small></span></a>
+      </div>` : ''}
       ${aktiv.filter((f) => f.entdecken).map((f) => `<a class="disc" href="${f.href}#entdecken">
         <span class="ic">✦</span>
         <span><b>Entdecken${aktiv.filter((x) => x.entdecken).length > 1 ? ' in ' + f.name : ''}</b><small>${esc(f.entdecken)}</small></span>
@@ -224,6 +242,7 @@ a{color:inherit}
   }
 
   if (A) A.style();
+  if (B) B.onChange(() => { if (location.hash !== '#eltern') render(); });
   render();
   let asked = '1'; try { asked = localStorage.getItem('lerndax.avatar.asked') || ''; } catch (e) {}
   if (A && !A.get() && !asked) setTimeout(() => { if (!A.get()) choose(true); }, 400);
