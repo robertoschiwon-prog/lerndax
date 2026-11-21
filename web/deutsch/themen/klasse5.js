@@ -1257,16 +1257,20 @@
     const w = vor.split(' '), komma = [];
     it.forEach((x, i) => { if (i === n - 1) w.push('und'); x.split(' ').forEach((y) => w.push(y)); if (i < n - 2) komma.push(w.length - 1); });
     const mit = (ks) => w.map((x, i) => x + (ks.includes(i) ? ',' : '')).join(' ') + '.';
-    return { w, komma, mit, richtig: mit(komma), vorUnd: w.indexOf('und') - 1 };
+    // Teile der Aufzählung als Wortbereiche [von, bis]
+    const teile = []; let von = vor.split(' ').length;
+    it.forEach((x, i) => { if (i === n - 1) von++; const l = x.split(' ').length; teile.push([von, von + l - 1]); von += l; });
+    return { w, komma, mit, richtig: mit(komma), vorUnd: w.indexOf('und') - 1, bild: { typ: 'aufz', teile, und: w.indexOf('und') } };
   }
   const REGEL_AUFZ = 'Bei einer <b>Aufzählung</b> steht zwischen den Teilen ein Komma. Vor <b>und</b> steht kein Komma: Das „und“ ersetzt es.';
-  const exKomma = (art, w, komma, s1) => ({ mode: 'komma', art, tokens: w.map((x, i) => (i === w.length - 1 ? x + '.' : x)), gaps: komma, s1 });
+  // bild (seit v121): Angaben, mit denen die Animation den Satzbau zeigt (Teile der Aufzählung, Haupt- und Nebensatz, Beisatz), statt nur die Kommas einzublenden
+  const exKomma = (art, w, komma, s1, bild) => ({ mode: 'komma', art, tokens: w.map((x, i) => (i === w.length - 1 ? x + '.' : x)), gaps: komma, s1, bild });
   function kommaAufz() {
     const a = aufzaehlung();
     return {
       prompt: 'Setze die fehlenden <b>Kommas</b>: Tippe die Stellen an.',
       tap: { tokens: a.w.map((x, i) => (i === a.w.length - 1 ? x + '.' : x)), correct: a.komma, gaps: true }, answerText: a.richtig,
-      hint: REGEL_AUFZ, solution: `<b>${a.richtig}</b><br>${REGEL_AUFZ}`, ex: exKomma('kommaAufz', a.w, a.komma, REGEL_AUFZ),
+      hint: REGEL_AUFZ, solution: `<b>${a.richtig}</b><br>${REGEL_AUFZ}`, ex: exKomma('kommaAufz', a.w, a.komma, REGEL_AUFZ, a.bild),
     };
   }
   function kommaWahl() {
@@ -1277,7 +1281,7 @@
       prompt: 'In welchem Satz stehen die Kommas richtig?',
       choices: wahl, correct: wahl.indexOf(a.richtig),
       hint: REGEL_AUFZ,
-      solution: `<b>${a.richtig}</b><br>${REGEL_AUFZ}`, ex: exKomma('kommaWahl', a.w, a.komma, REGEL_AUFZ),
+      solution: `<b>${a.richtig}</b><br>${REGEL_AUFZ}`, ex: exKomma('kommaWahl', a.w, a.komma, REGEL_AUFZ, a.bild),
     };
   }
   const REGEL_GEF = 'Zwischen <b>Hauptsatz</b> und <b>Nebensatz</b> steht immer ein Komma. Der Nebensatz beginnt mit einem Einleitewort (weil, wenn, dass, obwohl, bis), sein Verb steht am Ende.';
@@ -1287,7 +1291,7 @@
       prompt: 'Setze das fehlende <b>Komma</b>: Tippe die Stelle an.',
       tap: { tokens: x.w.map((t, i) => (i === x.w.length - 1 ? t + '.' : t)), correct: [x.komma], gaps: true, one: true }, answerText: x.mitKomma.join(' '),
       hint: 'Wo endet der eine Satz und wo beginnt der andere? Suche das Einleitewort (weil, wenn, dass, obwohl, bis) und die beiden Verben.',
-      solution: `<b>${x.mitKomma.join(' ')}</b><br>${REGEL_GEF}`, ex: exKomma('kommaGef', x.w, [x.komma], REGEL_GEF),
+      solution: `<b>${x.mitKomma.join(' ')}</b><br>${REGEL_GEF}`, ex: exKomma('kommaGef', x.w, [x.komma], REGEL_GEF, { typ: 'gef', ns: x.nsVorn ? [0, x.komma] : [x.komma + 1, x.w.length - 1], hs: x.nsVorn ? [x.komma + 1, x.w.length - 1] : [0, x.komma], einleit: x.nsVorn ? 0 : x.komma + 1, hsVerb: x.hsVerb, nsVerb: x.nsVerb, nsVorn: x.nsVorn }),
     };
   }
   // Apposition (Beisatz): Kommas mit (,) markiert (Deutschbuch Kap. 4, S. 112)
@@ -1302,7 +1306,7 @@
       prompt: 'Setze die fehlenden <b>Kommas</b>: Tippe die Stellen an.',
       tap: { tokens: w.map((t, i) => (i === w.length - 1 ? t + '.' : t)), correct: ks, gaps: true }, answerText: voll,
       hint: 'Steckt im Satz ein Einschub, der ein Nomen genauer erklärt (meine Freundin, unser Nachbar)? Den trennt man mit Kommas ab.',
-      solution: `<b>${voll}</b><br>${REGEL_APPO}`, ex: exKomma('kommaAppo', w, ks, REGEL_APPO),
+      solution: `<b>${voll}</b><br>${REGEL_APPO}`, ex: exKomma('kommaAppo', w, ks, REGEL_APPO, { typ: 'appo', von: ks[0] + 1, bis: ks.length > 1 ? ks[1] : w.length - 1 }),
     };
   }
   const komma = () => U.wahl([[28, kommaAufz], [18, kommaWahl], [34, kommaGef], [20, kommaAppo]]);
@@ -1388,7 +1392,7 @@
       prompt: 'Setze das fehlende <b>Komma</b>: Tippe die Stelle an.',
       tap: { tokens: w.map((t, i) => (i === w.length - 1 ? t + '.' : t)), correct: [komma], gaps: true, one: true }, answerText: voll,
       hint: 'Wo endet der erste Satz? Vor dem Verbindungswort (aber, denn, doch) steht ein Komma.',
-      solution: `<b>${voll}</b><br>${REIHE_REGEL}`, ex: exKomma('reiheKomma', w, [komma], REIHE_REGEL),
+      solution: `<b>${voll}</b><br>${REIHE_REGEL}`, ex: exKomma('reiheKomma', w, [komma], REIHE_REGEL, { typ: 'reihe', s1: [0, komma], s2: [komma + 1, w.length - 1], bind: komma + 1 }),
     };
   }
   function reiheOderGefuege() {
@@ -1476,15 +1480,21 @@
   const liste = (txt, extra) => txt.split(' ; ').map((z) => lw(z.trim(), extra));
   const luecke = (w) => `${w.vor}▢${w.nach}`;
   const exLw = (art, w, s1, s2) => zz(art, [w.vor, '▢', w.nach], 1, [w.vor, w.ein, w.nach], 1, s1, s2, `<b>${w.wort}</b><br>${s2}`);
-  function lwWahl(art, w, frage, hint, warum, s1) {
+  function lwWahl(art, w, frage, hint, warum, s1, exFn) {
     const wahl = shuffle([w.ein, ...w.falsch]);
-    return { prompt: `${frage}<br><span class="bsp gross">${luecke(w)}</span>`, choices: wahl, correct: wahl.indexOf(w.ein), hint, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${warum}`, ex: exLw(art, w, s1, warum) };
+    return { prompt: `${frage}<br><span class="bsp gross">${luecke(w)}</span>`, choices: wahl, correct: wahl.indexOf(w.ein), hint, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${warum}`, ex: exFn ? exFn(art, w, `<b>${w.wort}</b><br>${warum}`) : exLw(art, w, s1, warum) };
   }
-  function lwTippen(art, w, hint, warum, s1) {
+  function lwTippen(art, w, hint, warum, s1, exFn) {
     // Die Auswahl steht dabei: Ohne sie könnten in die Lücke auch andere Wörter passen (T▢r: Tür, Tor, Tier …)
     const angebot = [w.ein, ...w.falsch].sort((a, b) => a.length - b.length || a.localeCompare(b, 'de')).map((x) => `<b>${x}</b>`).join(', ').replace(/, (?!.*, )/, ' oder ');
-    return { prompt: `Schreibe das ganze Wort richtig: mit ${angebot}?<br><span class="bsp gross">${luecke(w)}</span>`, fields: [{ type: 'text', answer: w.wort, label: 'Wort' }], hint, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${warum}`, ex: exLw(art, w, s1, warum) };
+    return { prompt: `Schreibe das ganze Wort richtig: mit ${angebot}?<br><span class="bsp gross">${luecke(w)}</span>`, fields: [{ type: 'text', answer: w.wort, label: 'Wort' }], hint, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${warum}`, ex: exFn ? exFn(art, w, `<b>${w.wort}</b><br>${warum}`) : exLw(art, w, s1, warum) };
   }
+  // Erklär-Bilder für die Rechtschreibung (seit v121, statt „Wort mit ausgefüllter Lücke“):
+  //   Schubladen (mode 'laden'): Das Wort fällt in die Schublade seiner Schreibweise, dazu Wörter, die genauso geschrieben werden.
+  //   Weiche (mode 'weiche'): zwei Fragen nacheinander, das Wort läuft den Weg bis zur richtigen Schreibweise.
+  // Der Vokal vor der Lücke: Stelle im Wort und ob es ein Zwielaut ist
+  const vokalVor = (w) => { const m = w.vor.match(/(ie|au|ei|eu|äu|[aeiouäöü])(?=[^aeiouäöü]*$)/i); return m ? { von: m.index, bis: m.index + m[0].length, text: m[0].toLowerCase(), zwie: m[0].length > 1 && m[0].toLowerCase() !== 'ie' } : null; };
+  const istKons = (c) => !!c && !/[aeiouäöü]/i.test(c);
 
   // ---------- Thema: Lange Vokale ----------
   const LANG = [
@@ -1504,8 +1514,12 @@
   };
   const TIPP_LANG = 'Der Vokal klingt lang. Dafür gibt es drei Schreibweisen: einfach (T<b>a</b>l), mit Dehnungs-h (Z<b>ah</b>l) oder doppelt (H<b>aa</b>r). Das lange i heißt meistens <b>ie</b>. Die meisten Wörter haben den einfachen Vokal.';
   const S1_LANG = 'Der Vokal klingt lang. Wie wird er hier geschrieben?';
-  const langLuecke = () => { const w = pick(LANG); return lwWahl('langLuecke', w, 'Der Vokal ist <b>lang</b>. Was gehört in die Lücke?', TIPP_LANG, LANGWARUM[w.typ], S1_LANG); };
-  const langTippen = () => { const w = pick(LANG); return lwTippen('langTippen', w, TIPP_LANG, LANGWARUM[w.typ], S1_LANG); };
+  const exLang = (art, w, merk) => ({
+    mode: 'laden', art, wort: w.wort, stelle: [w.vor.length, w.vor.length + w.ein.length], typ: w.typ, danach: w.nach.charAt(0),
+    freunde: shuffle(LANG.filter((x) => x.typ === w.typ && x.wort !== w.wort)).slice(0, 3).map((x) => x.wort), merk,
+  });
+  const langLuecke = () => { const w = pick(LANG); return lwWahl('langLuecke', w, 'Der Vokal ist <b>lang</b>. Was gehört in die Lücke?', TIPP_LANG, LANGWARUM[w.typ], S1_LANG, exLang); };
+  const langTippen = () => { const w = pick(LANG); return lwTippen('langTippen', w, TIPP_LANG, LANGWARUM[w.typ], S1_LANG, exLang); };
   function langArt() {
     const w = pick(LANG.filter((x) => x.typ !== 'i')), arten = ['e', 'h', 'dd', 'ie'];
     return {
@@ -1513,7 +1527,7 @@
       choices: arten.map((a) => LANGART[a]), correct: arten.indexOf(w.typ),
       hint: 'Suche den langen Vokal. Steht ein <b>h</b> dahinter? Steht er <b>doppelt</b>? Oder ist es ein <b>ie</b>?',
       solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b>: ${LANGART[w.typ]}.<br>${LANGWARUM[w.typ]}`,
-      ex: zz('langArt', [w.vor, w.ein, w.nach], 1, [LANGART[w.typ] + ': ', w.ein], 1, 'Suche den langen Vokal im Wort.', LANGWARUM[w.typ], `<b>${w.wort}</b>: ${LANGART[w.typ]}`),
+      ex: exLang('langArt', w, `<b>${w.wort}</b>: ${LANGART[w.typ]}.<br>${LANGWARUM[w.typ]}`),
     };
   }
   const langeVokale = () => U.wahl([[45, langLuecke], [25, langArt], [30, langTippen]]);
@@ -1539,8 +1553,27 @@
   };
   const TIPP_KURZ = 'Sprich das Wort deutlich: Ist der betonte Vokal <b>kurz</b> oder <b>lang</b>? Nach kurzem Vokal folgen zwei Konsonanten. Hörst du nur einen, wird er verdoppelt (ck statt kk, tz statt zz). Merke: Nach l, n, r steht nie tz und nie ck.';
   const S1_KURZ = 'Sprich das Wort: Ist der betonte Vokal kurz oder lang? Und wie viele Konsonanten folgen?';
-  const kurzLuecke = () => { const w = pick(KURZ); return lwWahl('kurzLuecke', w, 'Was gehört in die Lücke?', TIPP_KURZ, KURZWARUM[w.typ], S1_KURZ); };
-  const kurzTippen = () => { const w = pick(KURZ); return lwTippen('kurzTippen', w, TIPP_KURZ, KURZWARUM[w.typ], S1_KURZ); };
+  function exKurz(art, w, merk) {
+    const v = vokalVor(w), davor = w.vor.slice(-1).toLowerCase(), nachLNR = 'lnr'.includes(davor);
+    // Weg durch die Weiche: lang → einfach; kurz und nur ein Konsonant zu hören → doppelt (ck, tz); kurz und zwei verschiedene → einfach
+    const zweig = { dop: 'dop', ck: 'dop', tz: 'dop', zwei: 'zwei', lang: 'lang', k: nachLNR ? 'zwei' : 'lang', z: nachLNR ? 'zwei' : 'lang' }[w.typ];
+    let bis = v.bis; while (istKons(w.wort.charAt(bis))) bis++;
+    const kons = w.wort.slice(v.bis, bis), doppelt = { ck: 'ck', tz: 'tz' }[w.typ] || 'doppelt';
+    const sag = [zweig === 'lang'
+      ? (v.zwie ? `Vor dem ${w.ein} steht der Zwielaut <b>${v.text}</b>. Er zählt wie ein langer Vokal.` : `Sprich <b>${w.wort}</b> langsam: Das <b>${v.text}</b> klingt <b>lang</b>. Nach langem Vokal wird nicht verdoppelt.`)
+      : `Sprich <b>${w.wort}</b> langsam: Das <b>${v.text}</b> klingt <b>kurz</b>.`];
+    if (zweig === 'dop') sag.push(`Nach dem kurzen ${v.text} hörst du nur <b>einen</b> Konsonanten. Deshalb wird er verdoppelt: <b>${w.ein}</b>${w.typ === 'ck' ? ' (statt kk)' : w.typ === 'tz' ? ' (statt zz)' : ''}.`);
+    if (zweig === 'zwei') sag.push(`Nach dem kurzen ${v.text} folgen schon <b>${kons.length > 2 ? 'mehrere' : 'zwei'} verschiedene</b> Konsonanten: ${kons.split('').join(', ')}. Dann wird nicht verdoppelt.${w.typ === 'k' ? ' Merke: Nach l, n, r steht nie ck.' : w.typ === 'z' ? ' Merke: Nach l, n, r steht nie tz.' : ''}`);
+    return {
+      mode: 'weiche', art, wort: w.wort, lauf: [w.vor.length, w.vor.length + w.ein.length],
+      fragen: [{ f: 'Ist der betonte Vokal kurz oder lang?', aus: ['lang', 'einfach'], weiter: 'kurz' }, { f: 'Wie viele Konsonanten hörst du danach?', wahl: [['einen', doppelt], ['zwei', 'einfach']] }],
+      weg: zweig === 'lang' ? [0] : [1, zweig === 'dop' ? 0 : 1],
+      zeichen: [[0, v.von, v.bis, zweig === 'lang' ? 'lang' : 'kurz']].concat(zweig === 'lang' ? [] : [[1, v.bis, bis, 'unter']]),
+      sag, merk,
+    };
+  }
+  const kurzLuecke = () => { const w = pick(KURZ); return lwWahl('kurzLuecke', w, 'Was gehört in die Lücke?', TIPP_KURZ, KURZWARUM[w.typ], S1_KURZ, exKurz); };
+  const kurzTippen = () => { const w = pick(KURZ); return lwTippen('kurzTippen', w, TIPP_KURZ, KURZWARUM[w.typ], S1_KURZ, exKurz); };
   function kurzLang() {
     const w = pick(KURZ.filter((x) => x.kurz !== undefined));
     return {
@@ -1548,7 +1581,7 @@
       choices: ['kurz', 'lang'], correct: w.kurz ? 0 : 1,
       hint: 'Sprich das Wort laut und dehne den Vokal. Klingt es noch richtig? Schau auch, was danach kommt: zwei Konsonanten (auch ck, tz) zeigen einen kurzen Vokal.',
       solution: `<b>${w.wort}</b>: Der Vokal ist <b>${w.kurz ? 'kurz' : 'lang'}</b>.<br>${KURZWARUM[w.typ]}`,
-      ex: zz('kurzLang', [w.vor, w.ein, w.nach], 1, [`${w.kurz ? 'kurzer' : 'langer'} Vokal: `, w.wort], 1, 'Schau auf die Konsonanten nach dem betonten Vokal.', KURZWARUM[w.typ], `<b>${w.wort}</b>: Der Vokal ist <b>${w.kurz ? 'kurz' : 'lang'}</b>.`),
+      ex: exKurz('kurzLang', w, `<b>${w.wort}</b>: Der Vokal ist <b>${w.kurz ? 'kurz' : 'lang'}</b>.<br>${KURZWARUM[w.typ]}`),
     };
   }
   function kurzWarum() {
@@ -1558,7 +1591,7 @@
       choices: ['Der Vokal davor ist lang.', 'Nach dem kurzen Vokal folgen schon zwei verschiedene Konsonanten.'], correct: w.typ === 'lang' ? 0 : 1,
       hint: 'Sprich das Wort: Ist der betonte Vokal lang oder kurz? Zähle dann die Konsonanten, die danach kommen.',
       solution: `<b>${w.wort}</b><br>${KURZWARUM[w.typ]}`,
-      ex: zz('kurzWarum', [w.vor, w.ein, w.nach], 1, [w.wort], 0, 'Verdoppelt wird nur nach kurzem Vokal, wenn danach nur ein Konsonant zu hören ist.', KURZWARUM[w.typ], `<b>${w.wort}</b>: nicht verdoppelt.`),
+      ex: exKurz('kurzWarum', w, `<b>${w.wort}</b>: nicht verdoppelt.<br>${KURZWARUM[w.typ]}`),
     };
   }
   const kurzeVokale = () => U.wahl([[42, kurzLuecke], [18, kurzLang], [25, kurzTippen], [15, kurzWarum]]);
@@ -1619,15 +1652,30 @@
   }[w.typ]);
   const TIPP_SL = 'Sprich das Wort. <b>Summt</b> das s weich (wie eine Biene)? Dann einfaches s. <b>Zischt</b> es: nach kurzem Vokal <b>ss</b>, nach langem Vokal oder au, ei, eu, ie <b>ß</b>. Am Wortende hilft Verlängern.';
   const S1_SL = 'Summt das s oder zischt es? Und ist der Vokal davor kurz oder lang?';
-  const slLuecke = () => { const w = pick(SL); return lwWahl('slLuecke', w, '<b>s</b>, <b>ss</b> oder <b>ß</b>?', TIPP_SL, slWarum(w), S1_SL); };
-  const slTippen = () => { const w = pick(SL); return lwTippen('slTippen', w, TIPP_SL, slWarum(w), S1_SL); };
+  function exSl(art, w, merk) {
+    const v = vokalVor(w), laenger = w.typ === 's' ? w.mehr[0] || '' : '';
+    const sag = [w.typ === 's'
+      ? (laenger ? `Am Wortende hört man es nicht genau. Verlängere: <b>${laenger}</b>. Dort <b>summt</b> das s weich wie eine Biene.` : `Sprich <b>${w.wort}</b> langsam: Das s <b>summt</b> weich wie eine Biene.`)
+      : `Sprich <b>${w.wort}</b> langsam: Das s <b>zischt</b> scharf wie eine Schlange.`];
+    if (w.typ === 'ss') sag.push(`Der Vokal <b>${v.text}</b> davor ist <b>kurz</b>. Nach kurzem Vokal: <b>ss</b>.`);
+    if (w.typ === 'ß') sag.push(v.zwie ? `Davor steht der Zwielaut <b>${v.text}</b>. Nach au, ei, eu und nach langem Vokal: <b>ß</b>.` : `Der Vokal <b>${v.text}</b> davor ist <b>lang</b>. Nach langem Vokal: <b>ß</b>.`);
+    return {
+      mode: 'weiche', art, wort: w.wort, lauf: [w.vor.length, w.vor.length + w.ein.length], laenger,
+      fragen: [{ f: 'Summt das s oder zischt es?', aus: ['summt', 's'], weiter: 'zischt' }, { f: 'Ist der Vokal davor kurz oder lang?', wahl: [['kurz', 'ss'], ['lang, au, ei, eu', 'ß']] }],
+      weg: w.typ === 's' ? [0] : [1, w.typ === 'ss' ? 0 : 1],
+      zeichen: w.typ === 's' || !v ? [] : [[1, v.von, v.bis, w.typ === 'ss' ? 'kurz' : 'lang']],
+      sag, merk,
+    };
+  }
+  const slLuecke = () => { const w = pick(SL); return lwWahl('slLuecke', w, '<b>s</b>, <b>ss</b> oder <b>ß</b>?', TIPP_SL, slWarum(w), S1_SL, exSl); };
+  const slTippen = () => { const w = pick(SL); return lwTippen('slTippen', w, TIPP_SL, slWarum(w), S1_SL, exSl); };
   function slRegel() {
     const w = pick(SL), typen = ['ss', 'ß', 's'];
     return {
       prompt: `Warum schreibt man dieses Wort mit <b>${w.ein}</b>?<br><span class="bsp gross">${w.wort}</span>`,
       choices: typen.map((t) => SREGEL[t]), correct: typen.indexOf(w.typ),
       hint: TIPP_SL, solution: `<b>${w.vor}<span class="vb">${w.ein}</span>${w.nach}</b><br>${slWarum(w)}`,
-      ex: zz('slRegel', [w.vor, w.ein, w.nach], 1, [w.wort], 0, S1_SL, slWarum(w), `<b>${w.wort}</b> mit <b>${w.ein}</b>`),
+      ex: exSl('slRegel', w, `<b>${w.wort}</b> mit <b>${w.ein}</b><br>${slWarum(w)}`),
     };
   }
   const sLaute = () => U.wahl([[48, slLuecke], [22, slRegel], [30, slTippen]]);
@@ -1713,7 +1761,8 @@
   const EINSILBER = ['Pferd', 'Strumpf', 'Herbst', 'Tisch', 'Schrank', 'Stuhl'];
   const REGEL_SILB = 'Sprich das Wort langsam und klatsche dazu: Jede Silbe hat einen Vokal (oder au, ei, eu, ie). Getrennt wird zwischen den Silben. <b>ch, sch, ck</b> bleiben zusammen. Von mehreren Konsonanten kommt nur der letzte in die nächste Zeile (Fens-ter, Kat-ze).';
   const silbInfo = (t) => { const teile = t.split('-'), wort = teile.join(''); const grenzen = []; let c = 0; teile.slice(0, -1).forEach((x) => { c += x.length; grenzen.push(c - 1); }); return { teile, wort, grenzen, t }; };
-  const exSilb = (art, x) => ({ mode: 'komma', art, dicht: true, mark: '-', tokens: [...x.wort], gaps: x.grenzen, s1: 'Sprich das Wort in Silben. Jede Silbe hat einen Vokal.', merk: `<b>${x.t}</b>: ${x.teile.length} ${x.teile.length === 1 ? 'Silbe' : 'Silben'}` });
+  // mode 'silben' (seit v121): Silbenbögen unter dem Wort, in jeder Silbe leuchtet der Vokal
+  const exSilb = (art, x) => ({ mode: 'silben', art, wort: x.wort, teile: x.teile, dicht: true, mark: '-', tokens: [...x.wort], gaps: x.grenzen, s1: 'Sprich das Wort in Silben. Jede Silbe hat einen Vokal.', merk: `<b>${x.t}</b>: ${x.teile.length} ${x.teile.length === 1 ? 'Silbe' : 'Silben'}` });
   function silbTrennen() {
     const x = silbInfo(pick(SILB.filter((t) => t.replace(/-/g, '').length <= 9)));
     return {

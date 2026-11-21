@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 21.11.2026, Version `lerndax-v120`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 21.11.2026, Version `lerndax-v121`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,30 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-30. Deutsch: echte Animationen für Rechtschreibung, Silben und Komma (lerndax-v121, 21.11.2026)
+
+Fortsetzung von 0-neu-29 (Roberto: „Okay, weiter.“). Für diese Aufgaben gab es seit v120 keinen Knopf „Lösung als Animation“ mehr,
+weil die alte Animation nur das Wort oder den Satz mit der Lösung wiederholte. Jetzt gibt es dort wieder einen Knopf, mit Bildern, die etwas zeigen:
+- **Lange Vokale** (`d5-lang`, neuer Baustein `laden`): vier Schubladen (einfach · mit h · doppelt · ie). Das Wort fällt in seine Schublade,
+  dazu drei Wörter, die genauso geschrieben werden. Beim Dehnungs-h wird der Buchstabe danach eingekreist (nur vor l, m, n, r).
+- **Kurze Vokale, Doppelkonsonanten** (`d5-kurz`) und **s, ss, ß** (`d5-slaute`), neuer Baustein `weiche`: zwei Fragen nacheinander,
+  eine Kugel läuft den Weg des Wortes. Kurz: „Vokal kurz oder lang?“ → „Wie viele Konsonanten hörst du danach?“ (einen → doppelt/ck/tz,
+  zwei → einfach). s-Laute: „Summt oder zischt das s?“ → „Vokal davor kurz oder lang?“. Am Wort: Punkt = kurzer Vokal, Strich = langer Vokal,
+  Klammer = die Konsonanten danach. Bei Haus → Häuser steht das verlängerte Wort daneben. Der ganze Weg ist von Anfang an blass zu sehen.
+- **Silben** (`d5-silben`, neuer Baustein `silben`): Silbenbögen mit Nummern (Klatscher), über jeder Silbe ein Strich für den Vokal-Klang.
+- **Komma** (`d5-komma`, `reiheKomma` in `d5-satzreihe`): Der Baustein `komma` zeigt erst den Satzbau, dann erscheinen die Kommas
+  (Angaben in `ex.bild`): Aufzählung (Teile unterstrichen, „und“ ersetzt das Komma), Satzgefüge (beide Verben, Einleitewort,
+  Hauptsatz blau und Nebensatz orange unterstrichen), Satzreihe (zwei Hauptsätze, Bindewort), Beisatz (Weglassprobe: ohne den Beisatz
+  bleibt ein ganzer Satz).
+- Technik: `lwWahl`/`lwTippen` nehmen einen eigenen Erklär-Baustein an (`exLang`, `exKurz`, `exSl`); `D.ohneAnimation` lässt Komma-Aufgaben
+  mit `ex.bild` durch. Höhe der Bilder angepasst (viewBox).
+
+**Deutsch noch ohne Knopf (nächste Schritte):** Groß/klein (Artikelprobe), Wortarten, Pronomen antippen, Präpositionen/Fall, Verbformen,
+wörtliche Rede, Vorsilben/Wortfeld, Textsorten. Bei den Text-Themen (Märchen, Sachtext, Theater) reicht vermutlich der Text.
+
+**Tests:** `dedax.py 3` (740 Antworten, 76 Animationen), `dedax_knobel.py`, `ui2.py` ohne Meldung. Neue Bilder bei 390 px und 320 px angesehen,
+auch als „ähnliches Beispiel“ vor der Aufgabe.
 
 ## 0-neu-29. Animationen aufgeräumt: keine bloße Wiederholung mehr (lerndax-v120, 21.11.2026)
 

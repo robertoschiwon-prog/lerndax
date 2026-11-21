@@ -325,6 +325,104 @@
       api.say(x.s2); await api.wait(2600);
       api.say(x.merk);
     },
+    // Rechtschreibung als Weiche (seit v121): zwei Fragen nacheinander, eine Kugel läuft den Weg des Wortes bis zur Schreibweise.
+    //   x: { wort, lauf:[von,bis] (die Buchstaben, um die es geht), laenger?, fragen:[{f, aus:[Antwort, Ergebnis], weiter}, {f, wahl:[[Antwort, Ergebnis] ×2]}],
+    //        weg:[0] (gleich fertig) oder [1, 0|1], zeichen:[[Schritt, von, bis, 'kurz'|'lang'|'unter']], sag:[Text je Schritt], merk }
+    async weiche(api, x) {
+      const t = el('text', { x: 180, y: 36, 'text-anchor': 'middle', class: 'vexpr' }, api.svg);
+      [[0, x.lauf[0]], x.lauf, [x.lauf[1], x.wort.length]].forEach(([a, b], k) => { if (b > a) { const ts = el('tspan', { text: x.wort.slice(a, b) }, t); if (k === 1) ts.setAttribute('fill', BLAU); } });
+      const pos = (a, b) => { try { return [t.getStartPositionOfChar(a).x, t.getEndPositionOfChar(b - 1).x]; } catch (e) { return [172, 188]; } };
+      const zeichne = (schritt) => (x.zeichen || []).filter((z) => z[0] === schritt).forEach(([, a, b, art]) => {
+        const [x1, x2] = pos(a, b), m = (x1 + x2) / 2;
+        if (art === 'kurz') el('circle', { cx: m, cy: 46, r: 3.5, fill: ORANGE }, api.svg);
+        else if (art === 'lang') el('line', { x1: x1 + 1, y1: 46, x2: x2 - 1, y2: 46, stroke: ORANGE, 'stroke-width': 3.5, 'stroke-linecap': 'round' }, api.svg);
+        else el('path', { d: `M ${x1} 43 v 5 H ${x2} v -5`, fill: 'none', stroke: BLAU, 'stroke-width': 2 }, api.svg);
+      });
+      const frage = (y, text) => el('text', { x: 180, y, 'text-anchor': 'middle', class: 'ex-s', text, style: 'font-weight:800;font-size:13.5px', opacity: 0 }, api.svg);
+      const pille = (x0, y, w, text) => {
+        const g = el('g', { opacity: 0 }, api.svg);
+        const r = el('rect', { x: x0, y, width: w, height: 28, rx: 14, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, g);
+        el('text', { x: x0 + w / 2, y: y + 18.5, 'text-anchor': 'middle', class: 'ex-s', text, style: 'font-size:12.5px;font-weight:700' }, g);
+        return { g, r, cx: x0 + w / 2, cy: y + 14, links: x0 };
+      };
+      const f1 = x.fragen[0], f2 = x.fragen[1];
+      const q1 = frage(72, f1.f);
+      const weiter = pille(24, 84, 130, `${f1.weiter} ↓`), aus = pille(206, 84, 130, `${f1.aus[0]} → ${f1.aus[1]}`);
+      const q2 = frage(140, f2.f);
+      const w0 = pille(20, 152, 150, `${f2.wahl[0][0]} → ${f2.wahl[0][1]}`), w1 = pille(190, 152, 150, `${f2.wahl[1][0]} → ${f2.wahl[1][1]}`);
+      const kugel = el('circle', { cx: 180, cy: 54, r: 7, fill: 'var(--c1)', stroke: 'var(--ink)', 'stroke-width': 2, opacity: 0 }, api.svg);
+      let ort = [180, 54];
+      const lauf = async (zx, zy) => { const [ax, ay] = ort; await api.tw(800, (k) => { kugel.setAttribute('cx', lerp(ax, zx, k)); kugel.setAttribute('cy', lerp(ay, zy, k)); }); ort = [zx, zy]; };
+      const treffer = (p) => { p.r.setAttribute('fill', '#dff5ea'); p.r.setAttribute('stroke', 'var(--ok)'); p.r.setAttribute('stroke-width', 2.5); };
+      const zeig = (...es) => api.tw(400, (k) => es.forEach((e) => e.setAttribute('opacity', Math.max(+e.getAttribute('opacity') || 0, k))));
+      await api.wait(700);
+      if (x.laenger) { const ende = pos(0, x.wort.length)[1]; const l = el('text', { x: ende + 10, y: 36, class: 'ex-b', text: `→ ${x.laenger}`, opacity: 0, style: `fill:${ORANGE}` }, api.svg); await zeig(l); }
+      // der ganze Weg ist von Anfang an blass zu sehen; die Frage, die gerade dran ist, wird kräftig
+      await api.tw(400, (k) => [q1, weiter.g, aus.g, q2, w0.g, w1.g].forEach((e) => e.setAttribute('opacity', 0.3 * k)));
+      await zeig(q1, weiter.g, aus.g, kugel);
+      api.say(`<b>${f1.f}</b>`); await api.wait(2200);
+      zeichne(0);
+      api.say(x.sag[0]);
+      const ziel1 = x.weg[0] === 0 ? aus : weiter;
+      await lauf(ziel1.links + 14, ziel1.cy);
+      if (x.weg[0] === 0) { treffer(aus); kugel.setAttribute('opacity', 0); weiter.g.setAttribute('opacity', 0.3); await api.wait(3200); api.say(x.merk); return; }
+      weiter.r.setAttribute('stroke', 'var(--c1)'); weiter.r.setAttribute('stroke-width', 2.5); aus.g.setAttribute('opacity', 0.3);
+      await api.wait(2800);
+      await zeig(q2, w0.g, w1.g);
+      api.say(`<b>${f2.f}</b>`); await api.wait(2200);
+      zeichne(1);
+      api.say(x.sag[1]);
+      const ziel2 = x.weg[1] === 0 ? w0 : w1;
+      await lauf(ziel2.links + 14, ziel2.cy);
+      treffer(ziel2); kugel.setAttribute('opacity', 0); (x.weg[1] === 0 ? w1 : w0).g.setAttribute('opacity', 0.3);
+      await api.wait(3400);
+      api.say(x.merk);
+    },
+    // Lange Vokale als Schubladen (seit v121): Das Wort fällt in die Schublade seiner Schreibweise; dazu Wörter, die genauso geschrieben werden.
+    //   x: { wort, stelle:[von,bis] (der lange Vokal), typ:'e'|'h'|'dd'|'ie'|'i', danach (Buchstabe nach dem Vokal), freunde:[Wörter], merk }
+    async laden(api, x) {
+      const t = el('text', { x: 180, y: 34, 'text-anchor': 'middle', class: 'vexpr' }, api.svg);
+      [[0, x.stelle[0]], x.stelle, [x.stelle[1], x.wort.length]].forEach(([a, b], k) => { if (b > a) { const ts = el('tspan', { text: x.wort.slice(a, b) }, t); if (k === 1) ts.setAttribute('fill', BLAU); } });
+      const pos = (a, b) => { try { return [t.getStartPositionOfChar(a).x, t.getEndPositionOfChar(b - 1).x]; } catch (e) { return [172, 188]; } };
+      const SP = [['e', 'einfach', 'die meisten'], ['h', 'mit h', 'vor l, m, n, r'], ['dd', 'doppelt', 'nur wenige'], ['ie', 'ie', 'langes i']];
+      const k0 = Math.max(0, SP.findIndex((s) => s[0] === (x.typ === 'i' ? 'e' : x.typ)));
+      const laden = SP.map((s, k) => {
+        const g = el('g', { opacity: 0 }, api.svg), x0 = 7 + k * 87.5;
+        const r = el('rect', { x: x0, y: 58, width: 83, height: 142, rx: 9, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, g);
+        el('path', { d: `M ${x0} 98 H ${x0 + 83}`, stroke: 'var(--soft)', 'stroke-width': 1.5 }, g);
+        el('text', { x: x0 + 41.5, y: 76, 'text-anchor': 'middle', class: 'ex-s', text: s[1], style: 'font-weight:800;font-size:13.5px' }, g);
+        el('text', { x: x0 + 41.5, y: 91, 'text-anchor': 'middle', class: 'ex-s f6', text: s[2], style: 'font-size:10.5px' }, g);
+        return { g, r, cx: x0 + 41.5 };
+      });
+      await api.wait(600);
+      const [v1, v2] = pos(x.stelle[0], x.stelle[1]);
+      el('line', { x1: v1 + 1, y1: 44, x2: v2 - 1, y2: 44, stroke: ORANGE, 'stroke-width': 3.5, 'stroke-linecap': 'round' }, api.svg);
+      api.say(`Sprich <b>${x.wort}</b> langsam: Der Vokal klingt <b>lang</b>. Dafür gibt es vier Schreibweisen, für jede eine Schublade.`);
+      await api.tw(600, (k) => laden.forEach((l) => l.g.setAttribute('opacity', k)));
+      await api.wait(3000);
+      if (x.typ === 'h') {
+        const [n1, n2] = pos(x.stelle[1], x.stelle[1] + 1);
+        el('circle', { cx: (n1 + n2) / 2, cy: 27, r: 12, fill: 'none', stroke: ORANGE, 'stroke-width': 2 }, api.svg);
+        api.say(`Hinter dem Vokal steht ein stummes <b>h</b>. Danach folgt <b>${x.danach}</b>: Ein Dehnungs-h gibt es nur vor l, m, n oder r.`);
+      } else if (x.typ === 'dd') api.say('Der Vokal steht <b>doppelt</b>. Das gibt es nur bei wenigen Wörtern mit aa, ee oder oo.');
+      else if (x.typ === 'ie') api.say('Es ist ein langes i. Das schreibt man fast immer <b>ie</b>.');
+      else if (x.typ === 'i') api.say('Achtung, Ausnahme: Dieses lange i steht <b>ohne e</b>. Es gehört in die Schublade „einfach“.');
+      else api.say('Kein h dahinter, kein doppelter Vokal: Der lange Vokal steht <b>einfach</b> da, wie bei den meisten Wörtern.');
+      await api.wait(3200);
+      const ziel = laden[k0], fs = x.wort.length > 7 ? 13 : 15;
+      const karte = el('text', { x: 180, y: 34, 'text-anchor': 'middle', class: 'ex-b', text: x.wort, style: `font-size:${fs}px;fill:${BLAU}` }, api.svg);
+      await api.tw(800, (k) => { karte.setAttribute('x', lerp(180, ziel.cx, k)); karte.setAttribute('y', lerp(34, 118, k)); });
+      ziel.r.setAttribute('stroke', 'var(--ok)'); ziel.r.setAttribute('stroke-width', 2.5); ziel.r.setAttribute('fill', '#f1fbf6');
+      laden.forEach((l, k) => { if (k !== k0) l.g.setAttribute('opacity', 0.4); });
+      await api.wait(1400);
+      if (x.freunde && x.freunde.length) {
+        const fr = x.freunde.map((w, i) => el('text', { x: ziel.cx, y: 140 + i * 19, 'text-anchor': 'middle', class: 'ex-s', text: w, style: `font-size:${w.length > 8 ? 11.5 : 13}px`, opacity: 0 }, api.svg));
+        api.say(`In dieselbe Schublade gehören zum Beispiel <b>${x.freunde.join(', ')}</b>. ${x.typ === 'e' || x.typ === 'ie' ? 'So werden die meisten geschrieben.' : 'Merke dir diese Wörter zusammen.'}`);
+        for (const f of fr) await api.tw(350, (k) => f.setAttribute('opacity', k));
+        await api.wait(3400);
+      }
+      api.say(x.merk);
+    },
     // ein Bild (SVG-Text aus der Aufgabe) in die Mitte, dann die Erklärung
     async bild(api, x) {
       const g = el('g', { opacity: 0 }, api.svg);
@@ -349,17 +447,88 @@
       if (x.dicht) t.setAttribute('style', 'font-size:26px');
       const lang = x.tokens.join(sep).length; let br = -1;
       if (!x.dicht && lang > 30) { let c = 0; for (let i = 0; i < x.tokens.length; i++) { c += x.tokens[i].length + 1; if (c >= lang / 2) { br = i + 1; break; } } if (br >= x.tokens.length) br = -1; }
-      const ks = {};
+      const ks = {}, tt = [];
       x.tokens.forEach((w, i) => {
-        const e = el('tspan', { text: (i && i !== br ? sep : '') + w }, t);
+        const e = el('tspan', { text: (i && i !== br ? sep : '') + w }, t); tt.push(e);
         if (i === br) { e.setAttribute('x', 180); e.setAttribute('dy', 26); }
         if (x.gaps.includes(i)) ks[i] = el('tspan', { text: mark, fill: ORANGE, 'fill-opacity': 0 }, t);
       });
       if (br > 0) t.setAttribute('y', 53);
       if (!x.dicht) fit(t, 336, 19); else { try { for (let fs = 26; fs >= 12 && t.getBBox().width > 336; fs--) t.setAttribute('style', `font-size:${fs}px`); } catch (e) {} }
-      api.say(x.s1); await api.wait(x.dicht ? 2200 : 3200);
-      for (const i of x.gaps) { await api.tw(350, (k) => ks[i].setAttribute('fill-opacity', k)); await api.wait(900); }
-      api.say(x.merk || `<b>${x.tokens.map((w, i) => w + (x.gaps.includes(i) ? ',' : '')).join(' ')}</b>`);
+      const fertig = () => api.say(x.merk || `<b>${x.tokens.map((w, i) => w + (x.gaps.includes(i) ? ',' : '')).join(' ')}</b>`);
+      const kommas = async () => { for (const i of x.gaps) { await api.tw(350, (k) => ks[i].setAttribute('fill-opacity', k)); await api.wait(700); } };
+      if (!x.bild) { api.say(x.s1); await api.wait(x.dicht ? 2200 : 3200); await kommas(); return fertig(); }
+      // ---- mit Bild (seit v121): erst den Satzbau zeigen, dann erscheinen die Kommas an den Nahtstellen
+      const b = x.bild, GRUEN = '#0f8a5f';
+      const wort = (i) => x.tokens[i].replace(/[.,!?]$/, ''), worte = ([a, z]) => x.tokens.slice(a, z + 1).map((w) => w.replace(/[.,!?]$/, '')).join(' ');
+      const ort = (i) => { try { const e = tt[i], a = /^\s/.test(e.textContent) ? 1 : 0, p1 = e.getStartPositionOfChar(a), p2 = e.getEndPositionOfChar(e.getNumberOfChars() - 1); return { x1: p1.x, x2: p2.x, y: p1.y }; } catch (e) { return { x1: 20 + i * 30, x2: 44 + i * 30, y: 66 }; } };
+      const farbe = (von, bis, f) => { for (let i = von; i <= bis; i++) tt[i].setAttribute('fill', f); };
+      const strich = async ([von, bis], f) => { // Unterstreichung über einen Wortbereich, auch über zwei Zeilen
+        const zeilen = {}; for (let i = von; i <= bis; i++) { const o = ort(i); (zeilen[o.y] = zeilen[o.y] || []).push(o); }
+        const ls = Object.keys(zeilen).map((y) => el('line', { x1: Math.min(...zeilen[y].map((o) => o.x1)), y1: +y + 7, x2: Math.min(...zeilen[y].map((o) => o.x1)), y2: +y + 7, stroke: f, 'stroke-width': 3.5, 'stroke-linecap': 'round', 'data-x2': Math.max(...zeilen[y].map((o) => o.x2)) }, api.svg));
+        await api.tw(500, (k) => ls.forEach((l) => l.setAttribute('x2', lerp(+l.getAttribute('x1'), +l.getAttribute('data-x2'), k))));
+      };
+      const unten = (br > 0 ? 79 : 66) + 34; let lx = 0;
+      const legende = (f, text) => { if (!lx) lx = 78; el('line', { x1: lx, y1: unten - 4, x2: lx + 18, y2: unten - 4, stroke: f, 'stroke-width': 3.5, 'stroke-linecap': 'round' }, api.svg); el('text', { x: lx + 24, y: unten, class: 'ex-s', text, style: 'font-size:12px;font-weight:700' }, api.svg); lx += 104; };
+      await api.wait(500);
+      if (b.typ === 'aufz') {
+        api.say(`Hier wird etwas <b>aufgezählt</b>. Suche die Teile der Aufzählung.`); await api.wait(2200);
+        for (const tl of b.teile) { farbe(tl[0], tl[1], BLAU); await strich(tl, BLAU); await api.wait(450); }
+        api.say(`Die Aufzählung hat <b>${b.teile.length} Teile</b>: ${b.teile.map(worte).join(' · ')}.`); await api.wait(3000);
+        await kommas();
+        api.say('Zwischen den Teilen steht ein <b>Komma</b>.'); await api.wait(2400);
+        tt[b.und].setAttribute('fill', ORANGE);
+        api.say('Vor <b>und</b> steht keins: Das „und“ verbindet die letzten beiden Teile schon.'); await api.wait(3400);
+      } else if (b.typ === 'gef') {
+        api.say('Suche zuerst die <b>beiden Verben</b>. Zwei Verben mit Personalform: Das sind zwei Sätze in einem.'); await api.wait(1400);
+        tt[b.hsVerb].setAttribute('fill', BLAU); tt[b.nsVerb].setAttribute('fill', ORANGE); await api.wait(3000);
+        tt[b.einleit].setAttribute('fill', ORANGE); await strich(b.ns, ORANGE); legende(BLAU, 'Hauptsatz'); legende(ORANGE, 'Nebensatz');
+        api.say(`Das Einleitewort <b>${wort(b.einleit).toLowerCase()}</b> beginnt den <b>Nebensatz</b>. Sein Verb „${wort(b.nsVerb)}“ steht ganz am Ende.`); await api.wait(3800);
+        await strich(b.hs, BLAU);
+        api.say(b.nsVorn ? `Der Rest ist der <b>Hauptsatz</b>. Weil der Nebensatz vorn steht, beginnt er gleich mit dem Verb „${wort(b.hsVerb)}“.` : `Der Rest ist der <b>Hauptsatz</b>. Sein Verb „${wort(b.hsVerb)}“ steht an 2. Stelle.`); await api.wait(3600);
+        await kommas();
+        api.say('Wo Hauptsatz und Nebensatz aneinanderstoßen, steht das <b>Komma</b>.'); await api.wait(3200);
+      } else if (b.typ === 'reihe') {
+        api.say('Suche die beiden Teile des Satzes.'); await api.wait(1200);
+        await strich(b.s1, BLAU); await strich([b.bind + 1, b.s2[1]], GRUEN); legende(BLAU, '1. Hauptsatz'); legende(GRUEN, '2. Hauptsatz');
+        api.say(`Das sind <b>zwei Hauptsätze</b>. Jeder könnte allein stehen: „${worte(b.s1)}.“ und „${worte([b.bind + 1, b.s2[1]]).replace(/^./, (c) => c.toUpperCase())}.“`); await api.wait(4200);
+        tt[b.bind].setAttribute('fill', ORANGE);
+        api.say(`Das Bindewort <b>${wort(b.bind)}</b> verbindet sie zu einer Satzreihe.`); await api.wait(2600);
+        await kommas();
+        api.say(`Vor <b>${wort(b.bind)}</b> steht das <b>Komma</b>: Dort endet der erste Hauptsatz.`); await api.wait(3200);
+      } else if (b.typ === 'appo') {
+        farbe(b.von, b.bis, ORANGE); await strich([b.von, b.bis], ORANGE);
+        api.say(`„${worte([b.von, b.bis])}“ erklärt das Nomen davor genauer: „${wort(b.von - 1)}“. So ein Einschub heißt <b>Beisatz</b> (Apposition).`); await api.wait(4000);
+        await kommas();
+        api.say(x.gaps.length > 1 ? 'Der Beisatz wird <b>vorn und hinten</b> mit einem Komma abgetrennt.' : 'Der Beisatz wird mit einem <b>Komma</b> abgetrennt. Am Satzende ersetzt der Punkt das zweite Komma.'); await api.wait(3200);
+        await api.tw(500, (k) => { for (let i = b.von; i <= b.bis; i++) tt[i].setAttribute('fill-opacity', 1 - 0.75 * k); });
+        const ohne = x.tokens.filter((w, i) => i < b.von || i > b.bis).map((w) => w.replace(/[.,!?]$/, '')).join(' ');
+        api.say(`Probe: Lass den Beisatz weg. Es bleibt ein ganzer Satz: <b>${ohne}.</b>`); await api.wait(4200);
+        await api.tw(400, (k) => { for (let i = b.von; i <= b.bis; i++) tt[i].setAttribute('fill-opacity', 0.25 + 0.75 * k); });
+      }
+      fertig();
+    },
+    // Silbenbögen (seit v121): unter jeder Silbe ein Bogen, in jeder Silbe leuchtet der Vokal (ein Klang je Silbe)
+    //   x: { wort, teile:[Silben], merk }
+    async silben(api, x) {
+      const t = el('text', { x: 180, y: 56, 'text-anchor': 'middle', class: 'ex-b', text: x.wort, style: 'font-size:30px;letter-spacing:2px' }, api.svg);
+      try { for (let fs = 30; fs >= 14 && t.getBBox().width > 330; fs--) t.setAttribute('style', `font-size:${fs}px;letter-spacing:2px`); } catch (e) {}
+      const pos = (a, z) => { try { return [t.getStartPositionOfChar(a).x, t.getEndPositionOfChar(z - 1).x]; } catch (e) { return [120 + a * 16, 120 + z * 16]; } };
+      api.say('Sprich das Wort langsam und <b>klatsche</b> zu jeder Silbe. Jeder Bogen ist ein Klatscher.'); await api.wait(2600);
+      let a = 0; const kerne = [];
+      for (let i = 0; i < x.teile.length; i++) {
+        const s = x.teile[i], z = a + s.length, [x1, x2] = pos(a, z);
+        const bogen = el('path', { d: `M ${x1 + 1} 66 Q ${(x1 + x2) / 2} ${66 + Math.min(22, 8 + (x2 - x1) / 4)} ${x2 - 3} 66`, fill: 'none', stroke: BLAU, 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0 }, api.svg);
+        const nr = el('text', { x: (x1 + x2) / 2, y: 104, 'text-anchor': 'middle', class: 'ex-s', text: i + 1, style: 'font-weight:800', opacity: 0 }, api.svg);
+        const m = s.match(/ie|au|ei|eu|äu|aa|ee|oo|[aeiouäöüy]/i);
+        if (m) { const [k1, k2] = pos(a + m.index, a + m.index + m[0].length); kerne.push(el('line', { x1: k1 + 1, y1: 26, x2: k2 - 3, y2: 26, stroke: ORANGE, 'stroke-width': 4, 'stroke-linecap': 'round', opacity: 0 }, api.svg)); }
+        await api.tw(380, (k) => { bogen.setAttribute('opacity', k); nr.setAttribute('opacity', k); });
+        await api.wait(650); a = z;
+      }
+      api.say(`<b>${x.teile.join('-')}</b>: ${x.teile.length} ${x.teile.length === 1 ? 'Silbe' : 'Silben'}. ${x.teile.length > 1 ? 'Getrennt wird dort, wo zwei Bögen aneinanderstoßen.' : 'Einsilbige Wörter trennt man nicht.'}`); await api.wait(3200);
+      await api.tw(500, (k) => kerne.forEach((l) => l.setAttribute('opacity', k)));
+      api.say('In jeder Silbe steckt <b>genau ein Vokal-Klang</b> (orange): ein Vokal, ein Umlaut oder ein Zwielaut wie au, ei, ie. So kannst du die Silben auch zählen.'); await api.wait(4200);
+      api.say(x.merk);
     },
     // Satzglieder als Wagen: markieren, benennen und (bei um) umstellen
     async glieder(api, x) {
@@ -529,14 +698,14 @@
   thema('d5-objekte', 'Objekte: Wem? Wen oder was?', '0 0 360 100');
   thema('d5-attribute', 'Attribute: genauer beschreiben', '0 0 360 120');
   thema('d5-nebensatz', 'Hauptsatz und Nebensatz', '0 0 360 150');
-  thema('d5-satzreihe', 'Satzreihe: zwei Hauptsätze', '0 0 360 120');
+  thema('d5-satzreihe', 'Satzreihe: zwei Hauptsätze', '0 0 360 124');
   thema('d5-satzarten', 'Satzarten', '0 0 360 120');
-  thema('d5-komma', 'Das Komma', '0 0 360 120');
+  thema('d5-komma', 'Das Komma', '0 0 360 124');
   thema('d5-rede', 'Wörtliche Rede', '0 0 360 120');
-  thema('d5-lang', 'Lange Vokale', '0 0 360 150');
-  thema('d5-kurz', 'Kurz oder lang? Doppelt oder einfach?', '0 0 360 150');
+  thema('d5-lang', 'Lange Vokale: vier Schubladen', '0 0 360 208');
+  thema('d5-kurz', 'Kurz oder lang? Doppelt oder einfach?', '0 0 360 190');
   thema('d5-ableiten', 'Verlängern und Ableiten', '0 0 360 150');
-  thema('d5-slaute', 's, ss oder ß?', '0 0 360 150');
+  thema('d5-slaute', 's, ss oder ß?', '0 0 360 190');
   thema('d5-gross', 'Groß oder klein?', '0 0 360 150');
   thema('d5-silben', 'Silben', '0 0 360 120');
   thema('d5-zusammen', 'Zusammengesetzte Wörter', '0 0 360 150');
@@ -555,5 +724,6 @@
   // Geblieben sind Animationen, die etwas zeigen: Fälle, Steigern, Satzglieder, Zeitformen, Reim, Schaubild und die Ausnahmen unten.
   const WIEDERHOLT = { marken: 1, liste: 1, komma: 1, zz: 1, bild: 1, satz: 1, wa: 1 };
   const ZEIGT_ETWAS = { 'd5-gedicht|marken': 1, 'd5-wortfamilie|liste': 1, 'd5-nebensatz|zz': 1, 'd5-zusammen|zz': 1, 'd5-ableiten|zz': 1, 'd5-subjekt|zz': 1, 'd5-pronomen|zz': 1 };
-  D.ohneAnimation = (themaId, ex) => !!WIEDERHOLT[ex.mode] && !ZEIGT_ETWAS[themaId + '|' + ex.mode];
+  // Komma-Aufgaben mit Satzbau-Bild (ex.bild, seit v121) behalten den Knopf
+  D.ohneAnimation = (themaId, ex) => !!WIEDERHOLT[ex.mode] && !ex.bild && !ZEIGT_ETWAS[themaId + '|' + ex.mode];
 })();
