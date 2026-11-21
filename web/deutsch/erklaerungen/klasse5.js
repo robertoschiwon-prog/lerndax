@@ -550,4 +550,10 @@
   thema('d5-theater', 'Theaterszenen', '0 0 360 150');
   thema('d5-kamera', 'Film: Einstellungsgrößen und Perspektiven', '0 0 360 125');
   thema('d5-sachtext', 'Sachtexte und Schaubilder lesen', '0 0 360 150');
+  // Aufgabenarten, deren Animation nur den Satz aus der Aufgabe mit markierter Lösung wiederholt (Durchsicht 21.11.2026, v120):
+  // nach der Aufgabe kein Knopf „Lösung als Animation“; Antwort und Warum stehen schon unter „So geht’s“.
+  // Geblieben sind Animationen, die etwas zeigen: Fälle, Steigern, Satzglieder, Zeitformen, Reim, Schaubild und die Ausnahmen unten.
+  const WIEDERHOLT = { marken: 1, liste: 1, komma: 1, zz: 1, bild: 1, satz: 1, wa: 1 };
+  const ZEIGT_ETWAS = { 'd5-gedicht|marken': 1, 'd5-wortfamilie|liste': 1, 'd5-nebensatz|zz': 1, 'd5-zusammen|zz': 1, 'd5-ableiten|zz': 1, 'd5-subjekt|zz': 1, 'd5-pronomen|zz': 1 };
+  D.ohneAnimation = (themaId, ex) => !!WIEDERHOLT[ex.mode] && !ZEIGT_ETWAS[themaId + '|' + ex.mode];
 })();

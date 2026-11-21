@@ -695,7 +695,8 @@
       correct: order.indexOf(1),
       hint: `${f.schaetz} Rechne mit runden Zahlen.`,
       solution: `<b>Was weiß ich?</b> ${f.weiss}<br><b>Was schätze ich?</b> ${f.schaetz}<br><b>Rechnen mit runden Zahlen:</b> ${f.rechnung.join(' → ')}<br>→ <b>${opts[1]}${f.opts ? '' : ' ' + f.einheit}</b>`,
-      ex: { mode: 'fermi', frage: f.frage, weiss: f.weiss, schaetz: f.schaetz, rechnung: f.rechnung, antwort: opts[1] + (f.opts ? '' : ' ' + f.einheit) },
+      // nach: false (seit v120): Die Animation zeigt nur die vier Schritte aus „So geht’s“ noch einmal, deshalb kein Knopf nach der Aufgabe
+      ex: { mode: 'fermi', nach: false, frage: f.frage, weiss: f.weiss, schaetz: f.schaetz, rechnung: f.rechnung, antwort: opts[1] + (f.opts ? '' : ' ' + f.einheit) },
     };
   }
 

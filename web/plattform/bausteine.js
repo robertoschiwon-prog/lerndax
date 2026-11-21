@@ -50,13 +50,14 @@
       return t;
     }
     // n = wie viele Teile (zufällige Auswahl in richtiger Reihenfolge)
+    // Ohne Bilder zeigt die Reihe nur dieselbe Liste wie „So geht’s“: dann kein Knopf „Lösung als Animation“ (nach: false, seit v120)
     function ordnen(art, e, hint, n) {
       let idx = e.items.map((_, i) => i);
       if (n && n < idx.length) idx = shuffle(idx).slice(0, n).sort((a, b) => a - b);
       const teile = idx.map((i) => e.items[i]);
       const loes = teile.map((x, k) => `${k + 1}. ${x}${opt.ordnenZusatz ? opt.ordnenZusatz(e, idx[k]) : ''}`).join('<br>');
       const ex = (opt.ordnenEx && opt.ordnenEx(art, e, idx, teile)) || (e.ex && Object.assign({ art }, e.ex))
-        || { mode: 'reihe', art, items: teile, bilder: e.bilder ? idx.map((i) => e.bilder[i]) : null, s1: e.s1 || 'Schritt für Schritt:', merk: e.w || `Die richtige Reihenfolge: ${teile.join(' → ')}` };
+        || { mode: 'reihe', nach: !!e.bilder, art, items: teile, bilder: e.bilder ? idx.map((i) => e.bilder[i]) : null, s1: e.s1 || 'Schritt für Schritt:', merk: e.w || `Die richtige Reihenfolge: ${teile.join(' → ')}` };
       const t = { prompt: e.t, order: { words: mische(teile), answer: teile.join(' '), end: '' }, hint: e.h || hint, solution: `${loes}${e.w ? '<br>' + e.w : ''}`, ex };
       if (e.svg) t.figure = bild(e.svg);
       return t;

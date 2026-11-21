@@ -554,25 +554,44 @@
     });
   }
   // Dezimalzahl : einstellige Zahl
-  erweitere('k5-dezimal', 'div', 'Dezimalzahl durch eine Zahl teilen', '0 0 360 150', (api, c, ctx) => {
+  // Umweg-Bild (seit v120): links hinunter „Komma weg“, unten ohne Komma teilen, rechts hinauf „Komma zurück“. Vorher standen hier nur drei Rechenzeilen.
+  erweitere('k5-dezimal', 'div', 'Dezimalzahl durch eine Zahl teilen', '0 0 360 190', (api, c, ctx) => {
     let g;
     const A = fmt(c.a / c.st), Q = fmt(c.q / c.st), nk = c.st === 10 ? 1 : 2;
+    const kasten = (x, y, text, cls) => { const k = el('g', { opacity: 0 }, api.svg); el('rect', { x: x - 52, y: y - 20, width: 104, height: 36, rx: 10, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2.5 }, k); const t = el('text', { x, y: y + 5, class: cls || 'ex-b', 'text-anchor': 'middle', text }, k); return { k, t }; };
+    const pfeil = (x1, y1, x2, y2, farbe, text, tx, ty, anker, strich) => {
+      const k = el('g', { opacity: 0 }, api.svg), w = Math.atan2(y2 - y1, x2 - x1), q = (d) => `${x2 - 11 * Math.cos(w) + d * 5 * Math.sin(w)} ${y2 - 11 * Math.sin(w) - d * 5 * Math.cos(w)}`;
+      el('line', Object.assign({ x1, y1, x2: x2 - 6 * Math.cos(w), y2: y2 - 6 * Math.sin(w), stroke: farbe, 'stroke-width': 3, 'stroke-linecap': 'round' }, strich ? { 'stroke-dasharray': '2 6' } : {}), k);
+      el('path', { d: `M ${x2} ${y2} L ${q(1)} L ${q(-1)} z`, fill: farbe }, k);
+      el('text', { x: tx, y: ty, class: 'ex-b', 'text-anchor': anker, text, style: `fill:${farbe}` }, k);
+      return k;
+    };
     return {
       reset() {
         api.clear(); api.sub(subText(ctx)); g = {};
-        g.l1 = el('text', { x: 180, y: 36, class: 'ex-b', 'text-anchor': 'middle', text: `${A} : ${c.d} = ?` }, api.svg);
-        g.l2 = el('text', { x: 180, y: 80, class: 'ex-b f2', 'text-anchor': 'middle', opacity: 0, text: `${fmt(c.a)} : ${c.d} = ${fmt(c.q)}` }, api.svg);
-        g.l3 = el('text', { x: 180, y: 124, class: 'ex-b f1', 'text-anchor': 'middle', opacity: 0, text: `${A} : ${c.d} = ${Q}` }, api.svg);
+        g.ol = kasten(82, 40, A); show(g.ol.k, 1);
+        g.or = kasten(278, 40, '?', 'ex-b f1'); show(g.or.k, 1);
+        g.oben = pfeil(138, 40, 222, 40, 'var(--soft)', `: ${c.d}`, 180, 30, 'middle', true); show(g.oben, 1);
+        g.ul = kasten(82, 150, fmt(c.a)); g.ur = kasten(278, 150, fmt(c.q), 'ex-b f2');
+        g.runter = pfeil(82, 60, 82, 126, 'var(--c1)', `· ${c.st}`, 92, 98, 'start');
+        g.unten = pfeil(138, 150, 222, 150, 'var(--c2)', `: ${c.d}`, 180, 140, 'middle');
+        g.rauf = pfeil(278, 126, 278, 60, 'var(--c1)', `: ${c.st}`, 268, 98, 'end');
+        g.h1 = el('text', { x: 92, y: 112, class: 'ex-s f6', text: 'Komma weg', opacity: 0, style: 'font-size:11px' }, api.svg);
+        g.h2 = el('text', { x: 268, y: 112, class: 'ex-s f6', 'text-anchor': 'end', text: 'Komma zurück', opacity: 0, style: 'font-size:11px' }, api.svg);
       },
       async play() {
-        api.say(`<b>${A} : ${c.d}</b>. Das Komma stört beim Rechnen. Wir denken es uns erst einmal weg.`);
+        api.say(`<b>${A} : ${c.d}</b>. Das Komma stört beim Rechnen. Wir machen einen <b>Umweg</b> über eine ganze Zahl.`);
         await api.wait(3600);
-        show(g.l2, 1);
+        await api.tw(500, (t) => { show(g.runter, t); show(g.h1, t); }); await api.tw(400, (t) => show(g.ul.k, t));
+        api.say(`Mal ${c.st}: Aus ${A} wird die ganze Zahl <b>${fmt(c.a)}</b>. Das Komma ist weg.`);
+        await api.wait(3200);
+        await api.tw(500, (t) => show(g.unten, t)); await api.tw(400, (t) => show(g.ur.k, t));
         api.say(`Ohne Komma: ${fmt(c.a)} : ${c.d} = <b>${fmt(c.q)}</b>. Das kannst du im Kopf oder schriftlich rechnen.`);
         await api.wait(3800);
-        show(g.l3, 1);
-        api.say(`${A} hat <b>${nk === 1 ? 'eine Nachkommastelle' : 'zwei Nachkommastellen'}</b>. Beim Teilen durch eine ganze Zahl bleibt das so: Auch das Ergebnis bekommt ${nk === 1 ? 'eine' : 'zwei'}.<br>${A} : ${c.d} = <b>${Q}</b>`);
-        await api.wait(4200);
+        await api.tw(500, (t) => { show(g.rauf, t); show(g.h2, t); });
+        g.or.t.textContent = Q;
+        api.say(`Jetzt den Umweg zurück: geteilt durch ${c.st}. Das Komma rückt ${nk === 1 ? 'eine Stelle' : 'zwei Stellen'} nach links.<br>${A} hat <b>${nk === 1 ? 'eine Nachkommastelle' : 'zwei Nachkommastellen'}</b>, das Ergebnis auch: ${A} : ${c.d} = <b>${Q}</b>`);
+        await api.wait(4600);
         api.say(`${A} : ${c.d} = <b>${Q}</b><br><small>Probe: ${Q} · ${c.d} = ${A}. Und der Überschlag passt: ${A} ist ${c.a / c.st < c.d ? 'kleiner als ' + c.d + ', also muss das Ergebnis kleiner als 1 sein' : 'etwa ' + Math.round(c.a / c.st) + ', geteilt durch ' + c.d + ' ergibt etwa ' + fmt(Math.round((c.a / c.st / c.d) * 10) / 10)}.</small>`);
       },
     };

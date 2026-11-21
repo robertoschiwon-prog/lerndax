@@ -170,41 +170,62 @@
   // „Mach die Probe“: rückwärts rechnen (Ergebnis mal Teiler, plus Rest) und mit der Ausgangszahl vergleichen
   //   ctx: { mode:'probe', n, d, q (behauptetes Ergebnis), r, qTrue }
   function probeErklaerung(api, ctx) {
+    // Pfeilbild (seit v120): oben der Weg hin (geteilt), unten der Weg zurück (mal, dann Rest dazu). Vorher standen hier nur Rechenzeilen.
     let { n, d, q, r } = ctx;
     if (ctx.pre) { d = R(3, 9); const qT = R(102, 999); r = ctx.r ? R(1, d - 1) : 0; n = d * qT + r; q = ctx.find || Math.random() < 0.5 ? qT : qT + pick([-10, -1, 1, 10]); }
-    const back = q * d + r, ok = back === n;
-    const T = (y, text, cls) => el('text', { x: 180, y, class: cls || 'ex-b', 'text-anchor': 'middle', text }, api.svg);
+    const back = q * d + r, ok = back === n, rest = r ? ` Rest ${r}` : '';
+    const T = (x, y, text, cls, extra) => el('text', Object.assign({ x, y, class: cls || 'ex-b', 'text-anchor': 'middle', text }, extra || {}), api.svg);
+    function bogen(x1, x2, y, hoch, farbe) {
+      const p = el('path', { d: `M ${x1} ${y} Q ${(x1 + x2) / 2} ${y - hoch} ${x2} ${y}`, fill: 'none', stroke: farbe, 'stroke-width': 3, 'stroke-linecap': 'round' }, api.svg);
+      let len = 200; try { len = p.getTotalLength(); } catch (e) {}
+      const sx = x2 > x1 ? 1 : -1, sy = hoch > 0 ? 1 : -1;
+      const kopf = el('path', { d: `M ${x2} ${y} l ${-12 * sx} ${-2 * sy} l ${6 * sx} ${-9 * sy} z`, fill: farbe }, api.svg);
+      return { p, len, kopf };
+    }
+    let g;
     return {
       reset() {
-        api.clear();
+        api.clear(); g = {};
         api.sub(ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst');
-        T(40, ctx.find ? `? : ${d} = ${fmt(q)}${r ? ` Rest ${r}` : ''}` : `${fmt(n)} : ${d} = ${fmt(q)}${r ? ` Rest ${r}` : ''} ?`, 'vexpr');
+        g.boxL = el('rect', { x: 20, y: 50, width: 110, height: 48, rx: 12, fill: '#fff', stroke: 'var(--ink)', 'stroke-width': 2.5 }, api.svg);
+        g.tL = T(75, 82, ctx.find ? '?' : fmt(n), 'vexpr');
+        el('rect', { x: 210, y: 50, width: 130, height: 48, rx: 12, fill: 'var(--tint)', stroke: 'var(--ink)', 'stroke-width': 2.5 }, api.svg);
+        T(275, 81, `${fmt(q)}${rest}`, 'ex-b');
+        bogen(134, 206, 58, 30, 'var(--c2)');
+        T(170, 32, `: ${d}`, 'ex-b f2');
+        g.zur = bogen(206, 134, 92, -30, 'var(--c1)');
+        g.zur.p.style.strokeDasharray = g.zur.len; g.zur.p.style.strokeDashoffset = g.zur.len; g.zur.kopf.setAttribute('opacity', 0);
+        g.zl = T(188, 128, `· ${d}${r ? `, dann + ${r}` : ''}`, 'ex-b f1', { opacity: 0 });
       },
       async play() {
         api.say(ctx.find
-          ? `Die gesuchte Zahl finden wir <b>rückwärts</b>, wie bei der Probe: Ergebnis <b>mal ${d}</b>${r ? ', dann den <b>Rest dazu</b>' : ''}.`
-          : `Die <b>Probe</b> rechnet rückwärts: Ergebnis <b>mal ${d}</b>${r ? ', dann den <b>Rest dazu</b>' : ''}. Kommt wieder ${fmt(n)} heraus, stimmt die Rechnung.`);
-        await api.wait(3400);
+          ? `Oben steht der Weg hin: eine Zahl <b>geteilt durch ${d}</b>. Die gesuchte Zahl finden wir <b>rückwärts</b>: Ergebnis <b>mal ${d}</b>${r ? ', dann den <b>Rest dazu</b>' : ''}.`
+          : `Die <b>Probe</b> geht den Weg zurück: Ergebnis <b>mal ${d}</b>${r ? ', dann den <b>Rest dazu</b>' : ''}. Kommt wieder ${fmt(n)} heraus, stimmt die Rechnung.`);
+        await api.wait(1200);
+        await api.tw(900, (t) => (g.zur.p.style.strokeDashoffset = g.zur.len * (1 - t)));
+        g.zur.kopf.setAttribute('opacity', 1); g.zl.setAttribute('opacity', 1);
+        await api.wait(2600);
         const ds = String(q).split('').map(Number), parts = ds.map((c, i) => c * 10 ** (ds.length - 1 - i)).filter((v) => v);
-        T(86, `${fmt(q)} · ${d}`);
-        api.say(`${fmt(q)} · ${d} rechnen wir in Teilen: ${parts.map((p) => `${p} · ${d}`).join(' + ')}`);
+        T(180, 160, `${fmt(q)} · ${d}${parts.length > 1 ? ` = ${parts.map((p) => fmt(p * d)).join(' + ')}` : ''}`, 'ex-b', { style: 'font-size:16px' });
+        api.say(parts.length > 1 ? `${fmt(q)} · ${d} rechnen wir in Teilen: ${parts.map((p) => `${p} · ${d}`).join(' + ')}` : `Zuerst mal ${d}: ${fmt(q)} · ${d}`);
         await api.wait(2800);
-        T(116, `= ${parts.map((p) => fmt(p * d)).join(' + ')}`);
-        await api.wait(2200);
-        T(146, `= ${fmt(q * d)}`, 'ex-b f2');
+        T(180, 186, `= ${fmt(q * d)}`, 'ex-b f1');
         api.say(`Zusammen: ${fmt(q)} · ${d} = <b>${fmt(q * d)}</b>`);
         await api.wait(2200);
         if (r) {
-          T(182, `${fmt(q * d)} + ${r} = ${fmt(back)}`, 'ex-b f2');
+          T(180, 212, `${fmt(q * d)} + ${r} = ${fmt(back)}`, 'ex-b f1');
           api.say(`Jetzt den Rest dazu: ${fmt(q * d)} + ${r} = <b>${fmt(back)}</b>`);
           await api.wait(2200);
         }
         if (ctx.find) {
-          T(r ? 232 : 200, `${fmt(n)} : ${d} = ${fmt(q)}${r ? ` Rest ${r}` : ''} ✓`, 'vexpr');
+          g.tL.textContent = fmt(n); g.tL.setAttribute('class', 'vexpr fok'); g.boxL.setAttribute('stroke', 'var(--ok)');
+          T(180, 250, `${fmt(n)} : ${d} = ${fmt(q)}${rest} ✓`, 'ex-b');
           api.say(`Die gesuchte Zahl ist <b>${fmt(n)}</b>.<br><small>Teilen und Malnehmen heben sich gegenseitig auf.</small>`);
           return;
         }
-        T(r ? 232 : 200, ok ? `${fmt(back)} = ${fmt(n)} ✓` : `${fmt(back)} ≠ ${fmt(n)} ✗`, 'vexpr');
+        g.boxL.setAttribute('stroke', ok ? 'var(--ok)' : 'var(--bad)');
+        T(75, 116, `zurück: ${fmt(back)}`, 'ex-s ' + (ok ? 'fok' : 'fbad'));
+        T(180, 250, ok ? `${fmt(back)} = ${fmt(n)} ✓` : `${fmt(back)} ≠ ${fmt(n)} ✗`, 'vexpr');
         api.say(ok
           ? `Die Probe ergibt genau <b>${fmt(n)}</b>: <b>Stimmt!</b>`
           : `Die Probe ergibt ${fmt(back)}, es müsste aber ${fmt(n)} sein: <b>Stimmt nicht!</b>${ctx.post && ctx.qTrue ? `<br><small>Richtig ist ${fmt(n)} : ${d} = ${fmt(ctx.qTrue)}${r ? ` Rest ${r}` : ''}.</small>` : ''}`);
@@ -750,27 +771,39 @@
   // Zwei Potenzen vergleichen: beide als Malaufgabe schreiben und ausrechnen
   //   ctx: { mode:'vgl', b1, e1, b2, e2, alt }, dazu pre/post
   function potVgl(api, ctx) {
+    // Wachsende Streifen (seit v120): Jede Zeile ist ein Faktor mehr. So sieht man, warum vertauschte Zahlen nicht dasselbe ergeben.
     const { b1, e1, b2, e2 } = ctx, A = b1 ** e1, B = b2 ** e2;
     const supTxt = (e) => String(e).split('').map((c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('');
-    const prodTxt = (b, e) => (e <= 6 ? Array(e).fill(b).join(' · ') : `${b} · ${b} · … · ${b} (${e}-mal)`);
-    let L, Rr, Lv, Rv, mid;
+    const T = (x, y, t, cls) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': 'middle', text: t }, api.svg);
+    const rowH = Math.min(20, 138 / Math.max(e1, e2)), masse = 96 / Math.max(A, B), fs = Math.min(13, rowH - 2);
+    async function spalte(x0, b, e, farbe) {
+      for (let i = 0; i < e; i++) {
+        const v = b ** (i + 1), y = 44 + i * rowH, w = Math.max(2, v * masse);
+        el('text', { x: x0 + 22, y: y + rowH * 0.5 + 4, class: 'ex-s f6', 'text-anchor': 'end', text: i ? `· ${b}` : `${b}`, style: `font-size:${fs}px` }, api.svg);
+        const r = el('rect', { x: x0 + 27, y: y + 2, width: 0, height: Math.max(4, rowH - 5), rx: 2, fill: farbe }, api.svg);
+        await api.tw(i ? 420 : 600, (t) => r.setAttribute('width', w * t));
+        el('text', { x: x0 + 31 + w, y: y + rowH * 0.5 + 4, class: 'ex-s', text: fmt(v), style: `font-size:${fs}px` }, api.svg);
+        await api.wait(i ? 520 : 1500);
+      }
+    }
+    let mid;
     return {
       reset() {
         api.clear();
         api.sub(ctx.post ? 'Lösung zu deiner Aufgabe' : ctx.pre ? 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst' : '');
-        const T = (x, y, t, cls) => el('text', { x, y, class: cls || 'ex-b', 'text-anchor': 'middle', text: t }, api.svg);
-        T(95, 50, `${b1}${supTxt(e1)}`, 'vexpr'); T(265, 50, `${b2}${supTxt(e2)}`, 'vexpr');
-        el('line', { x1: 180, y1: 30, x2: 180, y2: 200, class: 'dash' }, api.svg);
-        L = T(95, 100, '', 'ex-s'); Rr = T(265, 100, '', 'ex-s');
-        Lv = T(95, 150, '', 'vexpr'); Rv = T(265, 150, '', 'vexpr'); mid = T(180, 156, '', 'vexpr');
+        T(93, 30, `${b1}${supTxt(e1)}`, 'vexpr'); T(267, 30, `${b2}${supTxt(e2)}`, 'vexpr');
+        el('line', { x1: 180, y1: 12, x2: 180, y2: 190, class: 'dash' }, api.svg);
+        mid = T(180, 218, '', 'vexpr');
       },
       async play() {
-        api.say(`Was ist größer: <b>${b1}${supTxt(e1)}</b> oder <b>${b2}${supTxt(e2)}</b>? Die Zahlen sind dieselben, nur vertauscht. Ausrechnen hilft!`);
-        await api.wait(2400);
-        L.textContent = prodTxt(b1, e1); api.say(`${b1}${supTxt(e1)}: Die ${b1} kommt <b>${e1}-mal</b> als Faktor vor.`); await api.wait(2000);
-        Lv.textContent = `= ${fmt(A)}`; await api.wait(1400);
-        Rr.textContent = prodTxt(b2, e2); api.say(`${b2}${supTxt(e2)}: Die ${b2} kommt <b>${e2}-mal</b> als Faktor vor.`); await api.wait(2000);
-        Rv.textContent = `= ${fmt(B)}`; await api.wait(1400);
+        api.say(`Was ist größer: <b>${b1}${supTxt(e1)}</b> oder <b>${b2}${supTxt(e2)}</b>? Die Zahlen sind dieselben, nur vertauscht. Jede Zeile nimmt noch einmal mal.`);
+        await api.wait(2600);
+        api.say(`${b1}${supTxt(e1)}: Die ${b1} kommt <b>${e1}-mal</b> als Faktor vor. Der Streifen wird mit jedem Schritt ${b1}-mal so lang.`);
+        await spalte(8, b1, e1, 'var(--c2)');
+        T(93, 218, `= ${fmt(A)}`, 'vexpr'); await api.wait(1400);
+        api.say(`${b2}${supTxt(e2)}: Die ${b2} kommt <b>${e2}-mal</b> als Faktor vor. Hier wächst der Streifen ${e2 === 1 ? 'gar nicht' : `nur ${e2 - 1}-mal`}, dafür jedes Mal auf das ${b2}-Fache.`);
+        await spalte(186, b2, e2, 'var(--c1)');
+        T(267, 218, `= ${fmt(B)}`, 'vexpr'); await api.wait(1400);
         mid.textContent = A > B ? '>' : A < B ? '<' : '=';
         api.say(A === B ? `Beide ergeben <b>${fmt(A)}</b>: gleich groß! <small>(Das ist ein seltener Zufall.)</small>` : `${fmt(Math.max(A, B))} ist größer als ${fmt(Math.min(A, B))}: <b>${A > B ? `${b1}${supTxt(e1)}` : `${b2}${supTxt(e2)}`}</b> ist größer.<br><small>Vertauschen ist bei Potenzen <b>nicht</b> erlaubt.</small>`);
       },
@@ -2864,23 +2897,132 @@
         api.say(`Zusammen <b>${f * (x + y)}</b>, genauso viel wie ${f} · ${x + y}. <small>So rechnet man z. B. ${f} · ${x + y} im Kopf!</small>`);
         await api.wait(3200);
       }
-      // „Stimmt das?“: beide Seiten ausrechnen
+      // „Stimmt das?“: beide Seiten als Bild (seit v120). Mal: Punktefeld und gedrehtes Punktefeld. Plus, Minus, Geteilt: zwei Streifen im selben Maßstab.
       async function pruef() {
         api.clear(); sub();
-        let { left, right, lv, rv, ok, rule } = ctx;
-        T(180, 40, 'Beide Seiten ausrechnen', 'ex-s f6');
-        const L1 = T(95, 90, left, 'ex-b'), R1 = T(265, 90, right, 'ex-b');
-        el('line', { x1: 180, y1: 60, x2: 180, y2: 200, class: 'dash' }, api.svg);
-        const L2 = T(95, 140, '', 'vexpr'), R2 = T(265, 140, '', 'vexpr'), mid = T(180, 146, '', 'vexpr');
-        void L1; void R1;
-        api.say(`Stimmt <b>${left} = ${right}</b>? Wir rechnen beide Seiten aus.`);
-        await api.wait(2200);
-        L2.textContent = `= ${lv}`; api.say(`Links: ${left} = <b>${lv}</b>`); await api.wait(2000);
+        const { left, right, lv, rv, ok, rule } = ctx;
         const noR = typeof rv !== 'number'; // rechte Seite lässt sich mit natürlichen Zahlen nicht ausrechnen
-        if (noR) { R2.setAttribute('class', 'ex-b f1'); R2.textContent = 'geht nicht'; api.say(`Rechts: ${right}? ${ctx.rno || 'Das geht mit natürlichen Zahlen nicht.'}`); await api.wait(3000); }
-        else { R2.textContent = `= ${rv}`; api.say(`Rechts: ${right} = <b>${rv}</b>`); await api.wait(2000); }
-        mid.textContent = ok ? '=' : '≠';
-        api.say(`${ok ? `Beide Seiten ergeben ${lv}: <b>Stimmt!</b>` : noR ? `Links kommt ${lv} heraus, rechts lässt sich gar nicht ausrechnen: <b>Stimmt nicht!</b>` : `${lv} und ${rv} sind verschieden: <b>Stimmt nicht!</b>`}<br><small>${rule}</small>`);
+        const schluss = () => api.say(`${ok ? `Beide Seiten ergeben ${lv}: <b>Stimmt!</b>` : noR ? `Links kommt ${lv} heraus, rechts lässt sich gar nicht ausrechnen: <b>Stimmt nicht!</b>` : `${lv} und ${rv} sind verschieden: <b>Stimmt nicht!</b>`}<br><small>${rule}</small>`);
+        const lies = (s) => {
+          let m;
+          if ((m = s.match(/^\((\d+) ([+−·:]) (\d+)\) [+−·:] (\d+)$/))) return { form: 'vorn', op: m[2], a: +m[1], b: +m[3], c: +m[4] };
+          if ((m = s.match(/^(\d+) ([+−·:]) \((\d+) [+−·:] (\d+)\)$/))) return { form: 'hinten', op: m[2], a: +m[1], b: +m[3], c: +m[4] };
+          if ((m = s.match(/^(\d+) ([+−·:]) (\d+)$/))) return { form: 'einfach', op: m[2], a: +m[1], b: +m[3] };
+          return null;
+        };
+        const A = lies(left), B = lies(right);
+        if (!A || !B || (A.op === '·' && (A.form !== 'einfach' || B.form !== 'einfach' || Math.max(A.a, A.b) > 14))) {
+          // unbekannte Form: beide Seiten als Rechnung
+          T(95, 90, left, 'ex-b'); T(265, 90, right, 'ex-b');
+          el('line', { x1: 180, y1: 60, x2: 180, y2: 200, class: 'dash' }, api.svg);
+          api.say(`Stimmt <b>${left} = ${right}</b>? Wir rechnen beide Seiten aus.`); await api.wait(2200);
+          T(95, 140, `= ${lv}`, 'vexpr'); api.say(`Links: ${left} = <b>${lv}</b>`); await api.wait(2000);
+          T(265, 140, noR ? 'geht nicht' : `= ${rv}`, noR ? 'ex-b f1' : 'vexpr'); api.say(noR ? `Rechts: ${right}? ${ctx.rno || 'Das geht mit natürlichen Zahlen nicht.'}` : `Rechts: ${right} = <b>${rv}</b>`); await api.wait(2400);
+          T(180, 146, ok ? '=' : '≠', 'vexpr');
+          return schluss();
+        }
+        if (A.op === '·') {
+          const p = Math.min(11, 128 / Math.max(A.a, A.b));
+          const feld = async (cx, s) => {
+            const g = [], x0 = cx - ((s.b - 1) * p) / 2, y0 = 130 - ((s.a - 1) * p) / 2;
+            for (let i = 0; i < s.a; i++) for (let j = 0; j < s.b; j++) g.push(el('circle', { cx: x0 + j * p, cy: y0 + i * p, r: Math.max(1.6, p * 0.32), fill: 'var(--c2)', opacity: 0 }, api.svg));
+            await api.tw(900, (t) => g.forEach((c, k) => c.setAttribute('opacity', k / g.length <= t ? 1 : 0)));
+          };
+          T(95, 44, left, 'ex-b'); T(265, 44, right, 'ex-b');
+          el('line', { x1: 180, y1: 30, x2: 180, y2: 200, class: 'dash' }, api.svg);
+          api.say(`Stimmt <b>${left} = ${right}</b>? Wir legen beide Seiten als Punktefeld.`); await api.wait(2400);
+          await feld(95, A); T(95, 226, `= ${lv}`, 'vexpr');
+          api.say(`Links: ${A.a} ${A.a === 1 ? 'Reihe' : 'Reihen'} mit je ${A.b} Punkten. ${left} = <b>${lv}</b>`); await api.wait(2800);
+          await feld(265, B); T(265, 226, `= ${rv}`, 'vexpr');
+          api.say(`Rechts: ${B.a} ${B.a === 1 ? 'Reihe' : 'Reihen'} mit je ${B.b} Punkten. Das ist <b>dasselbe Feld, nur gedreht</b>: Kein Punkt kommt dazu, keiner fällt weg. ${right} = <b>${rv}</b>`); await api.wait(3600);
+          T(180, 226, ok ? '=' : '≠', 'vexpr');
+          return schluss();
+        }
+        const X0 = 30, W = 300, H = 20;
+        const lang = (s) => (s.op === '+' ? s.a + s.b + (s.c || 0) : s.op === '−' && s.form === 'einfach' ? Math.max(s.a, s.b) : s.a);
+        const u = W / Math.max(lang(A), lang(B));
+        const box = (x, w, y, fill, more) => el('rect', Object.assign({ x, y, width: Math.max(0, w), height: H, rx: 3, fill }, more || {}), api.svg);
+        const wachs = (r, w) => api.tw(600, (t) => r.setAttribute('width', Math.max(0, w * t)));
+        const klein = (x, y, text, cls, anker) => el('text', { x, y, class: cls || 'ex-s', 'text-anchor': anker || 'middle', text }, api.svg);
+        const weg = async (x, w, y, text, tief) => { // weggenommenes Stück: rot gestrichelt
+          const r = box(x, w, y, '#ffe9ee', { stroke: 'var(--bad)', 'stroke-width': 1.5, 'stroke-dasharray': '3 2', opacity: 0 });
+          await api.tw(450, (t) => r.setAttribute('opacity', t));
+          klein(x + w / 2, y + H + 14 + (tief ? 13 : 0), text, 'ex-s fbad');
+        };
+        const striche = (x, w, y, k) => { for (let i = 1; i < k; i++) el('line', { x1: x + (w * i) / k, y1: y - 3, x2: x + (w * i) / k, y2: y + H + 3, stroke: 'var(--ink)', 'stroke-width': 1.5 }, api.svg); };
+        async function zeile(s, y0, wert, seite, ausdruck) {
+          el('text', { x: X0, y: y0, class: 'ex-b', text: ausdruck }, api.svg);
+          const y = y0 + 10, a = s.a * u;
+          const fertig = (geht) => el('text', { x: X0 + W, y: y0, class: 'ex-b ' + (geht ? 'fok' : 'fbad'), 'text-anchor': 'end', text: geht ? `= ${wert}` : 'geht nicht' }, api.svg);
+          const rahmen = (w) => { box(X0, w, y, 'none', { stroke: 'var(--ok)', 'stroke-width': 3 }); klein(X0 + Math.max(w / 2, 8), y + H + 14, String(wert), 'ex-s fok'); };
+          if (s.op === '+') {
+            const st = [s.a, s.b].concat(s.form === 'einfach' ? [] : [s.c]), farben = ['var(--c2)', 'var(--c1)', 'var(--c4)'], xs = [];
+            let x = X0;
+            for (let i = 0; i < st.length; i++) {
+              const r = box(x, 0, y, farben[i], { opacity: 0.85 }); await wachs(r, st[i] * u);
+              if (st[i] * u > 18) el('text', { x: x + (st[i] * u) / 2, y: y + 15, class: 'ex-s', 'text-anchor': 'middle', text: st[i], style: 'fill:#fff' }, api.svg);
+              xs.push(x); x += st[i] * u;
+            }
+            if (s.form !== 'einfach') {
+              const v = s.form === 'vorn', k0 = v ? X0 : xs[1], k1 = v ? xs[2] : x, sum = v ? s.a + s.b : s.b + s.c;
+              el('path', { d: `M ${k0 + 2} ${y + H + 4} v 5 H ${k1 - 2} v -5`, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1.5 }, api.svg);
+              klein((k0 + k1) / 2, y + H + 23, `${v ? s.a : s.b} + ${v ? s.b : s.c} = ${sum}`);
+              api.say(`${seite}: Klammer zuerst: ${v ? s.a : s.b} + ${v ? s.b : s.c} = ${sum}. Dann ${v ? `${sum} + ${s.c}` : `${s.a} + ${sum}`} = <b>${wert}</b>. Der Streifen ist ${wert} lang.`);
+            } else api.say(`${seite}: ${ausdruck} = <b>${wert}</b>`);
+            fertig(true); return;
+          }
+          if (s.op === '−') {
+            const bar = box(X0, 0, y, 'var(--c2)', { opacity: 0.85 }); await wachs(bar, a);
+            if (s.form === 'einfach' && s.b > s.a) {
+              api.say(`${seite}: Der Streifen ist nur <b>${s.a}</b> lang. Wegnehmen sollen wir <b>${s.b}</b>.`); await api.wait(2400);
+              const r = box(X0, 0, y + H + 4, 'none', { stroke: 'var(--bad)', 'stroke-width': 1.5, 'stroke-dasharray': '3 2', height: 9 }); await wachs(r, s.b * u);
+              klein(X0 + (s.b * u) / 2, y + H + 27, `− ${s.b}: so viel ist gar nicht da`, 'ex-s fbad');
+              api.say(`${seite}: ${ausdruck}? ${ctx.rno || 'Das geht mit natürlichen Zahlen nicht.'}`);
+              fertig(false); return;
+            }
+            if (s.form === 'einfach') { api.say(`${seite}: ein Streifen der Länge ${s.a}. Davon nehmen wir ${s.b} weg.`); await api.wait(1800); await weg(X0 + a - s.b * u, s.b * u, y, `− ${s.b}`); }
+            else if (s.form === 'vorn') {
+              api.say(`${seite}: Klammer zuerst: Von ${s.a} nehmen wir ${s.b} weg, es bleiben ${s.a - s.b}.`); await api.wait(1800);
+              await weg(X0 + a - s.b * u, s.b * u, y, `− ${s.b}`); await api.wait(1800);
+              api.say(`${seite}: Dann noch einmal ${s.c} weg.`);
+              await weg(X0 + a - (s.b + s.c) * u, s.c * u, y, `− ${s.c}`, true);
+            } else {
+              const d = s.b - s.c;
+              api.say(`${seite}: Klammer zuerst: ${s.b} − ${s.c} = ${d}. Vom Streifen wird also <b>nur ${d}</b> weggenommen.`); await api.wait(2800);
+              await weg(X0 + a - d * u, d * u, y, `− ${d}`);
+            }
+            await api.wait(1500); rahmen(wert * u); fertig(true);
+            api.say(`${seite}: ${ausdruck} = <b>${wert}</b>`);
+            return;
+          }
+          const bar = box(X0, 0, y, 'var(--c2)', { opacity: 0.3 }); await wachs(bar, a);
+          if (s.form === 'einfach' && s.b > s.a) {
+            api.say(`${seite}: Der Streifen ist nur <b>${s.a}</b> lang und soll in <b>${s.b}</b> gleiche Teile geteilt werden.`); await api.wait(2600);
+            striche(X0, a, y, Math.min(s.b, Math.max(2, Math.floor(a / 3))));
+            klein(X0, y + H + 14, 'jedes Teil wäre kleiner als 1', 'ex-s fbad', 'start');
+            api.say(`${seite}: ${ausdruck}? ${ctx.rno || 'Es kommt keine natürliche Zahl heraus.'}`);
+            fertig(false); return;
+          }
+          if (s.form === 'einfach') { api.say(`${seite}: Der Streifen der Länge ${s.a} wird in ${s.b} gleiche Teile geteilt.`); await api.wait(1800); striche(X0, a, y, s.b); }
+          else if (s.form === 'vorn') {
+            api.say(`${seite}: Klammer zuerst: ${s.a} in ${s.b} gleiche Teile. Ein Teil ist ${s.a / s.b} lang.`); await api.wait(1600);
+            striche(X0, a, y, s.b); box(X0, a / s.b, y, 'var(--c1)', { opacity: 0.4 }); await api.wait(2400);
+            api.say(`${seite}: Dieses Teil wird noch einmal durch ${s.c} geteilt.`);
+            el('line', { x1: X0 + a / s.b / s.c, y1: y, x2: X0 + a / s.b / s.c, y2: y + H, stroke: 'var(--ink)', 'stroke-width': 1.5, 'stroke-dasharray': '2 2' }, api.svg);
+          } else {
+            const k = s.b / s.c;
+            api.say(`${seite}: Klammer zuerst: ${s.b} : ${s.c} = ${k}. Der Streifen wird also <b>nur in ${k} Teile</b> geteilt.`); await api.wait(2800);
+            striche(X0, a, y, k);
+          }
+          await api.wait(1500); box(X0, wert * u, y, 'var(--ok)', { opacity: 0.5 }); rahmen(wert * u); fertig(true);
+          api.say(`${seite}: ${ausdruck} = <b>${wert}</b>`);
+        }
+        api.say(`Stimmt <b>${left} = ${right}</b>? Wir legen beide Seiten als Streifen, im selben Maßstab.`); await api.wait(2600);
+        await zeile(A, 48, lv, 'Links', left); await api.wait(2400);
+        await zeile(B, 138, rv, 'Rechts', right); await api.wait(2600);
+        if (!noR) [[54, 82], [144, 172]].forEach(([y1, y2]) => el('line', { x1: X0 + lv * u, y1, x2: X0 + lv * u, y2, class: 'dash' }, api.svg)); // Hilfslinie: So weit reicht das Ergebnis links
+        T(180, 238, noR ? `links ${lv}, rechts geht nicht` : `${lv} ${ok ? '=' : '≠'} ${rv}`, noR ? 'ex-b' : 'vexpr');
+        schluss();
       }
       // Vorteilhaft rechnen: Zahlen umstellen und passende Paare bündeln
       async function tausch() {

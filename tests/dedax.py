@@ -67,7 +67,10 @@ async def main():
                                 if w and str(w) not in cap: meld.append(f'{t}: Antwort „{w}“ fehlt im Text der Animation: {cap}')
                             if rnd == 1 and k == 0: await pg.screenshot(path=str(SHOTS / f'dedax-anim-{t}.png'))
                             await pg.click('[data-exclose]')
-                        else: meld.append(f'{t}: keine Lösungs-Animation')
+                        else:
+                            # Aufgabenarten, deren Animation nur die Aufgabe wiederholt (ex.nach === false, seit v120), haben mit Absicht keinen Knopf
+                            nach = await pg.evaluate("() => { const e = window.__lerndax.round().cur.task.ex; return !e || e.nach !== false; }")
+                            if nach: meld.append(f'{t}: keine Lösungs-Animation')
                     else:
                         if rnd == 0: await pg.screenshot(path=str(SHOTS / f'dedax-{t}-{k}.png'))
                         await answer(pg, a)

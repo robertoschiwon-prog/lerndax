@@ -45,7 +45,10 @@ async def run(topics, n):
                             if await bt.get_attribute('data-choice') != str(ch): await bt.evaluate('e => e.click()'); break
                     await pg.wait_for_timeout(150)
                 post = await pg.query_selector('[data-when="post"]')
-                if not post: res.append({'t': t, 'p': info['p'], 'problem': 'kein Animations-Knopf'}); continue
+                if not post:
+                    # ex.nach === false (seit v120, z. B. Fermi): mit Absicht kein Knopf, die Lösung steht schon unter „So geht’s“
+                    if not (info['ex'] and info['ex'].get('nach') is False): res.append({'t': t, 'p': info['p'], 'problem': 'kein Animations-Knopf'})
+                    continue
                 await post.evaluate('e => e.click()'); await pg.wait_for_selector('.exov'); await pg.evaluate(WATCH)
                 done = False
                 for w in range(600):

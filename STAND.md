@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 16.11.2026, Version `lerndax-v119`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 21.11.2026, Version `lerndax-v120`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,52 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-29. Animationen aufgeräumt: keine bloße Wiederholung mehr (lerndax-v120, 21.11.2026)
+
+Roberto: „Da sind etliche Animationen dabei, die die Dinge nicht richtig erklären, sondern nur wiederholen, was in der Aufgabe steht.“
+Damit ist auch der offene Punkt „Mathe“ aus 0-neu-2 erledigt.
+
+**Durchsicht (alle 7 Fächer):** Je Thema und Aufgabenart bis zu 2 Aufgaben erzeugt, „Lösung als Animation“ abgespielt, Texte und
+Schlussbild mit Aufgabe und „So geht’s“ verglichen (861 Animationen; Mathe alle als Bild angesehen). Ergebnis und Liste im
+Claude-Projekt: `claude/animationen-durchsicht.md`.
+
+**Schritt 1: Knopf „Lösung als Animation“ weg, wo nur wiederholt wurde** (`ex.nach = false`, wie seit v92 bei den Merkzetteln):
+- Neu in `plattform/fach.js`: Ein Fach kann `app.ohneAnimation(themaId, ex)` anbieten; trifft es zu, bekommt die Aufgabe `ex.nach = false`.
+  Die Regeln stehen am Ende von `erklaerungen/klasse5.js` des Fachs (eine Stelle je Fach, mit Begründung).
+- **Deutsch:** Arten `marken`, `liste`, `komma`, `zz`, `bild`, `satz`, `wa` (Satz aus der Aufgabe mit blau markierter Lösung).
+  Geblieben: Genus/Plural, Fälle, Steigern, Satzglieder, Zeitformen, Reim, Schaubild und die Ausnahmen Versmaß, Wortfamilie,
+  Nebensatz, Zusammensetzung, Ableiten, Subjekt–Prädikat, Pronomen (Tabelle `ZEIGT_ETWAS`).
+- **Englisch:** alle Wortschatz-Themen (`e5-w-…`) und bei den Redemitteln (`e5-a-…`) die Arten `luecke`, `dialog`, `situation`,
+  `anweisung`, `lesen`, `preis`. Geblieben: Grammatik, Alphabet, a/an, Wegbeschreibung.
+- **Bio, Geschichte, Geografie, Technik:** Ordnen-Aufgaben ohne Bilder (`reihe` in `plattform/bausteine.js`): Die Animation zeigte
+  dieselbe nummerierte Liste wie „So geht’s“. Reihen mit Bildern und eigene Erklärungen (`e.ex`) behalten den Knopf.
+- **Mathe:** Fermi (`nach: false` im Generator): vier Textkästen, Text wie „So geht’s“.
+- Der Knopf „▶ Erklärung“ vor der Aufgabe bleibt überall.
+
+**Schritt 2: vier Mathe-Animationen neu gebaut** (vorher nur Rechenzeilen):
+- **„Stimmt das?“** (`k5-gesetze`, Art `pruef`): beide Seiten als Bild im selben Maßstab. Mal: Punktefeld und gedrehtes Punktefeld.
+  Plus: farbige Streifen mit Klammer. Minus: Streifen, weggenommene Stücke rot gestrichelt (bei 8 − 12: „so viel ist gar nicht da“).
+  Geteilt: Streifen in gleiche Teile. Hilfslinie zeigt, wie weit das Ergebnis der linken Seite reicht.
+- **Potenzen vergleichen** (`k5-potenz`, Art `vgl`): wachsende Streifen, jede Zeile ein Faktor mehr (2¹⁰ gegen 10²).
+- **Probe und „Welche Zahl wurde geteilt?“** (`k5-division`, Art `probe`): Pfeilbild, oben der Weg hin (geteilt), unten zurück
+  (mal, dann Rest dazu); der Kasten wird grün oder rot.
+- **Dezimalzahl durch Zahl** (`k5-dezimal`, Art `div`): Umweg-Bild mit vier Kästen (mal 10/100 „Komma weg“, ohne Komma teilen,
+  zurück „Komma zurück“).
+- Nebenbei: „Stimmt das? 3 · 3 = 3 · 3“ kommt nicht mehr vor (zwei verschiedene Faktoren).
+
+**Noch offen (nächste Schritte):**
+- Deutsch: echte Animationen für Rechtschreibung (lang/kurz, s/ss/ß, groß/klein), Wortarten, Komma. Bis dahin dort kein Knopf.
+- Englisch: Wortschatz und Redemittel brauchen eher keine Animation (Wort, Bild, Ton reichen).
+- Mathe, dünn aber vertretbar: Fachbegriffe bei „Bilde die Summe …“, Fahrplan ohne Stundenwechsel, Sachaufgaben mit Rechenbaum.
+- Nicht durchgesehen: „▶ Erklärung“ vor der Aufgabe, Knobel, Entdecken, weitere Varianten je Aufgabenart
+  (Prozent, Fahrplan, Einheiten, Überschlag).
+
+**Tests:** `dedax.py`, `endax.py`, `loesung.py` nehmen „kein Knopf“ bei `ex.nach === false` hin (wie schon Bio/Geschichte).
+Ganze Testreihe ohne Meldung: `gen-test.js` (246 000 Aufgaben), `loesung.py 3` (120 Animationen) und `loesung.py 14` für die
+umgebauten Themen (56), `ui2.py`, `ex.py`, `knobel.py`, `training.py`, `prim.py`, `pause.py`, `two.py`, `hub.py`, `eltern.py`,
+`belohnung.py`, `steuerung.py`, `sync_test.py`, `bild_audit.py`, `dedax.py 2`, `endax.py 2`, `biodax.py 2`, `gedax.py 2`, `geodax.py 2`,
+`tecdax.py 2`. Neue Animationen bei 390 px als Bild angesehen, auch als „ähnliches Beispiel“ vor der Aufgabe.
 
 ## 0-neu-28. Blöcke stapeln: ▲ lässt nicht mehr fallen (lerndax-v119, 16.11.2026)
 
@@ -419,7 +465,7 @@ kurzer Text; Animation nur, wenn sie etwas zeigt, das nicht schon in der Frage s
 - Geblieben sind die Animationen, die etwas zeigen: Reihenfolge mit Bildern, Sortieren in Fächer, Zeitstrahl, Pyramide.
 - Tests angepasst (`biodax.py`, `gedax.py`: kein Knopf ist bei `nach: false` richtig). Voller Lauf Bio (50 Themen) und
   Geschichte (31 Themen) mit einer Runde ohne Meldung, dazu zwei Runden für je 6 Themen.
-- **Offen: Mathe.** Roberto meint, dort wiederholen manche Erklärungen auch nur, was schon zu sehen war. Noch nicht durchgesehen.
+- ~~Offen: Mathe.~~ Erledigt in v120 (0-neu-29): alle Fächer durchgesehen.
 
 ## 0-neu. Näher am Schulbuch (lerndax-v90, 14.11.2026)
 

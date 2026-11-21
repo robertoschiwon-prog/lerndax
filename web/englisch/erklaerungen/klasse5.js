@@ -2820,4 +2820,8 @@
       };
     },
   };
+  // Aufgabenarten, deren Animation nur Wort, Satz oder Antwort aus der Aufgabe wiederholt (Durchsicht 21.11.2026, v120):
+  // nach der Aufgabe kein Knopf „Lösung als Animation“. Wortschatz (e5-w-…) ganz, bei den Redemitteln (e5-a-…) alles außer Alphabet, a/an und Wegbeschreibung.
+  const A_WIEDERHOLT = { luecke: 1, dialog: 1, situation: 1, anweisung: 1, lesen: 1, preis: 1 };
+  D.ohneAnimation = (themaId, ex) => /^e5-w-/.test(themaId) || (/^e5-a-/.test(themaId) && !!A_WIEDERHOLT[ex.mode]);
 })();

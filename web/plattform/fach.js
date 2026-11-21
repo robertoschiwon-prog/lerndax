@@ -348,6 +348,8 @@
     const sig = (t) => topic.id + '|' + t.prompt + '|' + (t.figure || '') + '|' + (t.pre || '') + '|' + (t.fields || []).map((f) => (f.prefix || '') + ('fixed' in f ? f.fixed : '')).join('|');
     for (let i = 0; i < 6; i++) { try { task = R.knobel ? topic.knobel() : topic.gen(); if (!R.seen.includes(sig(task))) break; } catch (e) { console.error(e); } }
     if (task) R.seen.push(sig(task));
+    // Ein Fach kann Aufgabenarten nennen, deren Animation nur die Aufgabe wiederholt (app.ohneAnimation): dann kein Knopf „Lösung als Animation“
+    if (task && task.ex && M.ohneAnimation && M.ohneAnimation(topic.id, task.ex)) task.ex.nach = false;
     R.cur = { topic, task, attempt: 1, done: false, hintShown: false };
     renderTask();
   }
