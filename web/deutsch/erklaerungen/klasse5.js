@@ -331,6 +331,7 @@
     async weiche(api, x) {
       const t = el('text', { x: 180, y: 36, 'text-anchor': 'middle', class: 'vexpr' }, api.svg);
       [[0, x.lauf[0]], x.lauf, [x.lauf[1], x.wort.length]].forEach(([a, b], k) => { if (b > a) { const ts = el('tspan', { text: x.wort.slice(a, b) }, t); if (k === 1) ts.setAttribute('fill', BLAU); } });
+      if (x.klein) fit(t, 336, 18); // ganzer Satz statt eines Wortes
       const pos = (a, b) => { try { return [t.getStartPositionOfChar(a).x, t.getEndPositionOfChar(b - 1).x]; } catch (e) { return [172, 188]; } };
       const zeichne = (schritt) => (x.zeichen || []).filter((z) => z[0] === schritt).forEach(([, a, b, art]) => {
         const [x1, x2] = pos(a, b), m = (x1 + x2) / 2;
@@ -338,6 +339,7 @@
         else if (art === 'lang') el('line', { x1: x1 + 1, y1: 46, x2: x2 - 1, y2: 46, stroke: ORANGE, 'stroke-width': 3.5, 'stroke-linecap': 'round' }, api.svg);
         else el('path', { d: `M ${x1} 43 v 5 H ${x2} v -5`, fill: 'none', stroke: BLAU, 'stroke-width': 2 }, api.svg);
       });
+      if (x.klein) { const [u1, u2] = pos(x.lauf[0], x.lauf[1]); el('line', { x1: u1, y1: 43, x2: u2, y2: 43, stroke: BLAU, 'stroke-width': 3, 'stroke-linecap': 'round' }, api.svg); }
       const frage = (y, text) => el('text', { x: 180, y, 'text-anchor': 'middle', class: 'ex-s', text, style: 'font-weight:800;font-size:13.5px', opacity: 0 }, api.svg);
       const pille = (x0, y, w, text) => {
         const g = el('g', { opacity: 0 }, api.svg);
@@ -345,11 +347,13 @@
         el('text', { x: x0 + w / 2, y: y + 18.5, 'text-anchor': 'middle', class: 'ex-s', text, style: 'font-size:12.5px;font-weight:700' }, g);
         return { g, r, cx: x0 + w / 2, cy: y + 14, links: x0 };
       };
-      const f1 = x.fragen[0], f2 = x.fragen[1];
-      const q1 = frage(72, f1.f);
-      const weiter = pille(24, 84, 130, `${f1.weiter} ↓`), aus = pille(206, 84, 130, `${f1.aus[0]} → ${f1.aus[1]}`);
-      const q2 = frage(140, f2.f);
-      const w0 = pille(20, 152, 150, `${f2.wahl[0][0]} → ${f2.wahl[0][1]}`), w1 = pille(190, 152, 150, `${f2.wahl[1][0]} → ${f2.wahl[1][1]}`);
+      // je Frage eine Reihe: p[0] = Ausgang (fertig), p[1] = weiter zur nächsten Frage; in der letzten Reihe zwei Ausgänge
+      const Y = (k) => 72 + 68 * k;
+      const reihen = x.fragen.map((f, k) => ({
+        q: frage(Y(k), f.f), ende: !!f.wahl,
+        p: f.wahl ? [pille(20, Y(k) + 12, 150, `${f.wahl[0][0]} → ${f.wahl[0][1]}`), pille(190, Y(k) + 12, 150, `${f.wahl[1][0]} → ${f.wahl[1][1]}`)]
+          : [pille(206, Y(k) + 12, 130, `${f.aus[0]} → ${f.aus[1]}`), pille(24, Y(k) + 12, 130, `${f.weiter} ↓`)],
+      }));
       const kugel = el('circle', { cx: 180, cy: 54, r: 7, fill: 'var(--c1)', stroke: 'var(--ink)', 'stroke-width': 2, opacity: 0 }, api.svg);
       let ort = [180, 54];
       const lauf = async (zx, zy) => { const [ax, ay] = ort; await api.tw(800, (k) => { kugel.setAttribute('cx', lerp(ax, zx, k)); kugel.setAttribute('cy', lerp(ay, zy, k)); }); ort = [zx, zy]; };
@@ -358,24 +362,19 @@
       await api.wait(700);
       if (x.laenger) { const ende = pos(0, x.wort.length)[1]; const l = el('text', { x: ende + 10, y: 36, class: 'ex-b', text: `→ ${x.laenger}`, opacity: 0, style: `fill:${ORANGE}` }, api.svg); await zeig(l); }
       // der ganze Weg ist von Anfang an blass zu sehen; die Frage, die gerade dran ist, wird kräftig
-      await api.tw(400, (k) => [q1, weiter.g, aus.g, q2, w0.g, w1.g].forEach((e) => e.setAttribute('opacity', 0.3 * k)));
-      await zeig(q1, weiter.g, aus.g, kugel);
-      api.say(`<b>${f1.f}</b>`); await api.wait(2200);
-      zeichne(0);
-      api.say(x.sag[0]);
-      const ziel1 = x.weg[0] === 0 ? aus : weiter;
-      await lauf(ziel1.links + 14, ziel1.cy);
-      if (x.weg[0] === 0) { treffer(aus); kugel.setAttribute('opacity', 0); weiter.g.setAttribute('opacity', 0.3); await api.wait(3200); api.say(x.merk); return; }
-      weiter.r.setAttribute('stroke', 'var(--c1)'); weiter.r.setAttribute('stroke-width', 2.5); aus.g.setAttribute('opacity', 0.3);
-      await api.wait(2800);
-      await zeig(q2, w0.g, w1.g);
-      api.say(`<b>${f2.f}</b>`); await api.wait(2200);
-      zeichne(1);
-      api.say(x.sag[1]);
-      const ziel2 = x.weg[1] === 0 ? w0 : w1;
-      await lauf(ziel2.links + 14, ziel2.cy);
-      treffer(ziel2); kugel.setAttribute('opacity', 0); (x.weg[1] === 0 ? w1 : w0).g.setAttribute('opacity', 0.3);
-      await api.wait(3400);
+      await api.tw(400, (k) => reihen.forEach((r) => [r.q, r.p[0].g, r.p[1].g].forEach((e) => e.setAttribute('opacity', 0.3 * k))));
+      for (let k = 0; k < x.weg.length; k++) {
+        const r = reihen[k], wahl = x.weg[k], ziel = r.p[wahl];
+        await zeig(r.q, r.p[0].g, r.p[1].g, kugel);
+        api.say(`<b>${x.fragen[k].f}</b>`); await api.wait(2200);
+        zeichne(k);
+        api.say(x.sag[k]);
+        await lauf(ziel.links + 14, ziel.cy);
+        r.p[1 - wahl].g.setAttribute('opacity', 0.3);
+        if (r.ende || wahl === 0) { treffer(ziel); kugel.setAttribute('opacity', 0); await api.wait(3300); break; }
+        ziel.r.setAttribute('stroke', 'var(--c1)'); ziel.r.setAttribute('stroke-width', 2.5);
+        await api.wait(2800);
+      }
       api.say(x.merk);
     },
     // Lange Vokale als Schubladen (seit v121): Das Wort fällt in die Schublade seiner Schreibweise; dazu Wörter, die genauso geschrieben werden.
@@ -421,6 +420,169 @@
         for (const f of fr) await api.tw(350, (k) => f.setAttribute('opacity', k));
         await api.wait(3400);
       }
+      api.say(x.merk);
+    },
+    // Artikelprobe (seit v122): Das Kärtchen „der · die · das“ fliegt vor das Wort. Passt es, ist es ein Nomen und wird groß.
+    //   x: { tokens, gross:{i: Großform}, ziele:[{ i, ok, artikel?, sag?, ohneChip? }], anfang?, signal?, merk }
+    async artikelprobe(api, x) {
+      const z = zeile(api, x.tokens, 74, true, true);
+      const ort = (i) => { try { const e = z.ts[i], a = /^\s/.test(e.textContent) ? 1 : 0, p1 = e.getStartPositionOfChar(a), p2 = e.getEndPositionOfChar(e.getNumberOfChars() - 1); return { x1: p1.x, x2: p2.x, y: p1.y }; } catch (e) { return { x1: 150, x2: 210, y: 74 }; } };
+      const unten = (o) => z.br > 0 && o.y > 70; // Wort in der zweiten Zeile: Kärtchen darunter statt darüber
+      const grossMach = (i) => { const e = z.ts[i]; e.textContent = e.textContent.replace(x.tokens[i], x.gross[i]); e.setAttribute('fill', BLAU); };
+      const chip = el('g', { opacity: 0 }, api.svg);
+      el('rect', { x: -50, y: -12, width: 100, height: 24, rx: 12, fill: '#fff', stroke: ORANGE, 'stroke-width': 2 }, chip);
+      const ct = el('text', { x: 0, y: 4.5, 'text-anchor': 'middle', class: 'ex-s', text: 'der · die · das', style: 'font-size:12.5px;font-weight:800' }, chip);
+      let c = [180, 22]; const setz = (px, py) => chip.setAttribute('transform', `translate(${px} ${py})`); setz(...c);
+      const flieg = async (px, py) => { const [ax, ay] = c; await api.tw(650, (k) => setz(lerp(ax, px, k), lerp(ay, py, k))); c = [px, py]; };
+      if (x.signal >= 0) z.ts[x.signal].setAttribute('fill', ORANGE);
+      await api.wait(600);
+      if (x.anfang) { grossMach(0); api.say(`Das <b>erste Wort</b> im Satz schreibt man immer groß: <b>${x.gross[0]}</b>.`); await api.wait(2800); }
+      const mitChip = x.ziele.some((zl) => !zl.ohneChip);
+      if (mitChip) { await api.tw(350, (k) => chip.setAttribute('opacity', k)); api.say('Die <b>Artikelprobe</b>: Passt <b>der, die oder das</b> direkt vor das Wort? Dann ist es ein Nomen.'); await api.wait(3000); }
+      for (const zl of x.ziele) {
+        const o = ort(zl.i), m = Math.max(54, Math.min(306, (o.x1 + o.x2) / 2)), u = unten(o);
+        if (!zl.ohneChip) { ct.textContent = zl.artikel || 'der · die · das'; await flieg(m, u ? o.y + 24 : o.y - 31); }
+        const wort = (zl.ok ? x.gross[zl.i] : x.tokens[zl.i]).replace(/[.,!?]$/, '');
+        if (zl.ok) grossMach(zl.i); else z.ts[zl.i].setAttribute('fill', ORANGE);
+        el('text', { x: zl.ohneChip ? (o.x1 + o.x2) / 2 : m + 60 > 350 ? m - 60 : m + 60, y: zl.ohneChip ? o.y - 22 : (u ? o.y + 29 : o.y - 26), 'text-anchor': 'middle', class: 'ex-b ' + (zl.ok ? 'fok' : 'fbad'), text: zl.ok ? '✓' : '✗', style: 'font-size:16px' }, api.svg).setAttribute('data-urteil', '1');
+        api.say(zl.sag || (zl.artikel ? `<b>${zl.artikel} ${wort}</b>: Der Artikel passt. Ein Nomen, also <b>groß</b>.` : `Vor „${wort}“ passt ein Artikel. Ein Nomen, also <b>groß</b>.`));
+        await api.wait(2600);
+        if (x.ziele.length > 1) api.svg.querySelectorAll('[data-urteil]').forEach((e) => e.remove());
+      }
+      if (x.ziele.length > 1) await api.tw(300, (k) => chip.setAttribute('opacity', 1 - k));
+      api.say(x.merk);
+    },
+    // Wörtliche Rede (seit v122): Sprechblase um das Gesagte, Begleitsatz unterstrichen, dann erscheint jedes Zeichen einzeln mit seinem Grund.
+    //   x: { tokens, correct (Stellen der Satzzeichen), vorn, wer, verb, rede, z, merk }
+    async rede(api, x) {
+      const t = el('text', { x: 180, y: 62, 'text-anchor': 'middle', class: 'ex-b', 'xml:space': 'preserve', style: 'white-space:pre' }, api.svg);
+      const ts = x.tokens.map((w, i) => { const e = el('tspan', { text: w.replace(/^ /, '\u00a0\u00a0') }, t); if (x.correct.includes(i)) { e.setAttribute('fill', ORANGE); e.setAttribute('fill-opacity', 0); } return e; }); // geschütztes Leerzeichen, sonst rückt die Rede an den Doppelpunkt
+      fit(t, 330, 19);
+      const iAuf = x.tokens.indexOf('„'), iZu = x.tokens.indexOf('“'), iRede = iAuf + 1, iBegl = x.vorn ? 0 : 5;
+      const rand = (i, ende) => { try { const e = ts[i], n = e.getNumberOfChars(), a = /^\s/.test(e.textContent) && n > 1 ? 1 : 0; return ende ? e.getEndPositionOfChar(n - 1).x : e.getStartPositionOfChar(a).x; } catch (e) { return ende ? 300 : 60; } };
+      const zeig = async (...is) => { await api.tw(380, (k) => is.forEach((i) => ts[i].setAttribute('fill-opacity', k))); };
+      api.say('Zwei Fragen: <b>Was</b> wird gesagt? Und <b>wer</b> sagt es?'); await api.wait(2400);
+      const b1 = rand(iAuf, false) - 3, b2 = rand(iZu, true) + 4;
+      const blase = el('rect', { x: b1, y: 41, width: b2 - b1, height: 31, rx: 13, fill: '#e6efff', stroke: BLAU, 'stroke-width': 1.5, opacity: 0 }, api.svg);
+      api.svg.insertBefore(blase, t);
+      const zipfel = el('path', { d: x.vorn ? `M ${b1 + 16} 71 l -9 11 l 17 -11 z` : `M ${b2 - 16} 71 l 9 11 l -17 -11 z`, fill: '#e6efff', stroke: BLAU, 'stroke-width': 1.5, opacity: 0 }, api.svg);
+      api.svg.insertBefore(zipfel, blase);
+      ts[iRede].setAttribute('fill', BLAU);
+      const lr = el('text', { x: (b1 + b2) / 2, y: 100, 'text-anchor': 'middle', class: 'ex-s', text: 'wörtliche Rede', style: `font-size:12px;font-weight:700;fill:${BLAU}`, opacity: 0 }, api.svg);
+      await api.tw(450, (k) => [blase, zipfel, lr].forEach((e) => e.setAttribute('opacity', k)));
+      api.say(`<b>„${x.rede}“</b>: Das wird gesagt. Es ist die <b>wörtliche Rede</b>.`); await api.wait(3000);
+      const g1 = rand(iBegl, false), g2 = rand(iBegl, true);
+      const strich = el('line', { x1: g1, y1: 69, x2: g1, y2: 69, stroke: ORANGE, 'stroke-width': 3.5, 'stroke-linecap': 'round' }, api.svg);
+      await api.tw(450, (k) => strich.setAttribute('x2', lerp(g1, g2, k)));
+      el('text', { x: (g1 + g2) / 2, y: 100, 'text-anchor': 'middle', class: 'ex-s', text: 'Begleitsatz', style: `font-size:12px;font-weight:700;fill:${ORANGE}` }, api.svg);
+      api.say(`<b>„${x.tokens[iBegl].trim()}“</b> sagt, wer spricht. Das ist der <b>Begleitsatz</b>. Er steht hier <b>${x.vorn ? 'vorn' : 'hinten'}</b>.`); await api.wait(3400);
+      if (x.vorn) { await zeig(1); api.say('Begleitsatz vorn: Ein <b>Doppelpunkt</b> kündigt die Rede an.'); await api.wait(2800); }
+      await zeig(iAuf, iZu); api.say('<b>Anführungszeichen</b> stehen vor und hinter dem, was gesagt wird: unten auf, oben zu.'); await api.wait(3200);
+      if (x.vorn) { await zeig(5); api.say(`Das Satzzeichen der Rede (${x.z}) steht <b>vor</b> dem letzten Anführungszeichen.`); await api.wait(3200); }
+      else {
+        if (x.z === '.') api.say('Der <b>Punkt</b> der Rede fällt weg, wenn der Begleitsatz folgt.'); else { await zeig(2); api.say(`Das ${x.z === '?' ? 'Fragezeichen' : 'Ausrufezeichen'} der Rede bleibt stehen, vor dem letzten Anführungszeichen.`); }
+        await api.wait(3000);
+        await zeig(4); api.say('Begleitsatz hinten: Nach der Rede steht ein <b>Komma</b>.'); await api.wait(2800);
+        await zeig(6); api.say('Der Punkt steht ganz am Ende des Satzes.'); await api.wait(2400);
+      }
+      api.say(x.merk);
+    },
+    // Bauplan (seit v122): Wo steht die Personalform des Verbs? 2. Stelle, ganz vorn oder am Ende: daran erkennt man Satzart und Nebensatz.
+    //   x: { tokens, verb (Stelle), neben? (Nebensatz), merk }
+    async verbplatz(api, x) {
+      const z = zeile(api, x.tokens, 58, true, false);
+      const ort = (i) => { try { const e = z.ts[i], a = /^\s/.test(e.textContent) ? 1 : 0, p1 = e.getStartPositionOfChar(a), p2 = e.getEndPositionOfChar(e.getNumberOfChars() - 1); return { x1: p1.x, x2: p2.x, y: p1.y }; } catch (e) { return { x1: 100 + i * 30, x2: 126 + i * 30, y: 58 }; } };
+      const typ = x.neben ? 2 : x.verb === 0 ? 1 : 0, wort = (i) => x.tokens[i].replace(/[.,!?]$/, '');
+      const ueber = (x1, x2, text, f) => { el('path', { d: `M ${x1} 41 v -5 H ${x2} v 5`, fill: 'none', stroke: f, 'stroke-width': 2 }, api.svg); el('text', { x: (x1 + x2) / 2, y: 30, 'text-anchor': 'middle', class: 'ex-s', text, style: `font-size:12px;font-weight:800;fill:${f}` }, api.svg); };
+      const PLAN = [
+        { teile: [['1', 0, 26], ['Verb', 1, 40], ['…', 0, 40]], text: 'Verb an 2. Stelle', wo: 'Aussagesatz · W-Frage · Hauptsatz' },
+        { teile: [['Verb', 1, 40], ['…', 0, 66]], text: 'Verb ganz vorn', wo: 'Frage ohne Fragewort · Aufforderung' },
+        { teile: [['weil', 2, 34], ['…', 0, 32], ['Verb', 1, 40]], text: 'Verb am Ende', wo: 'Nebensatz (nach weil, wenn, dass …)' },
+      ];
+      const plaene = PLAN.map((p, k) => {
+        const g = el('g', { opacity: 0 }, api.svg), y = 86 + k * 34; let px = 14;
+        const r = el('rect', { x: 8, y: y - 5, width: 344, height: 30, rx: 9, fill: 'none', stroke: 'none', 'stroke-width': 2.5 }, g);
+        p.teile.forEach(([txt, art, w]) => { el('rect', { x: px, y, width: w, height: 20, rx: 5, fill: art === 1 ? ORANGE : art === 2 ? BLAU : '#fff', stroke: art ? 'none' : 'var(--soft)', 'stroke-width': 1.5 }, g); el('text', { x: px + w / 2, y: y + 14, 'text-anchor': 'middle', class: 'ex-s', text: txt, style: `font-size:11px;font-weight:800;fill:${art ? '#fff' : 'var(--ink)'}` }, g); px += w + 3; });
+        el('text', { x: 134, y: y + 8, class: 'ex-s', text: p.text, style: 'font-size:12px;font-weight:800' }, g);
+        el('text', { x: 134, y: y + 21, class: 'ex-s f6', text: p.wo, style: 'font-size:10.5px' }, g);
+        return { g, r };
+      });
+      api.say('Suche die <b>Personalform des Verbs</b>. Wo steht sie im Satz?'); await api.wait(2400);
+      const ov = ort(x.verb); z.ts[x.verb].setAttribute('fill', ORANGE);
+      await api.wait(900);
+      if (typ === 0) {
+        ueber(ort(0).x1, ort(x.verb - 1).x2, '1. Stelle', 'var(--ink)'); ueber(ov.x1, ov.x2, '2.', ORANGE);
+        api.say(`Davor steht <b>ein</b> Satzglied: „${x.tokens.slice(0, x.verb).join(' ')}“. Das Verb „${wort(x.verb)}“ steht also an <b>2. Stelle</b>.`);
+      } else if (typ === 1) { ueber(ov.x1, ov.x2, 'vorn', ORANGE); api.say(`Das Verb „${wort(x.verb)}“ steht <b>ganz vorn</b>.`); }
+      else { z.ts[0].setAttribute('fill', BLAU); const o0 = ort(0); ueber(o0.x1, o0.x2, 'Einleitewort', BLAU); ueber(ov.x1, ov.x2, 'Ende', ORANGE); api.say(`Der Satz beginnt mit dem Einleitewort „${wort(0)}“. Das Verb „${wort(x.verb)}“ steht <b>ganz am Ende</b>.`); }
+      await api.wait(3400);
+      await api.tw(500, (k) => plaene.forEach((p, i) => p.g.setAttribute('opacity', (i === typ ? 1 : 0.4) * k)));
+      plaene[typ].r.setAttribute('stroke', 'var(--ok)'); plaene[typ].r.setAttribute('fill', '#f1fbf6');
+      api.say(`Deutsche Sätze haben drei Baupläne. Dieser Satz passt zum ${['ersten', 'zweiten', 'dritten'][typ]}: <b>${PLAN[typ].text}</b>.`); await api.wait(3800);
+      api.say(x.merk);
+    },
+    // Wo? oder Wohin? (seit v122): links bleibt die Kugel liegen (Dativ), rechts kommt sie neu an (Akkusativ).
+    //   x: { teile:[vor, nach] (Satz um den Artikel herum), artikel, frage:'wo'|'wohin', merk }
+    async wowohin(api, x) {
+      const t = el('text', { x: 180, y: 30, 'text-anchor': 'middle', class: 'ex-b' }, api.svg);
+      el('tspan', { text: x.teile[0] }, t); el('tspan', { text: x.artikel, fill: BLAU }, t); el('tspan', { text: x.teile[1] || '' }, t);
+      fit(t, 336, 18);
+      const feld = (x0, titel, unter, fall) => {
+        const g = el('g', { opacity: 0 }, api.svg);
+        const r = el('rect', { x: x0, y: 46, width: 160, height: 108, rx: 12, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, g);
+        el('text', { x: x0 + 80, y: 66, 'text-anchor': 'middle', class: 'ex-b', text: titel, style: 'font-size:16px' }, g);
+        el('rect', { x: x0 + 86, y: 112, width: 52, height: 7, rx: 3, fill: 'var(--ink)' }, g); // der Platz (ein Brett)
+        el('text', { x: x0 + 80, y: 135, 'text-anchor': 'middle', class: 'ex-s', text: unter, style: 'font-size:11.5px' }, g);
+        el('text', { x: x0 + 80, y: 148, 'text-anchor': 'middle', class: 'ex-s', text: fall, style: 'font-size:11.5px;font-weight:800' }, g);
+        return { g, r, x0 };
+      };
+      const wo = feld(14, 'Wo?', 'bleibt, wo es ist', 'Dativ: dem, der'), wohin = feld(186, 'Wohin?', 'kommt neu an', 'Akkusativ: den, die, das');
+      const k1 = el('circle', { cx: wo.x0 + 112, cy: 103, r: 9, fill: ORANGE, stroke: 'var(--ink)', 'stroke-width': 2 }, wo.g);
+      el('path', { d: `M ${wohin.x0 + 30} 100 Q ${wohin.x0 + 70} 62 ${wohin.x0 + 104} 94`, fill: 'none', stroke: 'var(--soft)', 'stroke-width': 2, 'stroke-dasharray': '4 4' }, wohin.g);
+      const k2 = el('circle', { cx: wohin.x0 + 30, cy: 100, r: 9, fill: ORANGE, stroke: 'var(--ink)', 'stroke-width': 2 }, wohin.g);
+      const flug = (k) => { const a = [wohin.x0 + 30, 100], c = [wohin.x0 + 70, 62], b = [wohin.x0 + 112, 103], u = 1 - k; k2.setAttribute('cx', u * u * a[0] + 2 * u * k * c[0] + k * k * b[0]); k2.setAttribute('cy', u * u * a[1] + 2 * u * k * c[1] + k * k * b[1]); };
+      await api.wait(500);
+      api.say('Nach auf, in, an, unter, neben … gibt es zwei Fälle. Frag nach dem Ort: <b>Wo?</b> oder <b>Wohin?</b>');
+      await api.tw(500, (k) => [wo.g, wohin.g].forEach((g) => g.setAttribute('opacity', k)));
+      await api.wait(1200);
+      await api.tw(900, flug); await api.wait(500); await api.tw(500, (k) => k1.setAttribute('cy', 103 - 5 * Math.sin(k * Math.PI)));
+      await api.wait(2000);
+      const ja = x.frage === 'wo' ? wo : wohin, nein = x.frage === 'wo' ? wohin : wo;
+      ja.r.setAttribute('stroke', 'var(--ok)'); ja.r.setAttribute('stroke-width', 2.5); ja.r.setAttribute('fill', '#f1fbf6'); nein.g.setAttribute('opacity', 0.4);
+      api.say(x.frage === 'wo'
+        ? `Hier passt <b>Wo?</b> Nichts kommt an einen neuen Platz, es bleibt, wo es ist. Dann steht der <b>Dativ</b>: <b>${x.artikel}</b>.`
+        : `Hier passt <b>Wohin?</b> Etwas kommt an einen neuen Platz. Dann steht der <b>Akkusativ</b>: <b>${x.artikel}</b>.`);
+      if (x.frage !== 'wo') { flug(0); await api.tw(900, flug); }
+      await api.wait(3800);
+      api.say(x.merk);
+    },
+    // Präposition und Fall (seit v122): zwei Körbe, die gefragte Präposition leuchtet in ihrem Korb.
+    //   x: { w (Präposition), f:'D'|'A', bsp, merk }
+    async prfall(api, x) {
+      const KORB = { D: ['aus', 'bei', 'mit', 'nach', 'seit', 'von', 'zu'], A: ['durch', 'für', 'gegen', 'ohne', 'um'] };
+      if (!KORB[x.f].includes(x.w)) KORB[x.f].push(x.w);
+      const t = zeile(api, x.bsp.split(' '), 32, true, false); t.ts[0].setAttribute('fill', ORANGE);
+      const chips = {};
+      const korb = (x0, f, titel, art) => {
+        const g = el('g', { opacity: 0 }, api.svg);
+        const r = el('rect', { x: x0, y: 50, width: 162, height: 104, rx: 12, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, g);
+        el('text', { x: x0 + 81, y: 68, 'text-anchor': 'middle', class: 'ex-s', text: titel, style: 'font-size:13px;font-weight:800' }, g);
+        el('text', { x: x0 + 81, y: 82, 'text-anchor': 'middle', class: 'ex-s f6', text: art, style: 'font-size:10.5px' }, g);
+        let cx = x0 + 8, cy = 90;
+        KORB[f].forEach((w) => { const br = w.length * 7 + 14; if (cx + br > x0 + 156) { cx = x0 + 8; cy += 21; } const c = el('rect', { x: cx, y: cy, width: br, height: 17, rx: 8.5, fill: 'var(--tint)', stroke: 'none', 'stroke-width': 2 }, g); const ct = el('text', { x: cx + br / 2, y: cy + 12.5, 'text-anchor': 'middle', class: 'ex-s', text: w, style: 'font-size:11.5px;font-weight:700' }, g); if (f === x.f && w === x.w) chips.ziel = { c, ct }; cx += br + 4; });
+        return { g, r };
+      };
+      const d = korb(12, 'D', 'immer Dativ', 'dem · der · dem · den'), a = korb(186, 'A', 'immer Akkusativ', 'den · die · das · die');
+      await api.wait(500);
+      api.say(`Nach <b>${x.w}</b> steht immer derselbe Fall. Diese Präpositionen sortiert man in zwei Körbe.`);
+      await api.tw(500, (k) => [d.g, a.g].forEach((g) => g.setAttribute('opacity', k)));
+      await api.wait(3000);
+      const ja = x.f === 'D' ? d : a, nein = x.f === 'D' ? a : d;
+      chips.ziel.c.setAttribute('fill', ORANGE); chips.ziel.ct.setAttribute('style', 'font-size:11.5px;font-weight:800;fill:#fff');
+      ja.r.setAttribute('stroke', 'var(--ok)'); ja.r.setAttribute('stroke-width', 2.5); nein.g.setAttribute('opacity', 0.4);
+      if (t.ts[1]) t.ts[1].setAttribute('fill', BLAU);
+      api.say(`<b>${x.w}</b> liegt im Korb „immer ${x.f === 'D' ? 'Dativ' : 'Akkusativ'}“, zusammen mit ${KORB[x.f].filter((w) => w !== x.w).join(', ')}. Am besten lernst du jeden Korb als Reihe auswendig.`);
+      await api.wait(4200);
       api.say(x.merk);
     },
     // ein Bild (SVG-Text aus der Aufgabe) in die Mitte, dann die Erklärung
@@ -669,22 +831,27 @@
       api.say(x.gleich ? `gleich → <b>so ${x.pos} wie</b><br>${x.satz}` : `verschieden → <b>${x.komp} als</b><br>${x.satz}`);
     },
   };
-  function thema(id, title, viewBox) {
+  // Bausteine mit eigener Bildhöhe (sonst gilt die Höhe des Themas)
+  const HOEHE = { weiche: (x) => 122 + 68 * (x.fragen.length - 1), laden: 208, artikelprobe: 124, rede: 112, verbplatz: 190, wowohin: 162, prfall: 162 };
+  // quelle: Thema, aus dem die Beispiele kommen, wenn die Erklärung kein eigenes Thema ist (über ex.via erreichbar)
+  function thema(id, title, viewBox, quelle) {
     EX[id] = {
       title, viewBox,
       create(api, ctx) {
         ctx = ctx || {};
         const task = !!ctx.mode && (ctx.pre || ctx.post);
-        const arten = D.arten[id], zufall = () => arten[U.pick(Object.keys(arten))]().ex;
-        let x = task ? (ctx.post ? ctx : arten[ctx.art]().ex) : zufall();
+        const arten = D.arten[quelle || id], zufall = () => arten[U.pick(Object.keys(arten))]().ex;
+        const eine = (art) => (arten[art] || Object.values(D.arten).map((a) => a[art]).find(Boolean))().ex;
+        let x = task ? (ctx.post ? ctx : eine(ctx.art)) : zufall();
         if (!task) api.chips([{ label: 'Anderes Beispiel', onClick() { x = zufall(); api.replay(); } }]);
         return {
-          reset() { api.clear(); api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst'); },
+          reset() { api.clear(); const h = HOEHE[x.mode]; api.svg.setAttribute('viewBox', h ? `0 0 360 ${typeof h === 'function' ? h(x) : h}` : viewBox); api.sub(!task ? '' : ctx.post ? 'Lösung zu deiner Aufgabe' : 'Ein ähnliches Beispiel – deine Aufgabe löst du danach selbst'); },
           play() { return BILD[x.mode](api, x); },
         };
       },
     };
   }
+  thema('d5-artikelprobe', 'Die Artikelprobe', '0 0 360 124', 'd5-gross');
   thema('d5-pronomen', 'Pronomen: kleine Wörter für große', '0 0 360 150');
   thema('d5-adjektive', 'Adjektive steigern', '0 0 360 180');
   thema('d5-praep', 'Präpositionen: wie Dinge zueinander stehen', '0 0 360 150');

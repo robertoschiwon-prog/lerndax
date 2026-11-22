@@ -355,7 +355,8 @@
       tap: { tokens, correct }, answerText: liste.join(', '),
       hint: 'Nomen schreibt man <b>groß</b>, und man kann einen Artikel davorsetzen (der, die, das). Vorsicht: Das erste Wort im Satz ist immer groß.',
       solution: `Nomen: <b>${liste.join(', ')}</b>.${correct[0] === 0 ? '' : ` „${tokens[0]}“ ist nur groß, weil es am Satzanfang steht.`} Probe: Vor ein Nomen passt ein Artikel.`,
-      ex: { mode: 'satz', tokens, correct },
+      // Artikelprobe als Bild (seit v122): Das Kärtchen „der · die · das“ fliegt vor jedes Nomen
+      ex: { mode: 'artikelprobe', via: 'd5-artikelprobe', art: 'substAntippen', tokens, gross: Object.fromEntries(correct.map((i) => [i, tokens[i]])), ziele: correct.map((i) => ({ i, ok: true })), merk: `Nomen: <b>${liste.join(', ')}</b>.${correct[0] === 0 ? '' : ` „${tokens[0]}“ ist nur groß, weil es am Satzanfang steht.`}` },
     };
   }
   const substantive = () => U.wahl([[28, artikelWahl], [34, mehrzahl], [16, einzahl], [10, einOderMehr], [12, substAntippen]]);
@@ -744,7 +745,27 @@
       choices: arten.map((a) => WA[a]), correct: arten.indexOf(z.tag[i]),
       hint: 'Mach die Proben: Passt ein Artikel davor (Nomen)? Ändert es sich mit der Person (Verb)? Kann man es steigern (Adjektiv)? Begleitet es ein Nomen (Artikel)? Steht es für ein Nomen (Pronomen)?',
       solution: `<b>${z.w[i]}</b> ist ein <b>${WA[z.tag[i]]}</b>. ${WAPROBE[z.tag[i]]}`,
-      ex: { mode: 'wa', art: 'waBestimmen', w: z.w, tag: z.tag, ziel: z.tag[i], idx: [i] },
+      ex: exWaLeiter('waBestimmen', z.w, z.tag, [i]),
+    };
+  }
+  // Wortart als Fragen-Leiter (mode 'weiche', seit v122): drei Proben nacheinander, das Wort läuft bis zu seiner Wortart.
+  // Vorher zeigte die Animation nur den Satz mit eingefärbten Wörtern.
+  function exWaLeiter(art, w, tag, idx, liste) {
+    const i = idx[0], t = tag[i], wort = w[i];
+    const von = liste ? 0 : w.slice(0, i).join(' ').length + (i ? 1 : 0);
+    const N1 = `„${wort}“ benennt kein Ding, kein Lebewesen und kein Gefühl. Also kein Nomen.`, N2 = `„${wort}“ sagt auch nicht, was jemand tut.`;
+    const sag = t === 'N' ? [`„${wort}“ benennt etwas. Probe: <b>der, die oder das ${wort}</b> passt.`]
+      : t === 'V' ? [N1, `„${wort}“ sagt, was jemand tut oder was geschieht. Ein Verb ändert sich mit der Person: ich …, du …, er …`]
+      : [N1, N2, t === 'A' ? `„${wort}“ sagt, <b>wie</b> etwas ist. Die meisten Adjektive kann man steigern.`
+        : t === 'D' ? `„${wort}“ sagt nicht, wie etwas ist. Es <b>begleitet</b> ein Nomen und zeigt dessen Geschlecht.`
+        : t === 'P' ? `„${wort}“ sagt nicht, wie etwas ist. Es steht <b>für</b> ein Nomen oder für die Person, die spricht.`
+        : `„${wort}“ sagt nicht, wie etwas ist.`];
+    const rest = t === 'D' ? 'Artikel' : t === 'P' ? 'Pronomen' : 'anderes Wort';
+    return {
+      mode: 'weiche', art, wort: liste ? wort : w.join(' ') + '.', klein: !liste, lauf: [von, von + wort.length], zeichen: [], sag,
+      fragen: [{ f: 'Benennt es etwas? (der, die, das davor)', aus: ['ja', 'Nomen'], weiter: 'nein' }, { f: 'Sagt es, was jemand tut oder was geschieht?', aus: ['ja', 'Verb'], weiter: 'nein' }, { f: 'Sagt es, wie etwas ist?', wahl: [['ja', 'Adjektiv'], ['nein', rest]] }],
+      weg: t === 'N' ? [0] : t === 'V' ? [1, 0] : [1, 1, t === 'A' ? 0 : 1],
+      merk: `„${wort}“ ist ein <b>${WA[t] || 'anderes Wort'}</b>.${idx.length > 1 ? ` Genauso: ${idx.slice(1).map((k) => w[k]).join(', ')}.` : ''}`,
     };
   }
   function waAntippen() {
@@ -755,7 +776,7 @@
       tap: { tokens: waTokens(z), correct }, answerText: correct.map((k) => z.w[k]).join(', '),
       hint: WAPROBE[ziel],
       solution: `${WAPL[ziel]}: <b>${correct.map((k) => z.w[k]).join(', ')}</b>. ${WAPROBE[ziel]}`,
-      ex: { mode: 'wa', art: 'waAntippen', w: z.w, tag: z.tag, ziel, idx: correct },
+      ex: exWaLeiter('waAntippen', z.w, z.tag, correct),
     };
   }
   function waWort() {
@@ -768,7 +789,7 @@
       choices: w, correct: tags.indexOf(ziel),
       hint: WAPROBE[ziel],
       solution: `<b>${w[tags.indexOf(ziel)]}</b> ist ein ${WA[ziel]}. ${WAPROBE[ziel]}<br>Die anderen: ${tags.map((t, k) => (t === ziel ? '' : `${w[k]} (${WA[t]})`)).filter(Boolean).join(', ')}.`,
-      ex: { mode: 'wa', art: 'waWort', w, tag: tags, ziel, idx: [tags.indexOf(ziel)], liste: true },
+      ex: exWaLeiter('waWort', w, tags, [tags.indexOf(ziel)], true),
     };
   }
   const wortarten = () => U.wahl([[40, waBestimmen], [36, waAntippen], [24, waWort]]);
@@ -821,7 +842,8 @@
       choices: ch.map((x) => PRFNAME[x]), correct: ch.indexOf(f),
       hint: 'Merke: <b>mit, nach, bei, seit, von, zu, aus</b> → Dativ. <b>für, durch, gegen, ohne, um</b> → Akkusativ.',
       solution: `<b>${bsp}</b>: Nach „${w}“ steht der <b>${f === 'D' ? 'Dativ' : 'Akkusativ'}</b>.<br>Merke: mit, nach, bei, seit, von, zu, aus → Dativ. für, durch, gegen, ohne, um → Akkusativ.`,
-      ex: { mode: 'marken', art: 'prFall', tokens: t, correct: [0, 1], was: `${w} + ${f === 'D' ? 'Dativ' : 'Akkusativ'}`, s1: `Nach „${w}“ steht immer derselbe Fall.`, merk: `<b>${bsp}</b>: ${w} + <b>${f === 'D' ? 'Dativ' : 'Akkusativ'}</b>.` },
+      // zwei Körbe (mode 'prfall', seit v122): Präpositionen mit Dativ und mit Akkusativ, die gefragte leuchtet
+      ex: { mode: 'prfall', art: 'prFall', w, f, bsp, merk: `<b>${bsp}</b>: ${w} + <b>${f === 'D' ? 'Dativ' : 'Akkusativ'}</b>.` },
     };
   }
   function prWechsel() {
@@ -832,7 +854,8 @@
       choices: ch, correct: ch.indexOf(ok),
       hint: 'Frage: <b>Wo</b> ist etwas? Dann Dativ (dem, der). <b>Wohin</b> kommt etwas? Dann Akkusativ (den, die, das).',
       solution: `<b>${voll}</b><br>Frage: <b>${frage === 'wo' ? 'Wo' : 'Wohin'}?</b> ${frage === 'wo' ? 'Es bleibt an seinem Platz: Dativ.' : 'Es kommt an einen neuen Platz: Akkusativ.'}`,
-      ex: zz('prWechsel', [satz], 0, [voll], 0, `Frage: <b>Wo</b> oder <b>Wohin</b>?`, frage === 'wo' ? '<b>Wo?</b> Es bleibt, wo es ist: Dativ.' : '<b>Wohin?</b> Es kommt an einen neuen Platz: Akkusativ.', `<b>${voll}</b>`),
+      // Wo oder Wohin? (mode 'wowohin', seit v122): zwei Bilder, bleiben oder hinkommen
+      ex: { mode: 'wowohin', art: 'prWechsel', teile: voll.split(ok), artikel: ok, frage, merk: `<b>${voll}</b><br>${frage === 'wo' ? '<b>Wo?</b> Es bleibt an seinem Platz: Dativ.' : '<b>Wohin?</b> Es kommt an einen neuen Platz: Akkusativ.'}` },
     };
   }
   function prPasst() {
@@ -1146,6 +1169,8 @@
     const mitKomma = w.map((x, i) => x + (i === komma ? ',' : '') + (i === w.length - 1 ? '.' : ''));
     return { g, w, komma, hsVerb, nsVerb, mitKomma, nsVorn, hsT: nsVorn ? hsUm.join(' ') : hs.join(' '), nsT: ns.join(' ') };
   }
+  // Angaben für das Satzbau-Bild eines Satzgefüges (Baustein komma)
+  const gefBild = (x) => ({ typ: 'gef', ns: x.nsVorn ? [0, x.komma] : [x.komma + 1, x.w.length - 1], hs: x.nsVorn ? [x.komma + 1, x.w.length - 1] : [0, x.komma], einleit: x.nsVorn ? 0 : x.komma + 1, hsVerb: x.hsVerb, nsVerb: x.nsVerb, nsVorn: x.nsVorn });
   const REGEL_NS = 'Im <b>Nebensatz</b> steht die Personalform des Verbs am <b>Ende</b>. Im <b>Hauptsatz</b> steht sie an 2. Stelle (oder ganz vorn, wenn der Nebensatz zuerst kommt).';
   function nsVerb() {
     const x = gefuege(Math.random() < 0.3), imNS = Math.random() < 0.6;
@@ -1155,7 +1180,7 @@
       tap: { tokens: x.mitKomma, correct: [i], one: true }, answerText: x.w[i],
       hint: `Finde zuerst den Nebensatz: Er beginnt mit einem Einleitewort wie <i>weil, wenn, dass, obwohl, bis</i>. ${REGEL_NS}`,
       solution: `${x.mitKomma.map((t, k) => (k === i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Nebensatz: „${x.nsT}“. Hauptsatz: „${x.hsT}“. ${REGEL_NS}`,
-      ex: { mode: 'marken', art: 'nsVerb', tokens: x.mitKomma, correct: [i], was: `Personalform im ${imNS ? 'Nebensatz' : 'Hauptsatz'}`, s1: REGEL_NS },
+      ex: Object.assign(exKomma('nsVerb', x.w, [x.komma], REGEL_NS, gefBild(x)), { merk: `Personalform im ${imNS ? 'Nebensatz' : 'Hauptsatz'}: <b>${x.w[i]}</b><br>${REGEL_NS}` }),
     };
   }
   function nsBau() {
@@ -1178,7 +1203,8 @@
       choices: ['Hauptsatz', 'Nebensatz'], correct: ns ? 1 : 0,
       hint: 'Kann der Satz <b>allein</b> stehen? Dann ist es ein Hauptsatz. Ein Nebensatz beginnt mit einem Einleitewort (weil, wenn, dass …), und sein Verb steht am Ende.',
       solution: ns ? `„${t}“ ist ein <b>Nebensatz</b>: Er beginnt mit „${g.k}“, das Verb „${g.ns[2]}“ steht am Ende, und allein ergibt er keinen vollständigen Satz.` : `„${t}“ ist ein <b>Hauptsatz</b>: Er kann allein stehen, und das Verb „${g.hs[1]}“ steht an 2. Stelle.`,
-      ex: { mode: 'marken', art: 'hsOderNs', tokens: t.split(' '), correct: ns ? [0, t.split(' ').length - 1] : [g.hs[0].split(' ').length], was: ns ? 'Nebensatz: Einleitewort und Verb am Ende' : 'Hauptsatz: Verb an 2. Stelle', s1: 'Schau auf das Verb: Wo steht die Personalform? Und beginnt der Satz mit einem Einleitewort?' },
+      // Bauplan-Bild (mode 'verbplatz', seit v122): Wo steht das Verb? Daran erkennt man Haupt- und Nebensatz
+      ex: { mode: 'verbplatz', art: 'hsOderNs', tokens: t.split(' '), verb: ns ? t.split(' ').length - 1 : g.hs[0].split(' ').length, neben: ns, merk: ns ? `<b>Nebensatz</b>: Einleitewort „${g.k}“ vorn, Verb „${g.ns[2]}“ am Ende. Allein ist er kein vollständiger Satz.` : `<b>Hauptsatz</b>: Das Verb „${g.hs[1]}“ steht an 2. Stelle. Er kann allein stehen.` },
     };
   }
   const nebensatz = () => U.wahl([[42, nsVerb], [30, nsBau], [28, hsOderNs]]);
@@ -1204,7 +1230,7 @@
     const w = roh.map((x) => x.replace('*', ''));
     return { art, w, verb, text: w.join(' ') + SZEICHEN[art], tokens: w.map((x, i) => (i === w.length - 1 ? x + SZEICHEN[art] : x)) };
   }
-  const exSart = (name, x) => ({ mode: 'marken', art: name, tokens: x.tokens, correct: [x.verb], was: `${SNAME[x.art]}, Verb`, s1: SWARUM[x.art] });
+  const exSart = (name, x) => ({ mode: 'verbplatz', art: name, tokens: x.tokens, verb: x.verb, merk: `<b>${SNAME[x.art]}</b>, Personalform: <b>${x.tokens[x.verb].replace(/[.!?]$/, '')}</b><br>${SWARUM[x.art]}` });
   function sartBestimmen() {
     const x = sartSatz(), arten = Object.keys(SARTEN);
     return {
@@ -1291,7 +1317,7 @@
       prompt: 'Setze das fehlende <b>Komma</b>: Tippe die Stelle an.',
       tap: { tokens: x.w.map((t, i) => (i === x.w.length - 1 ? t + '.' : t)), correct: [x.komma], gaps: true, one: true }, answerText: x.mitKomma.join(' '),
       hint: 'Wo endet der eine Satz und wo beginnt der andere? Suche das Einleitewort (weil, wenn, dass, obwohl, bis) und die beiden Verben.',
-      solution: `<b>${x.mitKomma.join(' ')}</b><br>${REGEL_GEF}`, ex: exKomma('kommaGef', x.w, [x.komma], REGEL_GEF, { typ: 'gef', ns: x.nsVorn ? [0, x.komma] : [x.komma + 1, x.w.length - 1], hs: x.nsVorn ? [x.komma + 1, x.w.length - 1] : [0, x.komma], einleit: x.nsVorn ? 0 : x.komma + 1, hsVerb: x.hsVerb, nsVerb: x.nsVerb, nsVorn: x.nsVorn }),
+      solution: `<b>${x.mitKomma.join(' ')}</b><br>${REGEL_GEF}`, ex: exKomma('kommaGef', x.w, [x.komma], REGEL_GEF, gefBild(x)),
     };
   }
   // Apposition (Beisatz): Kommas mit (,) markiert (Deutschbuch Kap. 4, S. 112)
@@ -1361,6 +1387,13 @@
     ['Paul lacht', 'der Film', 'lustig', 'ist'], ['Nora übt jeden Tag', 'sie', 'bald ein Konzert', 'hat']];
   const vEnde = (b) => `${b[1]} ${b[2]} ${b[3]}`, vZwei = (b) => `${b[1]} ${b[3]} ${b[2]}`;
   const BEG_REGEL = 'Nach <b>weil</b> und <b>da</b> beginnt ein Nebensatz: Das Verb steht am <b>Ende</b>. Nach <b>denn</b> kommt ein Hauptsatz: Das Verb steht an <b>2. Stelle</b>.';
+  // Satzbau-Bild für „Hauptsatz, weil/da/denn …“ (Baustein komma mit bild, seit v122)
+  function exBeg(art, b, k, ende, merk) {
+    const hs = b[0].split(' '), w = [...hs, k, ...(ende ? vEnde(b) : vZwei(b)).split(' ')], komma = hs.length - 1;
+    const bild = ende ? { typ: 'gef', hs: [0, komma], ns: [komma + 1, w.length - 1], einleit: komma + 1, hsVerb: /^(Der|Die|Das) /.test(b[0]) ? 2 : 1, nsVerb: w.length - 1, nsVorn: false }
+      : { typ: 'reihe', s1: [0, komma], s2: [komma + 1, w.length - 1], bind: komma + 1 };
+    return Object.assign(exKomma(art, w, [komma], BEG_REGEL, bild), { merk });
+  }
   function begSatz() {
     const b = pick(BEG), k = pick(['weil', 'da', 'denn']), ende = k !== 'denn';
     const ok = `${b[0]}, ${k} ${ende ? vEnde(b) : vZwei(b)}.`, falsch = `${b[0]}, ${k} ${ende ? vZwei(b) : vEnde(b)}.`;
@@ -1368,7 +1401,7 @@
     return {
       prompt: `Welcher Satz ist richtig gebaut? Achte auf <b>${k}</b>.`, choices: ch, correct: ch.indexOf(ok), hint: BEG_REGEL,
       solution: `<b>${ok}</b><br>${ende ? `Nach „${k}“ steht das Verb „${b[3]}“ am Ende.` : `Nach „denn“ steht das Verb „${b[3]}“ an 2. Stelle, wie in einem Hauptsatz.`}`,
-      ex: { mode: 'marken', art: 'begSatz', tokens: ok.split(' '), correct: [w.indexOf(k), vi], was: `${k} und das Verb`, s1: BEG_REGEL, merk: `<b>${ok}</b>` },
+      ex: exBeg('begSatz', b, k, ende, `<b>${ok}</b><br>${ende ? `Nach „${k}“ steht das Verb „${b[3]}“ am Ende.` : `Nach „denn“ steht das Verb „${b[3]}“ an 2. Stelle, wie in einem Hauptsatz.`}`),
     };
   }
   function begWort() {
@@ -1377,7 +1410,7 @@
     return {
       prompt: `Welches Wort passt?<br><span class="bsp">${b[0]}, ___ ${rest}.</span>`, choices: ch, correct: ch.indexOf(k), hint: BEG_REGEL,
       solution: `<b>${ok}</b><br>${ende ? `Das Verb „${b[3]}“ steht am Ende. Dazu passt „${k}“.` : `Das Verb „${b[3]}“ steht an 2. Stelle. Dazu passt nur „denn“.`}`,
-      ex: { mode: 'marken', art: 'begWort', tokens: ok.split(' '), correct: [ok.split(' ').indexOf(k), ok.replace('.', '').split(' ').lastIndexOf(b[3])], was: `${k} und das Verb`, s1: 'Schau zuerst, wo das Verb steht: am Ende oder an 2. Stelle?', merk: `<b>${ok}</b>` },
+      ex: exBeg('begWort', b, k, ende, `<b>${ok}</b><br>${ende ? `Das Verb „${b[3]}“ steht am Ende. Dazu passt „${k}“.` : `Das Verb „${b[3]}“ steht an 2. Stelle. Dazu passt nur „denn“.`}`),
     };
   }
   // Satzreihen: [Hauptsatz 1, Verbindungswort, Hauptsatz 2]
@@ -1398,13 +1431,14 @@
   function reiheOderGefuege() {
     const reihe = Math.random() < 0.5;
     let t, toks, mark;
-    if (reihe) { const [a, k, b] = pick(REIHE); t = `${a}, ${k} ${b}.`; toks = t.split(' '); mark = [toks.indexOf(k)]; }
-    else { const x = gefuege(false); t = x.mitKomma.join(' '); toks = x.mitKomma; mark = [x.nsVerb]; }
+    let exBild; // Satzbau-Bild (seit v122)
+    if (reihe) { const [a, k, b] = pick(REIHE); t = `${a}, ${k} ${b}.`; toks = t.split(' '); mark = [toks.indexOf(k)]; const w = [...a.split(' '), k, ...b.split(' ')], km = a.split(' ').length - 1; exBild = exKomma('reiheOderGefuege', w, [km], REIHE_REGEL, { typ: 'reihe', s1: [0, km], s2: [km + 1, w.length - 1], bind: km + 1 }); }
+    else { const x = gefuege(false); t = x.mitKomma.join(' '); toks = x.mitKomma; mark = [x.nsVerb]; exBild = exKomma('reiheOderGefuege', x.w, [x.komma], REGEL_NS, gefBild(x)); }
     return {
       prompt: `Satzreihe oder Satzgefüge?<br><span class="bsp">${t}</span>`, choices: ['Satzreihe (Hauptsatz + Hauptsatz)', 'Satzgefüge (Hauptsatz + Nebensatz)'], correct: reihe ? 0 : 1,
       hint: 'Schau auf das Verb im zweiten Teil: An 2. Stelle? Dann ist es ein Hauptsatz (Satzreihe). Ganz am Ende? Dann ist es ein Nebensatz (Satzgefüge).',
       solution: reihe ? `<b>Satzreihe</b>: Beide Teile sind Hauptsätze. Das Verb steht jeweils an 2. Stelle.` : `<b>Satzgefüge</b>: Der zweite Teil ist ein Nebensatz. Sein Verb steht am Ende.`,
-      ex: { mode: 'marken', art: 'reiheOderGefuege', tokens: toks, correct: mark, was: reihe ? 'Satzreihe' : 'Satzgefüge', s1: 'Wo steht das Verb im zweiten Teil?', merk: reihe ? '<b>Satzreihe</b>: Hauptsatz + Hauptsatz.' : '<b>Satzgefüge</b>: Hauptsatz + Nebensatz, das Verb steht am Ende.' },
+      ex: Object.assign(exBild, { merk: reihe ? '<b>Satzreihe</b>: Hauptsatz + Hauptsatz. Jeder Teil könnte allein stehen.' : '<b>Satzgefüge</b>: Hauptsatz + Nebensatz. Im Nebensatz steht das Verb am Ende.' }),
     };
   }
   const satzreihe = () => U.wahl([[30, begSatz], [24, begWort], [24, reiheKomma], [22, reiheOderGefuege]]);
@@ -1426,7 +1460,8 @@
     const t = vorn ? [`${r.wer} ${r.verb}`, ':', ' ', '„', r.rede, r.z, '“'] : ['„', r.rede, r.z === '.' ? '' : r.z, '“', ',', ` ${r.verb} ${klein(r.wer)}`, '.'];
     return { tokens: t, correct: t.map((x, i) => (/^[:„“,.?!]$/.test(x) ? i : -1)).filter((i) => i >= 0) };
   }
-  const exRede = (art, r, vorn) => Object.assign({ mode: 'marken', art, dicht: true, was: 'Richtig', s1: vorn ? REGEL_VORN : REGEL_HINTEN, merk: `<b>${vorn ? redeVorn(r) : redeHinten(r)}</b>` }, redeTeile(r, vorn));
+  // mode 'rede' (seit v122): Sprechblase um das Gesagte, Begleitsatz unterstrichen, dann kommt jedes Zeichen einzeln mit seinem Grund
+  const exRede = (art, r, vorn) => Object.assign({ mode: 'rede', vorn, wer: r.wer, verb: r.verb, rede: r.rede, z: r.z, art, dicht: true, was: 'Richtig', s1: vorn ? REGEL_VORN : REGEL_HINTEN, merk: `<b>${vorn ? redeVorn(r) : redeHinten(r)}</b>` }, redeTeile(r, vorn));
   function redeRichtig() {
     const r = pick(REDE), vorn = Math.random() < 0.5;
     const ok = vorn ? redeVorn(r) : redeHinten(r);
@@ -1691,7 +1726,8 @@
       tap: { tokens, correct }, answerText: correct.map((k) => z.w[k]).join(', '),
       hint: REGEL_GROSS,
       solution: `<b>${z.w.join(' ')}.</b><br>${z.w[0]}: Satzanfang. ${correct.slice(1).map((k) => z.w[k]).join(', ')}: Nomen.`,
-      ex: { mode: 'marken', art: 'grossAntippen', tokens, correct, was: 'Groß', s1: REGEL_GROSS, merk: `<b>${z.w.join(' ')}.</b><br>Groß: ${correct.map((k) => z.w[k]).join(', ')}` },
+      // Artikelprobe als Bild (mode 'artikelprobe', seit v122)
+      ex: { mode: 'artikelprobe', art: 'grossAntippen', tokens, anfang: true, gross: Object.fromEntries(correct.map((k) => [k, z.w[k] + (k === z.w.length - 1 ? '.' : '')])), ziele: correct.filter((k) => z.tag[k] === 'N').map((k) => ({ i: k, ok: true })), merk: `<b>${z.w.join(' ')}.</b><br>Groß: ${correct.map((k) => z.w[k]).join(', ')}` },
     };
   }
   function grossWort() {
@@ -1703,7 +1739,7 @@
       fields: [{ type: 'text', answer: z.w[i], prefix: vor, suffix: (nach ? nach : '') + '.', label: 'Wort' }],
       hint: REGEL_GROSS,
       solution: `${vor} <b class="vb">${z.w[i]}</b>${nach ? ' ' + nach : ''}.<br>„${z.w[i]}“ ist ein ${WA[z.tag[i]]}${ist ? ', also <b>groß</b>. Probe: Ein Artikel passt davor.' : ', also <b>klein</b>.'}`,
-      ex: zz('grossWort', [z.w[i].toUpperCase()], 0, [vor + ' ', z.w[i], (nach ? ' ' + nach : '') + '.'], 1, `Welche Wortart ist das? ${ist ? 'Passt ein Artikel davor?' : 'Passt ein Artikel davor? Hier nicht.'}`, `„${z.w[i]}“ ist ein ${WA[z.tag[i]]}: ${ist ? 'groß' : 'klein'}.`, `${vor} <b>${z.w[i]}</b>${nach ? ' ' + nach : ''}.`),
+      ex: { mode: 'artikelprobe', art: 'grossWort', tokens: z.w.map((w, k) => (k === i ? w.toLowerCase() : w) + (k === z.w.length - 1 ? '.' : '')), gross: { [i]: z.w[i] + (i === z.w.length - 1 ? '.' : '') }, ziele: [{ i, ok: ist, sag: ist ? '' : `„${z.w[i]}“ benennt nichts. Es ist ein ${WA[z.tag[i]]}: Es sagt, ${z.tag[i] === 'V' ? 'was jemand tut' : 'wie etwas ist'}. Also <b>klein</b>.` }], merk: `${vor} <b>${z.w[i]}</b>${nach ? ' ' + nach : ''}.<br>„${z.w[i]}“ ist ein ${WA[z.tag[i]]}: ${ist ? 'groß' : 'klein'}.` },
     };
   }
   // Aus Verben werden Nomen: das Laufen, beim Spielen
@@ -1719,7 +1755,12 @@
       choices: wahl, correct: wahl.indexOf(subst ? gr : v),
       hint: 'Auch ein Verb kann zum Nomen werden. Das erkennst du am <b>Artikel</b> davor: das, beim (= bei dem), zum (= zu dem). Dann schreibt man es groß.',
       solution: `${vor} <b class="vb">${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.<br>${subst ? `Vor dem Wort steht „${wort}“. Das Verb ist hier ein Nomen, also <b>groß</b>.` : 'Hier sagt das Wort, was jemand tut. Es ist ein Verb, also <b>klein</b>.'}`,
-      ex: zz('grossVerb', [vor + ' ', '___', nach ? ' ' + nach + '.' : '.'], 1, [vor + ' ', subst ? gr : v, nach ? ' ' + nach + '.' : '.'], 1, 'Steht ein Artikel davor (das, beim, zum)?', subst ? `„${wort}“ macht das Verb zum Nomen: groß.` : 'Kein Artikel davor: Es bleibt ein Verb, also klein.', `${vor} <b>${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.`),
+      ex: (() => {
+        const vw = vor.split(' '), nw = nach ? nach.split(' ') : [], alle = [...vw, v, ...nw], k = vw.length, pkt = (w, n) => w + (n === alle.length - 1 ? '.' : '');
+        return { mode: 'artikelprobe', art: 'grossVerb', tokens: alle.map(pkt), gross: { [k]: pkt(gr, k) }, signal: subst ? 0 : -1,
+          ziele: [{ i: k, ok: subst, ohneChip: true, sag: subst ? `Vor dem Wort steht „${wort}“. Darin steckt ein Artikel. Das Verb wird hier zum Nomen: <b>groß</b>.` : 'Kein Artikel davor: Hier sagt das Wort, was jemand tut. Es bleibt ein Verb, also <b>klein</b>.' }],
+          merk: `${vor} <b>${subst ? gr : v}</b>${nach ? ' ' + nach : ''}.` };
+      })(),
     };
   }
   function grossWelches() {
@@ -1731,7 +1772,7 @@
       choices: w, correct: w.indexOf(n.toLowerCase()),
       hint: 'Mach die Artikelprobe: Vor welches Wort passt „der“, „die“ oder „das“?',
       solution: `<b>${n}</b> ist ein Nomen: ${N.find((x) => x.sg === n).art} ${n}. Die anderen Wörter sind Verb, Adjektiv und Pronomen. Die schreibt man klein.`,
-      ex: zz('grossWelches', [n.toLowerCase()], 0, [N.find((x) => x.sg === n).art + ' ', n], 1, 'Artikelprobe: Vor welches Wort passt der, die oder das?', 'Passt ein Artikel davor, ist es ein Nomen: groß.', `<b>${n}</b>`),
+      ex: { mode: 'artikelprobe', art: 'grossWelches', tokens: [n.toLowerCase()], gross: { 0: n }, ziele: [{ i: 0, ok: true, artikel: N.find((x) => x.sg === n).art }], merk: `<b>${N.find((x) => x.sg === n).art} ${n}</b>: ein Nomen, also groß.` },
     };
   }
   // Anredewörter im Brief (Deutschbuch Kap. 1, S. 28): Sie, Ihnen, Ihr immer groß; du, dich, dein darf man groß oder klein schreiben

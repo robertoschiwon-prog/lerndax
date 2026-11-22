@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 21.11.2026, Version `lerndax-v121`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 22.11.2026, Version `lerndax-v122`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,35 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-31. Deutsch: Wortarten, Groß/klein, wörtliche Rede, Satzbau, Präpositionen (lerndax-v122, 22.11.2026)
+
+Fortsetzung von 0-neu-30 (Roberto: „Zieh durch und frag wenig nach.“). Weitere Aufgaben, die seit v120 keinen Knopf mehr hatten,
+haben jetzt eine Animation, die etwas zeigt:
+- **Wortarten** (`d5-wortarten`, alle drei Arten): Fragen-Leiter mit drei Proben (benennt es etwas? → Nomen · sagt es, was jemand tut?
+  → Verb · sagt es, wie etwas ist? → Adjektiv, sonst Artikel/Pronomen). Der Baustein `weiche` kann jetzt beliebig viele Fragen.
+- **Groß oder klein?** (`d5-gross` außer Anrede) und **Nomen antippen** (`d5-substantive`): Baustein `artikelprobe`. Das Kärtchen
+  „der · die · das“ fliegt vor das Wort; passt es, wird das Wort groß und blau. Satzanfang wird zuerst großgeschrieben.
+  Bei „Beim Lesen“ leuchtet das Signalwort. Nomen antippen läuft über `ex.via: 'd5-artikelprobe'`.
+- **Wörtliche Rede** (`d5-rede`): Baustein `rede`. Sprechblase um das Gesagte, Begleitsatz unterstrichen, dann erscheint jedes Zeichen
+  einzeln mit seinem Grund (Doppelpunkt, Anführungszeichen, Satzzeichen der Rede, Komma, Schlusspunkt).
+- **Satzarten** (`d5-satzarten`) und **Hauptsatz oder Nebensatz?** (`hsOderNs`): Baustein `verbplatz`. Die Personalform wird markiert
+  (1. Stelle / 2. / vorn / Ende), darunter die drei Baupläne deutscher Sätze, der passende leuchtet.
+- **Satzgefüge und Satzreihe** (`nsVerb`, `begSatz`, `begWort`, `reiheOderGefuege`): nutzen das Satzbau-Bild des Bausteins `komma`
+  (Hauptsatz/Nebensatz unterstrichen, Einleite- oder Bindewort, Verben).
+- **Präpositionen** (`d5-praep`): `prWechsel` mit Baustein `wowohin` (links „Wo?“: Kugel bleibt liegen, Dativ; rechts „Wohin?“: Kugel
+  kommt neu an, Akkusativ), `prFall` mit Baustein `prfall` (zwei Körbe: immer Dativ / immer Akkusativ, die Präposition leuchtet).
+- Technik: Bausteine dürfen eine eigene Bildhöhe haben (`HOEHE` in `erklaerungen/klasse5.js`); `thema(…, quelle)` für Erklärungen ohne eigenes Thema.
+
+**Vollständig geprüft (per Skript, 6000 Durchläufe je Aufgabenart):** alle 96 Silben-Wörter (jede Silbe genau ein Vokal-Klang), alle
+41 Satzgefüge, 16 Satzreihen, 8 Beisätze, 48 Sätze mit Verbstelle, alle Aufzählungen, alle 218 Wörter aus v121. Keine Fehler.
+
+**Deutsch weiter ohne Knopf (mit Absicht oder noch offen):** Pronomen antippen, Verbformen, Attribute, Adverbien, Konjunktionen,
+Ableitung/Vorsilben, Wortfeld, zusammengesetzte Wörter trennen, Präposition antippen/passt, Anrede im Brief; Text-Themen
+(Märchen, sprachliche Bilder, Textsorten, Sachtext-Fragen, Theater, Kamera): dort reicht der Text unter „So geht’s“.
+
+**Tests:** `dedax.py 4` (888 Antworten, 193 Animationen), `dedax_knobel.py`, `ui2.py` ohne Meldung. Bilder bei 390 px und 320 px angesehen,
+auch als „ähnliches Beispiel“ vor der Aufgabe.
 
 ## 0-neu-30. Deutsch: echte Animationen für Rechtschreibung, Silben und Komma (lerndax-v121, 21.11.2026)
 
