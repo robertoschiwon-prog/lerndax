@@ -552,7 +552,8 @@
       tap: { tokens, correct }, answerText: liste.join(', '),
       hint: 'Personalpronomen stehen <b>für</b> jemanden oder etwas: ich, du, er, sie, es, wir, ihr, mir, dir, ihn, ihm, uns, euch … Possessivpronomen zeigen, <b>wem</b> etwas gehört: mein, dein, sein, ihr, unser, euer.',
       solution: `Pronomen: <b>${liste.join(', ')}</b>.`,
-      ex: { mode: 'marken', art: 'pronAntippen', tokens, correct, was: 'Pronomen', s1: 'Pronomen stehen für jemanden oder etwas (ich, dir, ihn …) oder zeigen, wem etwas gehört (mein, dein, sein …).' },
+      // mode 'pronprobe' (seit v125): Possessivpronomen = Pronomen direkt vor einem Nomen (nächstes Wort großgeschrieben)
+      ex: { mode: 'pronprobe', art: 'pronAntippen', tokens, correct, poss: correct.filter((i) => tokens[i + 1] && /^[A-ZÄÖÜ]/.test(tokens[i + 1])), merk: `Pronomen: <b>${liste.join(', ')}</b>` },
     };
   }
   const cleanW = (w) => w.replace(/[.,!?]/g, '');
@@ -729,7 +730,9 @@
       choices: FORMART, correct: art,
       hint: 'Probe: Ersetze das Subjekt durch „ich“. Ändert sich das markierte Wort? Dann ist es die <b>Personalform</b>. Bleibt es gleich, ist es Grundform (-en) oder Partizip (ge-).',
       solution: `${mark}<br><b>${wort}</b> ist ${art === 0 ? 'die' : art === 1 ? 'die' : 'das'} <b>${FORMART[art]}</b>. ${warum}`,
-      ex: zz('formArt', teile, hinten ? 3 : 1, [FORMART[art] + ': ', wort], 1, 'Probe: Wechsle die Person. Welches Verbwort ändert sich?', warum, `<b>${wort}</b>: ${FORMART[art]}`),
+      // mode 'personprobe' (seit v125): derselbe Satz mit einer anderen Person, nur die Personalform ändert sich
+      ex: (() => { const p = SUBJ.find((x) => x.t === s.subj).p, s2 = satz(V.find((x) => x.inf === s.inf), SUBJ.find((x) => x.t === ([3, 5].includes(p) ? 'Ich' : 'Wir')), zeit);
+        return { mode: 'personprobe', art: 'formArt', a: [s.subj, s.v1, s.rest, s.v2], b: [s2.subj, s2.v1, s2.rest, s2.v2], hinten, part: zeit !== 'futur', merk: `<b>${wort}</b>: ${FORMART[art]}<br><small>${warum}</small>` }; })(),
     };
   }
   const verbformen = () => U.wahl([[26, persForm], [14, persWahl], [22, partizip], [22, imperativ], [16, formArt]]);
@@ -819,6 +822,10 @@
     'Mia sitzt *zwischen ihren Freunden', '*Seit dem Sommer hat Ben einen Hund', 'Die Schuhe stehen *neben dem Bett', 'Wir laufen *um den See',
     'Paul kommt *ohne seine Jacke', '*Bei Regen bleiben wir *in der Hütte', 'Das Heft liegt *auf dem Tisch', 'Nora fährt *mit dem Rad *zu ihrer Oma'];
   const prSatz = () => { const w = pick(PRS).split(' '); const correct = w.map((x, i) => (x[0] === '*' ? i : -1)).filter((i) => i >= 0); const tokens = w.map((x, i) => x.replace('*', '') + (i === w.length - 1 ? '.' : '')); return { tokens, correct, woerter: correct.map((i) => tokens[i].replace('.', '')) }; };
+  // Frage, auf die Präposition + Nomen zusammen antworten (für die Animation, seit v125)
+  const PRFRAGE = { 'unter dem Tisch': 'Wo?', 'vor der Tür': 'Wo?', 'über dem Sofa': 'Wo?', 'durch den Park': 'Wo entlang?', 'mit seinem Hund': 'Mit wem?', 'für meine Oma': 'Für wen?',
+    'Nach der Schule': 'Wann?', 'in den Garten': 'Wohin?', 'hinter das Auto': 'Wohin?', 'zwischen ihren Freunden': 'Wo?', 'Seit dem Sommer': 'Seit wann?', 'neben dem Bett': 'Wo?',
+    'um den See': 'Wo entlang?', 'ohne seine Jacke': 'Ohne was?', 'Bei Regen': 'Wann?', 'in der Hütte': 'Wo?', 'auf dem Tisch': 'Wo?', 'mit dem Rad': 'Womit?', 'zu ihrer Oma': 'Zu wem?' };
   const PR_TIPP = 'Präpositionen sind kleine Wörter wie <b>auf, unter, mit, für, durch, nach</b>. Sie stehen vor einem Nomen (oder Pronomen) und zeigen, wie Dinge zueinander stehen: wo, wohin, wann, womit.';
   // [Präposition, Fall, Beispiel]
   const PRFALL = [['mit', 'D', 'mit dem Bus'], ['nach', 'D', 'nach der Schule'], ['bei', 'D', 'bei meiner Oma'], ['seit', 'D', 'seit dem Sommer'], ['von', 'D', 'von meinem Freund'],
@@ -833,11 +840,11 @@
     ['Die Schuhe stehen unter ___ Bett.', 'dem', 'das', 'wo'], ['Ben stellt die Schuhe unter ___ Bett.', 'das', 'dem', 'wohin'],
     ['Die Katze liegt vor ___ Ofen.', 'dem', 'den', 'wo'], ['Die Katze legt sich vor ___ Ofen.', 'den', 'dem', 'wohin']];
   // passende Präposition: [Satz mit ___, richtig, [falsch], Hinweis]
-  const PRORT = [['Der Ball liegt ___ dem Schrank.', 'hinter', ['auf', 'neben'], 'Man sieht ihn nicht, der Schrank verdeckt ihn.'],
-    ['Die Lampe hängt ___ dem Tisch.', 'über', ['unter', 'neben'], 'Sie ist oben, der Tisch ist unten.'],
-    ['Der Hund schläft ___ dem Tisch.', 'unter', ['auf', 'über'], 'Der Tisch ist sein Dach.'],
-    ['Mia sitzt ___ Lina und Ben.', 'zwischen', ['über', 'unter'], 'Lina sitzt links von ihr, Ben rechts.'],
-    ['Wir gehen ___ den Wald.', 'durch', ['unter', 'über'], 'Wir kommen auf der anderen Seite wieder heraus.'],
+  const PRORT = [['Der Ball liegt ___ dem Schrank.', 'hinter', ['auf', 'neben'], 'Man sieht ihn nicht, der Schrank verdeckt ihn.', { ort: 'schrank', namen: ['Schrank'], ding: 'den Ball' }],
+    ['Die Lampe hängt ___ dem Tisch.', 'über', ['unter', 'neben'], 'Sie ist oben, der Tisch ist unten.', { ort: 'tisch', namen: ['Tisch'], ding: 'die Lampe' }],
+    ['Der Hund schläft ___ dem Tisch.', 'unter', ['auf', 'über'], 'Der Tisch ist sein Dach.', { ort: 'tisch', namen: ['Tisch'], ding: 'den Hund' }],
+    ['Mia sitzt ___ Lina und Ben.', 'zwischen', ['über', 'unter'], 'Lina sitzt links von ihr, Ben rechts.', { ort: 'zwei', namen: ['Lina', 'Ben'], ding: 'Mia' }],
+    ['Wir gehen ___ den Wald.', 'durch', ['unter', 'über'], 'Wir kommen auf der anderen Seite wieder heraus.', { ort: 'wald', namen: ['Wald'], ding: 'unseren Weg' }],
     ['Ich trinke den Tee ___ Zucker.', 'ohne', ['für', 'durch'], 'Ich mag ihn nicht süß.'],
     ['Das Geschenk ist ___ dich.', 'für', ['mit', 'ohne'], 'Du bekommst es.'],
     ['Wir fahren ___ dem Zug nach Berlin.', 'mit', ['ohne', 'gegen'], 'Der Zug bringt uns hin.']];
@@ -848,7 +855,9 @@
       tap: { tokens: x.tokens, correct: x.correct }, answerText: x.woerter.join(', '),
       hint: PR_TIPP,
       solution: `${x.tokens.map((t, k) => (x.correct.includes(k) ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Präposition${x.correct.length > 1 ? 'en' : ''}: <b>${x.woerter.join(', ')}</b>. Sie ${x.correct.length > 1 ? 'stehen' : 'steht'} vor einem Nomen und ${x.correct.length > 1 ? 'zeigen' : 'zeigt'}, wie die Dinge zueinander stehen.`,
-      ex: { mode: 'marken', art: 'prAntippen', tokens: x.tokens, correct: x.correct, was: 'Präpositionen', s1: 'Präpositionen stehen vor einem Nomen: <b>unter</b> dem Tisch, <b>mit</b> dem Bus.' },
+      // mode 'praepnomen' (seit v125): Bogen von der Präposition zu ihrem Nomen, dazu die Frage, auf die beide antworten
+      ex: (() => { const ende = x.correct.map((i) => { let n = i + 1; while (n < x.tokens.length - 1 && !/^[A-ZÄÖÜ]/.test(x.tokens[n])) n++; return n; });
+        return { mode: 'praepnomen', art: 'prAntippen', tokens: x.tokens, correct: x.correct, ende, fragen: x.correct.map((i, k) => PRFRAGE[x.tokens.slice(i, ende[k] + 1).join(' ').replace('.', '')]), merk: `Präposition${x.correct.length > 1 ? 'en' : ''}: <b>${x.woerter.join(', ')}</b><br><small>Eine Präposition steht vor einem Nomen und gehört zu ihm.</small>` }; })(),
     };
   }
   function prFall() {
@@ -876,14 +885,16 @@
     };
   }
   function prPasst() {
-    const [satz, ok, falsch, hinweis] = pick(PRORT), ch = shuffle([ok, ...falsch]);
+    const [satz, ok, falsch, hinweis, lage] = pick(PRORT), ch = shuffle([ok, ...falsch]);
     const voll = satz.replace('___', ok);
     return {
       prompt: `Welche Präposition passt? <i>${hinweis}</i><br><span class="bsp">${satz}</span>`,
       choices: ch, correct: ch.indexOf(ok),
       hint: 'Stell dir das Bild vor: Wo genau ist das Ding? Oben, unten, dahinter, dazwischen?',
       solution: `<b>${voll}</b><br>${hinweis} Deshalb: <b>${ok}</b>.`,
-      ex: { mode: 'marken', art: 'prPasst', tokens: voll.split(' '), correct: [voll.split(' ').indexOf(ok)], was: 'Präposition', s1: hinweis, merk: `<b>${voll}</b>` },
+      // mit Lagebild (mode 'lage', seit v125), wo sich der Platz zeichnen lässt; sonst bleibt es beim Text (kein Knopf)
+      ex: lage ? Object.assign({ mode: 'lage', art: 'prPasst', wahl: [ok, ...falsch], ok, s1: hinweis, merk: `<b>${voll}</b><br><small>${hinweis} Deshalb: ${ok}.</small>` }, lage)
+        : { mode: 'marken', art: 'prPasst', tokens: voll.split(' '), correct: [voll.split(' ').indexOf(ok)], was: 'Präposition', s1: hinweis, merk: `<b>${voll}</b>` },
     };
   }
   const praepositionen = () => U.wahl([[30, prAntippen], [22, prFall], [26, prWechsel], [22, prPasst]]);
@@ -2089,8 +2100,8 @@
     ['Das Kaninchen ___ an einer Möhre.', 'knabbert', ['schlingt', 'speist'], 'essen', 'an einer Möhre'],
   ].map(([satz_, ok, falsch, feld, grund]) => ({ satz: satz_, ok, falsch, feld, grund }));
   const STARK = [
-    ['Welches Wort ist am <b>lautesten</b>?', ['flüstern', 'sagen', 'rufen', 'brüllen'], 3], ['Welches Wort ist am <b>leisesten</b>?', ['flüstern', 'rufen', 'schreien', 'sagen'], 0],
-    ['Womit kommt man am <b>schnellsten</b> voran?', ['schlendern', 'gehen', 'rennen', 'humpeln'], 2], ['Welches Wort bedeutet <b>sehr klein</b>?', ['winzig', 'riesig', 'mächtig', 'breit'], 0],
+    ['Welches Wort ist am <b>lautesten</b>?', ['flüstern', 'sagen', 'rufen', 'brüllen'], 3, ['flüstern', 'sagen', 'rufen', 'brüllen'], ['leise', 'laut']], ['Welches Wort ist am <b>leisesten</b>?', ['flüstern', 'rufen', 'schreien', 'sagen'], 0, ['flüstern', 'sagen', 'rufen', 'schreien'], ['leise', 'laut']],
+    ['Womit kommt man am <b>schnellsten</b> voran?', ['schlendern', 'gehen', 'rennen', 'humpeln'], 2, ['humpeln', 'schlendern', 'gehen', 'rennen'], ['langsam', 'schnell']], ['Welches Wort bedeutet <b>sehr klein</b>?', ['winzig', 'riesig', 'mächtig', 'breit'], 0],
     ['Welches Wort bedeutet <b>sehr groß</b>?', ['winzig', 'riesig', 'zierlich', 'schmal'], 1], ['Welches Wort passt für <b>genau und lange hinsehen</b>?', ['blinzeln', 'beobachten', 'übersehen', 'zwinkern'], 1],
   ];
   const REGEL_FELD = 'Wörter mit ähnlicher Bedeutung bilden ein <b>Wortfeld</b>. Mit dem treffenden Wort wird ein Text genauer und lebendiger als mit „sagen“ oder „gehen“.';
@@ -2110,7 +2121,8 @@
       prompt: `Welches Wort passt <b>nicht</b> ins Wortfeld „${a}“?`, choices: w, correct: w.indexOf(fremd),
       hint: `Frage bei jedem Wort: Ist das eine Art zu ${a}?`,
       solution: `<b>${fremd}</b> passt nicht: Es gehört zum Wortfeld „${b}“. Die anderen sind Arten zu ${a}.<br>${REGEL_FELD}`,
-      ex: { mode: 'liste', art: 'feldNicht', woerter: w, stamm: '', raus: w.indexOf(fremd), s1: `Wortfeld „${a}“: Ist jedes Wort eine Art zu ${a}?`, merk: `<b>${fremd}</b> gehört zum Wortfeld „${b}“, nicht zu „${a}“.` },
+      // mode 'wolken' (seit v125): zwei Kästen, die Wörter wandern in ihr Wortfeld
+      ex: { mode: 'wolken', art: 'feldNicht', felder: [a, b], woerter: w.map((x) => ({ w: x, f: x === fremd ? 1 : 0, hell: x === fremd })), s1: `Ist jedes Wort eine Art zu <b>${a}</b>? Wir sortieren.`, s2: `<b>${fremd}</b> ist keine Art zu ${a}, sondern eine Art zu <b>${b}</b>.`, merk: `<b>${fremd}</b> gehört zum Wortfeld „${b}“, nicht zu „${a}“.` },
     };
   }
   function feldWelches() {
@@ -2119,16 +2131,18 @@
       prompt: `Zu welchem Wortfeld gehört <b>${w}</b>?`, choices: namen, correct: namen.indexOf(a),
       hint: 'Ein Wortfeld sammelt Wörter mit ähnlicher Bedeutung. Wofür könntest du das Wort einsetzen?',
       solution: `<b>${w}</b> ist eine Art zu <b>${a}</b>.<br>${REGEL_FELD}`,
-      ex: { mode: 'liste', art: 'feldWelches', woerter: [a, w], stamm: '', raus: -1, s1: `Was bedeutet „${w}“?`, merk: `<b>${w}</b> gehört zum Wortfeld „<b>${a}</b>“.` },
+      ex: { mode: 'wolken', art: 'feldWelches', felder: [a], woerter: [...shuffle(FELD[a].filter((x) => x !== w)).slice(0, 2).map((x) => ({ w: x, f: 0, da: true })), { w, f: 0, hell: true }], s1: `Wofür könntest du „${w}“ einsetzen? Im Wortfeld „${a}“ stehen schon ähnliche Wörter.`, s2: `<b>${w}</b> ist wie sie eine Art zu <b>${a}</b>, nur genauer.`, merk: `<b>${w}</b> gehört zum Wortfeld „<b>${a}</b>“.` },
     };
   }
   function feldStark() {
-    const [frage, woerter, ok] = pick(STARK), w = shuffle(woerter);
+    const [frage, woerter, ok, skala, pole] = pick(STARK), w = shuffle(woerter);
     return {
       prompt: frage, choices: w, correct: w.indexOf(woerter[ok]),
       hint: 'Stell dir jedes Wort vor: Wie laut, wie schnell, wie groß ist das?',
       solution: `<b>${woerter[ok]}</b>.<br>${REGEL_FELD}`,
-      ex: { mode: 'liste', art: 'feldStark', woerter: w, stamm: '', raus: -1, hell: w.indexOf(woerter[ok]), s1: frage, merk: `<b>${woerter[ok]}</b>` },
+      // mit Skala (mode 'skala', seit v125), wo sich die Wörter ordnen lassen (leise–laut, langsam–schnell)
+      ex: skala ? { mode: 'skala', art: 'feldStark', skala, pole, ziel: woerter[ok], s1: frage, merk: `<b>${woerter[ok]}</b><br><small>Geordnet von ${pole[0]} bis ${pole[1]}: ${skala.join(', ')}.</small>` }
+        : { mode: 'liste', art: 'feldStark', woerter: w, stamm: '', raus: -1, hell: w.indexOf(woerter[ok]), s1: frage, merk: `<b>${woerter[ok]}</b>` },
     };
   }
   const wortfeld = () => U.wahl([[45, feldTreffend], [20, feldNicht], [20, feldWelches], [15, feldStark]]);

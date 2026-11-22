@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 22.11.2026, Version `lerndax-v124`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 22.11.2026, Version `lerndax-v125`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,27 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-34. Deutsch: Pronomen, Verbform bestimmen, Präpositionen, Wortfelder (lerndax-v125, 22.11.2026)
+
+Fortsetzung von 0-neu-33. Sechs weitere Bausteine in `web/deutsch/erklaerungen/klasse5.js` (dazu die Hilfen `ortTs`, `bogenTs`):
+- **Pronomen antippen** (`pronAntippen`): Baustein `pronprobe`. Erst die Personalpronomen blau, dann die Possessivpronomen orange
+  mit Bogen zu ihrem Nomen. Possessivpronomen = Pronomen direkt vor einem großgeschriebenen Wort.
+- **Verbform bestimmen** (`formArt`): Baustein `personprobe`. Derselbe Satz mit einer anderen Person darunter (Ich oder Wir):
+  Die Personalform ändert sich (orange), Partizip oder Grundform bleibt gleich (blau).
+- **Präposition antippen** (`prAntippen`): Baustein `praepnomen`. Bogen von der Präposition zu ihrem Nomen, dazu die Frage, auf die
+  beide zusammen antworten (Wo? Wohin? Wann? Mit wem? …; Tabelle `PRFRAGE` in `web/deutsch/themen/klasse5.js`).
+- **Welche Präposition passt?** (`prPasst`): Baustein `lage`. Kleines Lagebild (Tisch, Schrank, zwei Personen, Wald) mit den drei
+  Möglichkeiten als Plätzen; der richtige leuchtet. Nur für die fünf Sätze mit Ort; „ohne/für/mit“ bleiben ohne Knopf.
+- **Wortfeld** (`feldNicht`, `feldWelches`): Baustein `wolken`. Die Wörter wandern in den Kasten ihres Wortfelds, das fremde in den
+  anderen. (`feldStark`): Baustein `skala`, Wörter geordnet von leise bis laut oder langsam bis schnell (nur wo sich ordnen lässt).
+
+**Geprüft:** alle 12 Pronomen-Sätze, alle 16 Präpositions-Sätze (19 Fragen), 744 Satzpaare der Personenprobe (Personalform immer
+verschieden, Rest gleich), 5 Lagebilder, 3 Skalen per Skript (0 Fehler). `dedax.py 4` (888 Antworten, 245 Animationen, 0 Fehler),
+`dedax_knobel.py`, `ui2.py`. Bilder bei 390 px; alle Deutsch-Bausteine aus v123–v125 auch bei 320 px angesehen.
+
+**Deutsch jetzt mit Absicht ohne Knopf:** Textthemen (Märchen, Bilder, Textsorten, Sachtext, Theater, Kamera), Anrede im Brief,
+„Welches Wort passt am besten?“ (`feldTreffend`), Präposition ohne Ort (`prPasst` mit ohne/für/mit), „sehr klein/sehr groß“.
 
 ## 0-neu-33. Deutsch: Konjunktionen, Aufforderung, Adverb oder Adjektiv · Mathe: Prozent → Bruch (lerndax-v124, 22.11.2026)
 

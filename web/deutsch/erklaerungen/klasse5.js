@@ -305,6 +305,16 @@
     const ts = tokens.map((w, i) => { const neu = i > 0 && c + w.length + 1 > 40; const e = el('tspan', { text: (i && !neu ? ' ' : '') + w }, t); if (neu) { e.setAttribute('x', 180); e.setAttribute('dy', 21); c = 0; } c += w.length + 1; return e; });
     return { t, ts };
   }
+  // Ort eines Wortes (tspan) und Bogen von Wort a zu Wort b; der Bogen kommt nur, wenn beide in derselben Zeile stehen (seit v125)
+  const ortTs = (z, i) => { try { const e = z.ts[i], a = /^\s/.test(e.textContent) ? 1 : 0, p1 = e.getStartPositionOfChar(a), p2 = e.getEndPositionOfChar(e.getNumberOfChars() - 1); return { x1: p1.x, x2: p2.x, y: p1.y, m: (p1.x + p2.x) / 2 }; } catch (e) { return { x1: 100 + i * 40, x2: 136 + i * 40, y: 80, m: 118 + i * 40 }; } };
+  function bogenTs(api, z, a, b, farbe) {
+    const o1 = ortTs(z, a), o2 = ortTs(z, b);
+    if (Math.abs(o1.y - o2.y) >= 2) return false;
+    const u = z.br > 0 && a >= z.br ? -1 : 1, yb = u > 0 ? o1.y - 17 : o1.y + 7; // zweite Zeile: Bogen unter den Wörtern
+    el('path', { d: `M ${o1.m} ${yb} Q ${(o1.m + o2.m) / 2} ${yb - 18 * u} ${o2.m} ${yb}`, fill: 'none', stroke: farbe, 'stroke-width': 2.5, 'stroke-linecap': 'round' }, api.svg);
+    el('path', { d: `M ${o2.m} ${yb + u} l ${o2.m > o1.m ? -9 : 9} ${-3 * u} l ${o2.m > o1.m ? 6 : -6} ${-6 * u} z`, fill: farbe }, api.svg);
+    return true;
+  }
   const ohneU = (w) => w.toLowerCase().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u');
   const mitteX = (t, teile, idx, sep) => { // Mitte eines Teils in x (für Pfeile)
     try { let a = 0; for (let i = 0; i < idx; i++) a += teile[i].length + (sep && i ? 1 : 0); if (sep && idx) a += 1;
@@ -784,6 +794,140 @@
       api.say(x.adj ? 'Steigern geht auch. Beides zusammen zeigt: ein <b>Adjektiv</b>.' : 'Steigern geht auch nicht. Beides zusammen zeigt: ein <b>Adverb</b>.'); await api.wait(3200);
       api.say(x.merk);
     },
+    // Pronomen im Satz (seit v125): erst die Personalpronomen (blau), dann die Possessivpronomen (orange, Bogen zu ihrem Nomen).
+    //   x: { tokens, correct, poss:[Stellen der Possessivpronomen], merk }
+    async pronprobe(api, x) {
+      const z = zeile(api, x.tokens, 62, true, true);
+      const sauber = (i) => x.tokens[i].replace(/[.,!?]$/, '');
+      const pers = x.correct.filter((i) => !x.poss.includes(i));
+      const leg = (yy, farbe, text) => { const g = el('g', { opacity: 0 }, api.svg); el('circle', { cx: 74, cy: yy - 4, r: 5, fill: farbe }, g); el('text', { x: 86, y: yy, class: 'ex-s', text, style: 'font-size:12px' }, g); return g; };
+      const l1 = leg(112, BLAU, 'Personalpronomen: steht für jemanden'), l2 = leg(131, ORANGE, 'Possessivpronomen: zeigt, wem es gehört');
+      api.say('Es gibt zwei Sorten Pronomen. Wir suchen sie nacheinander.'); await api.wait(2400);
+      if (pers.length) {
+        for (const i of pers) { z.ts[i].setAttribute('fill', BLAU); await api.wait(600); }
+        l1.setAttribute('opacity', 1);
+        api.say(`<b>${pers.map(sauber).join(', ')}</b>: <b>Personalpronomen</b>. ${pers.length > 1 ? 'Sie stehen' : 'Es steht'} für jemanden oder etwas, ohne den Namen zu nennen.`); await api.wait(4200);
+      }
+      for (const i of x.poss) {
+        z.ts[i].setAttribute('fill', ORANGE); bogenTs(api, z, i, i + 1, ORANGE); l2.setAttribute('opacity', 1);
+        api.say(`<b>${sauber(i)}</b> zeigt, zu wem „${sauber(i + 1)}“ gehört: <b>Possessivpronomen</b>. Es steht direkt vor seinem Nomen.`); await api.wait(3800);
+      }
+      api.say(x.merk);
+    },
+    // Personalform oder nicht? (seit v125) Derselbe Satz mit einer anderen Person: Nur die Personalform ändert sich.
+    //   x: { a:[subj, v1, rest, v2], b:[subj, v1, rest, v2], hinten, merk }
+    async personprobe(api, x) {
+      const tok = (s) => [s[0], s[1], s[2]].concat(s[3] ? [s[3] + '.'] : []).map((w, i, arr) => (i === arr.length - 1 && !s[3] ? w + '.' : w));
+      const z1 = zeile(api, tok(x.a), 34, true, false);
+      { const o = ortTs(z1, x.hinten ? 3 : 1); el('path', { d: `M ${o.x1} ${o.y + 5} H ${o.x2}`, stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linecap': 'round' }, api.svg); }
+      api.say('Probe: Wir wechseln die Person. Welches Verbwort ändert sich?'); await api.wait(2800);
+      const z2 = zeile(api, tok(x.b), 82, true, false); z2.t.setAttribute('opacity', 0);
+      el('text', { x: 180, y: 58, 'text-anchor': 'middle', class: 'ex-s f6', text: '↓ andere Person', style: 'font-size:11.5px' }, api.svg);
+      await api.tw(500, (k) => z2.t.setAttribute('opacity', k));
+      z2.ts[0].setAttribute('fill', '#0a7d57'); await api.wait(1200);
+      z1.ts[1].setAttribute('fill', ORANGE); z2.ts[1].setAttribute('fill', ORANGE);
+      const o1 = ortTs(z2, 1);
+      el('text', { x: Math.max(48, Math.min(312, o1.m)), y: 106, 'text-anchor': 'middle', class: 'ex-s', text: 'ändert sich', style: `font-size:11.5px;fill:${ORANGE}` }, api.svg);
+      api.say(`<b>${x.a[1]}</b> wird zu <b>${x.b[1]}</b>. Dieses Wort richtet sich nach der Person: Es ist die <b>Personalform</b>.`); await api.wait(4200);
+      if (x.a[3]) {
+        z1.ts[3].setAttribute('fill', BLAU); z2.ts[3].setAttribute('fill', BLAU);
+        const o2 = ortTs(z2, 3);
+        el('text', { x: Math.max(Math.min(312, o1.m) + 78, Math.min(318, o2.m)), y: 106, 'text-anchor': 'middle', class: 'ex-s', text: 'bleibt gleich', style: `font-size:11.5px;fill:${BLAU}` }, api.svg);
+        api.say(`<b>${x.a[3]}</b> bleibt gleich, egal welche Person. ${x.part ? 'Es ist das <b>Partizip</b>.' : 'Es ist die <b>Grundform</b> (endet auf -en).'}`); await api.wait(4000);
+      }
+      api.say(x.merk);
+    },
+    // Präposition und ihr Nomen (seit v125): Bogen von der Präposition zum Nomen, dazu die Frage, auf die beide zusammen antworten.
+    //   x: { tokens, correct, ende:[Stelle des Nomens], fragen:[…], merk }
+    async praepnomen(api, x) {
+      const z = zeile(api, x.tokens, 84, true, true);
+      const sauber = (i) => x.tokens[i].replace(/[.,!?]$/, '');
+      await api.wait(500);
+      for (let k = 0; k < x.correct.length; k++) {
+        const p = x.correct[k], n = x.ende[k];
+        z.ts[p].setAttribute('fill', ORANGE); for (let i = p + 1; i <= n; i++) z.ts[i].setAttribute('fill', BLAU);
+        const da = bogenTs(api, z, p, n, ORANGE), o1 = ortTs(z, p), o2 = ortTs(z, n);
+        const unten = z.br > 0 && n >= z.br, mx = da ? (o1.m + o2.m) / 2 : o2.m;
+        el('text', { x: Math.max(44, Math.min(316, mx)), y: unten ? o2.y + (da ? 38 : 22) : o2.y - 42, 'text-anchor': 'middle', class: 'ex-b', text: x.fragen[k], style: `font-size:13px;fill:${ORANGE}` }, api.svg);
+        const gruppe = x.tokens.slice(p + 1, n + 1).map((w) => w.replace(/[.,!?]$/, '')).join(' ');
+        api.say(`<b>${sauber(p)}</b> steht vor „${gruppe}“ und gehört dazu. Zusammen antworten sie auf die Frage: <b>${x.fragen[k]}</b>`); await api.wait(4200);
+      }
+      api.say(x.merk);
+    },
+    // Welche Präposition passt? (seit v125) Ein kleines Lagebild: die drei Möglichkeiten als Plätze, der richtige Platz leuchtet.
+    //   x: { ort:'tisch'|'schrank'|'zwei'|'wald', namen:[…], ding, wahl:[…], ok, s1, merk }
+    async lage(api, x) {
+      const g0 = el('g', {}, api.svg), ink = 'var(--ink)';
+      const name = (xx, yy, t) => el('text', { x: xx, y: yy, 'text-anchor': 'middle', class: 'ex-s f6', text: t, style: 'font-size:12px' }, g0);
+      let P;
+      if (x.ort === 'tisch') {
+        el('path', { d: 'M 104 66 H 256 M 120 66 V 118 M 240 66 V 118', fill: 'none', stroke: ink, 'stroke-width': 4, 'stroke-linecap': 'round' }, g0); name(180, 134, x.namen[0]);
+        P = { auf: [180, 55], über: [180, 22], unter: [180, 98], neben: [276, 108] };
+      } else if (x.ort === 'schrank') {
+        el('rect', { x: 135, y: 34, width: 90, height: 84, rx: 6, fill: '#fff', stroke: ink, 'stroke-width': 3 }, g0); el('path', { d: 'M 180 36 V 116', stroke: ink, 'stroke-width': 1.5 }, g0); name(180, 134, x.namen[0]);
+        P = { auf: [180, 24], neben: [252, 108], hinter: [158, 76] };
+      } else if (x.ort === 'zwei') {
+        [[68, 0], [292, 1]].forEach(([cx, n]) => { el('rect', { x: cx - 34, y: 56, width: 68, height: 34, rx: 17, fill: '#fff', stroke: ink, 'stroke-width': 2.5 }, g0); el('text', { x: cx, y: 78, 'text-anchor': 'middle', class: 'ex-b', text: x.namen[n], style: 'font-size:14px' }, g0); });
+        P = { zwischen: [180, 73], über: [180, 26], unter: [180, 120] };
+      } else {
+        el('rect', { x: 118, y: 48, width: 124, height: 50, rx: 22, fill: '#e3f3e6', stroke: '#0a7d57', 'stroke-width': 2.5 }, g0); el('text', { x: 180, y: 66, 'text-anchor': 'middle', class: 'ex-s', text: x.namen[0], style: 'font-size:12px;fill:#0a7d57' }, g0);
+        P = { durch: [180, 80], über: [180, 26], unter: [180, 120] };
+      }
+      api.say(x.s1); await api.wait(3000);
+      const marken = {};
+      for (const w of x.wahl) {
+        const [mx, my] = P[w], g = el('g', { opacity: 0, color: '#8a8478' }, api.svg);
+        if (x.ort === 'wald') { el('path', { d: `M ${mx - 84} ${my} H ${mx + 74}`, stroke: 'currentColor', 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-dasharray': w === 'durch' ? '7 6' : '' }, g); el('path', { d: `M ${mx + 84} ${my} l -12 -6 v 12 z`, fill: 'currentColor' }, g); el('text', { x: mx + 92, y: my + 5, class: 'ex-b', text: w, style: 'font-size:13px;fill:currentColor' }, g); }
+        else { el('circle', { cx: mx, cy: my, r: 9, fill: w === 'hinter' ? 'none' : 'currentColor', stroke: 'currentColor', 'stroke-width': 2.5, 'stroke-dasharray': w === 'hinter' ? '4 3' : '' }, g); el('text', { x: w === 'zwischen' ? mx : mx + (w === 'hinter' ? -40 : 16), y: my + (w === 'zwischen' ? 26 : 5), 'text-anchor': w === 'zwischen' ? 'middle' : w === 'hinter' ? 'end' : 'start', class: 'ex-b', text: w, style: 'font-size:13px;fill:currentColor' }, g); }
+        marken[w] = g; await api.tw(350, (k) => g.setAttribute('opacity', k)); await api.wait(500);
+      }
+      api.say(`Drei Plätze für ${x.ding}. Welcher passt zum Hinweis?`); await api.wait(2800);
+      marken[x.ok].setAttribute('color', ORANGE);
+      await api.tw(400, (k) => x.wahl.forEach((w) => { if (w !== x.ok) marken[w].setAttribute('opacity', 1 - 0.75 * k); }));
+      api.say(x.merk);
+    },
+    // Wörter eines Wortfelds auf einer Skala (seit v125), z. B. von leise bis laut.
+    //   x: { skala:[geordnete Wörter], pole:[links, rechts], ziel, s1, merk }
+    async skala(api, x) {
+      el('path', { d: 'M 30 74 L 330 74 L 330 52 Z', fill: '#f3e3d6' }, api.svg);
+      el('path', { d: 'M 30 74 H 330', stroke: 'var(--ink)', 'stroke-width': 2.5, 'stroke-linecap': 'round' }, api.svg);
+      el('text', { x: 30, y: 112, class: 'ex-s f6', text: x.pole[0], style: 'font-size:12px' }, api.svg);
+      el('text', { x: 330, y: 112, 'text-anchor': 'end', class: 'ex-s f6', text: x.pole[1], style: 'font-size:12px' }, api.svg);
+      api.say(x.s1 + ' Die Wörter lassen sich ordnen.'); await api.wait(2800);
+      const n = x.skala.length, ts = [];
+      for (let i = 0; i < n; i++) {
+        const cx = 52 + i * (256 / (n - 1)), oben = i % 2 === 1;
+        el('circle', { cx, cy: 74, r: 4.5, fill: 'var(--ink)' }, api.svg);
+        const t = el('text', { x: cx, y: oben ? 40 : 96, 'text-anchor': 'middle', class: 'ex-b', text: x.skala[i], style: 'font-size:14px', opacity: 0 }, api.svg); ts.push(t);
+        await api.tw(350, (k) => t.setAttribute('opacity', k)); await api.wait(450);
+      }
+      api.say(`Von <b>${x.pole[0]}</b> bis <b>${x.pole[1]}</b>: ${x.skala.join(' → ')}.`); await api.wait(3600);
+      ts[x.skala.indexOf(x.ziel)].setAttribute('style', `font-size:15px;fill:${ORANGE}`);
+      api.say(x.merk);
+    },
+    // Wortfelder als Kästen (seit v125): Die Wörter wandern in ihr Feld; das fremde Wort landet im anderen Kasten.
+    //   x: { felder:[a] oder [a, b], woerter:[{ w, f, da, hell }], s1, s2, merk }
+    async wolken(api, x) {
+      const zwei = x.felder.length > 1, B = zwei ? [[10, 165], [185, 165]] : [[90, 180]];
+      x.felder.forEach((f, n) => {
+        el('rect', { x: B[n][0], y: 50, width: B[n][1], height: 102, rx: 14, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, api.svg);
+        el('text', { x: B[n][0] + B[n][1] / 2, y: 68, 'text-anchor': 'middle', class: 'ex-s f6', text: `Wortfeld „${f}“`, style: 'font-size:11.5px' }, api.svg);
+      });
+      const platz = [0, 0];
+      const ziel = (o) => { const n = o.f, k = platz[n]++; return [B[n][0] + B[n][1] / 2, 90 + k * 20]; };
+      for (const o of x.woerter.filter((o) => o.da)) { const [zx, zy] = ziel(o); el('text', { x: zx, y: zy, 'text-anchor': 'middle', class: 'ex-b', text: o.w, style: 'font-size:14px', 'fill-opacity': 0.55 }, api.svg); }
+      api.say(x.s1); await api.wait(2600);
+      for (const o of x.woerter.filter((o) => !o.da)) {
+        const farbe = o.hell ? `;fill:${ORANGE}` : '';
+        const t = el('text', { x: 180, y: 28, 'text-anchor': 'middle', class: 'ex-b', text: o.w, style: 'font-size:16px' + farbe }, api.svg);
+        await api.wait(o.hell ? 1300 : 600);
+        const [zx, zy] = ziel(o);
+        await api.tw(550, (k) => { t.setAttribute('x', lerp(180, zx, k)); t.setAttribute('y', lerp(28, zy, k)); });
+        t.setAttribute('style', 'font-size:14px' + farbe);
+        if (o.hell) { api.say(x.s2); await api.wait(3600); }
+      }
+      api.say(x.merk);
+    },
     // ein Bild (SVG-Text aus der Aufgabe) in die Mitte, dann die Erklärung
     async bild(api, x) {
       const g = el('g', { opacity: 0 }, api.svg);
@@ -1031,7 +1175,7 @@
     },
   };
   // Bausteine mit eigener Bildhöhe (sonst gilt die Höhe des Themas)
-  const HOEHE = { weiche: (x) => 122 + 68 * (x.fragen.length - 1), laden: 208, artikelprobe: 124, rede: 112, verbplatz: 190, wowohin: 162, prfall: 162, konjtafel: 138, bauteile: 124, attribut: 132, advfrage: 158, bruecke: 128, streichen: 110, adjprobe: 152 };
+  const HOEHE = { weiche: (x) => 122 + 68 * (x.fragen.length - 1), laden: 208, artikelprobe: 124, rede: 112, verbplatz: 190, wowohin: 162, prfall: 162, konjtafel: 138, bauteile: 124, attribut: 132, advfrage: 158, bruecke: 128, streichen: 110, adjprobe: 152, pronprobe: 142, personprobe: 118, praepnomen: 150, lage: 142, skala: 120, wolken: 160 };
   // quelle: Thema, aus dem die Beispiele kommen, wenn die Erklärung kein eigenes Thema ist (über ex.via erreichbar)
   function thema(id, title, viewBox, quelle) {
     EX[id] = {
