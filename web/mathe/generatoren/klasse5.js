@@ -739,14 +739,16 @@
           fields: [{ answer: sum, suffix: '€' }],
           hint: 'Schreib zuerst eine Rechnung auf. Denk an Punkt vor Strich.',
           solution: `Rechnung: <b>${a} · ${p} + ${x[1]}</b><br>Punkt vor Strich: ${a} · ${p} = ${a * p}, dann ${a * p} + ${x[1]} = <b>${sum} €</b>`,
-          ex: { mode: 'tree', e: `${a} · ${p} + ${x[1]}`, via: 'k5-vorrang' },
+          // woher (seit v126): welcher Teil der Geschichte zu welchem Teil der Rechnung wird
+          ex: { mode: 'tree', e: `${a} · ${p} + ${x[1]}`, via: 'k5-vorrang', woher: [[`${a} ${k[0]} zu je ${p} €`, `${a} · ${p}`, `${a}-mal derselbe Preis: eine Mal-Aufgabe.`], [`dazu ${x[0]} für ${x[1]} €`, `+ ${x[1]}`, 'Das kommt dazu: plus.']] },
         };
       return {
         prompt: `Du kaufst <b>${a} ${k[0]}</b> zu je <b>${p} €</b> und <b>${x[0]}</b> für <b>${x[1]} €</b>. Du bezahlst mit <b>${pay} €</b>. Wie viel Geld bekommst du zurück?`,
         fields: [{ answer: pay - sum, suffix: '€' }],
         hint: 'Rechne erst aus, was alles zusammen kostet. Achtung: Klammer!',
         solution: `Rechnung: <b>${pay} − (${a} · ${p} + ${x[1]})</b><br>Klammer zuerst: ${a} · ${p} + ${x[1]} = ${sum}, dann ${pay} − ${sum} = <b>${pay - sum} €</b>`,
-        ex: { mode: 'tree', e: `${pay} − (${a} · ${p} + ${x[1]})`, via: 'k5-vorrang' },
+        ex: { mode: 'tree', e: `${pay} − (${a} · ${p} + ${x[1]})`, via: 'k5-vorrang', woher: [[`${a} ${k[0]} zu je ${p} €`, `${a} · ${p}`, `${a}-mal derselbe Preis: eine Mal-Aufgabe.`], [`und ${x[0]} für ${x[1]} €`, `+ ${x[1]}`, 'Das kommt dazu: plus.'],
+          [`bezahlt mit ${pay} €`, `${pay} − ( … )`, 'Vom Geld geht der ganze Einkauf ab. Deshalb steht er in einer Klammer.']] },
       };
     }
     if (v === 3) {

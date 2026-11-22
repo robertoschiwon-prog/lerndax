@@ -2686,6 +2686,26 @@
           const total = value(root);
           if (mode === 'punkt') api.say(`Wer gehört zu wem? Bei <b>${plain(root)}</b> hält das <b>Mal</b> die ${b} und die ${c} fester zusammen als das Plus.`);
           else if (mode === 'klammer') api.say(`Die <b>Klammer</b> packt ${a} und ${b} zu einem Paket zusammen.`);
+          else if (mode === 'task' && ctx.post && ctx.woher) {
+            // Sachaufgabe (seit v126): erst zeigen, welcher Teil der Geschichte zu welchem Teil der Rechnung wird
+            exprT.setAttribute('opacity', 0);
+            const g = el('g', {}, api.svg);
+            api.say('Aus der Geschichte wird eine Rechnung. Stück für Stück:');
+            await api.wait(2200);
+            for (let i = 0; i < ctx.woher.length; i++) {
+              const [was, term, sag] = ctx.woher[i], y = 96 + i * 44, r = el('g', { opacity: 0 }, g);
+              el('rect', { x: 14, y: y - 22, width: 332, height: 36, rx: 10, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, r);
+              el('text', { x: 26, y: y + 1, class: 'ex-s', text: was, style: 'font-size:12.5px' }, r);
+              el('text', { x: 334, y: y + 2, class: 'ex-b f1', 'text-anchor': 'end', text: term, style: 'font-size:17px' }, r);
+              await api.tw(400, (t) => r.setAttribute('opacity', t));
+              api.say(`„${was}“ → <b>${term}</b><br><small>${sag}</small>`);
+              await api.wait(3600);
+            }
+            exprT.setAttribute('opacity', 1);
+            api.say(`Zusammen: <b>${plain(root)}</b>. Jetzt ausrechnen, der Baum zeigt die Reihenfolge.`);
+            await api.wait(3000);
+            await api.tw(400, (t) => g.setAttribute('opacity', 1 - t)); g.remove();
+          }
           else if (mode === 'task') api.say(`Wer gehört bei <b>${plain(root)}</b> zu wem? Der Baum zeigt es.`);
           else api.say('Eine längere Rechnung. Der Baum zeigt, was zusammengehört.');
           await api.tw(800, (t) => { edgesG.setAttribute('opacity', t); nodesG.setAttribute('opacity', t); });

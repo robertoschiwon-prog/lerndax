@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 22.11.2026, Version `lerndax-v125`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 22.11.2026, Version `lerndax-v126`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,19 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-35. Mathe: Sachaufgaben – von der Geschichte zur Rechnung (lerndax-v126, 22.11.2026)
+
+Die dünnen Mathe-Fälle noch einmal als Bild angesehen (36 Stichproben): Fachbegriffe (`fb`) und Fahrplan (`fahr`) erklären genug
+(Namen-Tafel mit Umkehraufgabe; Zeitstrahl mit Sprung), sie bleiben. Geändert ist nur die Sachaufgabe „Du kaufst …“ (`k5-text`,
+Rechenbaum über `via: 'k5-vorrang'`): Vor dem Baum zeigt die Animation jetzt, welcher Teil der Geschichte zu welchem Teil der
+Rechnung wird („6 Comichefte zu je 5 €“ → 6 · 5; „dazu einen Stift für 3 €“ → + 3; „bezahlt mit 30 €“ → 30 − ( … )).
+Daten: `ex.woher` (Liste aus Text, Rechenteil, Satz) in `web/mathe/generatoren/klasse5.js`; gezeigt nur bei „Lösung zu deiner Aufgabe“.
+
+**Geprüft:** `gen-test.js` (246 000 Aufgaben, 0 Fehler), `loesung.py 6 k5-text`, `ui2.py`. Zusätzlich alle Deutsch-Erklärungen
+**vor** der Aufgabe („▶ Erklärung“, ähnliches Beispiel) bei 320 px abgespielt: 53 Animationen, alle laufen bis zum Ende, 0 Fehler.
+
+**Noch offen:** Knobel-Aufgaben und „Entdecken“ durchsehen; „▶ Erklärung“ vor der Aufgabe in den anderen Fächern.
 
 ## 0-neu-34. Deutsch: Pronomen, Verbform bestimmen, Präpositionen, Wortfelder (lerndax-v125, 22.11.2026)
 
