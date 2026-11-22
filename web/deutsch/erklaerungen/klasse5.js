@@ -585,6 +585,128 @@
       await api.wait(4200);
       api.say(x.merk);
     },
+    // Konjugationstafel (seit v123): alle Personen, Stamm dunkel und Endung orange, die gefragte Zeile leuchtet.
+    //   x: { inf, stamm, pers:[6], formen:[6], p, merk }
+    async konjtafel(api, x) {
+      const END = [['e'], ['est', 'st', 't'], ['et', 't'], ['en', 'n'], ['et', 't'], ['en', 'n']];
+      const teil = (f, k) => { // Stamm und Endung trennen; bei Vokalwechsel passt der Stamm der Grundform nicht
+        if (f.startsWith(x.stamm) && f.length > x.stamm.length) return [x.stamm, f.slice(x.stamm.length), false];
+        if (f === x.stamm) return [f, '', false];
+        const zisch = /[sßzx]$/.test(x.stamm), e = (k === 1 && zisch ? ['t'] : END[k]).find((q) => f.endsWith(q) && f.length > q.length) || '';
+        return [f.slice(0, f.length - e.length), e, true];
+      };
+      el('text', { x: 180, y: 24, 'text-anchor': 'middle', class: 'ex-b', text: x.inf, style: 'font-size:17px' }, api.svg);
+      el('line', { x1: 180, y1: 38, x2: 180, y2: 128, class: 'dash' }, api.svg);
+      const zeilen = x.formen.map((f, k) => {
+        const [st, en, anders] = teil(f, k), sp = k < 3 ? 0 : 1, y = 58 + (k % 3) * 30, x0 = 14 + sp * 178;
+        const g = el('g', { opacity: 0 }, api.svg);
+        const r = el('rect', { x: x0 - 4, y: y - 18, width: 162, height: 26, rx: 8, fill: 'none', stroke: 'none', 'stroke-width': 2.5 }, g);
+        el('text', { x: x0 + 2, y, class: 'ex-s', text: x.pers[k], style: 'font-size:12px' }, g);
+        const t = el('text', { x: x0 + 70, y, class: 'ex-b', style: 'font-size:17px' }, g);
+        el('tspan', { text: st, fill: anders ? BLAU : 'var(--ink)' }, t); el('tspan', { text: en, fill: ORANGE }, t);
+        return { g, r, st, en, anders };
+      });
+      api.say(`Die Grundform <b>${x.inf}</b> besteht aus dem Stamm <b>${x.stamm}</b> und der Endung. Für jede Person hängt eine andere Endung am Stamm.`);
+      for (const z of zeilen) await api.tw(260, (k) => z.g.setAttribute('opacity', k));
+      await api.wait(3200);
+      const anders = zeilen.some((z) => z.anders);
+      api.say(`Die Endungen (orange) sind bei fast allen Verben gleich: <b>-e, -st, -t, -en, -t, -en</b>.${anders ? ' Achtung, hier ändert sich bei „du“ und „er/sie/es“ auch der Stamm (blau).' : ''}`);
+      await api.wait(4000);
+      const z = zeilen[x.p]; z.r.setAttribute('stroke', 'var(--ok)'); z.r.setAttribute('fill', '#f1fbf6');
+      zeilen.forEach((q, k) => { if (k !== x.p) q.g.setAttribute('opacity', 0.45); });
+      api.say(`Gesucht: <b>${x.pers[x.p]} ${x.formen[x.p]}</b>${z.en ? `, Endung <b>-${z.en}</b>` : ''}.`);
+      await api.wait(3000);
+      api.say(x.merk);
+    },
+    // Wort-Bausteine (seit v123): Die Teile stehen erst einzeln mit Pluszeichen da, dann rücken sie zu einem Wort zusammen.
+    //   x: { oben?, teile:[{ allein, im, label, farbe? }], s1, s2, merk }
+    async bauteile(api, x) {
+      if (x.oben) el('text', { x: 180, y: 22, 'text-anchor': 'middle', class: 'ex-s f6', text: x.oben, style: 'font-size:13px' }, api.svg);
+      const B = 12.5, br = (t) => Math.max(34, t.length * B + 18);
+      const weit = x.teile.map((t) => br(t.allein.length >= t.im.length ? t.allein : t.im)), luecke = 30;
+      const ges = (lk) => weit.reduce((a, b) => a + b, 0) + lk * (x.teile.length - 1);
+      const f = Math.min(1, 336 / ges(luecke)); // sehr lange Wörter: alles etwas kleiner
+      const g0 = el('g', { transform: `translate(${180 * (1 - f)} ${58 * (1 - f)}) scale(${f})` }, api.svg);
+      const xs = (lk) => { let px = 180 - ges(lk) / 2; return weit.map((w) => { const r = px; px += w + lk; return r; }); };
+      const a0 = xs(luecke), a1 = xs(0);
+      const bl = x.teile.map((t, k) => {
+        const g = el('g', { opacity: 0, transform: `translate(${a0[k]} 0)` }, g0);
+        const r = el('rect', { x: 0, y: 38, width: weit[k], height: 40, rx: 9, fill: t.farbe ? '#fff1ea' : '#fff', stroke: t.farbe ? ORANGE : 'var(--ink)', 'stroke-width': 2.5 }, g);
+        const tx = el('text', { x: weit[k] / 2, y: 65, 'text-anchor': 'middle', class: 'ex-b', text: t.allein, style: 'font-size:21px' }, g);
+        el('text', { x: weit[k] / 2, y: 96 + (k % 2) * 15, 'text-anchor': 'middle', class: 'ex-s', text: t.label, style: `font-size:11.5px;font-weight:700;fill:${t.farbe ? ORANGE : 'var(--ink)'}` }, g);
+        return { g, r, tx };
+      });
+      const plus = a0.slice(1).map((px) => el('text', { x: px - luecke / 2, y: 65, 'text-anchor': 'middle', class: 'ex-b', text: '+', opacity: 0, style: 'font-size:20px' }, g0));
+      for (const b of bl) await api.tw(300, (k) => b.g.setAttribute('opacity', k));
+      await api.tw(300, (k) => plus.forEach((e) => e.setAttribute('opacity', k)));
+      api.say(x.s1); await api.wait(3600);
+      await api.tw(300, (k) => plus.forEach((e) => e.setAttribute('opacity', 1 - k)));
+      await api.tw(800, (k) => bl.forEach((b, i) => b.g.setAttribute('transform', `translate(${lerp(a0[i], a1[i], k)} 0)`)));
+      let gewechselt = false;
+      bl.forEach((b, i) => {
+        const t = x.teile[i], alt = t.allein.replace(/^-|-$/g, '');
+        b.tx.textContent = '';
+        [...t.im].forEach((c, n) => { const neu = alt[n] !== c; if (neu) gewechselt = true; el('tspan', { text: c, fill: neu ? BLAU : 'var(--ink)' }, b.tx); });
+      });
+      const kurz = x.teile.find((t) => { const alt = t.allein.replace(/^-|-$/g, ''); return alt.length > t.im.length && alt.toLowerCase().startsWith(t.im.toLowerCase()); });
+      api.say(x.s2 + (kurz ? ` Von „${kurz.allein}“ bleibt nur der Stamm „${kurz.im.toLowerCase()}“.` : '') + (gewechselt ? ' Achte auf den blauen Buchstaben: Groß und klein richten sich nach dem neuen Wort.' : '')); await api.wait(4200);
+      api.say(x.merk);
+    },
+    // Attribut (seit v123): Pfeil vom Attribut zu seinem Nomen, dann die Weglassprobe (das Attribut verblasst, der Satz bleibt richtig).
+    //   x: { tokens, attr:[Stellen], merk }  Das Nomen steht direkt hinter dem Attribut.
+    async attribut(api, x) {
+      const z = zeile(api, x.tokens, 80, true, true);
+      const ort = (i) => { try { const e = z.ts[i], a = /^\s/.test(e.textContent) ? 1 : 0, p1 = e.getStartPositionOfChar(a), p2 = e.getEndPositionOfChar(e.getNumberOfChars() - 1); return { x1: p1.x, x2: p2.x, y: p1.y }; } catch (e) { return { x1: 100 + i * 40, x2: 136 + i * 40, y: 80 }; } };
+      const sauber = (i) => x.tokens[i].replace(/[.,!?]$/, '');
+      await api.wait(500);
+      for (const a of x.attr) {
+        z.ts[a].setAttribute('fill', ORANGE); z.ts[a + 1].setAttribute('fill', BLAU);
+        const o1 = ort(a), o2 = ort(a + 1);
+        if (Math.abs(o1.y - o2.y) < 2) { // Bogen nur, wenn beide in derselben Zeile stehen
+          const u = z.br > 0 && o1.y > 80 ? -1 : 1; // zweite Zeile: Bogen unter den Wörtern, sonst läge er auf der ersten Zeile
+          const m1 = (o1.x1 + o1.x2) / 2, m2 = (o2.x1 + o2.x2) / 2, yb = u > 0 ? o1.y - 17 : o1.y + 7;
+          el('path', { d: `M ${m1} ${yb} Q ${(m1 + m2) / 2} ${yb - 18 * u} ${m2} ${yb}`, fill: 'none', stroke: ORANGE, 'stroke-width': 2.5, 'stroke-linecap': 'round' }, api.svg);
+          el('path', { d: `M ${m2} ${yb + u} l -9 ${-3 * u} l 6 ${-6 * u} z`, fill: ORANGE }, api.svg);
+        }
+        api.say(`<b>${sauber(a)}</b> steht direkt vor dem Nomen <b>${sauber(a + 1)}</b> und beschreibt es genauer: Es sagt, welche Eigenschaft gemeint ist.`);
+        await api.wait(3600);
+      }
+      await api.tw(600, (k) => x.attr.forEach((a) => z.ts[a].setAttribute('fill-opacity', 1 - 0.8 * k)));
+      const ohne = x.tokens.filter((w, i) => !x.attr.includes(i)).join(' ');
+      api.say(`<b>Weglassprobe:</b> Ohne ${x.attr.length > 1 ? 'die Attribute' : 'das Attribut'} bleibt der Satz richtig: „${ohne}“ Er ist nur weniger genau.`);
+      await api.wait(4200);
+      await api.tw(400, (k) => x.attr.forEach((a) => z.ts[a].setAttribute('fill-opacity', 0.2 + 0.8 * k)));
+      api.say(x.merk);
+    },
+    // Adverb und seine Frage (seit v123): vier Fragen-Felder mit Beispielen, das Adverb wandert in sein Feld.
+    //   x: { tokens, i, wort, f:'wann'|'wo'|'wie'|'warum', fragen:{…}, beispiele:{…}, merk }
+    async advfrage(api, x) {
+      const z = zeile(api, x.tokens, 30, true, false);
+      z.ts[x.i].setAttribute('fill', ORANGE);
+      const keys = Object.keys(x.fragen);
+      const felder = keys.map((k, n) => {
+        const g = el('g', { opacity: 0 }, api.svg), x0 = 10 + (n % 2) * 174, y0 = 48 + Math.floor(n / 2) * 52;
+        const r = el('rect', { x: x0, y: y0, width: 166, height: 46, rx: 10, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, g);
+        el('text', { x: x0 + 10, y: y0 + 19, class: 'ex-b', text: x.fragen[k], style: 'font-size:15px' }, g);
+        const bsp = x.beispiele[k].filter((w) => w !== x.wort.toLowerCase()).slice(0, 3).join(', ');
+        el('text', { x: x0 + 10, y: y0 + 36, class: 'ex-s f6', text: bsp, style: 'font-size:11.5px' }, g);
+        return { g, r, x0, y0 };
+      });
+      await api.wait(400);
+      api.say('Adverbien sagen genauer, wie etwas geschieht. Jedes antwortet auf eine von <b>vier Fragen</b>.');
+      await api.tw(500, (k) => felder.forEach((f) => f.g.setAttribute('opacity', k)));
+      await api.wait(3000);
+      const n = keys.indexOf(x.f), ziel = felder[n];
+      const karte = el('text', { x: 180, y: 30, 'text-anchor': 'middle', class: 'ex-b', text: x.wort.toLowerCase(), style: `font-size:15px;fill:${ORANGE}`, opacity: 0 }, api.svg);
+      let sx = 180; try { const e = z.ts[x.i]; sx = (e.getStartPositionOfChar(0).x + e.getEndPositionOfChar(e.getNumberOfChars() - 1).x) / 2; } catch (e) {}
+      karte.setAttribute('opacity', 1);
+      await api.tw(800, (k) => { karte.setAttribute('x', lerp(sx, ziel.x0 + 124, k)); karte.setAttribute('y', lerp(30, ziel.y0 + 20, k)); });
+      ziel.r.setAttribute('stroke', 'var(--ok)'); ziel.r.setAttribute('stroke-width', 2.5); ziel.r.setAttribute('fill', '#f1fbf6');
+      felder.forEach((f, k) => { if (k !== n) f.g.setAttribute('opacity', 0.4); });
+      api.say(`Frag mit dem Satz nach: <b>${x.fragen[x.f]}</b> Antwort: <b>${x.wort.toLowerCase()}</b>. Adverbien bekommen nie eine Endung.`);
+      await api.wait(3800);
+      api.say(x.merk);
+    },
     // ein Bild (SVG-Text aus der Aufgabe) in die Mitte, dann die Erklärung
     async bild(api, x) {
       const g = el('g', { opacity: 0 }, api.svg);
@@ -832,7 +954,7 @@
     },
   };
   // Bausteine mit eigener Bildhöhe (sonst gilt die Höhe des Themas)
-  const HOEHE = { weiche: (x) => 122 + 68 * (x.fragen.length - 1), laden: 208, artikelprobe: 124, rede: 112, verbplatz: 190, wowohin: 162, prfall: 162 };
+  const HOEHE = { weiche: (x) => 122 + 68 * (x.fragen.length - 1), laden: 208, artikelprobe: 124, rede: 112, verbplatz: 190, wowohin: 162, prfall: 162, konjtafel: 138, bauteile: 124, attribut: 132, advfrage: 158 };
   // quelle: Thema, aus dem die Beispiele kommen, wenn die Erklärung kein eigenes Thema ist (über ex.via erreichbar)
   function thema(id, title, viewBox, quelle) {
     EX[id] = {

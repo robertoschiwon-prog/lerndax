@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 22.11.2026, Version `lerndax-v122`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 22.11.2026, Version `lerndax-v123`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,29 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-32. Deutsch: Verbformen, Wortbausteine, Attribute, Adverbien (lerndax-v123, 22.11.2026)
+
+Fortsetzung von 0-neu-31. Vier weitere Bausteine in `web/deutsch/erklaerungen/klasse5.js`:
+- **Verbformen** (`persForm`, `persWahl`): Baustein `konjtafel`. Alle sechs Personen nebeneinander, Stamm dunkel, Endung orange;
+  bei Vokalwechsel (du läufst, er läuft) ist der Stamm blau. Die gefragte Zeile leuchtet.
+- **Partizip** (`partizip`), **Vor- und Nachsilben** (`d5-ableitung`, alle vier Arten), **zusammengesetzte Wörter trennen**
+  (`zusTrennen`): Baustein `bauteile`. Die Teile stehen erst einzeln mit Pluszeichen da, dann rücken sie zusammen
+  (ge- + lach + -t · gesund + -heit → Gesundheit · Gras + Halm → Grashalm). Ändert sich groß/klein, wird der Buchstabe blau;
+  fällt eine Endung weg (heizen → Heiz-ung), steht es im Text.
+- **Attribute** (`d5-attribute`, alle drei Arten): Baustein `attribut`. Bogen vom Attribut zu seinem Nomen, dann die Weglassprobe
+  (das Attribut verblasst, der Satz bleibt richtig).
+- **Adverbien** (`advAntippen`, `advFrage`, `advLuecke`): Baustein `advfrage`. Vier Felder Wann? Wo? Wie? Warum? mit Beispielen,
+  das Adverb wandert in sein Feld.
+
+**Per Skript vollständig geprüft:** alle 39 Verben (Stamm/Endung in allen Personen, Partizip-Bausteine; gehen → ge-gang-en),
+66 Wortbildungen, 32 Sätze mit Attributen (hinter jedem Attribut steht ein Nomen). Keine Fehler.
+Die vier neuen Mathe-Animationen aus v120 bei 320 px angesehen: passt.
+
+**Deutsch weiter ohne Knopf:** Pronomen antippen, Imperativ, Verbform bestimmen (`formArt`), Konjunktionen (4 Arten), Wortfeld (4),
+Präposition antippen/passt, Adverb oder Adjektiv, Anrede im Brief; Text-Themen mit Absicht.
+
+**Tests:** `dedax.py 4` (888 Antworten, 223 Animationen), `dedax_knobel.py`, `ui2.py` ohne Meldung. Bilder bei 390 px angesehen.
 
 ## 0-neu-31. Deutsch: Wortarten, Groß/klein, wörtliche Rede, Satzbau, Präpositionen (lerndax-v122, 22.11.2026)
 

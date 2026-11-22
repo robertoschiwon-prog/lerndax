@@ -636,6 +636,22 @@
   const PW = ['ich', 'du', 'er/sie/es', 'wir', 'ihr'];
   const alleFormen = (v) => [0, 1, 2, 3, 4].map((p) => praesens(v, p));
   const endung = (v, form) => { const st = stamm(v); return form.startsWith(st) ? form.slice(st.length) : ''; };
+  // Konjugationstafel (mode 'konjtafel', seit v123): alle Personen nebeneinander, Stamm und Endung getrennt, die gefragte Zeile leuchtet
+  const exKonj = (art, v, p, merk) => ({ mode: 'konjtafel', art, inf: v.inf, stamm: stamm(v), pers: PW.concat(['sie (viele)']), formen: alleFormen(v).concat([v.inf]), p, merk });
+  // Bauplan des Partizips als Bausteine (mode 'bauteile', seit v123)
+  function exPartizip(v, h, s2) {
+    const P = v.part; let vor = '', ge = '', rest = P;
+    if (P.startsWith('ge') && (!v.inf.startsWith('ge') || P[2] !== v.inf[2])) { ge = 'ge'; rest = P.slice(2); } // gehen → ge-gang-en, aber gewinnen → gewonnen (dort gehört ge- schon zum Verb)
+    else { const k = P.indexOf('ge'); if (k > 0 && v.inf.startsWith(P.slice(0, k)) && !v.inf.slice(k).startsWith('ge')) { vor = P.slice(0, k); ge = 'ge'; rest = P.slice(k + 2); } }
+    const end = /en$/.test(rest) ? 'en' : /[td]et$/.test(rest) ? 'et' : 't', st = rest.slice(0, rest.length - end.length);
+    const teile = [];
+    if (vor) teile.push({ allein: vor, im: vor, label: 'Vorsilbe' });
+    if (ge) teile.push({ allein: 'ge-', im: 'ge', label: 'ge-', farbe: 1 });
+    teile.push({ allein: st, im: st, label: 'Stamm' }, { allein: '-' + end, im: end, label: 'Endung', farbe: 1 });
+    return { mode: 'bauteile', art: 'partizip', oben: `${v.inf} → ich ${h} …`, teile,
+      s1: `Das Partizip brauchst du für das Perfekt. Sein Bauplan: ${ge ? '<b>ge-</b> + ' : ''}Stamm + <b>-t</b> oder <b>-en</b>.${ge ? '' : ' Dieses Verb hat schon eine Vorsilbe, deshalb kommt kein ge- dazu.'}`,
+      s2, merk: `${v.inf} → ich ${h} <b>${P}</b>` };
+  }
   function persForm() {
     const v = pick(V), p = pick([0, 1, 1, 2, 2, 3, 4]);
     const f = praesens(v, p);
@@ -646,7 +662,7 @@
       fields: [{ type: 'text', answer: ans, ci: true, prefix: PW[p], label: 'Personalform' }],
       hint: 'Die Endung richtet sich nach der Person: ich -<b>e</b>, du -<b>st</b>, er/sie/es -<b>t</b>, wir -<b>en</b>, ihr -<b>t</b>. Bei manchen Verben ändert sich bei <i>du</i> und <i>er/sie/es</i> auch der Vokal.',
       solution: `${v.inf}: ${[0, 1, 2, 3, 4].map((q) => (q === p ? `<b class="vb">${PW[q]} ${praesens(v, q)}</b>` : `${PW[q]} ${praesens(v, q)}`)).join(' · ')}${wechsel ? '<br>Hier ändert sich bei „du“ und „er/sie/es“ der Vokal im Wort.' : ''}`,
-      ex: zz('persForm', ['Grundform: ', v.inf], 1, [PW[p] + ' ', f], 1, `Die Grundform <b>${v.inf}</b> endet auf -en. Für jede Person bekommt das Verb eine eigene Endung.`, `${PW[p]} → ${endung(v, f) ? `Endung <b>-${endung(v, f)}</b>` : 'eine eigene Form'}${wechsel ? ', und der Vokal ändert sich' : ''}.`, `${v.inf} → <b>${PW[p]} ${f}</b>`),
+      ex: exKonj('persForm', v, p, `${v.inf} → <b>${PW[p]} ${f}</b>${wechsel ? '<br>Bei „du“ und „er/sie/es“ ändert sich hier der Vokal.' : ''}`),
     };
   }
   function persWahl() {
@@ -657,7 +673,7 @@
       choices: PW, correct: p,
       hint: 'Schau auf die <b>Endung</b>: -e → ich, -st → du, -en → wir. Bei -t hilft der Vokal: er <b>läuft</b>, aber ihr <b>lauft</b>.',
       solution: `<b class="vb">${PW[p]} ${f[p]}</b><br>${v.inf}: ${[0, 1, 2, 3, 4].map((q) => `${PW[q]} ${f[q]}`).join(' · ')}`,
-      ex: zz('persWahl', ['___ ', f[p]], 1, [PW[p], ' ' + f[p]], 0, `Schau auf die Endung von <b>${f[p]}</b> und vergleiche mit den anderen Formen von „${v.inf}“.`, `Nur zu einer Person passt genau diese Form: <b>${PW[p]}</b>.`, `<b>${PW[p]} ${f[p]}</b>`),
+      ex: exKonj('persWahl', v, p, `<b>${PW[p]} ${f[p]}</b><br>Nur zu dieser Person passt genau diese Form.`),
     };
   }
   function partizip() {
@@ -667,7 +683,7 @@
       fields: [{ type: 'text', answer: v.part, ci: true, prefix: `ich ${h}`, label: 'Partizip' }],
       hint: 'Das Partizip brauchst du für das Perfekt: „Ich habe …“ oder „Ich bin …“. Es beginnt meistens mit <b>ge-</b> und endet auf <b>-t</b> (regelmäßig) oder <b>-en</b> (unregelmäßig).',
       solution: `${v.inf} → ich ${h} <b class="vb">${v.part}</b><br>${v.art === 's' ? 'Regelmäßig: ge- + Stamm + -t.' : v.art === 'g' ? 'Der Vokal ändert sich, die Endung ist -t.' : 'Unregelmäßig: Endung -en, oft mit anderem Vokal.'}`,
-      ex: zz('partizip', ['Grundform: ', v.inf], 1, [`ich ${h} `, v.part], 1, 'Das Partizip steht im Perfekt am Satzende. Bauplan: <b>ge-</b> + Stamm + <b>-t</b> oder <b>-en</b>.', v.art === 's' ? `„${v.inf}“ ist regelmäßig: Endung <b>-t</b>.` : `„${v.inf}“ ist unregelmäßig. Diese Form muss man sich merken.`, `${v.inf} → ich ${h} <b>${v.part}</b>`),
+      ex: exPartizip(v, h, v.art === 's' ? `„${v.inf}“ ist regelmäßig: Der Stamm bleibt, die Endung ist <b>-t</b>.` : v.art === 'g' ? `Bei „${v.inf}“ ändert sich der Vokal im Stamm, die Endung ist <b>-t</b>. Diese Form muss man sich merken.` : `„${v.inf}“ ist unregelmäßig: Endung <b>-en</b>, oft mit anderem Vokal im Stamm. Diese Form muss man sich merken.`),
     };
   }
   // Aufforderung (Imperativ): [Grundform, richtige Formen für eine Person, Rest des Satzes]
@@ -888,7 +904,7 @@
       prompt: 'Tippe das <b>Adverb</b> an.', tap: { tokens: x.tokens, correct: [x.i], one: true }, answerText: x.wort,
       hint: ADV_TIPP,
       solution: `${x.tokens.map((t, k) => (k === x.i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br><b>${x.wort}</b> ist ein Adverb. Es antwortet auf die Frage <b>${ADVF[x.f]}</b>`,
-      ex: { mode: 'marken', art: 'advAntippen', tokens: x.tokens, correct: [x.i], was: 'Adverb', s1: `Frage: Wann? Wo? Wie? Warum?`, merk: `Adverb: <b>${x.wort}</b>. Frage: ${ADVF[x.f]}` },
+      ex: { mode: 'advfrage', art: 'advAntippen', tokens: x.tokens, i: x.i, wort: x.wort, f: x.f, fragen: ADVF, beispiele: ADVW, merk: `Adverb: <b>${x.wort}</b>. Frage: ${ADVF[x.f]}` },
     };
   }
   function advFrage() {
@@ -897,7 +913,7 @@
       prompt: `Auf welche Frage antwortet das Adverb <b>${x.wort}</b>?<br><span class="bsp">${x.tokens.join(' ')}</span>`,
       choices: arten.map((a) => ADVF[a]), correct: arten.indexOf(x.f), hint: ADV_TIPP,
       solution: `${x.tokens.map((t, k) => (k === x.i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br><b>${x.wort}</b> antwortet auf <b>${ADVF[x.f]}</b>`,
-      ex: { mode: 'marken', art: 'advFrage', tokens: x.tokens, correct: [x.i], was: 'Adverb', s1: 'Frage: Wann? Wo? Wie? Warum?', merk: `<b>${x.wort}</b>: ${ADVF[x.f]}` },
+      ex: { mode: 'advfrage', art: 'advFrage', tokens: x.tokens, i: x.i, wort: x.wort, f: x.f, fragen: ADVF, beispiele: ADVW, merk: `<b>${x.wort}</b>: ${ADVF[x.f]}` },
     };
   }
   function advLuecke() {
@@ -909,7 +925,7 @@
       prompt: `Welches Adverb passt? Frage: <b>${ADVF[x.f]}</b><br><span class="bsp">${luecke}</span>`,
       choices: ch.map(passt), correct: ch.indexOf(x.wort.toLowerCase()), hint: ADV_TIPP,
       solution: `${x.tokens.map((t, k) => (k === x.i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br>Gefragt ist <b>${ADVF[x.f]}</b> → <b>${x.wort}</b>.`,
-      ex: { mode: 'marken', art: 'advLuecke', tokens: x.tokens, correct: [x.i], was: 'Adverb', s1: `Gesucht: ein Adverb für die Frage <b>${ADVF[x.f]}</b>`, merk: `${ADVF[x.f]} → <b>${x.wort}</b>` },
+      ex: { mode: 'advfrage', art: 'advLuecke', tokens: x.tokens, i: x.i, wort: x.wort, f: x.f, fragen: ADVF, beispiele: ADVW, merk: `${ADVF[x.f]} → <b>${x.wort}</b>` },
     };
   }
   function advOderAdj() {
@@ -1112,7 +1128,8 @@
       prompt: 'Tippe <b>alle Attribute</b> an.', tap: { tokens, correct }, answerText: liste.join(', '),
       hint: TIPP_ATTR,
       solution: `Attribute: <b>${liste.join(', ')}</b>.<br>Weglassprobe: „${ohne}“ Der Satz stimmt immer noch.`,
-      ex: { mode: 'marken', art: 'attrAntippen', tokens, correct, was: 'Attribute', s1: 'Ein Attribut steht vor einem Nomen und beschreibt es genauer. Ohne Attribut bleibt der Satz richtig.' },
+      // Attribut-Bild (mode 'attribut', seit v123): Pfeil vom Attribut zu seinem Nomen, dann die Weglassprobe
+      ex: { mode: 'attribut', art: 'attrAntippen', tokens, attr: correct, merk: `Attribute: <b>${liste.join(', ')}</b>` },
     };
   }
   function attrWeglassen() {
@@ -1129,7 +1146,7 @@
       choices: wahlIdx.map((i) => cleanW(tokens[i])), correct: wahlIdx.indexOf(a),
       hint: TIPP_ATTR,
       solution: `<b>${tokens[a]}</b> ist ein Attribut. Ohne es heißt der Satz: „${gross(ohne)}“ Das ist immer noch ein richtiger Satz.`,
-      ex: { mode: 'marken', art: 'attrWeglassen', tokens, correct: [a], was: 'Attribut', s1: 'Weglassprobe: Welches Wort darf fehlen, ohne dass der Satz falsch wird?' },
+      ex: { mode: 'attribut', art: 'attrWeglassen', tokens, attr: [a], merk: `<b>${tokens[a]}</b> ist ein Attribut. Man kann es weglassen.` },
     };
   }
   function attrBezug() {
@@ -1141,7 +1158,7 @@
       choices: subst.map((i) => cleanW(tokens[i])), correct: subst.indexOf(a + 1),
       hint: 'Ein Attribut steht direkt <b>vor</b> seinem Nomen. Frage: „Was für ein …?“',
       solution: `<b>${tokens[a]} ${cleanW(tokens[a + 1])}</b>: Das Attribut „${tokens[a]}“ steht direkt vor „${cleanW(tokens[a + 1])}“ und beschreibt es genauer.`,
-      ex: { mode: 'marken', art: 'attrBezug', tokens, correct: [a, a + 1], was: 'Attribut und Nomen', s1: 'Ein Attribut steht direkt vor seinem Nomen. Frage: Was für ein …?' },
+      ex: { mode: 'attribut', art: 'attrBezug', tokens, attr: [a], merk: `<b>${tokens[a]} ${cleanW(tokens[a + 1])}</b>: Das Attribut beschreibt „${cleanW(tokens[a + 1])}“ genauer.` },
     };
   }
   const attribute = () => U.wahl([[40, attrAntippen], [32, attrWeglassen], [28, attrBezug]]);
@@ -1920,7 +1937,7 @@
       tap: { tokens: [...z.wort], correct: [z.w1.length - 1], gaps: true, mark: '|', eng: true, one: true }, answerText: `${z.w1} + ${z.w2}`,
       hint: 'Suche zwei Wörter, die du kennst. Jedes muss allein einen Sinn ergeben.',
       solution: `<b>${z.w1} + ${z.w2}</b> = ${z.a2} ${z.wort}<br>${REGEL_ZUS}`,
-      ex: { mode: 'komma', art: 'zusTrennen', dicht: true, mark: '|', tokens: [...z.wort], gaps: [z.w1.length - 1], s1: 'Suche zwei Wörter, die du kennst.', merk: `<b>${z.w1} + ${z.w2}</b> = ${z.a2} ${z.wort}` },
+      ex: { mode: 'bauteile', art: 'zusTrennen', teile: [{ allein: z.w1, im: z.wort.slice(0, z.w1.length), label: 'sagt genauer, welcher' }, { allein: z.w2, im: z.wort.slice(z.w1.length), label: 'Grundwort', farbe: 1 }], s1: 'Suche zwei Wörter, die du kennst. Jedes ergibt allein einen Sinn.', s2: `Zusammen schreibt man sie als <b>ein</b> Wort. Das letzte Wort ist das Grundwort: Es bestimmt den Artikel (${z.a2}).`, merk: `<b>${z.w1} + ${z.w2}</b> = ${z.a2} ${z.wort}` },
     };
   }
   const zusammen = () => U.wahl([[28, zusArtikel], [30, zusBauen], [17, zusBedeutung], [25, zusTrennen]]);
@@ -1956,10 +1973,12 @@
       choices: wahl.map((x) => x + '-'), correct: wahl.indexOf(v.ok),
       hint: 'Setze jede Vorsilbe ein und lies den Satz. Nur mit einer entsteht ein Wort, das es gibt und das in den Satz passt.',
       solution: `${v.satz.replace('___', `<b class="vb">${v.ok}</b>`)}<br>Eine Vorsilbe verändert die Bedeutung des Verbs: <b>${v.wort}</b>.`,
-      ex: zz('vorsilbe', v.satz.split('___'), 1, [v.satz.split('___')[0], v.ok, v.satz.split('___')[1]], 1, 'Eine Vorsilbe steht vor dem Wortstamm und verändert die Bedeutung.', `Nur <b>${v.ok}-</b> ergibt hier ein sinnvolles Wort.`, `<b>${v.wort}</b>`),
+      ex: { mode: 'bauteile', art: 'vorsilbe', oben: v.satz.replace('___', '…'), teile: [{ allein: v.ok + '-', im: v.ok, label: 'Vorsilbe', farbe: 1 }, { allein: v.wort.slice(v.ok.length), im: v.wort.slice(v.ok.length), label: 'Wortstamm' }], s1: 'Eine Vorsilbe steht vor dem Wortstamm. Der Stamm bleibt, aber die Bedeutung ändert sich.', s2: `Nur <b>${v.ok}-</b> ergibt hier ein sinnvolles Wort: ${v.wort}.`, merk: `<b>${v.wort}</b>` },
     };
   }
-  const exNach = (art, n) => zz(art, [n.basis, ' + ', '-' + n.nach], 2, [n.wort.slice(0, n.wort.length - n.nach.length), n.nach], 1, 'Eine Nachsilbe hängt man hinten an. Sie kann die Wortart ändern.', NREGEL[n.wa], `${n.basis} + -${n.nach} = <b>${n.wort}</b> (${WA[n.wa]})`);
+  // Bausteine (mode 'bauteile', seit v123): Stamm und Nachsilbe rücken zusammen; ändert sich groß/klein, leuchtet der Buchstabe
+  const exNach = (art, n) => ({ mode: 'bauteile', art, teile: [{ allein: n.basis, im: n.wort.slice(0, n.wort.length - n.nach.length), label: 'Wortstamm' }, { allein: '-' + n.nach, im: n.nach, label: `macht ein ${WA[n.wa]}`, farbe: 1 }],
+    s1: 'Eine Nachsilbe hängt man hinten an. Sie bestimmt die Wortart des neuen Wortes.', s2: NREGEL[n.wa], merk: `${n.basis} + -${n.nach} = <b>${n.wort}</b> (${WA[n.wa]})` });
   function nachWortart() {
     const n = pick(NACHS);
     return {
