@@ -707,6 +707,83 @@
       await api.wait(3800);
       api.say(x.merk);
     },
+    // Konjunktion als Brücke (seit v124): zwei Teile unterstrichen, darüber ein Bogen von Teil zu Teil; beim Nebensatz leuchtet das Verb am Ende.
+    //   x: { tokens, i (Konjunktion), typ:'wort'|'haupt'|'neben', a:[von,bis], b:[von,bis], verb, wort, merk }
+    async bruecke(api, x) {
+      const z = zeile(api, x.tokens, 70, true, true), GRUEN = '#0f8a5f';
+      const ort = (i) => { try { const e = z.ts[i], a = /^\s/.test(e.textContent) ? 1 : 0, p1 = e.getStartPositionOfChar(a), p2 = e.getEndPositionOfChar(e.getNumberOfChars() - 1); return { x1: p1.x, x2: p2.x, y: p1.y }; } catch (e) { return { x1: 60 + i * 34, x2: 90 + i * 34, y: 70 }; } };
+      const worte = ([a, b]) => x.tokens.slice(a, b + 1).filter((w, k) => a + k !== x.i).map((w) => w.replace(/[.,!?]$/, '')).join(' ');
+      const strich = async ([von, bis], f) => {
+        const zeilen = {}; for (let i = von; i <= bis; i++) { if (i === x.i) continue; const o = ort(i); (zeilen[o.y] = zeilen[o.y] || []).push(o); }
+        const ls = Object.keys(zeilen).map((y) => el('line', { x1: Math.min(...zeilen[y].map((o) => o.x1)), y1: +y + 7, x2: Math.min(...zeilen[y].map((o) => o.x1)), y2: +y + 7, stroke: f, 'stroke-width': 3.5, 'stroke-linecap': 'round', 'data-x2': Math.max(...zeilen[y].map((o) => o.x2)) }, api.svg));
+        await api.tw(500, (k) => ls.forEach((l) => l.setAttribute('x2', lerp(+l.getAttribute('x1'), +l.getAttribute('data-x2'), k))));
+      };
+      const unten = (z.br > 0 ? 83 : 70) + 34; let lx = 0;
+      const legende = (f, text, n) => { if (!lx) lx = n > 1 ? 62 : 130; el('line', { x1: lx, y1: unten - 4, x2: lx + 18, y2: unten - 4, stroke: f, 'stroke-width': 3.5, 'stroke-linecap': 'round' }, api.svg); el('text', { x: lx + 24, y: unten, class: 'ex-s', text, style: 'font-size:12px;font-weight:700' }, api.svg); lx += 124; };
+      await api.wait(500);
+      z.ts[x.i].setAttribute('fill', ORANGE);
+      const ok = ort(x.i); if (!(z.br > 0 && ok.y > 70)) el('path', { d: `M ${ok.x1 - 2} ${ok.y - 17} Q ${(ok.x1 + ok.x2) / 2} ${ok.y - 30} ${ok.x2 + 2} ${ok.y - 17}`, fill: 'none', stroke: ORANGE, 'stroke-width': 3, 'stroke-linecap': 'round' }, api.svg);
+      api.say(`<b>${x.wort}</b> ist ein Bindewort (Konjunktion). Wie eine Brücke verbindet es zwei Teile. Welche?`); await api.wait(3000);
+      if (x.typ === 'wort') {
+        await strich(x.a, BLAU); await strich(x.b, BLAU);
+        api.say(`Hier verbindet „${x.wort}“ zwei <b>Wörter</b>: ${worte(x.a)} ${x.wort} ${worte(x.b)}. Dann steht kein Komma.`);
+      } else if (x.typ === 'haupt') {
+        await strich(x.a, BLAU); await strich(x.b, GRUEN); legende(BLAU, '1. Hauptsatz', 2); legende(GRUEN, '2. Hauptsatz', 2);
+        api.say(`Hier verbindet „${x.wort}“ zwei <b>Hauptsätze</b>: „${worte(x.a)}.“ und „${worte(x.b).replace(/^./, (c) => c.toUpperCase())}.“ Jeder könnte allein stehen, das Verb bleibt an seinem Platz.`);
+      } else {
+        await strich(x.a, BLAU); await strich(x.b, ORANGE); legende(BLAU, 'Hauptsatz', 2); legende(ORANGE, 'Nebensatz', 2);
+        api.say(`„${x.wort}“ leitet einen <b>Nebensatz</b> ein. Allein kann er nicht stehen.`); await api.wait(3000);
+        const ov = ort(x.verb); el('rect', { x: ov.x1 - 4, y: ov.y - 17, width: ov.x2 - ov.x1 + 8, height: 21, rx: 6, fill: 'none', stroke: ORANGE, 'stroke-width': 2, 'stroke-dasharray': '4 3' }, api.svg); z.ts[x.verb].setAttribute('fill', ORANGE);
+        api.say(`Nach „${x.wort}“ wandert das Verb ans <b>Ende</b>: „${x.tokens[x.verb].replace(/[.,!?]$/, '')}“.`);
+      }
+      await api.wait(4000);
+      api.say(x.merk);
+    },
+    // Aufforderung bilden (seit v124): „du“ und die Endung werden durchgestrichen, übrig bleibt der Imperativ.
+    //   x: { pron:'du'|'ihr', form, erg, rest, merk }
+    async streichen(api, x) {
+      const uml = (w) => w.replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u');
+      const e = x.erg.toLowerCase(); let n = 0; // gemeinsamer Anfang von du-Form und Aufforderung
+      while (n < x.form.length && n < e.length && uml(x.form[n]) === uml(e[n])) n++;
+      const passt = n === e.length || (n === x.form.length), weg = x.form.slice(n), umlaut = x.form.slice(0, n) !== e.slice(0, n);
+      const t = el('text', { x: 180, y: 44, 'text-anchor': 'middle', class: 'ex-b', style: 'font-size:22px' }, api.svg);
+      const t1 = el('tspan', { text: x.pron + ' ' }, t), t2 = el('tspan', { text: x.form.slice(0, n) }, t), t3 = el('tspan', { text: weg }, t), t4 = el('tspan', { text: ' ' + x.rest }, t);
+      fit(t, 336, 22);
+      const durch = async (ts) => { if (!ts.textContent.trim()) return; let a = 150, b = 170, y = 38; try { const k = ts.getNumberOfChars(), s0 = /^ /.test(ts.textContent) ? 1 : 0, s1 = / $/.test(ts.textContent) ? k - 2 : k - 1; a = ts.getStartPositionOfChar(s0).x - 2; b = ts.getEndPositionOfChar(s1).x + 2; } catch (er) {} ts.setAttribute('fill', 'var(--bad)'); const l = el('line', { x1: a, y1: y, x2: a, y2: y, stroke: 'var(--bad)', 'stroke-width': 3, 'stroke-linecap': 'round' }, api.svg); await api.tw(450, (k) => l.setAttribute('x2', lerp(a, b, k))); };
+      api.say(`Starte mit der ${x.pron}-Form: <b>${x.pron} ${x.form}</b> ${x.rest}.`); await api.wait(2800);
+      await durch(t1);
+      api.say(`Bei einer Aufforderung sagt man die Person nicht dazu: „${x.pron}“ fällt weg.`); await api.wait(2800);
+      if (x.pron === 'du' && weg && passt) { await durch(t3); api.say(`Auch die Endung <b>-${weg}</b> fällt weg.${umlaut ? ' Und der Umlaut verschwindet.' : ''}`); await api.wait(2800); }
+      else if (x.pron === 'du' && !passt) { api.say('Dieses Verb ist unregelmäßig. Der Vokal bleibt wie in der du-Form, die Endung fällt weg.'); await api.wait(2800); }
+      const r = el('text', { x: 180, y: 92, 'text-anchor': 'middle', class: 'ex-b', style: 'font-size:22px', opacity: 0 }, api.svg);
+      el('tspan', { text: x.erg, fill: BLAU }, r); el('tspan', { text: ' ' + x.rest + '!' }, r); fit(r, 336, 22);
+      el('text', { x: 180, y: 66, 'text-anchor': 'middle', class: 'ex-s f6', text: '↓', style: 'font-size:14px' }, api.svg);
+      await api.tw(450, (k) => r.setAttribute('opacity', k));
+      api.say('Das Verb rückt ganz nach vorn und wird großgeschrieben. Am Ende steht ein Ausrufezeichen.'); await api.wait(3200);
+      api.say(x.merk);
+    },
+    // Adverb oder Adjektiv? (seit v124): zwei Proben, jede bekommt einen Haken oder ein Kreuz.
+    //   x: { wort, adj, merk }
+    async adjprobe(api, x) {
+      const st = x.wort.replace(/e$/, '');
+      const STEIG = { schnell: ['schneller', 'schnellsten'], groß: ['größer', 'größten'], rot: ['roter', 'rotesten'], müde: ['müder', 'müdesten'], laut: ['lauter', 'lautesten'], schön: ['schöner', 'schönsten'], klein: ['kleiner', 'kleinsten'], alt: ['älter', 'ältesten'] };
+      el('text', { x: 180, y: 30, 'text-anchor': 'middle', class: 'vexpr', text: x.wort, fill: BLAU }, api.svg);
+      const probe = (y, titel, text) => {
+        const g = el('g', { opacity: 0 }, api.svg);
+        el('rect', { x: 16, y, width: 328, height: 44, rx: 10, fill: '#fff', stroke: 'var(--soft)', 'stroke-width': 1.5 }, g);
+        el('text', { x: 28, y: y + 17, class: 'ex-s f6', text: titel, style: 'font-size:11.5px' }, g);
+        el('text', { x: 28, y: y + 36, class: 'ex-b', text, style: 'font-size:16px' }, g);
+        const u = el('text', { x: 322, y: y + 30, 'text-anchor': 'middle', class: 'ex-b ' + (x.adj ? 'fok' : 'fbad'), text: x.adj ? '✓' : '✗', style: 'font-size:22px', opacity: 0 }, g);
+        return { g, u };
+      };
+      const p1 = probe(46, 'Probe 1: mit Endung vor ein Nomen stellen', `der ${st}e Hund`), p2 = probe(98, 'Probe 2: steigern', `${x.wort} – ${(STEIG[x.wort] || [st + 'er'])[0]} – am ${(STEIG[x.wort] || [0, st + 'sten'])[1]}`);
+      api.say(`Ist <b>${x.wort}</b> ein Adverb oder ein Adjektiv? Zwei Proben helfen.`); await api.wait(2600);
+      await api.tw(400, (k) => p1.g.setAttribute('opacity', k)); await api.wait(1400); p1.u.setAttribute('opacity', 1);
+      api.say(x.adj ? `<b>der ${st}e Hund</b>: Das geht. Das Wort bekommt eine Endung.` : `„der ${st}e Hund“: Das gibt es nicht. „${x.wort}“ bekommt nie eine Endung.`); await api.wait(3200);
+      await api.tw(400, (k) => p2.g.setAttribute('opacity', k)); await api.wait(1400); p2.u.setAttribute('opacity', 1);
+      api.say(x.adj ? 'Steigern geht auch. Beides zusammen zeigt: ein <b>Adjektiv</b>.' : 'Steigern geht auch nicht. Beides zusammen zeigt: ein <b>Adverb</b>.'); await api.wait(3200);
+      api.say(x.merk);
+    },
     // ein Bild (SVG-Text aus der Aufgabe) in die Mitte, dann die Erklärung
     async bild(api, x) {
       const g = el('g', { opacity: 0 }, api.svg);
@@ -954,7 +1031,7 @@
     },
   };
   // Bausteine mit eigener Bildhöhe (sonst gilt die Höhe des Themas)
-  const HOEHE = { weiche: (x) => 122 + 68 * (x.fragen.length - 1), laden: 208, artikelprobe: 124, rede: 112, verbplatz: 190, wowohin: 162, prfall: 162, konjtafel: 138, bauteile: 124, attribut: 132, advfrage: 158 };
+  const HOEHE = { weiche: (x) => 122 + 68 * (x.fragen.length - 1), laden: 208, artikelprobe: 124, rede: 112, verbplatz: 190, wowohin: 162, prfall: 162, konjtafel: 138, bauteile: 124, attribut: 132, advfrage: 158, bruecke: 128, streichen: 110, adjprobe: 152 };
   // quelle: Thema, aus dem die Beispiele kommen, wenn die Erklärung kein eigenes Thema ist (über ex.via erreichbar)
   function thema(id, title, viewBox, quelle) {
     EX[id] = {

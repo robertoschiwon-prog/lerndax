@@ -710,7 +710,8 @@
       solution: `<b class="vb">${ans[0]}</b> ${rest}!<br>${mehrere ? `ihr ${praesens(v, 4)} → <b>${ans[0]}</b> (ohne „ihr“).` : (ohneUml(v.du.replace(/st$/, '')) === ans[0].toLowerCase()
         ? `du ${v.du} → <b>${ans[0]}</b> (ohne „du“ und ohne -st${v.du !== ohneUml(v.du) && inf === ohneUml(inf) ? ', ohne Umlaut' : ''}).${ans.length > 1 ? ` Auch richtig: ${ans[1]}.` : ''}`
         : `du ${v.du} → <b>${ans[0]}</b>. Der Vokal ist wie in der du-Form. Diese Form merkt man sich am besten.`)}`,
-      ex: zz('imperativ', [mehrere ? 'ihr ' : 'du ', mehrere ? praesens(v, 4) : v.du, ' ' + rest], 1, [ans[0], ' ' + rest + '!'], 0, mehrere ? `Starte mit der ihr-Form: <b>ihr ${praesens(v, 4)}</b>.` : `Starte mit der du-Form: <b>du ${v.du}</b>.`, mehrere ? 'Lass „ihr“ weg. Fertig ist die Aufforderung.' : 'Lass „du“ und die Endung -st weg (ein Umlaut verschwindet auch).', `<b>${ans[0]}</b> ${rest}!`),
+      // mode 'streichen' (seit v124): „du“ und die Endung werden durchgestrichen, übrig bleibt die Aufforderung
+      ex: { mode: 'streichen', art: 'imperativ', pron: mehrere ? 'ihr' : 'du', form: mehrere ? praesens(v, 4) : v.du, erg: ans[0], rest, merk: `<b>${ans[0]}</b> ${rest}!${!mehrere && ans.length > 1 ? `<br>Auch richtig: ${ans[1]}.` : ''}` },
     };
   }
   const FORMART = ['Personalform', 'Grundform (Infinitiv)', 'Partizip'];
@@ -933,8 +934,9 @@
     return {
       prompt: `Adverb oder Adjektiv?<br><span class="bsp">${w}</span>`, choices: ['Adverb', 'Adjektiv'], correct: adv ? 0 : 1,
       hint: 'Probe: Kann das Wort mit einer Endung vor einem Nomen stehen (der <b>schnelle</b> Hund) und kann man es steigern (schneller)? Dann ist es ein Adjektiv. Ein Adverb bleibt immer gleich.',
-      solution: adv ? `<b>${w}</b> ist ein <b>Adverb</b>: Es bekommt nie eine Endung und lässt sich nicht steigern. Mit Endung vor einem Nomen geht es nicht.` : `<b>${w}</b> ist ein <b>Adjektiv</b>: der ${w}e Hund, ${w}er. Adjektive kann man vor ein Nomen stellen und steigern.`,
-      ex: { mode: 'marken', art: 'advOderAdj', tokens: adv ? [w] : ['der', w + 'e', 'Hund'], correct: adv ? [0] : [1], was: adv ? 'Adverb' : 'Adjektiv', s1: 'Probe: Passt das Wort mit Endung vor ein Nomen?', merk: adv ? `<b>${w}</b>: Adverb, ohne Endung.` : `<b>der ${w}e Hund</b>: Adjektiv.` },
+      solution: adv ? `<b>${w}</b> ist ein <b>Adverb</b>: Es bekommt nie eine Endung und lässt sich nicht steigern. Mit Endung vor einem Nomen geht es nicht.` : `<b>${w}</b> ist ein <b>Adjektiv</b>: der ${w.replace(/e$/, '')}e Hund, ${w.replace(/e$/, '')}er. Adjektive kann man vor ein Nomen stellen und steigern.`,
+      // mode 'adjprobe' (seit v124): zwei Proben mit Haken oder Kreuz (vor ein Nomen stellen, steigern)
+      ex: { mode: 'adjprobe', art: 'advOderAdj', wort: w, adj: !adv, merk: adv ? `<b>${w}</b>: Adverb. Es bleibt immer gleich.` : `<b>${w}</b>: Adjektiv. Es passt vor ein Nomen und lässt sich steigern.` },
     };
   }
   const adverbien = () => U.wahl([[32, advAntippen], [24, advFrage], [24, advLuecke], [20, advOderAdj]]);
@@ -950,12 +952,23 @@
     ['Ich rufe dich an, ___ ich zu Hause bin.', 'wenn', ['aber', 'oder']], ['Lina weiß, ___ morgen Ferien sind.', 'dass', ['und', 'denn']],
     ['Möchtest du Tee ___ Saft?', 'oder', ['weil', 'dass']], ['Ich bin müde, ___ ich lese noch ein Kapitel.', 'aber', ['weil', 'dass']],
     ['Ben ist froh, ___ er hat eine Eins.', 'denn', ['weil', 'obwohl']]];
+  // Brücken-Bild (mode 'bruecke', seit v124): Die Konjunktion steht als Brücke zwischen zwei Teilen; beim Nebensatz leuchtet das Verb am Ende
+  const KJ_BSP = { und: 'Lina liest, und Ben malt.', oder: 'Wir gehen ins Kino, oder wir bleiben zu Hause.', aber: 'Ich bin müde, aber ich lese noch.', denn: 'Ich bleibe zu Hause, denn es regnet.',
+    weil: 'Ich bleibe zu Hause, weil es regnet.', dass: 'Ich weiß, dass es regnet.', wenn: 'Ich bleibe zu Hause, wenn es regnet.', obwohl: 'Ich gehe raus, obwohl es regnet.', bis: 'Ich warte, bis der Regen aufhört.', bevor: 'Ich gehe heim, bevor es dunkel wird.' };
+  function exBruecke(art, tokens, i, merk) {
+    const w = tokens[i].replace(/[.,?]/g, '').toLowerCase(), n = tokens.length - 1, gr = (k) => /^[A-ZÄÖÜ]/.test(tokens[k] || '');
+    let typ, a, b, verb = -1;
+    if (KJ_UNTER.includes(w)) { typ = 'neben'; if (i === 0) { const k = tokens.findIndex((t) => /,$/.test(t)); b = [0, k]; a = [k + 1, n]; verb = k; } else { a = [0, i - 1]; b = [i, n]; verb = n; } }
+    else if (i > 0 && gr(i - 1) && gr(i + 1) && !/,$/.test(tokens[i - 1])) { typ = 'wort'; a = [i - 1, i - 1]; b = [i + 1, i + 1]; }
+    else { typ = 'haupt'; a = [0, i - 1]; b = [i + 1, n]; }
+    return { mode: 'bruecke', art, tokens, i, typ, a, b, verb, wort: w, merk };
+  }
   function kjAntippen() {
     const roh = pick(KJS).split(' '), i = roh.findIndex((x) => x[0] === '*'), tokens = roh.map((x) => x.replace('*', '')), w = tokens[i].replace(/[.,?]/g, '');
     return {
       prompt: 'Tippe die <b>Konjunktion</b> an.', tap: { tokens, correct: [i], one: true }, answerText: w, hint: KJ_TIPP,
       solution: `${tokens.map((t, k) => (k === i ? `<b class="vb">${t}</b>` : t)).join(' ')}<br><b>${w}</b> ist eine Konjunktion: Es verbindet ${KJ_NEBEN.includes(w.toLowerCase()) ? 'zwei Wörter oder Hauptsätze' : 'einen Hauptsatz mit einem Nebensatz'}.`,
-      ex: { mode: 'marken', art: 'kjAntippen', tokens, correct: [i], was: 'Konjunktion', s1: 'Welches Wort verbindet die Teile?', merk: `Konjunktion: <b>${w}</b>` },
+      ex: exBruecke('kjAntippen', tokens, i, `Konjunktion: <b>${w}</b>`),
     };
   }
   function kjLuecke() {
@@ -964,7 +977,7 @@
       prompt: `Welche Konjunktion passt?<br><span class="bsp">${satz}</span>`, choices: ch, correct: ch.indexOf(ok),
       hint: 'Achte auf das Verb im zweiten Teil: Steht es am <b>Ende</b>, passt nur weil, dass, wenn, obwohl. Steht es an <b>2. Stelle</b>, passt und, oder, aber, denn. Dann entscheidet der Sinn.',
       solution: `<b>${voll}</b><br>${KJ_UNTER.includes(ok) ? `„${ok}“ leitet einen Nebensatz ein: Das Verb steht am Ende.` : `„${ok}“ verbindet gleichrangige Teile: Das Verb bleibt an seinem Platz.`}`,
-      ex: { mode: 'marken', art: 'kjLuecke', tokens: voll.split(' '), correct: [voll.split(' ').indexOf(ok)], was: 'Konjunktion', s1: 'Wo steht das Verb im zweiten Teil?', merk: `<b>${voll}</b>` },
+      ex: exBruecke('kjLuecke', voll.split(' '), voll.split(' ').indexOf(ok), `<b>${voll}</b>`),
     };
   }
   function kjWortart() {
@@ -975,7 +988,12 @@
       prompt: `Welche Wortart ist <b>${w}</b>?`, choices: ch, correct: idx,
       hint: 'Konjunktion: verbindet (und, weil). Präposition: steht vor einem Nomen (mit dem Rad). Adverb: sagt wann, wo, wie, warum (heute, dort).',
       solution: `<b>${w}</b> ist ${art === 'A' ? 'ein' : 'eine'} <b>${ch[idx]}</b>. ${warum} Alle drei bleiben immer gleich, sie haben keine Endungen.`,
-      ex: { mode: 'marken', art: 'kjWortart', tokens: [w], correct: [0], was: ch[idx], s1: 'Verbindet es, steht es vor einem Nomen, oder sagt es wann, wo, wie?', merk: `<b>${w}</b>: ${ch[idx]}. ${warum}` },
+      // Fragen-Leiter (mode 'weiche', seit v124): drei kleine Wortarten unterscheiden
+      ex: { mode: 'weiche', art: 'kjWortart', wort: w, lauf: [0, w.length], zeichen: [],
+        fragen: [{ f: 'Verbindet es Wörter oder Sätze?', aus: ['ja', 'Konjunktion'], weiter: 'nein' }, { f: 'Steht es vor einem Nomen? (… dem Bus)', aus: ['ja', 'Präposition'], weiter: 'nein' }, { f: 'Sagt es wann, wo, wie oder warum?', wahl: [['ja', 'Adverb'], ['nein', 'anderes Wort']] }],
+        weg: art === 'K' ? [0] : art === 'P' ? [1, 0] : [1, 1, 0],
+        sag: art === 'K' ? [`<b>${w}</b> verbindet: zum Beispiel „${KJ_BSP[w]}“`] : art === 'P' ? [`„${w}“ verbindet keine Sätze.`, `<b>${w}</b> steht vor einem Nomen und zeigt eine Beziehung: ${w} ${({ mit: 'dem Bus', auf: 'dem Tisch', für: 'den Hund', unter: 'dem Bett', durch: 'den Wald', nach: 'der Schule' })[w]}.`] : [`„${w}“ verbindet keine Sätze.`, `„${w}“ steht nicht vor einem Nomen wie „mit dem Bus“.`, `<b>${w}</b> sagt genauer, ${({ heute: 'wann', oft: 'wann', dort: 'wo', draußen: 'wo', gern: 'wie' })[w]} etwas geschieht.`],
+        merk: `<b>${w}</b>: ${ch[idx]}. ${warum}` },
     };
   }
   function kjArt() {
@@ -984,7 +1002,7 @@
       prompt: `Was macht die Konjunktion <b>${w}</b>, wenn sie zwei Sätze verbindet?`, choices: ['Sie verbindet zwei Hauptsätze. Das Verb bleibt an 2. Stelle.', 'Sie leitet einen Nebensatz ein. Das Verb steht am Ende.'], correct: neben ? 0 : 1,
       hint: 'Bilde einen Satz mit dem Wort. Steht das Verb danach an 2. Stelle oder ganz am Ende?',
       solution: neben ? `<b>${w}</b> verbindet zwei Hauptsätze, zum Beispiel: ${({ und: 'Lina liest, und Ben malt.', oder: 'Wir gehen ins Kino, oder wir bleiben zu Hause.', aber: 'Ich bin müde, aber ich lese noch.', denn: 'Ich bleibe zu Hause, denn es regnet.' })[w]}` : `<b>${w}</b> leitet einen Nebensatz ein, das Verb wandert ans Ende: ${({ weil: 'Ich bleibe zu Hause, weil es regnet.', dass: 'Ich weiß, dass es regnet.', wenn: 'Ich bleibe zu Hause, wenn es regnet.', obwohl: 'Ich gehe raus, obwohl es regnet.', bis: 'Ich warte, bis der Regen aufhört.', bevor: 'Ich gehe heim, bevor es dunkel wird.' })[w]}`,
-      ex: { mode: 'marken', art: 'kjArt', tokens: [w], correct: [0], was: neben ? 'verbindet Hauptsätze' : 'leitet einen Nebensatz ein', s1: 'Wo steht das Verb danach?', merk: neben ? `<b>${w}</b>: Hauptsatz + Hauptsatz.` : `<b>${w}</b>: Nebensatz, Verb am Ende.` },
+      ex: exBruecke('kjArt', KJ_BSP[w].split(' '), KJ_BSP[w].split(' ').indexOf(w), neben ? `<b>${w}</b>: Hauptsatz + Hauptsatz.` : `<b>${w}</b>: Nebensatz, Verb am Ende.`),
     };
   }
   const konjunktionen = () => U.wahl([[30, kjAntippen], [28, kjLuecke], [22, kjWortart], [20, kjArt]]);

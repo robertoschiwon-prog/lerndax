@@ -225,6 +225,19 @@
           g.zellen[0].setAttribute('class', 'tz hi');
           await api.wait(3000);
           g.zellen[0].setAttribute('class', 'tz');
+          if (c.rueck) { // Richtung Prozent → gekürzter Bruch (seit v124); vorher lief die Animation auch hier vom Bruch zum Prozent
+            g.t1.textContent = `${h} %`;
+            api.say(`<b>${h} %</b> heißt: ${h} von 100 Kästchen. Als Bruch sind das ${fr(h, 100)}.`);
+            await api.tw(900, (t) => { const bis = Math.round(t * h); for (let i = 0; i < bis; i++) g.zellen[i].setAttribute('class', 'tz hi'); });
+            g.t2.textContent = `= ${h}/100`;
+            await api.wait(3200);
+            api.say(`Jetzt kürzen: Zähler und Nenner durch <b>${k}</b> teilen. Im Bild heißt das: Immer ${k} Kästchen bilden ein Päckchen.`);
+            for (let j = 0; j < q; j++) { for (let i = j * k; i < (j + 1) * k; i++) g.zellen[i].setAttribute('opacity', j % 2 ? 0.5 : 1); if (j < p) await api.wait(350); }
+            await api.wait(3200);
+            g.t3.textContent = `= ${p}/${q}`;
+            api.say(`Die ganze Tafel hat ${q} Päckchen, gefärbt ${p === 1 ? 'ist' : 'sind'} ${p}. Also ${h} % = ${fr(h, 100)} = <b>${fr(p, q)}</b><br><small>Gekürzt mit ${k}. Weiter kürzen geht nicht.</small>`);
+            return;
+          }
           g.t1.textContent = `${p}/${q}`;
           api.say(`${fr(p, q)} in Prozent: Erweitere auf den <b>Nenner 100</b>. Dafür nimmst du Zähler und Nenner mal ${k} (denn ${q} · ${k} = 100).`);
           await api.wait(3800);

@@ -257,7 +257,7 @@
         hint: `${fmt(pc)} % bedeutet ${fmt(pc)} Hundertstel. Schreibe ${fr(fmt(pc), 100)} und kürze so weit wie möglich.`,
         solution: `${fmt(pc)} % = ${fr(fmt(pc), 100)} = <b>${fr(p, q)}</b><br><small>gekürzt mit ${100 / q}</small>`,
         answerText: fr(p, q),
-        ex: exP(p, q),
+        ex: Object.assign(exP(p, q), { rueck: true }) /* Animation in der Richtung der Aufgabe: Prozent → Bruch (seit v124) */,
       };
     }
     if (v === 5) {

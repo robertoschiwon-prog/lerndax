@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 22.11.2026, Version `lerndax-v123`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 22.11.2026, Version `lerndax-v124`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,29 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-33. Deutsch: Konjunktionen, Aufforderung, Adverb oder Adjektiv · Mathe: Prozent → Bruch (lerndax-v124, 22.11.2026)
+
+Fortsetzung von 0-neu-32. Drei weitere Bausteine in `web/deutsch/erklaerungen/klasse5.js`:
+- **Konjunktionen** (`kjAntippen`, `kjLuecke`, `kjArt`): Baustein `bruecke`. Die beiden Teilsätze sind blau und grün unterstrichen,
+  die Konjunktion steht orange dazwischen (Bogen als Brücke, nur wenn sie in der ersten Zeile steht). Bei Nebensätzen ist das Verb
+  am Ende gestrichelt umrahmt. Daten: `exBruecke(art, tokens, i, merk)` und `KJ_BSP` in `web/deutsch/themen/klasse5.js`.
+- **Konjunktion oder andere Wortart** (`kjWortart`): Baustein `weiche` mit drei Fragen.
+- **Aufforderung/Imperativ**: Baustein `streichen`. Aus „du hilfst“ werden „du“ und „-st“ durchgestrichen, darunter steht die Form.
+- **Adverb oder Adjektiv** (`advOderAdj`): Baustein `adjprobe`. Zwei Proben mit Haken oder Kreuz: mit Endung vor ein Nomen stellen,
+  steigern (Steigerungsformen aus der Tabelle `STEIG`). Dabei Tippfehler im Lösungstext behoben („müdee“).
+
+**Mathe, Prozent:** Bei „Schreibe als vollständig gekürzten Bruch: 75 %“ lief die Animation in der falschen Richtung (Bruch → Prozent).
+Jetzt mit `rueck: true` (Generator `klasse5-abgleich.js`): erst 75 von 100 Kästchen, dann Päckchen bilden (= kürzen), am Ende 3/4.
+Die übrigen Mathe-Varianten (Fahrplan, Fachbegriffe, Einheiten, Tafeln, Überschlag, Sachaufgaben; 63 Stichproben) sind in Ordnung.
+
+**Geprüft:** `dedax.py 4` (37 Themen, 888 Antworten, 235 Animationen, 0 Fehler), `dedax_knobel.py`, `ui2.py` (656 Aufgaben),
+`loesung.py 6 k5-prozent`, `gen-test.js` (246 000 Aufgaben, 0 Fehler). Daten der neuen Bausteine per Skript geprüft (0 Fehler),
+Bilder bei 390 px angesehen.
+
+**Noch offen:** Deutsch ohne Knopf (Absicht oder noch nicht gebaut): `pronAntippen`, `formArt`, `grossAnrede`, Wortfeld, `prAntippen`/`prPasst`,
+Textthemen (Märchen, Bilder, Textsorten, Sachtext, Theater, Kamera). Dünne Mathe-Fälle (Fachbegriffe „Bilde die Summe“, Fahrplan ohne
+Stundenwechsel). Deutsch-Animationen aus v123/v124 bei 320 px. „▶ Erklärung“ vor der Aufgabe, Knobeln, Entdecken.
 
 ## 0-neu-32. Deutsch: Verbformen, Wortbausteine, Attribute, Adverbien (lerndax-v123, 22.11.2026)
 
