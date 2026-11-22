@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 22.11.2026, Version `lerndax-v127`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 22.11.2026, Version `lerndax-v128`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,40 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-37. Alle Eingaben durchgesehen: Richtige Antworten scheitern nicht mehr an der Schreibweise (lerndax-v128, 22.11.2026)
+
+Anlass: v127 (Primfaktoren mit Rechenweg wurden falsch gewertet). Roberto: „Überprüfe das alles. Das darf nicht passieren.“
+Durchgesehen sind alle Eingabearten in allen 7 Fächern samt Knobeln (rund 9 900 Aufgabenarten: Zahlenfelder, Wortfelder,
+Auswahl, Antippen, Reihenfolge, eigene Prüfregeln). Geändert in `web/plattform/fach.js`:
+
+**Zahlen (`parseNum`, `numRoh`, `parseNumPunkt`)**
+- Mitgetippter Rechenweg: „3 · 4 = 12“, „= 12“, „x = 5“. Es zählt der letzte Teil, der eine einzelne Zahl ist.
+- Einheit oder Text dahinter: „12 cm“, „753 v. Chr.“, „12.“, „ca. 12“. Text, der neben dem Feld steht, darf mitgetippt sein.
+- Punkt statt Komma bei drei Nachkommastellen: „9.005“ gilt als 9,005 **und** als 9005, je nachdem, was zur Lösung passt
+  (vorher wurde es immer als 9005 gelesen und war bei der Lösung 9,005 falsch).
+
+**Wörter (`normText`, `textVarianten`, `textOk`)**
+- Die Wörter vor oder nach der Lücke dürfen mitgetippt sein: „du bleibst“ statt „bleibst“, „dem Hund“ bei „Wir folgen [dem Hund].“,
+  auch der ganze Satz. Anführungszeichen außen und Satzzeichen am Ende zählen nicht.
+- Bei Feldern ohne Groß/klein-Prüfung (`ci`) gilt Bindestrich wie Leerzeichen.
+- Englisch-Vokabeln (`vor`): „the book“, „a book“, „to go“ sind richtig. Kurzform/Langform (`nach`): der ganze Satz ist richtig.
+- Fachwörter in den Sachfächern (`tol`, gesetzt in `plattform/bausteine.js`): Ein einzelner Tippfehler oder ae/oe/ue/ss statt
+  ä/ö/ü/ß zählt als richtig, mit dem Hinweis „Genau geschrieben heißt es: …“. Nicht in Deutsch und Englisch (dort ist die
+  Schreibweise der Lernstoff) und nicht bei Zahlen.
+
+**Unverändert, weil in Ordnung:** eigene Prüfregeln (Brüche: gleichwertig gilt, „vollständig gekürzt“ nur wo verlangt; Fahrplan),
+Auswahl-Aufgaben (keine doppelten Antworten außer bei Groß/klein-Aufgaben), Reihenfolge-Aufgaben in Englisch (Zeitangabe vorn
+oder hinten gilt beides), Plural- und Genitiv-Doppelformen in Deutsch.
+
+**Neue Tests:** `tests/eingabe_sammeln.py` (sammelt alle Eingabefelder aller Fächer nach /tmp/lerndax-eing) und
+`tests/eingabe-varianten.js` (prüft je Feld viele richtige Schreibweisen und Gegenproben): 106 548 Prüfungen, 0 falsche Antworten
+angenommen; die 35 Rest-Treffer sind Sonderzeichen-Fälle des Tests (z. B. Lücke neben Anführungszeichen), keine echten Eingaben.
+`tests/ui_varianten.py`: alle 41 Mathe-Themen in der echten Oberfläche mit Rechenweg, „=“ und Einheit getippt: 656 von 656 richtig.
+Dazu wie immer: `gen-test.js`, `ui2.py`, `prim.py`, `knobel.py`, `dedax.py 2`, `endax.py 2`, `biodax.py 2`, `gedax.py 2`, alle 0 Fehler.
+
+**Grenze:** Geprüft ist die Schreibweise. Ob ein Kind ein anderes, ebenfalls richtiges Wort wählt (Synonym in den Sachfächern),
+lässt sich nicht automatisch finden; solche Meldungen bitte mit Foto, dann kommt das Wort in die Liste der Lösungen.
 
 ## 0-neu-36. Primfaktoren: ganzer Rechenweg als Antwort erlaubt (lerndax-v127, 22.11.2026)
 

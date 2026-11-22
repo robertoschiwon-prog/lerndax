@@ -134,7 +134,7 @@
     const s = pick(PRONS), k = KURZ[s.subj];
     return {
       prompt: `Schreibe die <b>Kurzform</b> von <b lang="en">${s.subj} ${s.form}</b>.${en(`${s.subj} ${s.form} ${s.rest}.`)}`,
-      fields: [{ type: 'text', ci: true, answer: [k, k.replace('’', "'")], label: 'Kurzform' }],
+      fields: [{ type: 'text', ci: true, answer: [k, k.replace('’', "'")], label: 'Kurzform', nach: s.rest /* ganzer Satz getippt ist auch richtig (seit v128) */ }],
       answerText: k,
       hint: 'Bei der Kurzform rücken die beiden Wörter zusammen. Der <b>erste Buchstabe</b> von am, is oder are fällt weg, an seine Stelle kommt ein <b>Apostroph</b> (’). Beispiel: we are → we’re.',
       solution: `<span lang="en">${s.subj} ${s.form}</span> → <b class="vb" lang="en">${k}</b><br>Das <b>${s.form[0]}</b> von „${s.form}“ fällt weg, dafür steht der Apostroph.<br><span lang="en">${kurzText(s)}</span> ${U.say(kurzText(s))}<br><small>So spricht man meistens. Auf Deutsch: ${s.de}</small>`,
@@ -146,7 +146,7 @@
     const s = pick(PRONS), k = KURZ[s.subj], lang = `${s.subj} ${s.form}`;
     return {
       prompt: `Schreibe die <b>Langform</b> (zwei Wörter) von <b lang="en">${k}</b>.${en(kurzText(s))}`,
-      fields: [{ type: 'text', ci: true, answer: lang, label: 'Langform' }],
+      fields: [{ type: 'text', ci: true, answer: lang, label: 'Langform', nach: s.rest }],
       hint: 'Der Apostroph (’) zeigt: Hier fehlt ein Buchstabe. Welche Form von to be gehört zu diesem Wort: am, is oder are?',
       solution: `<b class="vb" lang="en">${k}</b> → <span lang="en">${s.subj} <b class="vb">${s.form}</b></span><br>${GRUPPE_TEXT[s.g]}<br>${markiert(s)} ${U.say(s.text)}<br><small>Auf Deutsch: ${s.de}</small>`,
       ex: EX(s, 'lang'),
@@ -511,7 +511,7 @@
     const s = pick(HPRON), k = HKURZ[s.subj];
     return {
       prompt: `Schreibe die <b>Kurzform</b> von <b lang="en">${s.subj} ${s.form}</b>.${en(s.text)}`,
-      fields: [{ type: 'text', ci: true, answer: [k, k.replace('’', "'")], label: 'Kurzform' }],
+      fields: [{ type: 'text', ci: true, answer: [k, k.replace('’', "'")], label: 'Kurzform', nach: s.text.split(' ').slice(2).join(' ') }],
       answerText: k,
       hint: 'Aus have wird <b>’ve</b>, aus has wird <b>’s</b>. Der Apostroph steht für die Buchstaben, die wegfallen. Beispiel: we have → we’ve.',
       solution: `<span lang="en">${s.subj} ${s.form}</span> → <b class="vb" lang="en">${k}</b><br><span lang="en">${hKurz(s)}</span> ${U.say(hKurz(s))}${s.g === 1 ? `<br>Achtung: <b lang="en">${k}</b> kann „${s.subj.toLowerCase()} is“ oder „${s.subj.toLowerCase()} has“ heißen. Steht <b>got</b> dahinter, ist es has.` : ''}<br><small>Auf Deutsch: ${s.de}</small>`,
@@ -844,7 +844,7 @@
     const s = pick(TH1);
     return {
       prompt: `Schreibe die <b>Kurzform</b> von <b lang="en">There is</b>.${en(s.text)}`,
-      fields: [{ type: 'text', ci: true, answer: ['There’s', 'There\'s'], label: 'Kurzform' }], answerText: 'There’s',
+      fields: [{ type: 'text', ci: true, answer: ['There’s', 'There\'s'], label: 'Kurzform', nach: s.text.split(' ').slice(2).join(' ') }], answerText: 'There’s',
       hint: 'is wird zu <b>’s</b>: Das i fällt weg, dafür steht der Apostroph. Wie bei he is → he’s.',
       solution: `<span lang="en">There is</span> → <b class="vb" lang="en">There’s</b><br><span lang="en">${thKurz(s)}</span> ${U.say(thKurz(s))}<br>Für „there are“ schreibt man keine Kurzform.<br><small>Auf Deutsch: ${s.de}</small>`,
       ex: TEX(s, 'kf'),
@@ -3118,7 +3118,7 @@
   const WFT = {
     wDeEn(F) { const w = pick(F.W), ch = shuffle([w, ...wfAndere(F, w, 3)]); return { prompt: `Wie heißt <b>${w.de}</b> auf Englisch?`, choices: ch.map((x) => `<span lang="en">${x.en}</span>`), correct: ch.indexOf(w), hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
     wEnDe(F) { const w = pick(F.W), ch = shuffle([w, ...wfAndere(F, w, 3)]); return { prompt: `Was heißt das auf Deutsch?${en(w.en)}`, choices: ch.map((x) => x.de), correct: ch.indexOf(w), hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
-    wTippen(F) { const w = pick(F.W); return { prompt: `Wie heißt <b>${w.de}</b> auf Englisch? Tippe es ein.`, fields: [{ type: 'text', ci: true, answer: [w.en, ...(w.alt || [])], label: 'auf Englisch' }], hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
+    wTippen(F) { const w = pick(F.W); return { prompt: `Wie heißt <b>${w.de}</b> auf Englisch? Tippe es ein.`, fields: [{ type: 'text', ci: true, answer: [w.en, ...(w.alt || [])], vor: ['a', 'an', 'the', 'to'] /* Artikel oder „to“ davor ist kein Fehler (seit v128) */, label: 'auf Englisch' }], hint: F.tipp, solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
     wHoeren(F) { const w = pick(F.W), ch = shuffle([w, ...wfAndere(F, w, 3)]); return { prompt: `Hör genau hin: Was bedeutet das? ${U.say(w.en)}`, choices: ch.map((x) => x.de), correct: ch.indexOf(w), hint: 'Tippe auf den Lautsprecher und hör dir das Wort an. Du kannst es so oft hören, wie du willst.', solution: wfLoesung(F, w), ex: { mode: 'wort', en: w.en } }; },
     wBild(F) {
       const hat = (x) => x.bild || x.farbe, w = pick(F.W.filter(hat)), ch = shuffle([w, ...wfAndere(F, w, 3, hat)]);

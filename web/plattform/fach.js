@@ -84,13 +84,35 @@
   const totalStars = () => allTopics().reduce((s, t) => s + mastery(t.id).stars, 0);
   const weakTopics = () => allTopics().filter((t) => { const m = mastery(t.id); return m.n > 0 && m.avg < 0.75; });
 
-  function parseNum(s) {
-    s = String(s).trim().replace(/[\s  ]/g, '').replace(/−/g, '-');
-    s = s.replace(/(%|€|°|[a-zA-ZäöüÄÖÜ²³]+)$/g, '');
+  // Zahl aus einer Eingabe lesen. Großzügig bei der Schreibweise (seit v128), damit eine richtige Antwort nicht an der Form scheitert:
+  // Einheit dahinter („12 cm“, „753 v. Chr.“, „5 €“), Punkt oder Komma am Ende, Tausenderpunkt, „ca.“ davor,
+  // und ein mitgetippter Rechenweg („3 · 4 = 12“, „x = 5“): Dann zählt der letzte Teil, der eine einzelne Zahl ist.
+  function parseNumTeil(s) {
+    s = String(s).trim().replace(/−|–/g, '-').replace(/^(ca\.?|etwa|rund|ungefähr)\s*/i, '');
+    s = s.replace(/[\s  ']/g, '').replace(/^[€$+]/, '');
+    s = s.replace(/[^\d]+$/, ''); // Einheit und Satzzeichen am Ende
     if (s === '') return NaN;
     if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
     else if (/^-?[1-9]\d{0,2}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); // 1.250 = Tausenderpunkt; 0.125 und 3.5 = Punkt statt Komma
     return /^-?\d*\.?\d+$/.test(s) ? Number(s) : NaN;
+  }
+  // Zweite Lesart für „9.005“: Punkt als Komma (9,005) statt Tausenderpunkt (9005). Beide gelten, wenn eine zur Lösung passt.
+  function parseNumPunkt(s) { s = String(s).trim().replace(/[\s  ]/g, '').replace(/[^\d]+$/, ''); return /^-?\d{1,3}(\.\d{3})+$/.test(s) ? Number(s) : NaN; }
+  // Text, der neben dem Feld steht („x =“ davor, „^3 = 64“ oder „cm“ dahinter), darf mitgetippt sein.
+  function numRoh(raw, f) {
+    let s = String(raw).trim(); const eng = (x) => ohneTagsRoh(x).replace(/\s+/g, '');
+    const pre = eng(f.prefix), suf = eng(f.suffix), k = s.replace(/\s+/g, '');
+    if (suf && k.length > suf.length && k.toLowerCase().endsWith(suf.toLowerCase())) s = k.slice(0, k.length - suf.length);
+    const k2 = s.replace(/\s+/g, '');
+    if (pre && k2.length > pre.length && k2.toLowerCase().startsWith(pre.toLowerCase())) s = k2.slice(pre.length);
+    return s;
+  }
+  const ohneTagsRoh = (h) => String(h == null ? '' : h).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+  function parseNum(s) {
+    s = String(s);
+    if (!/[=≈]/.test(s)) return parseNumTeil(s);
+    const zahlen = s.split(/[=≈]/).map(parseNumTeil).filter((v) => !Number.isNaN(v));
+    return zahlen.length ? zahlen[zahlen.length - 1] : NaN;
   }
   // Primfaktoren: „2·2·3“, „2*2*3“, „2 2 3“ und auch mit Hochzahl „2²·3“ oder „2^2·3“.
   // Eine unlesbare Eingabe ergibt eine leere Liste (= falsch).
@@ -118,8 +140,51 @@
   // Groß- und Kleinschreibung zählt (außer f.ci), Leerzeichen am Rand und doppelte Leerzeichen nicht.
   const textAnswers = (f) => [].concat(f.answer).map(String);
   // Apostrophe gelten alle gleich: Das Handy tippt „’“ statt „'“ (don’t).
-  const normText = (s, f) => { s = String(s).trim().replace(/[’‘`´]/g, "'").replace(/\s+/g, ' ').replace(/[.!?]+$/, ''); return f.ci ? s.toLocaleLowerCase('de') : s; };
-  const textOk = (v, f) => textAnswers(f).some((a) => normText(a, f) === normText(v, f));
+  // Anführungszeichen außen herum und Satzzeichen am Ende zählen nicht; bei f.ci auch nicht Groß/klein und Bindestrich statt Leerzeichen.
+  const normText = (s, f) => {
+    s = String(s).trim().replace(/[’‘`´]/g, "'").replace(/^[„“”"«»]+|[„“”"«»]+$/g, '').replace(/\s+/g, ' ').replace(/[.!?,;:]+$/, '').trim();
+    return f.ci ? s.toLocaleLowerCase('de').replace(/\s*[-–]\s*/g, ' ') : s;
+  };
+  const ohneTags = (h) => String(h == null ? '' : h).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/[.!?,;:„“”"()→…]+/g, ' ').replace(/[‘’']/g, '').replace(/\s+/g, ' ').trim();
+  // Was ein Kind statt der reinen Antwort tippen kann (seit v128): die Wörter vor oder nach der Lücke mit dazu
+  // („du bleibst“ statt „bleibst“, der ganze Satz), bei Vokabeln einen Artikel oder „to“ davor (f.vor).
+  function textVarianten(v, f) {
+    const klein = (x) => x.toLocaleLowerCase('de'), out = [String(v)];
+    const rein = (w) => w.replace(/[.!?,;:()„“”"→…‘’']+/g, ''), woerter = (x) => x.trim().split(/\s+/).filter((w) => rein(w) !== '');
+    const pre = ohneTags(f.prefix).split(' ').filter(Boolean), suf = ohneTags(f.nach || f.suffix).split(' ').filter(Boolean); // f.nach: Rest des Satzes, der nicht neben dem Feld steht
+    const ab = (x, davor) => { // Wörter von vorn abschneiden, wenn sie das Ende von „davor“ sind
+      const w = woerter(x), res = [];
+      for (let k = 1; k <= Math.min(davor.length, w.length - 1); k++) if (davor.slice(-k).every((d, i) => klein(d) === klein(rein(w[i])))) res.push(w.slice(k).join(' '));
+      return res;
+    };
+    const hinten = (x, danach) => {
+      const w = woerter(x), res = [];
+      for (let k = 1; k <= Math.min(danach.length, w.length - 1); k++) if (danach.slice(0, k).every((d, i) => klein(d) === klein(rein(w[w.length - k + i])))) res.push(w.slice(0, w.length - k).join(' '));
+      return res;
+    };
+    for (const x of ab(out[0], pre)) out.push(x);
+    for (const x of out.slice()) for (const y of hinten(x, suf)) out.push(y);
+    if (f.vor) for (const x of out.slice()) { const w = x.trim().split(/\s+/); if (w.length > 1 && f.vor.includes(klein(w[0]))) out.push(w.slice(1).join(' ')); }
+    return out;
+  }
+  const textOk = (v, f) => { const A = textAnswers(f).map((a) => normText(a, f)); return textVarianten(v, f).some((x) => A.includes(normText(x, f))); };
+  // Fachwörter in den Sachfächern (f.tol): Ein einzelner Tippfehler oder ae/oe/ue/ss statt ä/ö/ü/ß gilt als richtig,
+  // dazu kommt ein Hinweis auf die genaue Schreibweise. Gibt das richtig geschriebene Wort zurück oder null.
+  const falten = (x) => x.toLocaleLowerCase('de').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[\s-]+/g, '');
+  function lev1(a, b) { // höchstens ein Buchstabe anders, zu viel, zu wenig oder zwei vertauscht
+    if (a === b) return true;
+    if (Math.abs(a.length - b.length) > 1) return false;
+    let i = 0; while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    if (a.length === b.length) return a.slice(i + 1) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+    const [k, l] = a.length < b.length ? [a, b] : [b, a];
+    return k.slice(i) === l.slice(i + 1);
+  }
+  function textFast(v, f) {
+    if (!f.tol) return null;
+    for (const x of textVarianten(v, f)) { const g = falten(normText(x, { ci: true }));
+      for (const a of textAnswers(f)) { const z = falten(a); if (z.length >= 5 && !/\d/.test(z) && lev1(g, z)) return a; } }
+    return null;
+  }
   const cleanTok = (s) => String(s).replace(/[.,!?:;„“"]+/g, '');
 
   function answerText(t) {
@@ -454,17 +519,18 @@
         const empty = els.find((el) => el && !el.value.trim()); if (empty) empty.focus();
         return;
       }
-      const vals = t.fields.map((f, i) => ('fixed' in f ? f.fixed : f.type === 'factors' ? parseFactors(raw[i]) : f.type === 'text' ? raw[i] : parseNum(raw[i])));
+      const vals = t.fields.map((f, i) => ('fixed' in f ? f.fixed : f.type === 'factors' ? parseFactors(raw[i]) : f.type === 'text' ? raw[i] : parseNum(numRoh(raw[i], f))));
       if (t.check) {
         const r = t.check(vals); ok = r.ok; note = r.note || '';
         if (!ok) wrongFields = els.map((_, i) => i);
       } else {
         t.fields.forEach((f, i) => {
           if ('fixed' in f) return;
-          const good = f.type === 'factors'
+          let good = f.type === 'factors'
             ? vals[i].length === f.answer.length && vals[i].every((v, k) => v === f.answer[k])
             : f.type === 'text' ? textOk(vals[i], f)
-            : near(vals[i], f.answer);
+            : near(vals[i], f.answer) || near(parseNumPunkt(numRoh(raw[i], f)), f.answer);
+          if (!good && f.type === 'text') { const fast = textFast(vals[i], f); if (fast) { good = true; note = `Genau geschrieben heißt es: <b>${fast}</b>`; } }
           // richtiges Wort, aber Groß- und Kleinschreibung stimmt nicht: eigener Hinweis
           if (!good && f.type === 'text' && !f.ci && textOk(vals[i], Object.assign({}, f, { ci: true }))) note = 'Achte auf die Groß- und Kleinschreibung.';
           if (!good) wrongFields.push(i);
