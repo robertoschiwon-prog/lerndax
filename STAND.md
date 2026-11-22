@@ -53,6 +53,12 @@ angenommen; die 35 Rest-Treffer sind Sonderzeichen-Fälle des Tests (z. B. Lück
 `tests/ui_varianten.py`: alle 41 Mathe-Themen in der echten Oberfläche mit Rechenweg, „=“ und Einheit getippt: 656 von 656 richtig.
 Dazu wie immer: `gen-test.js`, `ui2.py`, `prim.py`, `knobel.py`, `dedax.py 2`, `endax.py 2`, `biodax.py 2`, `gedax.py 2`, alle 0 Fehler.
 
+**Nachkontrolle (22.11.2026, spät, ohne Änderung an der App):** Stand auf GitHub = lokaler Stand (801be6e). Neuer Test
+`tests/prim_rechenweg.py`: tippt in der echten Oberfläche Primfaktoren in sieben richtigen Formen (darunter genau Brunos
+„2·14=2·2·7=2·2·7“) und vier falschen: 25 Eingaben, 0 Abweichungen. Zusätzlich `geodax.py 2` (660 Antworten), `tecdax.py 2` (636),
+`dedax_knobel.py`, Varianten-Test erneut: alles ohne Fehler. In `geodax.py` einen Fehlalarm des Tests behoben (suchte „4.5“ im
+Text, dort steht richtig „4,5“).
+
 **Grenze:** Geprüft ist die Schreibweise. Ob ein Kind ein anderes, ebenfalls richtiges Wort wählt (Synonym in den Sachfächern),
 lässt sich nicht automatisch finden; solche Meldungen bitte mit Foto, dann kommt das Wort in die Liste der Lösungen.
 
