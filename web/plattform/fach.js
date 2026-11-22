@@ -97,6 +97,11 @@
   const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
   function parseFactors(s) {
     s = String(s).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, (m) => '^' + [...m].map((c) => SUPS.indexOf(c)).join(''));
+    // Ganzer Rechenweg eingetippt, z. B. „28=2·14=2·2·7“ (seit v127)? Dann zählt der Teil mit den meisten Faktoren (bei Gleichstand der letzte).
+    if (s.includes('=')) {
+      const teile = s.split('=').map((x) => x.trim()).filter(Boolean), zahl = (x) => x.split(/[\s·*×xX.,;:+]+/).filter(Boolean).length;
+      s = teile.reduce((best, x) => (zahl(x) >= zahl(best) ? x : best), teile[0] || '');
+    }
     const out = [];
     for (const tok of s.split(/[\s·*×xX.,;:+]+/).filter(Boolean)) {
       const m = tok.match(/^(\d+)(?:\^(\d+))?$/);

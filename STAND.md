@@ -1,6 +1,6 @@
 # LernDax – Projektstand & Gedächtnis
 
-**Stand: 22.11.2026, Version `lerndax-v126`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
+**Stand: 22.11.2026, Version `lerndax-v127`** · **Zuerst Abschnitt 0 lesen (Übergabe).** Diese Datei ist das Gedächtnis des Projekts. Sie enthält alles, was in
 den Chats mit Claude besprochen, entschieden und gebaut wurde, damit ein neuer Chat (oder ein
 Mensch) ohne Vorwissen weitermachen kann.
 
@@ -21,6 +21,16 @@ Weitere Dokumente:
   dieses Repository öffentlich ist. Diese Datei hier bleibt deshalb bewusst neutral.
 
 ---
+
+## 0-neu-36. Primfaktoren: ganzer Rechenweg als Antwort erlaubt (lerndax-v127, 22.11.2026)
+
+Meldung von Roberto mit Fotos: Bei „Zerlege 28 in Primfaktoren“ war die Eingabe „2·14=2·2·7=2·2·7“ falsch, obwohl sie stimmt
+(so schreibt man es im Heft, und so steht es auch in „So geht’s“). Ursache: `parseFactors` in `web/plattform/fach.js` kannte kein
+Gleichheitszeichen. Jetzt gilt bei einer Eingabe mit „=“ der Teil mit den meisten Faktoren (bei Gleichstand der letzte):
+„28=2·14=2·2·7“, „2·14=2·2·7“, „2·2·7=28“ und „28=2²·7“ sind richtig; „28=2·14“ bleibt falsch (14 ist keine Primzahl).
+Gilt für alle Felder vom Typ `factors` (Thema Primzahlen und die Knobel-Aufgabe dazu).
+
+**Geprüft:** 12 Eingaben per Skript, `ui2.py`, `prim.py`, `knobel.py`.
 
 ## 0-neu-35. Mathe: Sachaufgaben – von der Geschichte zur Rechnung (lerndax-v126, 22.11.2026)
 
